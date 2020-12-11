@@ -1,0 +1,9 @@
+# Create quay-pull-secret as described in the readme first.
+---
+# Service account used by every pipeline
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cpaas-bot
+imagePullSecrets:
+  - name: quay-pull-secret

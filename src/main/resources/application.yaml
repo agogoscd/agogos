@@ -1,0 +1,45 @@
+kubernetes:
+  namespace: "curling"
+
+quarkus:
+  http:
+    port: 7070
+  index-dependency:
+    operatorsdk:
+      group-id: "io.javaoperatorsdk"
+      artifact-id: "operator-framework"
+
+  banner:
+    enabled: true
+    path: "banner.txt"
+
+#  native:
+#    additional-build-args: "-H:ReflectionConfigurationFiles=reflection-config.json"
+
+"%dev":
+  kubernetes:
+    namespace: "default"
+
+  quarkus:
+    log:
+      category:
+        "com.redhat.cpaas":
+          level: DEBUG
+        # "io.javaoperatorsdk":
+        #   level: DEBUG
+
+    kubernetes-client:
+      trust-certs: true
+
+"%prod":
+  quarkus:
+    log:
+      category:
+        "io.javaoperatorsdk.operator.processing":
+          level: WARN
+        "io.fabric8.kubernetes.client.informers.cache":
+          level: WARN
+
+    # TODO: change this
+    kubernetes-client:
+      trust-certs: true

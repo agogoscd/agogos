@@ -1,0 +1,8 @@
+apiVersion: cpaas.redhat.com/v1alpha1
+kind: Group
+metadata:
+  name: test
+spec:
+  components:
+    - "sample-container"
+    - "sample-rpm"

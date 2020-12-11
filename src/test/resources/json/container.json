@@ -1,0 +1,15 @@
+{
+  "data": {
+    "type": "container",
+    "description": "Some description",
+    "displayName": "Display name",
+    "hostLevelAccess": "unprivileged",
+    "imageType": "layered",
+    "summary": "Some summary",
+    "sourceRef": "cpaas-tp-1.7-rhel-7",
+    "sourceRepo": "rpms/cpaas-test-brew-rpm",
+    "target": "cpaas-tp-1.7-rhel-7-candidate"
+  },
+  "builder": "brew",
+  "name": "test-container"
+}

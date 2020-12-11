@@ -1,0 +1,65 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: service
+imagePullSecrets:
+  - name: quay-pull-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service
+spec:
+  ports:
+    - name: http
+      port: 7070
+      targetPort: 7070
+  type: ClusterIP
+  selector:
+    app: curling
+---
+# Give general "view" permission to the service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: factory-service-view
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: view
+subjects:
+  - kind: ServiceAccount
+    name: service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: curling-deployment
+  labels:
+    app: curling
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: curling
+  template:
+    metadata:
+      labels:
+        app: curling
+    spec:
+      containers:
+        - name: service
+          image: quay.io/redhat_emp1/curling:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 7070
+              name: http
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 7070
+            initialDelaySeconds: 3
+            periodSeconds: 3
+      serviceAccount: service

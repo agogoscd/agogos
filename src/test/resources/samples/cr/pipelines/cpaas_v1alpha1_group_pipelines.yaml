@@ -1,0 +1,8 @@
+apiVersion: cpaas.redhat.com/v1alpha1
+kind: Pipeline
+metadata:
+  name: test
+spec:
+  group: "test"
+  stages:
+    - "errata"
