@@ -1,5 +1,5 @@
 kubernetes:
-  namespace: "curling"
+  storage-class: ""
 
 quarkus:
   http:
@@ -18,7 +18,8 @@ quarkus:
 
 "%dev":
   kubernetes:
-    namespace: "default"
+    # Default storage class name in minikube
+    storage-class: "standard"
 
   quarkus:
     log:

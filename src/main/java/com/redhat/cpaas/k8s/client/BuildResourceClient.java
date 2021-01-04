@@ -16,7 +16,6 @@ import com.redhat.cpaas.k8s.model.BuildResource;
 import com.redhat.cpaas.k8s.model.BuildResource.BuildStatus;
 import com.redhat.cpaas.k8s.model.BuildResource.Status;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.ListOptions;
@@ -30,9 +29,6 @@ import io.fabric8.kubernetes.internal.KubernetesDeserializer;
 @ApplicationScoped
 public class BuildResourceClient {
     private static final Logger LOG = Logger.getLogger(BuildResourceClient.class);
-
-    @ConfigProperty(name = "kubernetes.namespace")
-    String namespace;
 
     @Inject
     KubernetesClient kubernetesClient;
@@ -55,8 +51,7 @@ public class BuildResourceClient {
                 .build();
 
         buildClient = kubernetesClient
-                .customResources(context, BuildResource.class, BuildResourceList.class, BuildResourceDoneable.class)
-                .inNamespace(namespace);
+                .customResources(context, BuildResource.class, BuildResourceList.class, BuildResourceDoneable.class);
     }
 
     public BuildResource updateStatus(final BuildResource build, Status status, String reason) {

@@ -4,11 +4,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import com.redhat.cpaas.ApplicationException;
-import com.redhat.cpaas.k8s.PlatformOperator;
 import com.redhat.cpaas.k8s.client.ComponentResourceClient;
 import com.redhat.cpaas.k8s.client.TektonResourceClient;
 import com.redhat.cpaas.k8s.model.ComponentResource;
@@ -24,7 +22,6 @@ import io.javaoperatorsdk.operator.api.DeleteControl;
 import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
 import io.javaoperatorsdk.operator.processing.event.internal.CustomResourceEvent;
-import io.quarkus.runtime.StartupEvent;
 
 @ApplicationScoped
 @Controller(crdName = "components.cpaas.redhat.com")
@@ -40,13 +37,6 @@ public class ComponentController implements ResourceController<ComponentResource
 
     @Inject
     TektonResourceClient tektonResourceClient;
-
-    @Inject
-    PlatformOperator operator;
-
-    void onStart(@Observes StartupEvent ev) {
-        operator.registerController(this);
-    }
 
     private void setStatus(ComponentResource component, Status status, String reason) {
         ComponentStatus componentStatus = component.getStatus();

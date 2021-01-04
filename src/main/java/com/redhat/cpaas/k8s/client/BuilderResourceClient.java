@@ -10,8 +10,6 @@ import javax.inject.Inject;
 import com.redhat.cpaas.k8s.model.BuilderResource;
 import com.redhat.cpaas.model.Builder;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -23,9 +21,6 @@ import io.fabric8.tekton.client.TektonClient;
 
 @ApplicationScoped
 public class BuilderResourceClient {
-    @ConfigProperty(name = "kubernetes.namespace")
-    String namespace;
-
     @Inject
     KubernetesClient kubernetesApiClient;
 
@@ -46,7 +41,7 @@ public class BuilderResourceClient {
                 .withVersion("v1alpha1").withPlural("builders").build();
 
         builderResourceClient = kubernetesApiClient.customResources(context, BuilderResource.class,
-                BuilderResourceList.class, BuilderResourceDoneable.class).inNamespace(namespace);
+                BuilderResourceList.class, BuilderResourceDoneable.class);
     }
 
     public List<Builder> list() {

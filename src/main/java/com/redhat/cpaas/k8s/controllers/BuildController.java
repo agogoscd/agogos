@@ -7,12 +7,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import com.redhat.cpaas.ApplicationException;
 import com.redhat.cpaas.MissingResourceException;
-import com.redhat.cpaas.k8s.PlatformOperator;
 import com.redhat.cpaas.k8s.client.BuildResourceClient;
 import com.redhat.cpaas.k8s.client.ComponentResourceClient;
 import com.redhat.cpaas.k8s.client.TektonResourceClient;
@@ -32,7 +30,6 @@ import io.javaoperatorsdk.operator.api.DeleteControl;
 import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
 import io.javaoperatorsdk.operator.processing.event.EventSourceManager;
-import io.quarkus.runtime.StartupEvent;
 
 @ApplicationScoped
 @Controller(crdName = "builds.cpaas.redhat.com", generationAwareEventProcessing = false)
@@ -55,14 +52,7 @@ public class BuildController implements ResourceController<BuildResource> {
     TektonResourceClient tektonResourceClient;
 
     @Inject
-    PlatformOperator operator;
-
-    @Inject
     PipelineRunEventSource pipelineRunEventSource;
-
-    void onStart(@Observes StartupEvent ev) {
-        operator.registerController(this);
-    }
 
     private boolean hasLabels(BuildResource build) {
         Map<String, String> labels = build.getMetadata().getLabels();

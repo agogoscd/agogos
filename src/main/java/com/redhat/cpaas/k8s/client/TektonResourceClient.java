@@ -54,8 +54,8 @@ import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBindingBuilder;
 public class TektonResourceClient {
     public static String CPAAS_SA_NAME = "service";
 
-    @ConfigProperty(name = "kubernetes.namespace")
-    String namespace;
+    @ConfigProperty(name = "kubernetes.storage-class")
+    String storageClass;
 
     @Inject
     KubernetesClient kubernetesClient;
@@ -137,7 +137,7 @@ public class TektonResourceClient {
         PersistentVolumeClaim pvc = new PersistentVolumeClaimBuilder() //
                 .withNewSpec() //
                 .withNewResources().withRequests(requests).endResources() //
-                .withStorageClassName("") //
+                .withStorageClassName(storageClass) //
                 .withAccessModes("ReadWriteOnce") //
                 .endSpec()//
                 .build();
@@ -178,7 +178,8 @@ public class TektonResourceClient {
                 .endSpec() //
                 .build();
 
-        return tektonClient.v1beta1().pipelineRuns().inNamespace(namespace).create(pipelineRun);
+        return tektonClient.v1beta1().pipelineRuns().inNamespace(build.getMetadata().getNamespace())
+                .create(pipelineRun);
     }
 
     public Pipeline createPipeline(ComponentResource component) throws ApplicationException {
@@ -284,6 +285,7 @@ public class TektonResourceClient {
                 .endSpec() //
                 .build();
 
-        return tektonClient.v1beta1().pipelines().inNamespace(namespace).createOrReplace(pipeline);
+        return tektonClient.v1beta1().pipelines().inNamespace(component.getMetadata().getNamespace())
+                .createOrReplace(pipeline);
     }
 }

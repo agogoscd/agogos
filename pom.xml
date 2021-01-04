@@ -70,13 +70,13 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
+            <version>1.18.16</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.openapi4j</groupId>
             <artifactId>openapi-schema-validator</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.5</version>
         </dependency>
         <dependency>
             <groupId>io.javaoperatorsdk</groupId>

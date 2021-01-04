@@ -6,8 +6,6 @@ import javax.inject.Inject;
 
 import com.redhat.cpaas.k8s.controllers.PipelineRunEventSource;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.base.OperationContext;
 import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
@@ -18,9 +16,6 @@ import io.quarkus.runtime.StartupEvent;
 
 @ApplicationScoped
 public class KubernetesInformerManager {
-    @ConfigProperty(name = "kubernetes.namespace")
-    String namespace;
-
     @Inject
     KubernetesClient kubernetesClient;
 
@@ -28,7 +23,7 @@ public class KubernetesInformerManager {
     PipelineRunEventSource pipelineRunEventSource;
 
     void onStart(@Observes StartupEvent ev) {
-        OperationContext operationContext = new OperationContext().withNamespace(namespace);
+        OperationContext operationContext = new OperationContext();
 
         SharedInformerFactory sharedInformerFactory = kubernetesClient.informers();
 

@@ -19,7 +19,6 @@ import com.redhat.cpaas.k8s.model.ComponentResource.ComponentStatus;
 import com.redhat.cpaas.model.Builder;
 import com.redhat.cpaas.model.Component;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 import org.openapi4j.core.exception.ResolutionException;
 import org.openapi4j.schema.validator.ValidationData;
@@ -36,8 +35,6 @@ import io.fabric8.kubernetes.internal.KubernetesDeserializer;
 @Singleton
 public class ComponentResourceClient {
     private static final Logger LOG = Logger.getLogger(ComponentResourceClient.class);
-    @ConfigProperty(name = "kubernetes.namespace")
-    String namespace;
 
     @Inject
     KubernetesClient kubernetesClient;
@@ -64,7 +61,7 @@ public class ComponentResourceClient {
                 .build();
 
         componentClient = kubernetesClient.customResources(context, ComponentResource.class,
-                ComponentResourceList.class, ComponentResourceDoneable.class).inNamespace(namespace);
+                ComponentResourceList.class, ComponentResourceDoneable.class);
     }
 
     public List<ComponentResource> list() {
