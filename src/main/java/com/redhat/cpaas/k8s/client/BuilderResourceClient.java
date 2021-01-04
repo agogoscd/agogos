@@ -8,6 +8,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.redhat.cpaas.k8s.model.BuilderResource;
+import com.redhat.cpaas.k8s.model.BuilderResourceDoneable;
+import com.redhat.cpaas.k8s.model.BuilderResourceList;
 import com.redhat.cpaas.model.Builder;
 
 import io.fabric8.kubernetes.api.model.ListOptions;

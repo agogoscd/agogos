@@ -16,6 +16,8 @@ import com.redhat.cpaas.MissingResourceException;
 import com.redhat.cpaas.ValidationException;
 import com.redhat.cpaas.k8s.model.ComponentResource;
 import com.redhat.cpaas.k8s.model.ComponentResource.ComponentStatus;
+import com.redhat.cpaas.k8s.model.ComponentResourceDoneable;
+import com.redhat.cpaas.k8s.model.ComponentResourceList;
 import com.redhat.cpaas.model.Builder;
 import com.redhat.cpaas.model.Component;
 

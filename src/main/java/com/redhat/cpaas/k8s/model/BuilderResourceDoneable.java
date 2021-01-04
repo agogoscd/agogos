@@ -1,6 +1,4 @@
-package com.redhat.cpaas.k8s.client;
-
-import com.redhat.cpaas.k8s.model.BuilderResource;
+package com.redhat.cpaas.k8s.model;
 
 import io.fabric8.kubernetes.api.builder.Function;
 import io.fabric8.kubernetes.client.CustomResourceDoneable;

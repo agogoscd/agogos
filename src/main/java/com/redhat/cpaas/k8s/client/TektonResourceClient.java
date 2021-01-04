@@ -54,7 +54,7 @@ import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBindingBuilder;
 public class TektonResourceClient {
     public static String CPAAS_SA_NAME = "service";
 
-    @ConfigProperty(name = "kubernetes.storage-class")
+    @ConfigProperty(name = "kubernetes.storage-class", defaultValue = "")
     String storageClass;
 
     @Inject

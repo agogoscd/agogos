@@ -15,6 +15,8 @@ import com.redhat.cpaas.MissingResourceException;
 import com.redhat.cpaas.k8s.model.BuildResource;
 import com.redhat.cpaas.k8s.model.BuildResource.BuildStatus;
 import com.redhat.cpaas.k8s.model.BuildResource.Status;
+import com.redhat.cpaas.k8s.model.BuildResourceDoneable;
+import com.redhat.cpaas.k8s.model.BuildResourceList;
 
 import org.jboss.logging.Logger;
 

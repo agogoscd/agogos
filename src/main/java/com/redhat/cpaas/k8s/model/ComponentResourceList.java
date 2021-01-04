@@ -1,7 +1,6 @@
-package com.redhat.cpaas.k8s.client;
+package com.redhat.cpaas.k8s.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.redhat.cpaas.k8s.model.ComponentResource;
 
 import io.fabric8.kubernetes.client.CustomResourceList;
 import io.quarkus.runtime.annotations.RegisterForReflection;
