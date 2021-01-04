@@ -7,7 +7,7 @@ quarkus:
   index-dependency:
     operatorsdk:
       group-id: "io.javaoperatorsdk"
-      artifact-id: "operator-framework"
+      artifact-id: "operator-framework-core"
 
   banner:
     enabled: true

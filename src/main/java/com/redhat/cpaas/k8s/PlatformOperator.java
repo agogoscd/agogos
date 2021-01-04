@@ -10,6 +10,7 @@ import org.jboss.logging.Logger;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.javaoperatorsdk.operator.Operator;
 import io.javaoperatorsdk.operator.api.ResourceController;
+import io.javaoperatorsdk.operator.config.runtime.DefaultConfigurationService;
 
 @ApplicationScoped
 public class PlatformOperator {
@@ -25,7 +26,7 @@ public class PlatformOperator {
 
     @PostConstruct
     void init() {
-        operator = new Operator(kubernetesClient);
+        operator = new Operator(kubernetesClient, DefaultConfigurationService.instance());
     }
 
     public void registerController(ResourceController controller) {
