@@ -5,16 +5,25 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.redhat.cpaas.k8s.model.StageResource.StageSpec;
 
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.client.CustomResource;
+import io.fabric8.kubernetes.model.annotation.Group;
+import io.fabric8.kubernetes.model.annotation.Kind;
+import io.fabric8.kubernetes.model.annotation.Version;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-public class StageResource extends CustomResource implements Namespaced {
+@ToString
+@RegisterForReflection
+@Kind("Stage")
+@Group("cpaas.redhat.com")
+@Version("v1alpha1")
+public class StageResource extends CustomResource<StageSpec, Void> implements Namespaced {
 
     private static final long serialVersionUID = 1191367775606383094L;
     public static final String KIND = "Stage";
@@ -40,10 +49,6 @@ public class StageResource extends CustomResource implements Namespaced {
         @Setter
         private Schema schema = new Schema();
 
-    }
-
-    StageResource() {
-        super(KIND);
     }
 
     @Getter

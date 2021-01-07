@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.redhat.cpaas.k8s.client.TektonResourceClient;
@@ -36,8 +35,7 @@ import io.javaoperatorsdk.operator.api.DeleteControl;
 import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
 
-@ApplicationScoped
-@Controller(crdName = "pipelineruns.cpaas.redhat.com")
+@Controller
 public class PipelineRunController implements ResourceController<PipelineRunResource> {
 
     private static final Logger LOG = Logger.getLogger(PipelineRunController.class);

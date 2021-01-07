@@ -15,7 +15,6 @@ import com.redhat.cpaas.MissingResourceException;
 import com.redhat.cpaas.k8s.model.BuildResource;
 import com.redhat.cpaas.k8s.model.BuildResource.BuildStatus;
 import com.redhat.cpaas.k8s.model.BuildResource.Status;
-import com.redhat.cpaas.k8s.model.BuildResourceDoneable;
 import com.redhat.cpaas.k8s.model.BuildResourceList;
 
 import org.jboss.logging.Logger;
@@ -23,10 +22,9 @@ import org.jboss.logging.Logger;
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
+import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
-import io.fabric8.kubernetes.internal.KubernetesDeserializer;
 
 @ApplicationScoped
 public class BuildResourceClient {
@@ -38,11 +36,12 @@ public class BuildResourceClient {
     @Inject
     ObjectMapper objectMapper;
 
-    NonNamespaceOperation<BuildResource, BuildResourceList, BuildResourceDoneable, Resource<BuildResource, BuildResourceDoneable>> buildClient;
+    MixedOperation<BuildResource, BuildResourceList, Resource<BuildResource>> buildClient;
 
     @PostConstruct
     void init() {
-        KubernetesDeserializer.registerCustomKind("cpaas.redhat.com/v1alpha1", BuildResource.KIND, BuildResource.class);
+        // KubernetesDeserializer.registerCustomKind("cpaas.redhat.com/v1alpha1",
+        //         CustomResource.getCRDName(BuildResource.class), BuildResource.class);
 
         final CustomResourceDefinitionContext context = new CustomResourceDefinitionContext.Builder()
                 .withName("builds.cpaas.redhat.com") //
@@ -52,8 +51,7 @@ public class BuildResourceClient {
                 .withPlural("builds") //
                 .build();
 
-        buildClient = kubernetesClient
-                .customResources(context, BuildResource.class, BuildResourceList.class, BuildResourceDoneable.class);
+        buildClient = kubernetesClient.customResources(context, BuildResource.class, BuildResourceList.class);
     }
 
     public BuildResource updateStatus(final BuildResource build, Status status, String reason) {

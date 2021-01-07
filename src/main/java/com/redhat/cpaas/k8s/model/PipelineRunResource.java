@@ -2,10 +2,15 @@ package com.redhat.cpaas.k8s.model;
 
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.redhat.cpaas.k8s.model.PipelineRunResource.RunSpec;
+import com.redhat.cpaas.k8s.model.PipelineRunResource.RunStatus;
 
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.client.CustomResource;
+import io.fabric8.kubernetes.model.annotation.Group;
+import io.fabric8.kubernetes.model.annotation.Kind;
+import io.fabric8.kubernetes.model.annotation.Version;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +18,10 @@ import lombok.ToString;
 
 @ToString
 @RegisterForReflection
-public class PipelineRunResource extends CustomResource implements Namespaced {
+@Kind("PipelineRun")
+@Group("cpaas.redhat.com")
+@Version("v1alpha1")
+public class PipelineRunResource extends CustomResource<RunSpec, RunStatus> implements Namespaced {
     private static final long serialVersionUID = 6688424087008846788L;
 
     public static String KIND = "PipelineRun";
@@ -47,10 +55,6 @@ public class PipelineRunResource extends CustomResource implements Namespaced {
         @Getter
         @Setter
         private String pipeline;
-    }
-
-    public PipelineRunResource() {
-        this.setKind(KIND);
     }
 
     @Getter

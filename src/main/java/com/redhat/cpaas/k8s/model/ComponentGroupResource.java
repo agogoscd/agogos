@@ -5,10 +5,14 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.redhat.cpaas.k8s.model.ComponentGroupResource.ComponentGroupResourceSpec;
 
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.client.CustomResource;
+import io.fabric8.kubernetes.model.annotation.Group;
+import io.fabric8.kubernetes.model.annotation.Kind;
+import io.fabric8.kubernetes.model.annotation.Version;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +20,10 @@ import lombok.ToString;
 
 @ToString
 @RegisterForReflection
-public class ComponentGroupResource extends CustomResource implements Namespaced {
+@Kind("Group")
+@Group("cpaas.redhat.com")
+@Version("v1alpha1")
+public class ComponentGroupResource extends CustomResource<ComponentGroupResourceSpec, Void> implements Namespaced {
     @ToString
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
@@ -31,10 +38,6 @@ public class ComponentGroupResource extends CustomResource implements Namespaced
     private static final long serialVersionUID = -7092342726608099745L;
 
     public static String KIND = "Group";
-
-    public ComponentGroupResource() {
-        this.setKind(KIND);
-    }
 
     @Getter
     @Setter

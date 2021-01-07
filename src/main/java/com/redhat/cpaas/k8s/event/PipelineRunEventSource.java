@@ -1,4 +1,4 @@
-package com.redhat.cpaas.k8s.controllers;
+package com.redhat.cpaas.k8s.event;
 
 import java.util.List;
 
@@ -8,6 +8,7 @@ import com.redhat.cpaas.k8s.model.BuildResource;
 
 import org.jboss.logging.Logger;
 
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
@@ -40,10 +41,9 @@ public class PipelineRunEventSource extends AbstractEventSource implements Resou
             return null;
         }
 
-        // TODO: Handle API version!
         for (OwnerReference owner : owners) {
-            if (owner.getApiVersion().equals("cpaas.redhat.com/v1alpha1")
-                    && owner.getKind().equals(BuildResource.KIND)) {
+            if (owner.getApiVersion().equals(HasMetadata.getApiVersion(BuildResource.class))
+                    && owner.getKind().equals(HasMetadata.getKind(BuildResource.class))) {
                 return owner.getUid();
             }
         }

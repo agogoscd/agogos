@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -34,8 +33,7 @@ import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
 import io.javaoperatorsdk.operator.processing.event.internal.CustomResourceEvent;
 
-@ApplicationScoped
-@Controller(crdName = "components.cpaas.redhat.com")
+@Controller
 public class ComponentController implements ResourceController<ComponentResource> {
 
     private static final Logger LOG = Logger.getLogger(ComponentController.class);

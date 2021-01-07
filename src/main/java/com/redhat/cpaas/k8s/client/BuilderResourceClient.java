@@ -7,13 +7,13 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.redhat.cpaas.k8s.model.BuilderResource;
-import com.redhat.cpaas.k8s.model.BuilderResourceDoneable;
 import com.redhat.cpaas.k8s.model.BuilderResourceList;
 
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
+import io.fabric8.kubernetes.client.CustomResource;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
+import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
 import io.fabric8.kubernetes.internal.KubernetesDeserializer;
@@ -27,12 +27,7 @@ public class BuilderResourceClient {
     @Inject
     TektonClient tektonApiClient;
 
-    NonNamespaceOperation<BuilderResource, BuilderResourceList, BuilderResourceDoneable, Resource<BuilderResource, BuilderResourceDoneable>> builderResourceClient;
-
-    BuilderResourceClient() {
-        KubernetesDeserializer.registerCustomKind("cpaas.redhat.com/v1alpha1", BuilderResource.KIND,
-                BuilderResource.class);
-    }
+    MixedOperation<BuilderResource, BuilderResourceList, Resource<BuilderResource>> builderResourceClient;
 
     @PostConstruct
     void init() {
@@ -41,7 +36,7 @@ public class BuilderResourceClient {
                 .withVersion("v1alpha1").withPlural("builders").build();
 
         builderResourceClient = kubernetesApiClient.customResources(context, BuilderResource.class,
-                BuilderResourceList.class, BuilderResourceDoneable.class);
+                BuilderResourceList.class);
     }
 
     public List<BuilderResource> list() {

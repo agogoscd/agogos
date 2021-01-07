@@ -1,4 +1,4 @@
-package com.redhat.cpaas.k8s.controllers;
+package com.redhat.cpaas.k8s.event;
 
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRunStatus;

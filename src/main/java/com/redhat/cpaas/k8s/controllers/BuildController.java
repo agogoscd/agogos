@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.redhat.cpaas.ApplicationException;
@@ -14,6 +13,8 @@ import com.redhat.cpaas.MissingResourceException;
 import com.redhat.cpaas.k8s.client.BuildResourceClient;
 import com.redhat.cpaas.k8s.client.ComponentResourceClient;
 import com.redhat.cpaas.k8s.client.TektonResourceClient;
+import com.redhat.cpaas.k8s.event.PipelineRunEvent;
+import com.redhat.cpaas.k8s.event.PipelineRunEventSource;
 import com.redhat.cpaas.k8s.model.BuildResource;
 import com.redhat.cpaas.k8s.model.BuildResource.BuildStatus;
 import com.redhat.cpaas.k8s.model.BuildResource.Status;
@@ -31,8 +32,7 @@ import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
 import io.javaoperatorsdk.operator.processing.event.EventSourceManager;
 
-@ApplicationScoped
-@Controller(crdName = "builds.cpaas.redhat.com", generationAwareEventProcessing = false)
+@Controller(generationAwareEventProcessing = false)
 public class BuildController implements ResourceController<BuildResource> {
 
     private static final Logger LOG = Logger.getLogger(BuildController.class);

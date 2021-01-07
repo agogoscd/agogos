@@ -13,7 +13,6 @@ import com.redhat.cpaas.ApplicationException;
 import com.redhat.cpaas.MissingResourceException;
 import com.redhat.cpaas.k8s.model.ComponentResource;
 import com.redhat.cpaas.k8s.model.ComponentResource.ComponentStatus;
-import com.redhat.cpaas.k8s.model.ComponentResourceDoneable;
 import com.redhat.cpaas.k8s.model.ComponentResourceList;
 import com.redhat.cpaas.model.Component;
 
@@ -22,7 +21,7 @@ import org.jboss.logging.Logger;
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
+import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
 import io.fabric8.kubernetes.internal.KubernetesDeserializer;
@@ -40,12 +39,12 @@ public class ComponentResourceClient {
     @Inject
     ObjectMapper objectMapper;
 
-    NonNamespaceOperation<ComponentResource, ComponentResourceList, ComponentResourceDoneable, Resource<ComponentResource, ComponentResourceDoneable>> componentClient;
+    MixedOperation<ComponentResource, ComponentResourceList, Resource<ComponentResource>>  componentClient;
 
     @PostConstruct
     void init() {
-        KubernetesDeserializer.registerCustomKind("cpaas.redhat.com/v1alpha1", ComponentResource.KIND,
-                ComponentResource.class);
+        // KubernetesDeserializer.registerCustomKind("cpaas.redhat.com/v1alpha1", ComponentResource.KIND,
+        //         ComponentResource.class);
 
         final CustomResourceDefinitionContext context = new CustomResourceDefinitionContext.Builder()
                 .withName("components.cpaas.redhat.com") //
@@ -56,7 +55,7 @@ public class ComponentResourceClient {
                 .build();
 
         componentClient = kubernetesClient.customResources(context, ComponentResource.class,
-                ComponentResourceList.class, ComponentResourceDoneable.class);
+                ComponentResourceList.class);
     }
 
     public List<ComponentResource> list() {

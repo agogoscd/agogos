@@ -7,10 +7,14 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.redhat.cpaas.k8s.model.PipelineResource.PipelineSpec;
 
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.client.CustomResource;
+import io.fabric8.kubernetes.model.annotation.Group;
+import io.fabric8.kubernetes.model.annotation.Kind;
+import io.fabric8.kubernetes.model.annotation.Version;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +22,10 @@ import lombok.ToString;
 
 @ToString
 @RegisterForReflection
-public class PipelineResource extends CustomResource implements Namespaced {
+@Kind("Pipeline")
+@Group("cpaas.redhat.com")
+@Version("v1alpha1")
+public class PipelineResource extends CustomResource<PipelineSpec, Void> implements Namespaced {
 
     public static final String KIND = "Pipeline";
     private static final long serialVersionUID = 4918853237265675286L;
@@ -53,10 +60,6 @@ public class PipelineResource extends CustomResource implements Namespaced {
         @Setter
         private List<StageReference> stages = new ArrayList<>();
 
-    }
-
-    PipelineResource() {
-        super(KIND);
     }
 
     @Getter

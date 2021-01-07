@@ -6,11 +6,16 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.redhat.cpaas.k8s.model.ComponentResource.ComponentSpec;
+import com.redhat.cpaas.k8s.model.ComponentResource.ComponentStatus;
 import com.redhat.cpaas.model.Component;
 
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.client.CustomResource;
+import io.fabric8.kubernetes.model.annotation.Group;
+import io.fabric8.kubernetes.model.annotation.Kind;
+import io.fabric8.kubernetes.model.annotation.Version;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,9 +23,10 @@ import lombok.ToString;
 
 @ToString
 @RegisterForReflection
-public class ComponentResource extends CustomResource implements Namespaced {
-    public static String KIND = "Component";
-
+@Kind("Component")
+@Group("cpaas.redhat.com")
+@Version("v1alpha1")
+public class ComponentResource extends CustomResource<ComponentSpec, ComponentStatus> implements Namespaced {
     public enum Status {
         New, Initializing, Ready, Failed;
     }
@@ -66,11 +72,11 @@ public class ComponentResource extends CustomResource implements Namespaced {
     }
 
     public ComponentResource() {
-        super(KIND);
+        super();
     }
 
     public ComponentResource(Component component) {
-        super(KIND);
+        super();
 
         this.getMetadata().setName(component.getName());
         this.getSpec().getData().putAll(component.getData());

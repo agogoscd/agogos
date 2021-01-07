@@ -3,7 +3,6 @@ package com.redhat.cpaas.k8s.controllers;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -32,8 +31,7 @@ import io.javaoperatorsdk.operator.api.DeleteControl;
 import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
 
-@ApplicationScoped
-@Controller(crdName = "pipelines.cpaas.redhat.com")
+@Controller
 public class PipelineController implements ResourceController<PipelineResource> {
 
     private static final Logger LOG = Logger.getLogger(PipelineController.class);
