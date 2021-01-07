@@ -2,11 +2,8 @@ quarkus:
   http:
     port: 7070
   log:
-    # console:
-    #   format: "%d{HH:mm:ss} %-5p [%c] (%t) %s%e%n"
     syslog:
       truncate: false
-    # level: DEBUG
   index-dependency:
     operatorsdk:
       group-id: "io.javaoperatorsdk"
@@ -26,8 +23,6 @@ quarkus:
       category:
         "com.redhat.cpaas":
           level: DEBUG
-        # "io.javaoperatorsdk":
-        #   level: DEBUG
 
     kubernetes-client:
       trust-certs: true
