@@ -1,6 +1,12 @@
 quarkus:
   http:
     port: 7070
+  log:
+    # console:
+    #   format: "%d{HH:mm:ss} %-5p [%c] (%t) %s%e%n"
+    syslog:
+      truncate: false
+    # level: DEBUG
   index-dependency:
     operatorsdk:
       group-id: "io.javaoperatorsdk"
@@ -9,9 +15,6 @@ quarkus:
   banner:
     enabled: true
     path: "banner.txt"
-
-#  native:
-#    additional-build-args: "-H:ReflectionConfigurationFiles=reflection-config.json"
 
 "%dev":
   kubernetes:
@@ -31,12 +34,12 @@ quarkus:
 
 "%prod":
   quarkus:
-    log:
-      category:
-        "io.javaoperatorsdk.operator.processing":
-          level: WARN
-        "io.fabric8.kubernetes.client.informers.cache":
-          level: WARN
+    # log:
+    #   category:
+    #     "io.javaoperatorsdk.operator.processing":
+    #       level: WARN
+    #     "io.fabric8.kubernetes.client.informers.cache":
+    #       level: WARN
 
     # TODO: change this
     kubernetes-client:

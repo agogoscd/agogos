@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.cpaas.model.Builder;
 
+import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.client.CustomResource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
@@ -25,9 +28,11 @@ public class BuilderResource extends CustomResource implements Namespaced {
         private Map<Object, Object> openAPIV3Schema = new HashMap<>();
     }
 
-    // @JsonIgnoreProperties(value = { "schema" })
+    @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
-    public static class BuilderSpec {
+    public static class BuilderSpec implements KubernetesResource {
+        private static final long serialVersionUID = -3961879962688290544L;
+
         @Getter
         @Setter
         private String task;
@@ -40,14 +45,14 @@ public class BuilderResource extends CustomResource implements Namespaced {
     }
 
     public BuilderResource() {
-        this.setKind(KIND);
+        super(KIND);
     }
 
     public BuilderResource(Builder builder) {
+        super(KIND);
         // HashMap<String, String> annotations = new HashMap<>();
         // annotations.put("status", builder.getStatus().toString());
 
-        this.setKind(KIND);
         this.getMetadata().setName(builder.getName());
         // this.getMetadata().setAnnotations(annotations);
         this.getSpec().setTask(builder.getTask());
@@ -55,6 +60,7 @@ public class BuilderResource extends CustomResource implements Namespaced {
     }
 
     @Getter
+    @Setter
     private BuilderSpec spec = new BuilderSpec();
 
 }

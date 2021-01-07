@@ -28,8 +28,6 @@ public class PlatformOperator {
 
     void onStart(@Observes StartupEvent ev) {
         LOG.info("Starting operator");
-
-        System.out.println(operator.getCustomResourceClients());;
     }
 
     void onStop(@Observes ShutdownEvent ev) {

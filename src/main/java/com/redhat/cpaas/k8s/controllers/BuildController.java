@@ -215,7 +215,6 @@ public class BuildController implements ResourceController<BuildResource> {
 
     public UpdateControl<BuildResource> onEvent(BuildResource resource, Context<BuildResource> context) {
         LOG.info(resource);
-        System.out.println("ON EVENT!");
         return UpdateControl.noUpdate();
     }
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -54,8 +55,8 @@ import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBindingBuilder;
 public class TektonResourceClient {
     public static String CPAAS_SA_NAME = "service";
 
-    @ConfigProperty(name = "kubernetes.storage-class", defaultValue = "")
-    String storageClass;
+    @ConfigProperty(name = "kubernetes.storage-class")
+    Optional<String> storageClass;
 
     @Inject
     KubernetesClient kubernetesClient;
@@ -134,10 +135,18 @@ public class TektonResourceClient {
         Map<String, Quantity> requests = new HashMap<String, Quantity>();
         requests.put("storage", new Quantity("1Gi"));
 
+        String storageClassName;
+
+        if (storageClass.isPresent()) {
+            storageClassName = storageClass.get();
+        } else {
+            storageClassName = "";
+        }
+
         PersistentVolumeClaim pvc = new PersistentVolumeClaimBuilder() //
                 .withNewSpec() //
                 .withNewResources().withRequests(requests).endResources() //
-                .withStorageClassName(storageClass) //
+                .withStorageClassName(storageClassName) //
                 .withAccessModes("ReadWriteOnce") //
                 .endSpec()//
                 .build();
