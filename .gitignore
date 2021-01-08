@@ -4,6 +4,8 @@
 .settings/
 bin/
 
+.mvn
+
 # IntelliJ
 .idea
 *.ipr

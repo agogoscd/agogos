@@ -3,28 +3,21 @@ package com.redhat.cpaas.k8s.client;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.cpaas.ApplicationException;
 import com.redhat.cpaas.MissingResourceException;
-import com.redhat.cpaas.ValidationException;
 import com.redhat.cpaas.k8s.model.ComponentResource;
 import com.redhat.cpaas.k8s.model.ComponentResource.ComponentStatus;
 import com.redhat.cpaas.k8s.model.ComponentResourceDoneable;
 import com.redhat.cpaas.k8s.model.ComponentResourceList;
-import com.redhat.cpaas.model.Builder;
 import com.redhat.cpaas.model.Component;
 
 import org.jboss.logging.Logger;
-import org.openapi4j.core.exception.ResolutionException;
-import org.openapi4j.schema.validator.ValidationData;
-import org.openapi4j.schema.validator.v3.SchemaValidator;
 
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
@@ -93,35 +86,6 @@ public class ComponentResourceClient {
     }
 
     public ComponentResource create(final Component component) throws ApplicationException {
-        Builder builder = builderResourceClient.getByName(component.getBuilder());
-
-        if (builder == null) {
-            throw new MissingResourceException(
-                    String.format("Selected builder '%s' is not registered in the system", component.getBuilder()));
-        }
-
-        ValidationData<Void> validation = new ValidationData<>();
-
-        JsonNode schemaNode = objectMapper.valueToTree(builder.getSchema());
-        JsonNode contentNode = objectMapper.valueToTree(component.getData());
-
-        SchemaValidator schemaValidator;
-
-        try {
-            schemaValidator = new SchemaValidator(null, schemaNode);
-        } catch (ResolutionException e) {
-            e.printStackTrace();
-            throw new ApplicationException("Could not instantiate validator", e);
-        }
-
-        schemaValidator.validate(contentNode, validation);
-
-        if (!validation.isValid()) {
-            List<String> errorMessages = validation.results().items().stream()
-                    .map(item -> item.message().replaceAll("\\.+$", "")).collect(Collectors.toList());
-            throw new ValidationException("Component definition is not valid", errorMessages);
-        }
-
         return componentClient.createOrReplace(new ComponentResource(component));
     }
 

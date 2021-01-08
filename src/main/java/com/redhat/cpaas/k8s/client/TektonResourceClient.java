@@ -14,8 +14,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.cpaas.ApplicationException;
 import com.redhat.cpaas.MissingResourceException;
 import com.redhat.cpaas.k8s.model.BuildResource;
+import com.redhat.cpaas.k8s.model.BuilderResource;
 import com.redhat.cpaas.k8s.model.ComponentResource;
-import com.redhat.cpaas.model.Builder;
 import com.redhat.cpaas.model.Component;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -193,7 +193,8 @@ public class TektonResourceClient {
 
     public Pipeline createPipeline(ComponentResource component) throws ApplicationException {
         // Find the builder defined by the component
-        Builder builder = builderResourceClient.getByName(component.getSpec().getBuilder());
+        // TODO: This validation should be done as part of ValidatingAdmissionWebhook
+        BuilderResource builder = builderResourceClient.getByName(component.getSpec().getBuilder());
 
         if (builder == null) {
             throw new MissingResourceException(String.format("Selected builder '%s' is not registered in the system",

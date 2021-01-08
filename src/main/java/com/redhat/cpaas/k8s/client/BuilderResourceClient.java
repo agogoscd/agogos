@@ -1,7 +1,6 @@
 package com.redhat.cpaas.k8s.client;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -10,7 +9,6 @@ import javax.inject.Inject;
 import com.redhat.cpaas.k8s.model.BuilderResource;
 import com.redhat.cpaas.k8s.model.BuilderResourceDoneable;
 import com.redhat.cpaas.k8s.model.BuilderResourceList;
-import com.redhat.cpaas.model.Builder;
 
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
@@ -46,16 +44,15 @@ public class BuilderResourceClient {
                 BuilderResourceList.class, BuilderResourceDoneable.class);
     }
 
-    public List<Builder> list() {
-        return builderResourceClient.list().getItems().stream().map(item -> new Builder(item))
-                .collect(Collectors.toList());
+    public List<BuilderResource> list() {
+        return builderResourceClient.list().getItems();
     }
 
-    public Builder create(final Builder builder) {
-        return new Builder(builderResourceClient.createOrReplace(new BuilderResource(builder)));
+    public BuilderResource create(final BuilderResource builder) {
+        return builderResourceClient.createOrReplace(builder);
     }
 
-    public Builder getByName(String name) {
+    public BuilderResource getByName(String name) {
         ListOptions options = new ListOptionsBuilder().withFieldSelector(String.format("metadata.name=%s", name))
                 .build();
 
@@ -65,6 +62,6 @@ public class BuilderResourceClient {
             return null;
         }
 
-        return new Builder(builderResources.getItems().get(0));
+        return builderResources.getItems().get(0);
     }
 }

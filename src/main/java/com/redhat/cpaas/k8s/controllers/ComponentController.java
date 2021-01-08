@@ -2,18 +2,30 @@ package com.redhat.cpaas.k8s.controllers;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.cpaas.ApplicationException;
+import com.redhat.cpaas.MissingResourceException;
+import com.redhat.cpaas.ValidationException;
+import com.redhat.cpaas.k8s.client.BuilderResourceClient;
 import com.redhat.cpaas.k8s.client.ComponentResourceClient;
 import com.redhat.cpaas.k8s.client.TektonResourceClient;
+import com.redhat.cpaas.k8s.model.BuilderResource;
 import com.redhat.cpaas.k8s.model.ComponentResource;
 import com.redhat.cpaas.k8s.model.ComponentResource.ComponentStatus;
 import com.redhat.cpaas.k8s.model.ComponentResource.Status;
+import com.redhat.cpaas.model.Builder;
 
 import org.jboss.logging.Logger;
+import org.openapi4j.core.exception.ResolutionException;
+import org.openapi4j.schema.validator.ValidationData;
+import org.openapi4j.schema.validator.v3.SchemaValidator;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.javaoperatorsdk.operator.api.Context;
@@ -37,6 +49,12 @@ public class ComponentController implements ResourceController<ComponentResource
 
     @Inject
     TektonResourceClient tektonResourceClient;
+
+    @Inject
+    BuilderResourceClient builderResourceClient;
+
+    @Inject
+    ObjectMapper objectMapper;
 
     private void setStatus(ComponentResource component, Status status, String reason) {
         ComponentStatus componentStatus = component.getStatus();
@@ -64,6 +82,41 @@ public class ComponentController implements ResourceController<ComponentResource
         }
     }
 
+    private void validate(ComponentResource component) throws ApplicationException {
+        BuilderResource builder = builderResourceClient.getByName(component.getSpec().getBuilder());
+
+        if (builder == null) {
+            throw new MissingResourceException(String.format("Selected builder '%s' is not registered in the system",
+                    component.getSpec().getBuilder()));
+        }
+
+        LOG.infov("Validating component ''{0}''", component.getMetadata().getName());
+
+        ValidationData<Void> validation = new ValidationData<>();
+
+        JsonNode schemaNode = objectMapper.valueToTree(builder.getSpec().getSchema().getOpenAPIV3Schema());
+        JsonNode contentNode = objectMapper.valueToTree(component.getSpec().getData());
+
+        SchemaValidator schemaValidator;
+
+        try {
+            schemaValidator = new SchemaValidator(null, schemaNode);
+        } catch (ResolutionException e) {
+            e.printStackTrace();
+            throw new ApplicationException("Could not instantiate validator", e);
+        }
+
+        schemaValidator.validate(contentNode, validation);
+
+        if (!validation.isValid()) {
+            List<String> errorMessages = validation.results().items().stream()
+                    .map(item -> item.message().replaceAll("\\.+$", "")).collect(Collectors.toList());
+            throw new ValidationException("Component definition is not valid", errorMessages);
+        }
+
+        LOG.infov("Component ''{0}'' is valid!", component.getMetadata().getName());
+    }
+
     @Override
     public DeleteControl deleteResource(ComponentResource component, Context<ComponentResource> context) {
         LOG.infov("Removing component ''{0}''", component.getMetadata().getName());
@@ -73,6 +126,17 @@ public class ComponentController implements ResourceController<ComponentResource
     public UpdateControl<ComponentResource> onResourceUpdate(ComponentResource component,
             Context<ComponentResource> context) {
         LOG.infov("Component ''{0}'' modified", component.getMetadata().getName());
+
+        // TODO: This should be done before the request is accepted
+        // Any incorrect data should not be allowed
+        // ValidatingAdmissionWebhook
+        // https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#validatingadmissionwebhook
+        try {
+            validate(component);
+        } catch (Exception e) {
+            setStatus(component, Status.Failed, "Validation failed");
+            return UpdateControl.updateStatusSubResource(component);
+        }
 
         // TODO: Handle component updates
 
