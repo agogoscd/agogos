@@ -1,0 +1,6 @@
+apiVersion: cpaas.redhat.com/v1alpha1
+kind: Build
+metadata:
+  generateName: sample-java-
+spec:
+  component: sample-java

@@ -74,6 +74,8 @@ public class ComponentController implements ResourceController<ComponentResource
             Context<ComponentResource> context) {
         LOG.infov("Component ''{0}'' modified", component.getMetadata().getName());
 
+        // TODO: Handle component updates
+
         switch (Status.valueOf(component.getStatus().getStatus())) {
             case New:
                 createPipeline(component);
