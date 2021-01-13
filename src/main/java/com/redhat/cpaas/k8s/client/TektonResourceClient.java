@@ -90,7 +90,7 @@ public class TektonResourceClient {
         return taskList.getItems().get(0);
     }
 
-    private Pipeline getPipelineByName(String name) {
+    public Pipeline getPipelineByName(String name) {
         ListOptions options = new ListOptionsBuilder().withFieldSelector(String.format("metadata.name=%s", name))
                 .build();
 

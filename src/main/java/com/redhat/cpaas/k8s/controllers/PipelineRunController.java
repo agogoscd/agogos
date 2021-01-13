@@ -2,15 +2,34 @@ package com.redhat.cpaas.k8s.controllers;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
+import com.redhat.cpaas.k8s.client.TektonResourceClient;
 import com.redhat.cpaas.k8s.model.PipelineRunResource;
 import com.redhat.cpaas.k8s.model.PipelineRunResource.RunStatus;
 import com.redhat.cpaas.k8s.model.PipelineRunResource.Status;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
+import io.fabric8.kubernetes.api.model.OwnerReference;
+import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
+import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
+import io.fabric8.kubernetes.api.model.PersistentVolumeClaimBuilder;
+import io.fabric8.kubernetes.api.model.Quantity;
+import io.fabric8.tekton.client.TektonClient;
+import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
+import io.fabric8.tekton.pipeline.v1beta1.PipelineRef;
+import io.fabric8.tekton.pipeline.v1beta1.PipelineRefBuilder;
+import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
+import io.fabric8.tekton.pipeline.v1beta1.PipelineRunBuilder;
+import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBinding;
+import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBindingBuilder;
 import io.javaoperatorsdk.operator.api.Context;
 import io.javaoperatorsdk.operator.api.Controller;
 import io.javaoperatorsdk.operator.api.DeleteControl;
@@ -22,6 +41,17 @@ import io.javaoperatorsdk.operator.api.UpdateControl;
 public class PipelineRunController implements ResourceController<PipelineRunResource> {
 
     private static final Logger LOG = Logger.getLogger(PipelineRunController.class);
+
+    public static String CPAAS_SA_NAME = "service";
+
+    @ConfigProperty(name = "kubernetes.storage-class")
+    Optional<String> storageClass;
+
+    @Inject
+    TektonClient tektonClient;
+
+    @Inject
+    TektonResourceClient tektonResourceClient;
 
     @Override
     public DeleteControl deleteResource(PipelineRunResource run, Context<PipelineRunResource> context) {
@@ -37,6 +67,66 @@ public class PipelineRunController implements ResourceController<PipelineRunReso
             switch (Status.valueOf(run.getStatus().getStatus())) {
                 case New:
                     LOG.infov("Handling new pipeline run ''{0}''", run.getMetadata().getName());
+
+                    // TODO Externalize it!
+                    Pipeline pipeline = tektonResourceClient.getPipelineByName(run.getSpec().getPipeline());
+
+                    if (pipeline == null) {
+                        setStatus(run, Status.Failed, "Pipeline not found");
+                        return UpdateControl.updateStatusSubResource(run);
+                    }
+
+                    PipelineRef pipelineRef = new PipelineRefBuilder(true).withName(pipeline.getMetadata().getName())
+                            .build();
+
+                    Map<String, Quantity> requests = new HashMap<String, Quantity>();
+                    requests.put("storage", new Quantity("1Gi"));
+
+                    String storageClassName;
+
+                    if (storageClass.isPresent()) {
+                        storageClassName = storageClass.get();
+                    } else {
+                        storageClassName = "";
+                    }
+
+                    PersistentVolumeClaim pvc = new PersistentVolumeClaimBuilder() //
+                            .withNewSpec() //
+                            .withNewResources().withRequests(requests).endResources() //
+                            .withStorageClassName(storageClassName) //
+                            .withAccessModes("ReadWriteOnce") //
+                            .endSpec()//
+                            .build();
+
+                    WorkspaceBinding workspaceBinding = new WorkspaceBindingBuilder() //
+                            .withName("ws") //
+                            .withVolumeClaimTemplate(pvc) //
+                            .build();
+
+                    OwnerReference ownerReference = new OwnerReferenceBuilder() //
+                            .withApiVersion(run.getApiVersion()) //
+                            .withKind(run.getKind()) //
+                            .withName(run.getMetadata().getName()) //
+                            .withUid(run.getMetadata().getUid()) //
+                            .withBlockOwnerDeletion(true) //
+                            .withController(true) //
+                            .build();
+
+                    PipelineRun pipelineRun = new PipelineRunBuilder() //
+                            .withNewMetadata() //
+                            .withOwnerReferences(ownerReference) //
+                            .withName(run.getMetadata().getName()) //
+                            // .withLabels(labels) //
+                            .endMetadata() //
+                            .withNewSpec() //
+                            .withServiceAccountName(CPAAS_SA_NAME) //
+                            .withPipelineRef(pipelineRef) //
+                            .withWorkspaces(workspaceBinding) //
+                            .endSpec() //
+                            .build();
+
+                    tektonClient.v1beta1().pipelineRuns().inNamespace(run.getMetadata().getNamespace())
+                            .create(pipelineRun);
 
                     // Set build status to "Running"
                     setStatus(run, Status.Running, "Pipeline triggered");
@@ -57,6 +147,7 @@ public class PipelineRunController implements ResourceController<PipelineRunReso
         return UpdateControl.noUpdate();
     }
 
+    // TODO: Make this shared across controllers
     private boolean setStatus(PipelineRunResource run, Status status, String reason) {
         RunStatus runStatus = run.getStatus();
 

@@ -66,6 +66,9 @@ spec:
         - name: Group
           jsonPath: .spec.group
           type: string
+        - name: Stages
+          type: string
+          jsonPath: .spec.stages[]
         - name: Age
           type: date
           jsonPath: .metadata.creationTimestamp
