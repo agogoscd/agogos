@@ -20,7 +20,6 @@ import com.redhat.cpaas.k8s.model.BuilderResource;
 import com.redhat.cpaas.k8s.model.ComponentResource;
 import com.redhat.cpaas.k8s.model.ComponentResource.ComponentStatus;
 import com.redhat.cpaas.k8s.model.ComponentResource.Status;
-import com.redhat.cpaas.model.Builder;
 
 import org.jboss.logging.Logger;
 import org.openapi4j.core.exception.ResolutionException;

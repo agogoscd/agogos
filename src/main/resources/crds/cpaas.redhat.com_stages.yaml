@@ -40,6 +40,17 @@ spec:
                 task:
                   type: string
                   description: Name of the Tekton task being the implementation of the Stage.
+                schema:
+                  type: object
+                  description: Validation definition that should be applied on the Stage configuration defined.
+                  properties:
+                    openAPIV3Schema:
+                      type: object
+                      description: "OpenAPI v3 formatted validation.
+                        More info: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md"
+                      additionalProperties: true
+                  required:
+                    - "openAPIV3Schema"
               required:
                 - "task"
           type: object

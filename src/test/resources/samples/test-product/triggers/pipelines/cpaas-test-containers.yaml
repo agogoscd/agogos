@@ -1,0 +1,6 @@
+apiVersion: cpaas.redhat.com/v1alpha1
+kind: PipelineRun
+metadata:
+  generateName: cpaas-test-containers-
+spec:
+  pipeline: cpaas-test-containers

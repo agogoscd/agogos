@@ -2,20 +2,20 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: pipelines.cpaas.redhat.com
+  name: pipelineruns.cpaas.redhat.com
 spec:
   group: cpaas.redhat.com
   names:
-    kind: Pipeline
-    listKind: PipelineList
-    plural: pipelines
-    singular: pipeline
+    kind: PipelineRun
+    listKind: PipelineRunList
+    plural: pipelineruns
+    singular: pipelinerun
   scope: Namespaced
   versions:
     - name: v1alpha1
       schema:
         openAPIV3Schema:
-          description: Pipeline is the Schema for the pipeline API
+          description: PipelineRun is the Schema for the builds API
           properties:
             apiVersion:
               description:
@@ -35,18 +35,47 @@ spec:
               type: object
             spec:
               type: object
-              description: Defines the desired state of the Pipeline
+              description: Defines the desired state of Build
               properties:
-                group:
+                pipeline:
+                  description: "Name of the Pipeline to run"
                   type: string
-                  description: Name of the Group the Pipeline should run with
-                stages:
-                  type: array
-                  description: Name of the Stage to run
-                  items:
-                    type: string
               required:
-                - "stages"
+                - "pipeline"
+            status:
+              description: PipelineRunStatus defines the observed state of PipelineRun
+              properties:
+                lastUpdate:
+                  format: date-time
+                  type: string
+                reason:
+                  type: string
+                status:
+                  default: New
+                  enum:
+                    - New
+                    - Initializing
+                    - Running
+                    - Passed
+                    - Failed
+                    - Aborted
+                  type: string
+              type: object
           type: object
       served: true
       storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Status
+          jsonPath: .status.status
+          type: string
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

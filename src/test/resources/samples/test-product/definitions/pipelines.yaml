@@ -1,0 +1,14 @@
+apiVersion: cpaas.redhat.com/v1alpha1
+kind: Pipeline
+metadata:
+  name: cpaas-test-containers
+spec:
+  group: "cpaas-test-containers"
+  stages:
+    - name: "errata"
+      config:
+        advisoryType: "RHBA"
+        solution: "CPaaS Test Product 1.7.0 - Containers"
+        synopsis: "Release of components for CPaaS Test Product - Containers"
+        description: "Release of CPaaS Test Product provides these changes:"
+        topic: "Release of components for CPaaS Test Product - Containers"

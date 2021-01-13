@@ -1,0 +1,6 @@
+apiVersion: cpaas.redhat.com/v1alpha1
+kind: Build
+metadata:
+  generateName: cpaas-test-brew-container-
+spec:
+  component: cpaas-test-brew-container

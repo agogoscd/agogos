@@ -5,4 +5,4 @@ metadata:
 spec:
   group: "test"
   stages:
-    - "errata"
+    - name: "errata"

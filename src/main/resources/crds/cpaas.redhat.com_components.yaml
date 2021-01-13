@@ -79,6 +79,9 @@ spec:
         - name: Status
           jsonPath: .status.status
           type: string
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
 status:
   acceptedNames:
     kind: ""
