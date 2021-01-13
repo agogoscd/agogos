@@ -68,7 +68,8 @@ public class PipelineRunController implements ResourceController<PipelineRunReso
                 case New:
                     LOG.infov("Handling new pipeline run ''{0}''", run.getMetadata().getName());
 
-                    // TODO Externalize it!
+                    // TODO: Externalize it!
+                    // TODO:  This code can be made generic to work for any pipelines
                     Pipeline pipeline = tektonResourceClient.getPipelineByName(run.getSpec().getPipeline());
 
                     if (pipeline == null) {
