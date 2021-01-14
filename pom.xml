@@ -63,9 +63,9 @@
             <artifactId>quarkus-config-yaml</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.redhat.cpaas</groupId>
-            <artifactId>quarkus-tekton-client</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>io.quarkiverse.tektonclient</groupId>
+            <artifactId>quarkiverse-tekton-client</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

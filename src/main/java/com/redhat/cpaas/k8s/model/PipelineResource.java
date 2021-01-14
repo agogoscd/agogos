@@ -16,6 +16,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+@ToString
+@RegisterForReflection
 public class PipelineResource extends CustomResource implements Namespaced {
 
     public static final String KIND = "Pipeline";

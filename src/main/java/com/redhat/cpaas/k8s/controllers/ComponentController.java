@@ -133,6 +133,7 @@ public class ComponentController implements ResourceController<ComponentResource
         try {
             validate(component);
         } catch (Exception e) {
+            e.printStackTrace();
             setStatus(component, Status.Failed, "Validation failed");
             return UpdateControl.updateStatusSubResource(component);
         }

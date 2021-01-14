@@ -15,19 +15,27 @@ import io.fabric8.kubernetes.client.CustomResource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
+@ToString
 @RegisterForReflection
 public class BuilderResource extends CustomResource implements Namespaced {
     public static String KIND = "Builder";
 
     private static final long serialVersionUID = 9122121231081986174L;
 
-    public static class BuilderSchema {
+    @ToString
+    @JsonDeserialize(using = JsonDeserializer.None.class)
+    @RegisterForReflection
+    public static class BuilderSchema implements KubernetesResource {
+        private static final long serialVersionUID = -1996106000759225739L;
+
         @Getter
         @Setter
         private Map<Object, Object> openAPIV3Schema = new HashMap<>();
     }
 
+    @ToString
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class BuilderSpec implements KubernetesResource {

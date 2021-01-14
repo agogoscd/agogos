@@ -1,3 +1,18 @@
+# javaoperatorsdk:
+#   controllers:
+#     componentcontroller:
+#       retry:
+#         maxAttempts: 3
+#     buildcontroller:
+#       retry:
+#         maxAttempts: 3
+#     pipelinecontroller:
+#       retry:
+#         maxAttempts: 3
+#     pipelineruncontroller:
+#       retry:
+#         maxAttempts: 3
+
 quarkus:
   http:
     port: 7070
