@@ -8,6 +8,7 @@ import javax.inject.Inject;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redhat.cpaas.k8s.client.ComponentGroupResourceClient;
 import com.redhat.cpaas.k8s.model.PipelineResource;
 import com.redhat.cpaas.k8s.model.PipelineResource.PipelineSpec.StageReference;
 
@@ -39,6 +40,9 @@ public class PipelineController implements ResourceController<PipelineResource> 
 
     @Inject
     TektonClient tektonClient;
+
+    @Inject
+    ComponentGroupResourceClient componentGroupResourceClient;
 
     @Inject
     ObjectMapper objectMapper;
@@ -77,6 +81,9 @@ public class PipelineController implements ResourceController<PipelineResource> 
                 .build();
 
         List<PipelineTask> tasks = new ArrayList<>();
+
+
+        componentGroupResourceClient.getByName(pipeline.getSpec().getGroup());
 
         for (StageReference stageRef : pipeline.getSpec().getStages()) {
             String stageConfig;
