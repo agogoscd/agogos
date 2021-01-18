@@ -3,7 +3,6 @@ package com.redhat.cpaas.k8s.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.cpaas.k8s.model.ComponentResource.ComponentSpec;
@@ -56,7 +55,6 @@ public class ComponentResource extends CustomResource<ComponentSpec, ComponentSt
 
     @ToString
     @JsonDeserialize(using = JsonDeserializer.None.class)
-    @JsonIgnoreProperties(ignoreUnknown = true)
     @RegisterForReflection
     public static class ComponentSpec implements KubernetesResource {
         private static final long serialVersionUID = -2068477162805635444L;

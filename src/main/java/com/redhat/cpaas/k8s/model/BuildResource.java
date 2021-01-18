@@ -1,6 +1,5 @@
 package com.redhat.cpaas.k8s.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.cpaas.k8s.model.BuildResource.BuildSpec;
@@ -47,7 +46,6 @@ public class BuildResource extends CustomResource<BuildSpec, BuildStatus> implem
     }
 
     @ToString
-    @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class BuildSpec implements KubernetesResource {

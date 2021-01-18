@@ -51,9 +51,6 @@ public class BuilderResource extends CustomResource<BuilderSpec, Void> implement
         private String task;
         @Getter
         @Setter
-        private List<String> types = new ArrayList<>();
-        @Getter
-        @Setter
         private BuilderSchema schema = new BuilderSchema();
     }
 
