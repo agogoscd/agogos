@@ -81,12 +81,12 @@
         <dependency>
             <groupId>io.javaoperatorsdk</groupId>
             <artifactId>operator-framework-quarkus-extension</artifactId>
-            <version>1.6.4-SNAPSHOT</version>
+            <version>1.7.0</version>
         </dependency>
         <dependency>
             <groupId>io.javaoperatorsdk</groupId>
             <artifactId>operator-framework</artifactId>
-            <version>1.6.4-SNAPSHOT</version>
+            <version>1.7.0</version>
         </dependency>
     </dependencies>
     <build>

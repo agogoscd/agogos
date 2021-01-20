@@ -35,7 +35,5 @@ public class PlatformOperator {
 
     void onStop(@Observes ShutdownEvent ev) {
         LOG.info("Stopping operator");
-
-        operator.close();
     }
 }

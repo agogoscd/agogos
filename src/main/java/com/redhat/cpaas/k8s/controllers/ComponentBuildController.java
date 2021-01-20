@@ -33,9 +33,9 @@ import io.javaoperatorsdk.operator.api.UpdateControl;
 import io.javaoperatorsdk.operator.processing.event.EventSourceManager;
 
 @Controller(generationAwareEventProcessing = false)
-public class BuildController implements ResourceController<BuildResource> {
+public class ComponentBuildController implements ResourceController<BuildResource> {
 
-    private static final Logger LOG = Logger.getLogger(BuildController.class);
+    private static final Logger LOG = Logger.getLogger(ComponentBuildController.class);
 
     private static final String COMPONENT_LABEL = "cpaas.redhat.com/component";
 
