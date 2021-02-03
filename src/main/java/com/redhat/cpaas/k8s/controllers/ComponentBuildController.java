@@ -9,7 +9,6 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import com.redhat.cpaas.ApplicationException;
-import com.redhat.cpaas.MissingResourceException;
 import com.redhat.cpaas.k8s.client.ComponentBuildResourceClient;
 import com.redhat.cpaas.k8s.client.ComponentResourceClient;
 import com.redhat.cpaas.k8s.client.TektonResourceClient;
@@ -86,11 +85,9 @@ public class ComponentBuildController implements ResourceController<ComponentBui
     private void runPipeline(ComponentBuildResource build) throws Exception {
         LOG.info("New build, triggering pipeline for this build");
 
-        ComponentResource component;
+        ComponentResource component = componentResourceClient.getByName(build.getSpec().getComponent());
 
-        try {
-            component = componentResourceClient.getByName(build.getSpec().getComponent());
-        } catch (MissingResourceException e) {
+        if (component == null) {
             throw new Exception("Could not find component with name '" + build.getSpec().getComponent() + "'");
         }
 
@@ -115,7 +112,8 @@ public class ComponentBuildController implements ResourceController<ComponentBui
         return DeleteControl.DEFAULT_DELETE;
     }
 
-    public UpdateControl<ComponentBuildResource> onResourceUpdate(ComponentBuildResource build, Context<ComponentBuildResource> context) {
+    public UpdateControl<ComponentBuildResource> onResourceUpdate(ComponentBuildResource build,
+            Context<ComponentBuildResource> context) {
 
         LOG.infov("Build ''{0}'' modified", build.getMetadata().getName());
 
@@ -162,8 +160,8 @@ public class ComponentBuildController implements ResourceController<ComponentBui
     }
 
     /**
-     * Updates the status of particular {@link ComponentBuildResource} based on the event
-     * received from a {@link io.fabric8.tekton.pipeline.v1beta1.PipelineRun}.
+     * Updates the status of particular {@link ComponentBuildResource} based on the
+     * event received from a {@link io.fabric8.tekton.pipeline.v1beta1.PipelineRun}.
      * 
      * @param build the build to
      * @param event
@@ -213,13 +211,15 @@ public class ComponentBuildController implements ResourceController<ComponentBui
 
     }
 
-    public UpdateControl<ComponentBuildResource> onEvent(ComponentBuildResource resource, Context<ComponentBuildResource> context) {
+    public UpdateControl<ComponentBuildResource> onEvent(ComponentBuildResource resource,
+            Context<ComponentBuildResource> context) {
         LOG.info(resource);
         return UpdateControl.noUpdate();
     }
 
     @Override
-    public UpdateControl<ComponentBuildResource> createOrUpdateResource(ComponentBuildResource resource, Context<ComponentBuildResource> context) {
+    public UpdateControl<ComponentBuildResource> createOrUpdateResource(ComponentBuildResource resource,
+            Context<ComponentBuildResource> context) {
 
         Optional<PipelineRunEvent> event = context.getEvents().getLatestOfType(PipelineRunEvent.class);
 

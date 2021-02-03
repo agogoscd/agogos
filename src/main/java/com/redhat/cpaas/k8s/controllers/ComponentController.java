@@ -53,7 +53,18 @@ public class ComponentController implements ResourceController<ComponentResource
     @Inject
     ObjectMapper objectMapper;
 
-    private void setStatus(ComponentResource component, Status status, String reason) {
+    /**
+     * Updates {@link ComponentResource.ComponentStatus} of the particular
+     * {@link ComponentResource}.
+     * 
+     * This is useful when the are hooks executed which influence the ability of
+     * usage of the Component.
+     * 
+     * @param component {@link ComponentResource} object
+     * @param status    One of available statuses
+     * @param reason    Description of the reason for last status change
+     */
+    private void setStatus(final ComponentResource component, final Status status, final String reason) {
         ComponentStatus componentStatus = component.getStatus();
 
         componentStatus.setStatus(String.valueOf(status));

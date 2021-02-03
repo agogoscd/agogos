@@ -34,6 +34,13 @@ public class ComponentGroupResourceClient {
                 ComponentGroupResourceList.class);
     }
 
+    /**
+     * Find the {@link ComponentGroupResource} by name.
+     * 
+     * @param name Name of the ComponentGroup.
+     * @return The {@link ComponentGroupResource} or <code>null</code> in case it
+     *         cannot be found
+     */
     public ComponentGroupResource getByName(String name) {
         ListOptions options = new ListOptionsBuilder().withFieldSelector(String.format("metadata.name=%s", name))
                 .build();
@@ -41,6 +48,7 @@ public class ComponentGroupResourceClient {
         ComponentGroupResourceList componentGroupResources = componentGroupClient.list(options);
 
         if (componentGroupResources.getItems().isEmpty() || componentGroupResources.getItems().size() > 1) {
+            LOG.debugv("ComponentGroup ''{0}'' cannot be found", name);
             return null;
         }
 

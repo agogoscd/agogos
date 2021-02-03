@@ -13,8 +13,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.cpaas.ApplicationException;
 import com.redhat.cpaas.MissingResourceException;
-import com.redhat.cpaas.k8s.model.ComponentBuildResource;
 import com.redhat.cpaas.k8s.model.BuilderResource;
+import com.redhat.cpaas.k8s.model.ComponentBuildResource;
 import com.redhat.cpaas.k8s.model.ComponentResource;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -37,13 +37,10 @@ import io.fabric8.tekton.pipeline.v1beta1.PipelineResult;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineResultBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRunBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineRunList;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineTask;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineTaskBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineWorkspaceDeclaration;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineWorkspaceDeclarationBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.Task;
-import io.fabric8.tekton.pipeline.v1beta1.TaskList;
 import io.fabric8.tekton.pipeline.v1beta1.TaskRef;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBinding;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBindingBuilder;
@@ -72,23 +69,6 @@ public class TektonResourceClient {
     @Inject
     ObjectMapper objectMapper;
 
-    public List<Pipeline> listPipelines() {
-        return tektonClient.v1beta1().pipelines().list().getItems();
-    }
-
-    public Task getTaskByName(String name) {
-        ListOptions options = new ListOptionsBuilder().withFieldSelector(String.format("metadata.name=%s", name))
-                .build();
-
-        TaskList taskList = tektonClient.v1beta1().tasks().list(options);
-
-        if (taskList.getItems().isEmpty() || taskList.getItems().size() > 1) {
-            return null;
-        }
-
-        return taskList.getItems().get(0);
-    }
-
     public Pipeline getPipelineByName(String name) {
         ListOptions options = new ListOptionsBuilder().withFieldSelector(String.format("metadata.name=%s", name))
                 .build();
@@ -100,26 +80,6 @@ public class TektonResourceClient {
         }
 
         return pipelineList.getItems().get(0);
-    }
-
-    public PipelineRun getPipelineRunByName(String name) {
-        ListOptions options = new ListOptionsBuilder().withFieldSelector(String.format("metadata.name=%s", name))
-                .build();
-
-        PipelineRunList pipelineRunList = tektonClient.v1beta1().pipelineRuns().list(options);
-
-        if (pipelineRunList.getItems().isEmpty() || pipelineRunList.getItems().size() > 1) {
-            return null;
-        }
-
-        return pipelineRunList.getItems().get(0);
-    }
-
-    public List<PipelineRun> listPipelineRuns(String pipelineName) throws MissingResourceException {
-        ListOptions options = new ListOptionsBuilder()
-                .withLabelSelector(String.format("tekton.dev/pipeline=%s", pipelineName)).build();
-
-        return tektonClient.v1beta1().pipelineRuns().list(options).getItems();
     }
 
     public PipelineRun runPipeline(String componentName, String buildName) throws ApplicationException {

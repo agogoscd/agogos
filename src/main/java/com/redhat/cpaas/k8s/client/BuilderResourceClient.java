@@ -1,7 +1,5 @@
 package com.redhat.cpaas.k8s.client;
 
-import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -36,24 +34,6 @@ public class BuilderResourceClient {
     @PostConstruct
     void init() {
         builderResourceClient = kubernetesClient.customResources(BuilderResource.class, BuilderResourceList.class);
-    }
-
-    /**
-     * List all builders.
-     * 
-     * @return List of {@link BuilderResource} objects.
-     */
-    public List<BuilderResource> list() {
-        return builderResourceClient.list().getItems();
-    }
-
-    /**
-     * Creates or updates the {@link BuilderResource} object.
-     * 
-     * @return Created or updated {@link BuilderResource} object.
-     */
-    public BuilderResource create(final BuilderResource builder) {
-        return builderResourceClient.createOrReplace(builder);
     }
 
     /**

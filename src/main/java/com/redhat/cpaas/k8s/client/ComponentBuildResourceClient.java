@@ -1,19 +1,10 @@
 package com.redhat.cpaas.k8s.client;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import com.redhat.cpaas.MissingResourceException;
 import com.redhat.cpaas.k8s.model.ComponentBuildResource;
-import com.redhat.cpaas.k8s.model.ComponentBuildResource.BuildStatus;
-import com.redhat.cpaas.k8s.model.ComponentBuildResource.Status;
 import com.redhat.cpaas.k8s.model.ComponentBuildResourceList;
 
 import org.jboss.logging.Logger;
@@ -38,52 +29,32 @@ public class ComponentBuildResourceClient {
     @Inject
     KubernetesClient kubernetesClient;
 
-    MixedOperation<ComponentBuildResource, ComponentBuildResourceList, Resource<ComponentBuildResource>> buildClient;
+    MixedOperation<ComponentBuildResource, ComponentBuildResourceList, Resource<ComponentBuildResource>> componentBuildClient;
 
     @PostConstruct
     void init() {
-        buildClient = kubernetesClient.customResources(ComponentBuildResource.class, ComponentBuildResourceList.class);
+        componentBuildClient = kubernetesClient.customResources(ComponentBuildResource.class,
+                ComponentBuildResourceList.class);
     }
 
-    public ComponentBuildResource updateStatus(final ComponentBuildResource build, Status status, String reason) {
-        BuildStatus buildStatus = build.getStatus();
-        buildStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
-        buildStatus.setStatus(String.valueOf(status));
-        buildStatus.setReason(reason);
-
-        // Update the Status sub-resource, this will not trigger another reconcile.
-        return buildClient.updateStatus(build);
-    }
-
+    /**
+     * Find the {@link ComponentBuildResource} by name.
+     * 
+     * @param name Name of the ComponentBuild.
+     * @return The {@link ComponentBuildResource} or <code>null</code> in case it
+     *         cannot be found
+     */
     public ComponentBuildResource getByName(String name) {
         ListOptions options = new ListOptionsBuilder().withFieldSelector(String.format("metadata.name=%s", name))
                 .build();
 
-        ComponentBuildResourceList buildResources = buildClient.list(options);
+        ComponentBuildResourceList buildResources = componentBuildClient.list(options);
 
         if (buildResources.getItems().isEmpty() || buildResources.getItems().size() > 1) {
+            LOG.debugv("ComponentBuild ''{0}'' cannot be found", name);
             return null;
         }
 
         return buildResources.getItems().get(0);
-    }
-
-    public ComponentBuildResource create(String componentName) {
-        Map<String, String> labels = new HashMap<>();
-
-        labels.put("cpaas.redhat.com/component", componentName);
-
-        ComponentBuildResource build = new ComponentBuildResource();
-        build.getMetadata().setGenerateName(componentName + "-");
-        build.getMetadata().setLabels(labels);
-        build.getSpec().setComponent(componentName);
-        return buildClient.create(build);
-    }
-
-    public List<ComponentBuildResource> listBuilds(String componentName) throws MissingResourceException {
-        ListOptions options = new ListOptionsBuilder()
-                .withLabelSelector(String.format("cpaas.redhat.com/component=%s", componentName)).build();
-        // .withLabelSelector(String.format("tekton.dev/pipeline=%s", pipelineName))
-        return buildClient.list(options).getItems();
     }
 }
