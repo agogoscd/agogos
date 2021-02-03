@@ -3,6 +3,7 @@ package com.redhat.cpaas.k8s.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.cpaas.k8s.model.ComponentResource.ComponentSpec;
@@ -85,6 +86,7 @@ public class ComponentResource extends CustomResource<ComponentSpec, ComponentSt
         // }
     }
 
+    @JsonIgnore
     public boolean isReady() {
         if (getStatus().toEnum() == Status.Ready) {
             return true;

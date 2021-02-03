@@ -11,42 +11,56 @@ import com.redhat.cpaas.k8s.model.BuilderResourceList;
 
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
-import io.fabric8.kubernetes.client.CustomResource;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
-import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
-import io.fabric8.kubernetes.internal.KubernetesDeserializer;
 import io.fabric8.tekton.client.TektonClient;
 
+/**
+ * Builder CR client.
+ * 
+ * This bean is used to interact with the {@link BuilderResource} CR.
+ * 
+ * @author Marek Goldmann
+ */
 @ApplicationScoped
 public class BuilderResourceClient {
     @Inject
-    KubernetesClient kubernetesApiClient;
+    KubernetesClient kubernetesClient;
 
     @Inject
-    TektonClient tektonApiClient;
+    TektonClient tektonClient;
 
     MixedOperation<BuilderResource, BuilderResourceList, Resource<BuilderResource>> builderResourceClient;
 
     @PostConstruct
     void init() {
-        final CustomResourceDefinitionContext context = new CustomResourceDefinitionContext.Builder()
-                .withName("builders.cpaas.redhat.com").withGroup("cpaas.redhat.com").withScope("Namespaced")
-                .withVersion("v1alpha1").withPlural("builders").build();
-
-        builderResourceClient = kubernetesApiClient.customResources(context, BuilderResource.class,
-                BuilderResourceList.class);
+        builderResourceClient = kubernetesClient.customResources(BuilderResource.class, BuilderResourceList.class);
     }
 
+    /**
+     * List all builders.
+     * 
+     * @return List of {@link BuilderResource} objects.
+     */
     public List<BuilderResource> list() {
         return builderResourceClient.list().getItems();
     }
 
+    /**
+     * Creates or updates the {@link BuilderResource} object.
+     * 
+     * @return Created or updated {@link BuilderResource} object.
+     */
     public BuilderResource create(final BuilderResource builder) {
         return builderResourceClient.createOrReplace(builder);
     }
 
+    /**
+     * Finds {@link BuilderResource} by name and returns it.
+     * 
+     * @return {@link BuilderResource} object.
+     */
     public BuilderResource getByName(String name) {
         ListOptions options = new ListOptionsBuilder().withFieldSelector(String.format("metadata.name=%s", name))
                 .build();
