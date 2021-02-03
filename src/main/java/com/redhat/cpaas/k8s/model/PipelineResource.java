@@ -27,7 +27,6 @@ import lombok.ToString;
 @Version("v1alpha1")
 public class PipelineResource extends CustomResource<PipelineSpec, Void> implements Namespaced {
 
-    public static final String KIND = "Pipeline";
     private static final long serialVersionUID = 4918853237265675286L;
 
     @ToString

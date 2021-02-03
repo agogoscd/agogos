@@ -3,9 +3,6 @@ package com.redhat.cpaas;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.redhat.cpaas.model.Error;
-import com.redhat.cpaas.model.ValidationError;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,9 +36,9 @@ public class ValidationException extends ApplicationException {
         this.errors = new ArrayList<>(messages);
     }
 
-    @Override
-    public Error toError() {
-        return new ValidationError(this.getMessage(), this.getErrors());
-    }
+    // @Override
+    // public Error toError() {
+    //     return new ValidationError(this.getMessage(), this.getErrors());
+    // }
 
 }

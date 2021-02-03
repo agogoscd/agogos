@@ -1,14 +1,11 @@
 package com.redhat.cpaas.k8s.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.cpaas.k8s.model.BuilderResource.BuilderSpec;
-import com.redhat.cpaas.model.Builder;
 
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
@@ -56,17 +53,6 @@ public class BuilderResource extends CustomResource<BuilderSpec, Void> implement
 
     public BuilderResource() {
         super();
-    }
-
-    public BuilderResource(Builder builder) {
-        super();
-        // HashMap<String, String> annotations = new HashMap<>();
-        // annotations.put("status", builder.getStatus().toString());
-
-        this.getMetadata().setName(builder.getName());
-        // this.getMetadata().setAnnotations(annotations);
-        this.getSpec().setTask(builder.getTask());
-        this.getSpec().getSchema().setOpenAPIV3Schema(builder.getSchema());
     }
 
     @Getter

@@ -37,8 +37,6 @@ public class ComponentGroupResource extends CustomResource<ComponentGroupResourc
 
     private static final long serialVersionUID = -7092342726608099745L;
 
-    public static String KIND = "Group";
-
     @Getter
     @Setter
     private ComponentGroupResourceSpec spec = new ComponentGroupResourceSpec();

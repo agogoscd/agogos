@@ -15,7 +15,6 @@ import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
-import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
 
 @ApplicationScoped
 public class ComponentGroupResourceClient {
@@ -31,15 +30,7 @@ public class ComponentGroupResourceClient {
 
     @PostConstruct
     void init() {
-        final CustomResourceDefinitionContext context = new CustomResourceDefinitionContext.Builder()
-                .withName("groups.cpaas.redhat.com") //
-                .withGroup("cpaas.redhat.com") //
-                .withScope("Namespaced") //
-                .withVersion("v1alpha1") //
-                .withPlural("groups") //
-                .build();
-
-        componentGroupClient = kubernetesClient.customResources(context, ComponentGroupResource.class,
+        componentGroupClient = kubernetesClient.customResources(ComponentGroupResource.class,
                 ComponentGroupResourceList.class);
     }
 

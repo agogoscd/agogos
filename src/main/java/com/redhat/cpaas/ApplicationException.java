@@ -7,8 +7,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import com.redhat.cpaas.model.Error;
-
 import lombok.Getter;
 
 @Produces(MediaType.APPLICATION_JSON)

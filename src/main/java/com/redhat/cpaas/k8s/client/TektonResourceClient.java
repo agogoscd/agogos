@@ -16,7 +16,6 @@ import com.redhat.cpaas.MissingResourceException;
 import com.redhat.cpaas.k8s.model.BuildResource;
 import com.redhat.cpaas.k8s.model.BuilderResource;
 import com.redhat.cpaas.k8s.model.ComponentResource;
-import com.redhat.cpaas.model.Component;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -205,7 +204,7 @@ public class TektonResourceClient {
 
         // Convert Component metadata to JSON
         try {
-            componentJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new Component(component));
+            componentJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(component.toEasyMap());
         } catch (JsonProcessingException e) {
             throw new ApplicationException(String.format("Internal error; could not serialize component '%s'",
                     component.getMetadata().getName()), e);

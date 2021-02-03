@@ -24,7 +24,6 @@ import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
-import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
 
 @ApplicationScoped
 public class BuildResourceClient {
@@ -40,18 +39,7 @@ public class BuildResourceClient {
 
     @PostConstruct
     void init() {
-        // KubernetesDeserializer.registerCustomKind("cpaas.redhat.com/v1alpha1",
-        //         CustomResource.getCRDName(BuildResource.class), BuildResource.class);
-
-        final CustomResourceDefinitionContext context = new CustomResourceDefinitionContext.Builder()
-                .withName("builds.cpaas.redhat.com") //
-                .withGroup("cpaas.redhat.com") //
-                .withScope("Namespaced") //
-                .withVersion("v1alpha1") //
-                .withPlural("builds") //
-                .build();
-
-        buildClient = kubernetesClient.customResources(context, BuildResource.class, BuildResourceList.class);
+        buildClient = kubernetesClient.customResources(BuildResource.class, BuildResourceList.class);
     }
 
     public BuildResource updateStatus(final BuildResource build, Status status, String reason) {

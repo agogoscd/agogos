@@ -26,7 +26,6 @@ import lombok.ToString;
 public class StageResource extends CustomResource<StageSpec, Void> implements Namespaced {
 
     private static final long serialVersionUID = 1191367775606383094L;
-    public static final String KIND = "Stage";
 
     @ToString
     @JsonDeserialize(using = JsonDeserializer.None.class)

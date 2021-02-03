@@ -24,8 +24,6 @@ import lombok.ToString;
 public class PipelineRunResource extends CustomResource<RunSpec, RunStatus> implements Namespaced {
     private static final long serialVersionUID = 6688424087008846788L;
 
-    public static String KIND = "PipelineRun";
-
     public enum Status {
         New, Initialized, Running, Passed, Failed, Aborted;
     }
