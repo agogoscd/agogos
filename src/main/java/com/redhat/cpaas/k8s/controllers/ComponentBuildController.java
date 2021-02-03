@@ -10,14 +10,14 @@ import javax.inject.Inject;
 
 import com.redhat.cpaas.ApplicationException;
 import com.redhat.cpaas.MissingResourceException;
-import com.redhat.cpaas.k8s.client.BuildResourceClient;
+import com.redhat.cpaas.k8s.client.ComponentBuildResourceClient;
 import com.redhat.cpaas.k8s.client.ComponentResourceClient;
 import com.redhat.cpaas.k8s.client.TektonResourceClient;
 import com.redhat.cpaas.k8s.event.PipelineRunEvent;
 import com.redhat.cpaas.k8s.event.PipelineRunEventSource;
-import com.redhat.cpaas.k8s.model.BuildResource;
-import com.redhat.cpaas.k8s.model.BuildResource.BuildStatus;
-import com.redhat.cpaas.k8s.model.BuildResource.Status;
+import com.redhat.cpaas.k8s.model.ComponentBuildResource;
+import com.redhat.cpaas.k8s.model.ComponentBuildResource.BuildStatus;
+import com.redhat.cpaas.k8s.model.ComponentBuildResource.Status;
 import com.redhat.cpaas.k8s.model.ComponentResource;
 
 import org.jboss.logging.Logger;
@@ -33,7 +33,7 @@ import io.javaoperatorsdk.operator.api.UpdateControl;
 import io.javaoperatorsdk.operator.processing.event.EventSourceManager;
 
 @Controller(generationAwareEventProcessing = false)
-public class ComponentBuildController implements ResourceController<BuildResource> {
+public class ComponentBuildController implements ResourceController<ComponentBuildResource> {
 
     private static final Logger LOG = Logger.getLogger(ComponentBuildController.class);
 
@@ -43,7 +43,7 @@ public class ComponentBuildController implements ResourceController<BuildResourc
     KubernetesClient kubernetesClient;
 
     @Inject
-    BuildResourceClient buildResourceClient;
+    ComponentBuildResourceClient buildResourceClient;
 
     @Inject
     ComponentResourceClient componentResourceClient;
@@ -54,7 +54,7 @@ public class ComponentBuildController implements ResourceController<BuildResourc
     @Inject
     PipelineRunEventSource pipelineRunEventSource;
 
-    private boolean hasLabels(BuildResource build) {
+    private boolean hasLabels(ComponentBuildResource build) {
         Map<String, String> labels = build.getMetadata().getLabels();
 
         if (labels == null) {
@@ -68,7 +68,7 @@ public class ComponentBuildController implements ResourceController<BuildResourc
         return false;
     }
 
-    private boolean setStatus(BuildResource build, Status status, String reason) {
+    private boolean setStatus(ComponentBuildResource build, Status status, String reason) {
         BuildStatus buildStatus = build.getStatus();
 
         if (buildStatus.getStatus().equals(String.valueOf(status)) && buildStatus.getReason().equals(reason)) {
@@ -83,7 +83,7 @@ public class ComponentBuildController implements ResourceController<BuildResourc
     }
 
     // TODO: Use proper exceptions!
-    private void runPipeline(BuildResource build) throws Exception {
+    private void runPipeline(ComponentBuildResource build) throws Exception {
         LOG.info("New build, triggering pipeline for this build");
 
         ComponentResource component;
@@ -111,11 +111,11 @@ public class ComponentBuildController implements ResourceController<BuildResourc
     }
 
     @Override
-    public DeleteControl deleteResource(BuildResource build, Context<BuildResource> context) {
+    public DeleteControl deleteResource(ComponentBuildResource build, Context<ComponentBuildResource> context) {
         return DeleteControl.DEFAULT_DELETE;
     }
 
-    public UpdateControl<BuildResource> onResourceUpdate(BuildResource build, Context<BuildResource> context) {
+    public UpdateControl<ComponentBuildResource> onResourceUpdate(ComponentBuildResource build, Context<ComponentBuildResource> context) {
 
         LOG.infov("Build ''{0}'' modified", build.getMetadata().getName());
 
@@ -162,14 +162,14 @@ public class ComponentBuildController implements ResourceController<BuildResourc
     }
 
     /**
-     * Updates the status of particular {@link BuildResource} based on the event
+     * Updates the status of particular {@link ComponentBuildResource} based on the event
      * received from a {@link io.fabric8.tekton.pipeline.v1beta1.PipelineRun}.
      * 
      * @param build the build to
      * @param event
      * @return
      */
-    public UpdateControl<BuildResource> updateStatus(BuildResource build, PipelineRunEvent event) {
+    public UpdateControl<ComponentBuildResource> updateStatus(ComponentBuildResource build, PipelineRunEvent event) {
 
         PipelineRunStatus status = event.getStatus();
 
@@ -213,13 +213,13 @@ public class ComponentBuildController implements ResourceController<BuildResourc
 
     }
 
-    public UpdateControl<BuildResource> onEvent(BuildResource resource, Context<BuildResource> context) {
+    public UpdateControl<ComponentBuildResource> onEvent(ComponentBuildResource resource, Context<ComponentBuildResource> context) {
         LOG.info(resource);
         return UpdateControl.noUpdate();
     }
 
     @Override
-    public UpdateControl<BuildResource> createOrUpdateResource(BuildResource resource, Context<BuildResource> context) {
+    public UpdateControl<ComponentBuildResource> createOrUpdateResource(ComponentBuildResource resource, Context<ComponentBuildResource> context) {
 
         Optional<PipelineRunEvent> event = context.getEvents().getLatestOfType(PipelineRunEvent.class);
 

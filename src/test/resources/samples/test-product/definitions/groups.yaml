@@ -1,5 +1,5 @@
 apiVersion: cpaas.redhat.com/v1alpha1
-kind: Group
+kind: ComponentGroup
 metadata:
   name: cpaas-test-containers
 spec:
@@ -7,7 +7,7 @@ spec:
     - "cpaas-test-brew-container"
 ---
 apiVersion: cpaas.redhat.com/v1alpha1
-kind: Group
+kind: ComponentGroup
 metadata:
   name: cpaas-test-rpms
 spec:

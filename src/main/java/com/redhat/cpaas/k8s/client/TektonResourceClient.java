@@ -13,7 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.cpaas.ApplicationException;
 import com.redhat.cpaas.MissingResourceException;
-import com.redhat.cpaas.k8s.model.BuildResource;
+import com.redhat.cpaas.k8s.model.ComponentBuildResource;
 import com.redhat.cpaas.k8s.model.BuilderResource;
 import com.redhat.cpaas.k8s.model.ComponentResource;
 
@@ -67,7 +67,7 @@ public class TektonResourceClient {
     BuilderResourceClient builderResourceClient;
 
     @Inject
-    BuildResourceClient buildResourceClient;
+    ComponentBuildResourceClient componentBuildResourceClient;
 
     @Inject
     ObjectMapper objectMapper;
@@ -155,7 +155,7 @@ public class TektonResourceClient {
                 .withVolumeClaimTemplate(pvc) //
                 .build();
 
-        BuildResource build = buildResourceClient.getByName(buildName);
+        ComponentBuildResource build = componentBuildResourceClient.getByName(buildName);
 
         if (build == null) {
             throw new MissingResourceException(String.format("Selected build '%s' does not exist", buildName));

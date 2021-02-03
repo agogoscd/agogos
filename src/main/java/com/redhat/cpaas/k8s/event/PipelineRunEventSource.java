@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import com.redhat.cpaas.k8s.model.BuildResource;
+import com.redhat.cpaas.k8s.model.ComponentBuildResource;
 
 import org.jboss.logging.Logger;
 
@@ -22,12 +22,12 @@ public class PipelineRunEventSource extends AbstractEventSource implements Resou
 
     /**
      * <p>
-     * Finds if the owner of the {@link PipelineRun} is a {@link BuildResource}. If
+     * Finds if the owner of the {@link PipelineRun} is a {@link ComponentBuildResource}. If
      * this is the case, it returns the {@link OwnerReference#getUid()} value.
      * </p>
      * 
      * <p>
-     * In case the owner is not specified or is not a {@link BuildResource}
+     * In case the owner is not specified or is not a {@link ComponentBuildResource}
      * instance, <code>null</code> is returned.
      * </p>
      * 
@@ -42,8 +42,8 @@ public class PipelineRunEventSource extends AbstractEventSource implements Resou
         }
 
         for (OwnerReference owner : owners) {
-            if (owner.getApiVersion().equals(HasMetadata.getApiVersion(BuildResource.class))
-                    && owner.getKind().equals(HasMetadata.getKind(BuildResource.class))) {
+            if (owner.getApiVersion().equals(HasMetadata.getApiVersion(ComponentBuildResource.class))
+                    && owner.getKind().equals(HasMetadata.getKind(ComponentBuildResource.class))) {
                 return owner.getUid();
             }
         }

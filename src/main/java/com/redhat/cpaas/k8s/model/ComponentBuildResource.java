@@ -2,8 +2,8 @@ package com.redhat.cpaas.k8s.model;
 
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.redhat.cpaas.k8s.model.BuildResource.BuildSpec;
-import com.redhat.cpaas.k8s.model.BuildResource.BuildStatus;
+import com.redhat.cpaas.k8s.model.ComponentBuildResource.BuildSpec;
+import com.redhat.cpaas.k8s.model.ComponentBuildResource.BuildStatus;
 
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
@@ -18,10 +18,10 @@ import lombok.ToString;
 
 @ToString
 @RegisterForReflection
-@Kind("Build")
+@Kind("ComponentBuild")
 @Group("cpaas.redhat.com")
 @Version("v1alpha1")
-public class BuildResource extends CustomResource<BuildSpec, BuildStatus> implements Namespaced {
+public class ComponentBuildResource extends CustomResource<BuildSpec, BuildStatus> implements Namespaced {
     public enum Status {
         New, Initialized, Running, Passed, Failed, Aborted;
     }
@@ -56,7 +56,7 @@ public class BuildResource extends CustomResource<BuildSpec, BuildStatus> implem
         private String component;
     }
 
-    public BuildResource() {
+    public ComponentBuildResource() {
         super();
     }
 

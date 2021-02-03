@@ -20,7 +20,7 @@ import lombok.ToString;
 
 @ToString
 @RegisterForReflection
-@Kind("Group")
+@Kind("ComponentGroup")
 @Group("cpaas.redhat.com")
 @Version("v1alpha1")
 public class ComponentGroupResource extends CustomResource<ComponentGroupResourceSpec, Void> implements Namespaced {
