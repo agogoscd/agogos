@@ -13,9 +13,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.cpaas.ApplicationException;
 import com.redhat.cpaas.MissingResourceException;
-import com.redhat.cpaas.k8s.model.BuilderResource;
+import com.redhat.cpaas.k8s.model.AbstractStage.Phase;
 import com.redhat.cpaas.k8s.model.ComponentBuildResource;
 import com.redhat.cpaas.k8s.model.ComponentResource;
+import com.redhat.cpaas.k8s.model.StageResource;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
@@ -61,7 +62,7 @@ public class TektonResourceClient {
     TektonClient tektonClient;
 
     @Inject
-    BuilderResourceClient builderResourceClient;
+    StageResourceClient stageResourceClient;
 
     @Inject
     ComponentBuildResourceClient componentBuildResourceClient;
@@ -153,7 +154,7 @@ public class TektonResourceClient {
     public Pipeline createPipeline(ComponentResource component) throws ApplicationException {
         // Find the builder defined by the component
         // TODO: This validation should be done as part of ValidatingAdmissionWebhook
-        BuilderResource builder = builderResourceClient.getByName(component.getSpec().getBuilder());
+        StageResource builder = stageResourceClient.getByName(component.getSpec().getBuilder(), Phase.BUILD);
 
         if (builder == null) {
             throw new MissingResourceException(String.format("Selected builder '%s' is not registered in the system",
@@ -173,18 +174,30 @@ public class TektonResourceClient {
         List<PipelineTask> tasks = new ArrayList<>();
 
         // Prepare workspace for main task to store results
-        WorkspacePipelineTaskBinding resultsWsBinding = new WorkspacePipelineTaskBindingBuilder() //
-                .withName("results") //
+        WorkspacePipelineTaskBinding stageWsBinding = new WorkspacePipelineTaskBindingBuilder() //
+                .withName("stage") //
                 .withWorkspace("ws") //
-                .withSubPath("results") //
+                .withSubPath("stage") //
                 .build();
 
         // Prepare workspace for main task to share content between steps
-        WorkspacePipelineTaskBinding sharedWsBinding = new WorkspacePipelineTaskBindingBuilder() //
-                .withName("shared") //
+        WorkspacePipelineTaskBinding pipelineWsBinding = new WorkspacePipelineTaskBindingBuilder() //
+                .withName("pipeline") //
                 .withWorkspace("ws") //
-                .withSubPath("shared") //
+                .withSubPath("pipeline") //
                 .build();
+
+        PipelineTask initTask = new PipelineTaskBuilder() //
+                .withName("init") //
+                .withTaskRef(new TaskRef("tekton.dev/v1beta1", "ClusterTask", "init")) //
+                .addNewParam() //
+                .withName("data") //
+                .withNewValue(componentJson) //
+                .endParam() //
+                .withWorkspaces(stageWsBinding, pipelineWsBinding) //
+                .build();
+
+        tasks.add(initTask);
 
         // TODO: Make pre and post-tasks configurable?
         // Prepare main task
@@ -195,7 +208,8 @@ public class TektonResourceClient {
                 .withName("component") //
                 .withNewValue(componentJson) //
                 .endParam() //
-                .withWorkspaces(resultsWsBinding, sharedWsBinding) //
+                .withWorkspaces(stageWsBinding, pipelineWsBinding) //
+                .withRunAfter("init") //
                 .build();
 
         tasks.add(buildTask);

@@ -5,7 +5,16 @@ metadata:
 spec:
   group: "cpaas-test-containers"
   stages:
+    # - name: "prep1"
+    #   config:
+    #     foo: bar
+    # - name: "prep2"
+    #   config:
+    #     foo: bar
     - name: "errata"
+      # depends-on:
+      #   - prep1
+      #   - prep2
       config:
         advisoryType: "RHBA"
         solution: "CPaaS Test Product 1.7.0 - Containers"

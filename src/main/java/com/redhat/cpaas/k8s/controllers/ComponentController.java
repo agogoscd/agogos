@@ -12,13 +12,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.cpaas.ApplicationException;
 import com.redhat.cpaas.MissingResourceException;
 import com.redhat.cpaas.ValidationException;
-import com.redhat.cpaas.k8s.client.BuilderResourceClient;
 import com.redhat.cpaas.k8s.client.ComponentResourceClient;
+import com.redhat.cpaas.k8s.client.StageResourceClient;
 import com.redhat.cpaas.k8s.client.TektonResourceClient;
-import com.redhat.cpaas.k8s.model.BuilderResource;
+import com.redhat.cpaas.k8s.model.AbstractStage.Phase;
 import com.redhat.cpaas.k8s.model.ComponentResource;
 import com.redhat.cpaas.k8s.model.ComponentResource.ComponentStatus;
 import com.redhat.cpaas.k8s.model.ComponentResource.Status;
+import com.redhat.cpaas.k8s.model.StageResource;
 
 import org.jboss.logging.Logger;
 import org.openapi4j.core.exception.ResolutionException;
@@ -48,7 +49,7 @@ public class ComponentController implements ResourceController<ComponentResource
     TektonResourceClient tektonResourceClient;
 
     @Inject
-    BuilderResourceClient builderResourceClient;
+    StageResourceClient stageResourceClient;
 
     @Inject
     ObjectMapper objectMapper;
@@ -91,7 +92,7 @@ public class ComponentController implements ResourceController<ComponentResource
     }
 
     private void validate(ComponentResource component) throws ApplicationException {
-        BuilderResource builder = builderResourceClient.getByName(component.getSpec().getBuilder());
+        StageResource builder = stageResourceClient.getByName(component.getSpec().getBuilder(), Phase.BUILD);
 
         if (builder == null) {
             throw new MissingResourceException(String.format("Selected builder '%s' is not registered in the system",
@@ -104,6 +105,9 @@ public class ComponentController implements ResourceController<ComponentResource
 
         JsonNode schemaNode = objectMapper.valueToTree(builder.getSpec().getSchema().getOpenAPIV3Schema());
         JsonNode contentNode = objectMapper.valueToTree(component.getSpec().getData());
+
+        LOG.debugv("Validating component ''{0}'' content: ''{1}'' with schema: ''{2}''",
+                component.getMetadata().getName(), contentNode, schemaNode);
 
         SchemaValidator schemaValidator;
 
@@ -119,7 +123,14 @@ public class ComponentController implements ResourceController<ComponentResource
         if (!validation.isValid()) {
             List<String> errorMessages = validation.results().items().stream()
                     .map(item -> item.message().replaceAll("\\.+$", "")).collect(Collectors.toList());
-            throw new ValidationException("Component definition is not valid", errorMessages);
+
+            errorMessages.forEach(message -> {
+                LOG.errorv("Validation error for ''{0}'' component: ''{1}''", component.getMetadata().getName(),
+                        message);
+            });
+
+            throw new ValidationException(
+                    "Component definition '" + component.getMetadata().getName() + "' is not valid", errorMessages);
         }
 
         LOG.infov("Component ''{0}'' is valid!", component.getMetadata().getName());

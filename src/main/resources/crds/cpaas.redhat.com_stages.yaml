@@ -42,17 +42,35 @@ spec:
                   description: Name of the Tekton task being the implementation of the Stage.
                 schema:
                   type: object
-                  description: Validation definition that should be applied on the Stage configuration defined.
+                  description: Validation definition that should be applied on the Stage configuration passed.
                   properties:
                     openAPIV3Schema:
+                      x-kubernetes-preserve-unknown-fields: true
                       type: object
                       description: "OpenAPI v3 formatted validation.
                         More info: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md"
-                      additionalProperties: true
                   required:
                     - "openAPIV3Schema"
               required:
                 - "task"
+            status:
+              description: StageStatus defines the observed state of Stage
+              type: object
           type: object
       served: true
       storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Phase
+          type: string
+          jsonPath: .metadata.labels.cpaas\.redhat\.com/phase
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

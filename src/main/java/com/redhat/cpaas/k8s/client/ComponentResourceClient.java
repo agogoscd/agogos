@@ -24,9 +24,6 @@ public class ComponentResourceClient {
     KubernetesClient kubernetesClient;
 
     @Inject
-    BuilderResourceClient builderResourceClient;
-
-    @Inject
     ObjectMapper objectMapper;
 
     MixedOperation<ComponentResource, ComponentResourceList, Resource<ComponentResource>> componentClient;

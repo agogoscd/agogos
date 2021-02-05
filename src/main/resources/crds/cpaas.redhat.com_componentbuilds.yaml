@@ -71,7 +71,7 @@ spec:
           jsonPath: .status.status
           type: string
         - name: Component
-          jsonPath: .metadata.labels['cpaas.redhat.com/component']
+          jsonPath: .metadata.labels.cpaas\.redhat\.com/component
           type: string
 status:
   acceptedNames:

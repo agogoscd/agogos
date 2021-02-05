@@ -57,16 +57,16 @@ public class PipelineController implements ResourceController<PipelineResource> 
 
         // Prepare workspace for main task to store results
         WorkspacePipelineTaskBinding resultsWsBinding = new WorkspacePipelineTaskBindingBuilder() //
-                .withName("results") //
+                .withName("stage") //
                 .withWorkspace("ws") //
-                .withSubPath("results") //
+                .withSubPath("stage") //
                 .build();
 
         // Prepare workspace for main task to share content between steps
-        WorkspacePipelineTaskBinding sharedWsBinding = new WorkspacePipelineTaskBindingBuilder() //
-                .withName("shared") //
+        WorkspacePipelineTaskBinding pipelineWsBinding = new WorkspacePipelineTaskBindingBuilder() //
+                .withName("pipeline") //
                 .withWorkspace("ws") //
-                .withSubPath("shared") //
+                .withSubPath("pipeline") //
                 .build();
 
         OwnerReference ownerReference = new OwnerReferenceBuilder() //
@@ -80,7 +80,6 @@ public class PipelineController implements ResourceController<PipelineResource> 
 
         List<PipelineTask> tasks = new ArrayList<>();
 
-
         componentGroupResourceClient.getByName(pipeline.getSpec().getGroup());
 
         for (StageReference stageRef : pipeline.getSpec().getStages()) {
@@ -89,7 +88,6 @@ public class PipelineController implements ResourceController<PipelineResource> 
             // Convert Component metadata to JSON
             try {
                 stageConfig = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(stageRef.getConfig());
-                System.out.println(stageConfig);
             } catch (JsonProcessingException e) {
 
                 return UpdateControl.noUpdate();
@@ -107,7 +105,7 @@ public class PipelineController implements ResourceController<PipelineResource> 
                     .withName("config") //
                     .withNewValue(stageConfig) //
                     .endParam() //
-                    .withWorkspaces(resultsWsBinding, sharedWsBinding) //
+                    .withWorkspaces(resultsWsBinding, pipelineWsBinding) //
                     .build();
 
             tasks.add(task);
