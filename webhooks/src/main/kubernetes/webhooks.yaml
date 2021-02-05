@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpaas-webhooks
+  labels:
+    app: cpaas-webhooks
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cpaas-webhooks
+  template:
+    metadata:
+      labels:
+        app: cpaas-webhooks
+    spec:
+      containers:
+        - name: webhooks
+          image: quay.io/redhat_emp1/curling:webhooks
+          imagePullPolicy: Always
+          env:
+            - name: QUARKUS_HTTP_SSL_CERTIFICATE_FILE
+              value: /certs/tls.crt
+            - name: QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE
+              value: /certs/tls.key
+          volumeMounts:
+            - name: certs
+              mountPath: "/certs"
+              readOnly: true
+          ports:
+            - containerPort: 7070
+              name: http
+              protocol: TCP
+            - containerPort: 8443
+              name: https
+              protocol: TCP
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: 7070
+          #   initialDelaySeconds: 3
+          #   periodSeconds: 3
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+      volumes:
+        - name: certs
+          secret:
+            secretName: cpaas-tls
+      serviceAccount: service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cpaas-webhooks
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 7070
+    - port: 443
+      protocol: TCP
+      name: https
+      targetPort: 8443
+  type: ClusterIP
+  selector:
+    app: cpaas-webhooks

@@ -1,0 +1,20 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: "validation.webhook.cpaas.redhat.com"
+webhooks:
+  - name: component.validation.webhook.cpaas.redhat.com
+    sideEffects: None
+    admissionReviewVersions: ["v1"]
+    clientConfig:
+      service:
+        namespace: default
+        name: cpaas-webhooks
+        path: /webhooks/component
+        port: 443
+    rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["cpaas.redhat.com"]
+        apiVersions: ["v1alpha1"]
+        resources: ["components"]
+        scope: "Namespaced"

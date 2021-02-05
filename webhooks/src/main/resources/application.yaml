@@ -1,0 +1,26 @@
+quarkus:
+  http:
+    port: 7080
+  log:
+    min-level: TRACE
+    syslog:
+      truncate: false
+
+  banner:
+    enabled: true
+    path: "banner.txt"
+
+"%dev":
+  quarkus:
+    log:
+      category:
+        "com.redhat.cpaas":
+          level: TRACE
+        # "io.javaoperatorsdk":
+        #   level: TRACE
+
+
+"%prod":
+    # TODO: change this
+    kubernetes-client:
+      trust-certs: true

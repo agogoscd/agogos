@@ -1,0 +1,65 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cpaas-admin
+  labels:
+    # Add these permissions to the "admin" and "edit" default roles.
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+rules:
+  - apiGroups: ["cpaas.redhat.com"]
+    resources: ["*"]
+    verbs:
+      [
+        "get",
+        "list",
+        "watch",
+        "create",
+        "update",
+        "patch",
+        "delete",
+        "deletecollection",
+      ]
+  - apiGroups: ["apiextensions.k8s.io"]
+    resources: ["customresourcedefinitions"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["tekton.dev"]
+    resources: ["*"]
+    verbs:
+      [
+        "get",
+        "list",
+        "watch",
+        "create",
+        "update",
+        "patch",
+        "delete",
+        "deletecollection",
+      ]
+---
+# Give special permissions to the service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cpaas-service-admin
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: cpaas-admin
+subjects:
+  - kind: ServiceAccount
+    name: service
+    namespace: default
+# ---
+# kind: ClusterRole
+# apiVersion: rbac.authorization.k8s.io/v1
+# metadata:
+#   name: factory-view
+#   labels:
+#     # Add these permissions to the "view" default role.
+#     rbac.authorization.k8s.io/aggregate-to-view: "true"
+#     rbac.authorization.k8s.io/aggregate-to-cluster-reader: "true"
+# rules:
+#   - apiGroups: ["cpaas.redhat.com"]
+#     resources: ["*"]
+#     verbs: ["get", "list", "watch"]

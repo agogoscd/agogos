@@ -8,7 +8,9 @@
     <name>CPaaS</name>
 
     <modules>
-        <module>service</module>
+        <module>core</module>
+        <module>operator</module>
+        <module>webhooks</module>
     </modules>
 
     <properties>
@@ -22,6 +24,10 @@
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
         <quarkus.platform.version>1.11.1.Final</quarkus.platform.version>
         <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
+        <operator-framework.version>1.7.1</operator-framework.version>
+        <openapi-schema-validator.version>1.0.5</openapi-schema-validator.version>
+        <lombok.version>1.18.16</lombok.version>
+        <quarkus-tekton-client.version>0.2.0</quarkus-tekton-client.version>
     </properties>
 
     <dependencyManagement>

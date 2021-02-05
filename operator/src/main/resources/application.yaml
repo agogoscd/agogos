@@ -1,0 +1,55 @@
+quarkus:
+  http:
+    port: 7070
+  log:
+    min-level: TRACE
+    syslog:
+      truncate: false
+  index-dependency:
+    #   operatorsdk:
+    #     group-id: "io.javaoperatorsdk"
+    #     artifact-id: "operator-framework-core"
+    okhttp:
+      group-id: com.squareup.okhttp3
+      artifact-id: okhttp
+    okio:
+      group-id: com.squareup.okio
+      artifact-id: okio
+
+  banner:
+    enabled: true
+    path: "banner.txt"
+
+kubernetes:
+  # Default storage class name in minikube
+  storage-class: "standard"
+
+"%dev":
+  quarkus:
+    log:
+      category:
+        "com.redhat.cpaas":
+          level: DEBUG
+        # "io.javaoperatorsdk":
+        #   level: TRACE
+    kubernetes-client:
+      trust-certs: true
+
+"%prod":
+  quarkus:
+    http:
+      ssl:
+        certificate:
+          file: /server.crt
+          key-file: /server.key
+
+    # log:
+    #   category:
+    #     "io.javaoperatorsdk.operator.processing":
+    #       level: WARN
+    #     "io.fabric8.kubernetes.client.informers.cache":
+    #       level: WARN
+
+    # TODO: change this
+    kubernetes-client:
+      trust-certs: true
