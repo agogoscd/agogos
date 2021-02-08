@@ -187,17 +187,17 @@ public class TektonResourceClient {
                 .withSubPath("pipeline") //
                 .build();
 
-        // PipelineTask initTask = new PipelineTaskBuilder() //
-        //         .withName("init") //
-        //         .withTaskRef(new TaskRef("tekton.dev/v1beta1", "ClusterTask", "init")) //
-        //         .addNewParam() //
-        //         .withName("data") //
-        //         .withNewValue(componentJson) //
-        //         .endParam() //
-        //         .withWorkspaces(stageWsBinding, pipelineWsBinding) //
-        //         .build();
+        PipelineTask initTask = new PipelineTaskBuilder() //
+                .withName("init") //
+                .withTaskRef(new TaskRef("tekton.dev/v1beta1", "ClusterTask", "init")) //
+                .addNewParam() //
+                .withName("data") //
+                .withNewValue(componentJson) //
+                .endParam() //
+                .withWorkspaces(stageWsBinding, pipelineWsBinding) //
+                .build();
 
-        // tasks.add(initTask);
+        tasks.add(initTask);
 
         // TODO: Make pre and post-tasks configurable?
         // Prepare main task
