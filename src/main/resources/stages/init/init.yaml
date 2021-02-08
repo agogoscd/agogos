@@ -1,0 +1,27 @@
+apiVersion: cpaas.redhat.com/v1alpha1
+kind: ClusterStage
+metadata:
+  name: init
+spec:
+  task: init
+---
+# The Tekton Task responsible for handling errata
+apiVersion: tekton.dev/v1beta1
+kind: ClusterTask
+metadata:
+  name: init
+spec:
+  workspaces:
+    - name: "pipeline"
+    - name: "stage"
+  params:
+    - name: "image"
+      type: "string"
+      default: "quay.io/redhat_emp1/cpaas-next-poc-stage-init:latest"
+    - name: "data"
+      type: "string"
+  steps:
+    - name: "execute"
+      image: "$(params.image)"
+      command: ["/bin/python3"]
+      args: ["/run.py", "$(params.data)", "$(workspaces.pipeline.path)"]
