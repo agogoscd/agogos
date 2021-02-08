@@ -209,7 +209,7 @@ public class TektonResourceClient {
                 .withNewValue(componentJson) //
                 .endParam() //
                 .withWorkspaces(stageWsBinding, pipelineWsBinding) //
-                .withRunAfter("init") //
+                // .withRunAfter("init") //
                 .build();
 
         tasks.add(buildTask);
