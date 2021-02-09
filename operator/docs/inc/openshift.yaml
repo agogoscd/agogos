@@ -1,0 +1,9 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: agogos
+spec:
+  host: api.apps.agogos.lab.upshift.rdu2.redhat.com
+  to:
+    kind: Service
+    name: operator

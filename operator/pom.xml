@@ -4,14 +4,14 @@
 
     <parent>
         <groupId>com.redhat.cpaas</groupId>
-        <artifactId>cpaas-parent</artifactId>
+        <artifactId>agogos-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
     <groupId>com.redhat.cpaas</groupId>
-    <artifactId>cpaas-operator</artifactId>
+    <artifactId>agogos-operator</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>CPaaS Operator</name>
+    <name>Agogos Operator</name>
 
     <dependencies>
         <dependency>
@@ -50,7 +50,7 @@
         </dependency>
         <dependency>
             <groupId>com.redhat.cpaas</groupId>
-            <artifactId>cpaas-core</artifactId>
+            <artifactId>agogos-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

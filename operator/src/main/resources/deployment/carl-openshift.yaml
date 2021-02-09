@@ -1,9 +1,0 @@
-apiVersion: route.openshift.io/v1
-kind: Route
-metadata:
-  name: curling
-spec:
-  host: api.apps.curling.lab.upshift.rdu2.redhat.com
-  to:
-    kind: Service
-    name: service

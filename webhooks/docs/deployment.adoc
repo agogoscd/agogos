@@ -1,0 +1,40 @@
+= Agogos Webhooks Deployment Guide
+CP Development Team <cp-devel@redhat.com>
+:toc:
+:icons: font
+:numbered:
+:source-highlighter: highlightjs
+
+== Webhook Registration
+
+In order to utilize our service to make decisions to allow or reject requests,
+the cluster needs to be configured in such a way that requests for all resources
+we want to validate should go through our service.
+
+This is done via the `ValidatingWebhookConfiguration` resource as seen below.
+
+=== Service Deployment
+
+In case the handler is deployed as a Service within the cluster, we can
+refer to it directly using the `service` key.
+
+NOTE: This should be used in production deployment.
+
+[source,yaml]
+.Webhook registration within the cluster
+----
+include::inc/deployment-service.yaml[]
+----
+
+=== External Deployment
+
+In case of external deployments, we can use `url` key to point to the
+webhook deployment.
+
+NOTE: This deployment should be used only at development time.
+
+[source,yaml]
+.Webhook registration within the cluster
+----
+include::inc/deployment-external.yaml[]
+----

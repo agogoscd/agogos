@@ -1,3 +1,3 @@
-# About Curling
+# About Agogos
 
 TBD

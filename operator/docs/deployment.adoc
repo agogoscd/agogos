@@ -1,0 +1,26 @@
+= Agogos Operator Deployment Guide
+CP Development Team <cp-devel@redhat.com>
+:toc:
+:icons: font
+:numbered:
+:source-highlighter: highlightjs
+
+== Secrets
+
+* Image pull secret
+
+== RBAC
+
+[source,yaml]
+.OpenShift route definition
+----
+include::inc/rbac.yaml[]
+----
+
+== OpenShift specific resources
+
+[source,yaml]
+.OpenShift route definition
+----
+include::inc/openshift.yaml[]
+----

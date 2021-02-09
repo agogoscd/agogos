@@ -31,11 +31,10 @@ import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
 import io.fabric8.kubernetes.api.model.admission.AdmissionReview;
 import io.fabric8.kubernetes.api.model.admission.AdmissionReviewBuilder;
 
-@Path("/webhooks/component")
+@Path("/webhooks/admission")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ComponentWebhookHandler {
-
     private static final Logger LOG = Logger.getLogger(ComponentWebhookHandler.class);
 
     @Inject
