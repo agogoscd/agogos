@@ -55,13 +55,6 @@ public class PipelineController implements ResourceController<PipelineResource> 
             Context<PipelineResource> context) {
         LOG.infov("Pipeline ''{0}'' modified", pipeline.getMetadata().getName());
 
-        // Prepare workspace for main task to store results
-        WorkspacePipelineTaskBinding resultsWsBinding = new WorkspacePipelineTaskBindingBuilder() //
-                .withName("stage") //
-                .withWorkspace("ws") //
-                .withSubPath("stage") //
-                .build();
-
         // Prepare workspace for main task to share content between steps
         WorkspacePipelineTaskBinding pipelineWsBinding = new WorkspacePipelineTaskBindingBuilder() //
                 .withName("pipeline") //
@@ -97,6 +90,13 @@ public class PipelineController implements ResourceController<PipelineResource> 
                 // stageRef.getName()), e);
             }
 
+            // Prepare workspace for main task to store results
+            WorkspacePipelineTaskBinding stageWsBinding = new WorkspacePipelineTaskBindingBuilder() //
+                    .withName("stage") //
+                    .withWorkspace("ws") //
+                    .withSubPath(String.format("pipeline/%s", stageRef.getName())) //
+                    .build();
+
             // Prepare task
             PipelineTask task = new PipelineTaskBuilder() //
                     .withName(stageRef.getName()) //
@@ -105,7 +105,7 @@ public class PipelineController implements ResourceController<PipelineResource> 
                     .withName("config") //
                     .withNewValue(stageConfig) //
                     .endParam() //
-                    .withWorkspaces(resultsWsBinding, pipelineWsBinding) //
+                    .withWorkspaces(stageWsBinding, pipelineWsBinding) //
                     .build();
 
             tasks.add(task);

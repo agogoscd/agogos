@@ -7,12 +7,12 @@ CP Development Team <cp-devel@redhat.com>
 
 == Secrets
 
-* Image pull secret
+TBD
 
 == RBAC
 
 [source,yaml]
-.OpenShift route definition
+.RBAC
 ----
 include::inc/rbac.yaml[]
 ----

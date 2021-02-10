@@ -63,12 +63,13 @@ spec:
       served: true
       storage: true
       additionalPrinterColumns:
-        - name: Group
+        - name: Component Group
           jsonPath: .spec.group
           type: string
-        - name: Stages
-          type: string
-          jsonPath: .spec.stages[]
+        ## https://github.com/kubernetes/kubectl/issues/517
+        # - name: Stages
+        #   type: string
+        #   jsonPath: .spec.stages[*].name
         - name: Age
           type: date
           jsonPath: .metadata.creationTimestamp

@@ -20,6 +20,14 @@ quarkus:
     enabled: true
     path: "banner.txt"
 
+  container-image:
+    group: cpaas
+    name: agogos-poc-operator
+    registry: quay.io
+
+agogos:
+  service-account: agogos
+
 kubernetes:
   # Default storage class name in minikube
   storage-class: "standard"

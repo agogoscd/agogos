@@ -10,6 +10,11 @@ quarkus:
     enabled: true
     path: "banner.txt"
 
+  container-image:
+    group: cpaas
+    name: agogos-poc-webhooks
+    registry: quay.io
+
 "%dev":
   quarkus:
     log:

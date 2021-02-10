@@ -2,4 +2,4 @@
 
 set -e
 
-podman build . -t quay.io/redhat_emp1/cpaas-next-poc-stage-init:latest
+podman build . -t quay.io/cpaas/agogos-poc-stage-init:latest

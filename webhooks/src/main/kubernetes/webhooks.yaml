@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: webhooks
-          image: quay.io/redhat_emp1/curling:webhooks
+          image: quay.io/cpaas/agogos-poc-webhooks:latest
           imagePullPolicy: Always
           env:
             - name: QUARKUS_HTTP_SSL_CERTIFICATE_FILE
@@ -51,7 +51,7 @@ spec:
         - name: certs
           secret:
             secretName: cpaas-tls
-      serviceAccount: service
+      serviceAccount: agogos
 ---
 apiVersion: v1
 kind: Service

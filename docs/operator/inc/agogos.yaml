@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: service
+  name: agogos
 imagePullSecrets:
   - name: quay-pull-secret
 ---
@@ -50,7 +50,7 @@ spec:
     spec:
       containers:
         - name: service
-          image: quay.io/redhat_emp1/curling:latest
+          image: quay.io/cpaas/agogos-operator:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 7070

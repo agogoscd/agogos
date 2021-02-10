@@ -2,7 +2,6 @@ package com.redhat.cpaas.k8s.client;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 import com.redhat.cpaas.k8s.model.AbstractStage.Phase;
@@ -33,11 +32,6 @@ public class StageResourceClient {
     TektonClient tektonClient;
 
     MixedOperation<StageResource, StageResourceList, Resource<StageResource>> stageResourceClient;
-
-    // @Produces
-    // public StageResourceClient producer() {
-    //     return this;
-    // }
 
     @PostConstruct
     void init() {

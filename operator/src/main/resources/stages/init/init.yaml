@@ -13,11 +13,10 @@ metadata:
 spec:
   workspaces:
     - name: "pipeline"
-    - name: "stage"
   params:
     - name: "image"
       type: "string"
-      default: "quay.io/redhat_emp1/cpaas-next-poc-stage-init:latest"
+      default: "quay.io/cpaas/agogos-poc-stage-init:latest"
     - name: "data"
       type: "string"
   steps:

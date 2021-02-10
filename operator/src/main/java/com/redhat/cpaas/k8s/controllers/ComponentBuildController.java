@@ -12,6 +12,7 @@ import com.redhat.cpaas.k8s.client.ComponentBuildResourceClient;
 import com.redhat.cpaas.k8s.client.ComponentResourceClient;
 import com.redhat.cpaas.k8s.client.TektonResourceClient;
 import com.redhat.cpaas.k8s.errors.ApplicationException;
+import com.redhat.cpaas.k8s.errors.MissingResourceException;
 import com.redhat.cpaas.k8s.event.PipelineRunEvent;
 import com.redhat.cpaas.k8s.event.PipelineRunEventSource;
 import com.redhat.cpaas.k8s.model.ComponentBuildResource;
@@ -19,11 +20,26 @@ import com.redhat.cpaas.k8s.model.ComponentBuildResource.BuildStatus;
 import com.redhat.cpaas.k8s.model.ComponentBuildResource.Status;
 import com.redhat.cpaas.k8s.model.ComponentResource;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
 
 import io.fabric8.knative.internal.pkg.apis.Condition;
+import io.fabric8.kubernetes.api.model.OwnerReference;
+import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
+import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
+import io.fabric8.kubernetes.api.model.PersistentVolumeClaimBuilder;
+import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.tekton.client.TektonClient;
+import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
+import io.fabric8.tekton.pipeline.v1beta1.PipelineRef;
+import io.fabric8.tekton.pipeline.v1beta1.PipelineRefBuilder;
+import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
+import io.fabric8.tekton.pipeline.v1beta1.PipelineRunBuilder;
+import io.fabric8.tekton.pipeline.v1beta1.PipelineRunSpecBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRunStatus;
+import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBinding;
+import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBindingBuilder;
 import io.javaoperatorsdk.operator.api.Context;
 import io.javaoperatorsdk.operator.api.Controller;
 import io.javaoperatorsdk.operator.api.DeleteControl;
@@ -38,6 +54,12 @@ public class ComponentBuildController implements ResourceController<ComponentBui
 
     private static final String COMPONENT_LABEL = "cpaas.redhat.com/component";
 
+    @ConfigProperty(name = "agogos.service-account")
+    Optional<String> serviceAccount;
+
+    @ConfigProperty(name = "kubernetes.storage-class")
+    Optional<String> storageClass;
+
     @Inject
     KubernetesClient kubernetesClient;
 
@@ -48,10 +70,16 @@ public class ComponentBuildController implements ResourceController<ComponentBui
     ComponentResourceClient componentResourceClient;
 
     @Inject
+    ComponentBuildResourceClient componentBuildResourceClient;
+
+    @Inject
     TektonResourceClient tektonResourceClient;
 
     @Inject
     PipelineRunEventSource pipelineRunEventSource;
+
+    @Inject
+    TektonClient tektonClient;
 
     private boolean hasLabels(ComponentBuildResource build) {
         Map<String, String> labels = build.getMetadata().getLabels();
@@ -96,7 +124,7 @@ public class ComponentBuildController implements ResourceController<ComponentBui
         }
 
         try {
-            tektonResourceClient.runPipeline(build.getSpec().getComponent(), build.getMetadata().getName());
+            this.runBuildPipeline(build.getSpec().getComponent(), build.getMetadata().getName());
         } catch (ApplicationException e) {
             throw new Exception("Error occurred while triggering the pipeline for component ''{0}''", e);
         }
@@ -236,4 +264,79 @@ public class ComponentBuildController implements ResourceController<ComponentBui
         // return onEvent(resource, context);
     }
 
+    private PipelineRun runBuildPipeline(String componentName, String buildName) throws ApplicationException {
+        Pipeline pipeline = tektonResourceClient.getPipelineByName(componentName);
+
+        if (pipeline == null) {
+            throw new MissingResourceException(String.format("Pipeline '%s' not found in the system", componentName));
+        }
+
+        PipelineRef pipelineRef = new PipelineRefBuilder(true).withName(pipeline.getMetadata().getName()).build();
+
+        Map<String, Quantity> requests = new HashMap<String, Quantity>();
+        requests.put("storage", new Quantity("1Gi"));
+
+        String storageClassName = "";
+
+        if (storageClass.isPresent()) {
+            storageClassName = storageClass.get();
+        }
+
+        String serviceAccountName = null;
+
+        if (serviceAccount.isPresent()) {
+            serviceAccountName = serviceAccount.get();
+        }
+
+        PersistentVolumeClaim pvc = new PersistentVolumeClaimBuilder() //
+                .withNewSpec() //
+                .withNewResources().withRequests(requests).endResources() //
+                .withStorageClassName(storageClassName) //
+                .withAccessModes("ReadWriteOnce") //
+                .endSpec()//
+                .build();
+
+        WorkspaceBinding workspaceBinding = new WorkspaceBindingBuilder() //
+                .withName("ws") //
+                .withVolumeClaimTemplate(pvc) //
+                .build();
+
+        ComponentBuildResource build = componentBuildResourceClient.getByName(buildName);
+
+        if (build == null) {
+            throw new MissingResourceException(String.format("Selected build '%s' does not exist", buildName));
+        }
+
+        Map<String, String> labels = new HashMap<>();
+        labels.put("cpaas.redhat.com/build", buildName);
+
+        OwnerReference ownerReference = new OwnerReferenceBuilder() //
+                .withApiVersion(build.getApiVersion()) //
+                .withKind(build.getKind()) //
+                .withName(build.getMetadata().getName()) //
+                .withUid(build.getMetadata().getUid()) //
+                .withBlockOwnerDeletion(true) //
+                .withController(true) //
+                .build();
+
+        PipelineRunSpecBuilder pipelineRunSpecBuilder = new PipelineRunSpecBuilder() //
+                .withPipelineRef(pipelineRef) //
+                .withWorkspaces(workspaceBinding); //
+
+        if (serviceAccountName != null) {
+            pipelineRunSpecBuilder.withServiceAccountName(serviceAccountName);
+        }
+
+        PipelineRun pipelineRun = new PipelineRunBuilder() //
+                .withNewMetadata() //
+                .withOwnerReferences(ownerReference) //
+                .withName(buildName) //
+                .withLabels(labels) //
+                .endMetadata() //
+                .withSpec(pipelineRunSpecBuilder.build()) //
+                .build();
+
+        return tektonClient.v1beta1().pipelineRuns().inNamespace(build.getMetadata().getNamespace())
+                .create(pipelineRun);
+    }
 }

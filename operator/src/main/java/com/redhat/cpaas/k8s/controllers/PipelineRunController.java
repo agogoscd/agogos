@@ -27,6 +27,7 @@ import io.fabric8.tekton.pipeline.v1beta1.PipelineRef;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRefBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRunBuilder;
+import io.fabric8.tekton.pipeline.v1beta1.PipelineRunSpecBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBinding;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBindingBuilder;
 import io.javaoperatorsdk.operator.api.Context;
@@ -40,7 +41,8 @@ public class PipelineRunController implements ResourceController<PipelineRunReso
 
     private static final Logger LOG = Logger.getLogger(PipelineRunController.class);
 
-    public static String CPAAS_SA_NAME = "service";
+    @ConfigProperty(name = "agogos.service-account")
+    Optional<String> serviceAccount;
 
     @ConfigProperty(name = "kubernetes.storage-class")
     Optional<String> storageClass;
@@ -67,7 +69,7 @@ public class PipelineRunController implements ResourceController<PipelineRunReso
                     LOG.infov("Handling new pipeline run ''{0}''", run.getMetadata().getName());
 
                     // TODO: Externalize it!
-                    // TODO:  This code can be made generic to work for any pipelines
+                    // TODO: This code can be made generic to work for any pipelines
                     Pipeline pipeline = tektonResourceClient.getPipelineByName(run.getSpec().getPipeline());
 
                     if (pipeline == null) {
@@ -81,12 +83,16 @@ public class PipelineRunController implements ResourceController<PipelineRunReso
                     Map<String, Quantity> requests = new HashMap<String, Quantity>();
                     requests.put("storage", new Quantity("1Gi"));
 
-                    String storageClassName;
+                    String storageClassName = "";
 
                     if (storageClass.isPresent()) {
                         storageClassName = storageClass.get();
-                    } else {
-                        storageClassName = "";
+                    }
+
+                    String serviceAccountName = null;
+
+                    if (serviceAccount.isPresent()) {
+                        serviceAccountName = serviceAccount.get();
                     }
 
                     PersistentVolumeClaim pvc = new PersistentVolumeClaimBuilder() //
@@ -111,17 +117,21 @@ public class PipelineRunController implements ResourceController<PipelineRunReso
                             .withController(true) //
                             .build();
 
+                    PipelineRunSpecBuilder pipelineRunSpecBuilder = new PipelineRunSpecBuilder() //
+                            .withPipelineRef(pipelineRef) //
+                            .withWorkspaces(workspaceBinding); //
+
+                    if (serviceAccountName != null) {
+                        pipelineRunSpecBuilder.withServiceAccountName(serviceAccountName);
+                    }
+
                     PipelineRun pipelineRun = new PipelineRunBuilder() //
                             .withNewMetadata() //
                             .withOwnerReferences(ownerReference) //
                             .withName(run.getMetadata().getName()) //
                             // .withLabels(labels) //
                             .endMetadata() //
-                            .withNewSpec() //
-                            .withServiceAccountName(CPAAS_SA_NAME) //
-                            .withPipelineRef(pipelineRef) //
-                            .withWorkspaces(workspaceBinding) //
-                            .endSpec() //
+                            .withSpec(pipelineRunSpecBuilder.build()) //
                             .build();
 
                     tektonClient.v1beta1().pipelineRuns().inNamespace(run.getMetadata().getNamespace())

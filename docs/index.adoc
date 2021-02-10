@@ -1,0 +1,10 @@
+= Agogos
+CP Development Team <cp-devel@redhat.com>
+:toc:
+:icons: font
+:numbered:
+:source-highlighter: highlightjs
+
+* link:operator/index{outfilesuffix}[Operator]
+* link:webhooks/index{outfilesuffix}[Webhooks]
+* link:development{outfilesuffix}[Development]

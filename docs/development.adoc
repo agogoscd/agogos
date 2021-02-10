@@ -1,0 +1,258 @@
+= Agogos Development
+CP Development Team <cp-devel@redhat.com>
+:toc:
+:icons: font
+:numbered:
+:source-highlighter: highlightjs
+
+This document describes the development workflow.
+
+== System requirements
+
+Please make sure you have following requirements installed:
+
+* link:https://minikube.sigs.k8s.io/docs/start/[Minikube]
+** link:https://kubernetes.io/docs/tasks/tools/install-kubectl/[kubectl]
+* link:https://tekton.dev/docs/getting-started/#installation[Tekton]
+* link:https://sdkman.io/jdks#jdk.java.net[JDK 11]
+
+== Resource requirements
+
+=== Registering CRD's
+
+Once you have required tools installed and running on your system the next thing
+to do is to register CRD's within the system. This can be done by running this command:
+
+[source,bash]
+.Registering CRD's
+----
+❯ ./operator/src/main/resources/crds/apply.sh
+----
+
+NOTE: Each time after you change the CRD you need to run above command again.
+
+=== Quay pull secret
+
+To be able to use resources (stages) developed by the Agogos team you need to have access to
+these images. Currently these are private and hosted in link:https://quay.io[quay.io] repository.
+
+NOTE: You can obtain a token (password) for a bot account that has read-only access to these images.
+This will make it possible to fetch them in your deployment. Please each out to one of Agogos developers
+for details.
+
+==== Secret creation
+
+If your account has access to Agogos images you can create the pull secret by following
+instruction found below. Alternatively you can use details provided by the Agogos team.
+
+Navigate to link:https://quay.io[quay.io] and open Account Settings page. Click on the
+"Generate Encrypted Password" link and enter your quay.io password. Navigate to "Encrypted
+Password" and copy the value. It will be used in the command below.
+
+[source,bash]
+.Secret creation
+----
+❯ kubectl create secret docker-registry quay-pull-secret --docker-server=quay.io --docker-username=<username> --docker-password=<password> --docker-email=agogos@domain.com
+secret/quay-pull-secret created
+----
+
+NOTE: The Secret name: `quay-pull-secret` needs to match the `imagePullSecret` name in the Service Account definition.
+
+=== Service Account
+
+The `agogos` Service Account utilizes the pull secret created before to be able to fetch images from registry.
+
+[source,yaml]
+.sa.yaml
+----
+include::inc/deployment/sa.yaml[]
+----
+
+[source,bash]
+.Secret creation
+----
+❯ kubectl apply -f sa.yaml
+----
+
+== Running in the development mode
+
+[source,bash]
+.Compiling and installing the application
+----
+❯ ./mvnw install
+----
+
+You can run the Operator in dev mode that enables live coding using:
+
+[source,bash]
+.Running the Operator
+----
+❯ ./mvnw quarkus:dev -pl operator
+----
+
+Similarly you can run webhooks application:
+
+[source,bash]
+.Running the webhooks code
+----
+❯ ./mvnw quarkus:dev -pl webhooks
+----
+
+== Building and pushing container images
+
+It is possible to build and push container images with the application automatically using
+link:https://cloud.google.com/java/getting-started/jib[Jib].
+
+NOTE: More information can be found in Quarkus docs: https://quarkus.io/guides/container-image
+
+[source,bash]
+.Building and pushing Operator image
+----
+❯ ./mvnw clean package -pl operator -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true
+----
+
+[source,bash]
+.Building and pushing Operator image
+----
+❯ ./mvnw clean package -pl webhooks -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true
+----
+
+== Examples
+
+Your deployment is ready now. We can populate it with some resources to be able to see
+how Agogos works.
+
+=== Registering stages
+
+Before you can create Components and Pipelines you need to register stages
+that will be used by these resources in the first place.
+
+First, register the `init` Stage.
+
+[source,bash]
+----
+❯ kubectl apply -f ./operator/src/main/resources/stages/init/init.yaml
+clusterstage.cpaas.redhat.com/init created
+clustertask.tekton.dev/init created
+----
+
+Now we will register other Stages. These resources are developed outside this repository.
+
+Please clone the https://gitlab.cee.redhat.com/mgoldman/random-extensions repository locally
+and run the commands below in teh root of this repository to register stages.
+
+[source,bash]
+----
+❯ kubectl apply -f ./stages/build/brew/brew.yaml
+stage.cpaas.redhat.com/brew created
+task.tekton.dev/brew created
+❯ kubectl apply -f ./stages/build/pig/pig.yaml
+stage.cpaas.redhat.com/pig created
+task.tekton.dev/pig created
+----
+
+[WARNING]
+====
+Above build stages require additional configuration. Specifically, the `brew` stage
+requires a keytab Secret to be able to talk to Brew and the `pig` stage requires proper
+configuration to be able to connect to PNC.
+
+Instructions on how to set up these can be found in the link:https://gitlab.cee.redhat.com/mgoldman/random-extensions/-/tree/master/stages/build[extension repository for specific stages].
+Please *follow these*.
+
+Below you can find expected commands to run.
+
+[source,bash]
+.Creating Brew keytab
+----
+❯ kubectl create secret generic brew-keytab --from-file=keytab=<filename>.keytab --from-literal=principal=<username>@REDHAT.COM
+secret/brew-keytab created
+----
+
+[source,bash]
+.Creating PiG configuration
+----
+❯ kubectl create secret generic pig-configuration --from-file=config.yaml
+----
+
+====
+
+=== Creating resources
+
+Now we can create resources that will be used in our example. This includes Components
+and Pipelines.
+
+Run the `apply.sh` script from this repository.
+
+[source,bash]
+----
+./operator/src/test/resources/samples/test-product/definitions/apply.sh
+pipeline.cpaas.redhat.com/cpaas-test-containers created
+componentgroup.cpaas.redhat.com/cpaas-test-containers created
+componentgroup.cpaas.redhat.com/cpaas-test-rpms created
+component.cpaas.redhat.com/cpaas-test-brew-container created
+component.cpaas.redhat.com/cpaas-test-brew-rpm created
+component.cpaas.redhat.com/cpaas-test-java created
+----
+
+You can confirm that Components were created successfully:
+
+[source,bash]
+----
+❯ kubectl get components.cpaas.redhat.com
+NAME                        STATUS   AGE
+cpaas-test-brew-container   Ready    2m4s
+cpaas-test-brew-rpm         Ready    2m4s
+cpaas-test-java             Ready    2m4s
+----
+
+=== Building a Component
+
+Now let's build a sample Component `cpaas-test-brew-container`. This Component will use the
+`brew` build stage (aka Builder).
+
+[source,bash]
+----
+❯ kubectl create -f ./operator/src/test/resources/samples/test-product/triggers/components/cpaas-test-brew-container.yaml
+componentbuild.cpaas.redhat.com/cpaas-test-brew-container-7sz6z created
+----
+
+You can get the status of the build by running:
+
+[source,bash]
+----
+❯ kubectl get componentbuilds.cpaas.redhat.com cpaas-test-brew-container-7sz6z
+NAME                              STATUS    COMPONENT
+cpaas-test-brew-container-7sz6z   Running   cpaas-test-brew-container
+----
+After some time you should see it passing:
+
+[source,bash]
+----
+❯ kubectl get componentbuilds.cpaas.redhat.com cpaas-test-brew-container-7sz6z
+NAME                              STATUS   COMPONENT
+cpaas-test-brew-container-7sz6z   Passed   cpaas-test-brew-container
+----
+
+=== Running a Pipeline
+
+[source,bash]
+----
+❯ kubectl create -f operator/src/test/resources/samples/test-product/triggers/pipelines/cpaas-test-containers.yaml
+pipelinerun.cpaas.redhat.com/cpaas-test-containers-pxwgg created
+----
+
+[source,bash]
+----
+❯ kubectl get pipelineruns.cpaas.redhat.com
+NAME                          STATUS    AGE
+cpaas-test-containers-7zhrq   Running   3s
+----
+
+== Testing
+
+TBD
+
+
+
+
