@@ -21,13 +21,3 @@ spec:
         synopsis: "Release of components for CPaaS Test Product - Containers"
         description: "Release of CPaaS Test Product provides these changes:"
         topic: "Release of components for CPaaS Test Product - Containers"
-    - name: "errata"
-      # depends-on:
-      #   - prep1
-      #   - prep2
-      config:
-        advisoryType: "RHBA"
-        solution: "CPaaS Test Product 1.7.0 - Containers"
-        synopsis: "Release of components for CPaaS Test Product - Containers"
-        description: "Release of CPaaS Test Product provides these changes:"
-        topic: "Release of components for CPaaS Test Product - Containers"
