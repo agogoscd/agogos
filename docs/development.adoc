@@ -16,6 +16,23 @@ Please make sure you have following requirements installed:
 * link:https://tekton.dev/docs/getting-started/#installation[Tekton]
 * link:https://sdkman.io/jdks#jdk.java.net[JDK 11]
 
+=== Known issues
+
+==== Minikube failing to start due to `PROVIDER_KVM2_ERROR`
+
+If you see error similar to what can be found below, just start Minikube again. It will work.
+
+----
+❯ minikube start
+😄  minikube v1.17.1 on Fedora 33
+✨  Using the kvm2 driver based on existing profile
+
+💣  Exiting due to PROVIDER_KVM2_ERROR: /usr/bin/virsh domcapabilities --virttype kvm failed:
+
+💡  Suggestion: Follow your Linux distribution instructions for configuring KVM
+📘  Documentation: https://minikube.sigs.k8s.io/docs/reference/drivers/kvm2
+----
+
 == Resource requirements
 
 === Registering CRD's
@@ -186,7 +203,7 @@ Run the `apply.sh` script from this repository.
 
 [source,bash]
 ----
-./operator/src/test/resources/samples/test-product/definitions/apply.sh
+❯ ./operator/src/test/resources/samples/test-product/definitions/apply.sh
 pipeline.cpaas.redhat.com/cpaas-test-containers created
 componentgroup.cpaas.redhat.com/cpaas-test-containers created
 componentgroup.cpaas.redhat.com/cpaas-test-rpms created
@@ -251,8 +268,4 @@ cpaas-test-containers-7zhrq   Running   3s
 
 == Testing
 
-TBD
-
-
-
-
+See link:testing{outfilesuffix}[dedicated page].
