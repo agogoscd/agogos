@@ -17,6 +17,10 @@ quarkus:
 
 "%dev":
   quarkus:
+    http:
+      access-log:
+        enabled: true
+        pattern: combined
     log:
       category:
         "com.redhat.cpaas":

@@ -1,16 +1,17 @@
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
-  name: validation.webhook.cpaas.redhat.com
+  name: config.webhook.cpaas.redhat.com
 webhooks:
   - name: validation.webhook.cpaas.redhat.com
     sideEffects: None
+    failurePolicy: Fail
     admissionReviewVersions: ["v1"]
     clientConfig:
       service:
         namespace: default
         name: agogos-admission
-        path: /webhook/admission
+        path: /webhooks/validate
         port: 443
     rules:
       - operations: ["CREATE", "UPDATE"]

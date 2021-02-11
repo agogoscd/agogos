@@ -13,7 +13,7 @@ we want to validate should go through our service.
 
 This is done via the `ValidatingWebhookConfiguration` resource as seen below.
 
-=== Service Deployment
+=== Internal Service Deployment
 
 In case the handler is deployed as a Service within the cluster, we can
 refer to it directly using the `service` key.
@@ -38,3 +38,92 @@ NOTE: This deployment should be used only at development time.
 ----
 include::inc/deployment-external.yaml[]
 ----
+
+[NOTE]
+====
+*How to find the correct IP address?*
+
+To find out what IP address should be used in the configuration you can follow below
+steps for a Minikube deployment with kvm2 driver.
+
+[source,bash]
+----
+❯ sudo virsh net-info minikube-net
+Name:           minikube-net
+UUID:           d6520871-3c8a-4ccc-9ebd-0ad874576f8f
+Active:         yes
+Persistent:     yes
+Autostart:      yes
+Bridge:         virbr2
+----
+
+[source,bash]
+----
+❯ ip a s virbr2
+8: virbr2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 52:54:00:1c:a7:e4 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.39.1/24 brd 192.168.39.255 scope global virbr2
+       valid_lft forever preferred_lft forever
+----
+
+In our case the `virbr2` interface used by Minikube has the `192.168.39.1` IP address set.
+
+Please make sure you add this address to the certificate hosts' as well!
+====
+
+== SSL
+
+[NOTE]
+====
+Please refer to the link:ssl-certificates{outfilesuffix}[certificates document] for information
+on how to generate SSL certificates on the Kubernetes platform.
+
+This section assumes that you have available certificate and key.
+====
+
+=== Development Mode With SSL Enabled
+
+It is possible to develop the Webhooks application without SSL, but in order to
+test it working on a cluster it is required to secure it with a SSL certificate.
+
+To start standalone Quarkus application with SSL support, you need to export two environment variables:
+
+1. `QUARKUS_HTTP_SSL_CERTIFICATE_FILE`
+2. `QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE`
+
+These variables should point to our certificate and private key files.
+
+[source,bash]
+----
+❯ QUARKUS_HTTP_SSL_CERTIFICATE_FILE=$(pwd)/server.crt QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE=$(pwd)/server-key.pem ./mvnw quarkus:dev -pl webhooks -Dquarkus.http.host=0.0.0.0
+[INFO] Scanning for projects...
+
+...
+
+2021-02-10 22:08:11,793 INFO  [io.quarkus] (Quarkus Main Thread) agogos-webhooks 1.0-SNAPSHOT on JVM (powered by Quarkus 1.11.1.Final) started in 3.466s. Listening on: http://0.0.0.0:7080 and https://0.0.0.0:8443
+2021-02-10 22:08:11,795 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+2021-02-10 22:08:11,795 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, config-yaml, hibernate-validator, kubernetes, kubernetes-client, quarkiverse-tekton-client, resteasy, resteasy-jackson]
+----
+
+Now the application is available on port `7070` (insecure) as well as `8443` (secured).
+
+[NOTE]
+====
+*Firewall setting*
+
+Depending on your Minikube configuration, it may be required to configure firewall properly to
+allow requests from pods into the application.
+
+For example when Minikube is deployed using the kvm2 driver, it may be required to open the port
+on which the application is running in the `libvirt` Firewalld zone.
+
+[source,bash]
+----
+❯ sudo firewall-cmd --permanent --zone=libvirt --add-port=8443/tcp
+success
+❯ sudo firewall-cmd --reload
+success
+----
+
+
+====

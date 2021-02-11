@@ -5,4 +5,11 @@ CP Development Team <cp-devel@redhat.com>
 :numbered:
 :source-highlighter: highlightjs
 
+== About
+
+* https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/
+* https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/
+
+== Documentation
+
 * link:deployment{outfilesuffix}[Deployment]

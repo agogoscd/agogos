@@ -1,14 +1,9 @@
-package com.redhat.cpaas.k8s.admission;
+package com.redhat.cpaas.k8s.webhooks.validator;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,17 +20,12 @@ import org.openapi4j.core.exception.ResolutionException;
 import org.openapi4j.schema.validator.ValidationData;
 import org.openapi4j.schema.validator.v3.SchemaValidator;
 
-import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
-import io.fabric8.kubernetes.api.model.admission.AdmissionReview;
-import io.fabric8.kubernetes.api.model.admission.AdmissionReviewBuilder;
 
-@Path("/webhooks/admission")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-public class ComponentWebhookHandler {
-    private static final Logger LOG = Logger.getLogger(ComponentWebhookHandler.class);
+public class ComponentValidator extends Validator<ComponentResource> {
+
+    private static final Logger LOG = Logger.getLogger(ComponentValidator.class);
 
     @Inject
     ObjectMapper objectMapper;
@@ -43,49 +33,21 @@ public class ComponentWebhookHandler {
     @Inject
     StageResourceClient stageResourceClient;
 
-    @POST
-    public AdmissionReview validate(AdmissionReview reviewRequest) {
-        KubernetesResource object = reviewRequest.getRequest().getObject();
+    @Override
+    protected void validateResource(ComponentResource resource, AdmissionResponseBuilder responseBuilder) {
+        try {
+            validateComponent(resource);
 
-        LOG.debugv("New validation request incoming, resource: ''{0}'', requester: ''{1}''",
-                object.getClass().getSimpleName(), reviewRequest.getRequest().getUserInfo().getUsername());
+            responseBuilder.withAllowed(true);
+        } catch (ApplicationException e) {
+            LOG.error("An error occurred while validating Component", e);
 
-        LOG.tracev("Resource to validate: {0}", object);
-
-        AdmissionResponseBuilder responseBuilder = new AdmissionResponseBuilder() //
-                .withUid(reviewRequest.getRequest().getUid());
-
-        AdmissionReviewBuilder reviewBuilder = new AdmissionReviewBuilder() //
-                .withApiVersion(reviewRequest.getApiVersion());
-
-        if (!(object instanceof ComponentResource)) {
             responseBuilder.withAllowed(false) //
                     .withStatus(new StatusBuilder() //
                             .withCode(400) //
-                            .withMessage("Unsupported resource type: " + object.getClass().getSimpleName()) //
+                            .withMessage(e.getMessage()) //
                             .build());
-
-            return reviewBuilder.withResponse(responseBuilder.build()).build();
         }
-
-        if (object instanceof ComponentResource) {
-            try {
-                validateComponent((ComponentResource) object);
-
-                responseBuilder.withAllowed(true);
-            } catch (ApplicationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-
-                responseBuilder.withAllowed(false) //
-                        .withStatus(new StatusBuilder() //
-                                .withCode(400) //
-                                .withMessage(e.getMessage()) //
-                                .build());
-            }
-        }
-
-        return reviewBuilder.withResponse(responseBuilder.build()).build();
     }
 
     private void validateComponent(ComponentResource component) throws ApplicationException {
@@ -132,5 +94,4 @@ public class ComponentWebhookHandler {
 
         LOG.infov("Component ''{0}'' is valid!", component.getMetadata().getName());
     }
-
 }
