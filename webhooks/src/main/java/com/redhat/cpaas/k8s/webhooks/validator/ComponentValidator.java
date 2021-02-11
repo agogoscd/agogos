@@ -3,6 +3,8 @@ package com.redhat.cpaas.k8s.webhooks.validator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -20,9 +22,15 @@ import org.openapi4j.core.exception.ResolutionException;
 import org.openapi4j.schema.validator.ValidationData;
 import org.openapi4j.schema.validator.v3.SchemaValidator;
 
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
+import io.fabric8.kubernetes.internal.KubernetesDeserializer;
+import io.quarkus.runtime.StartupEvent;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 
+@ApplicationScoped
+@RegisterForReflection
 public class ComponentValidator extends Validator<ComponentResource> {
 
     private static final Logger LOG = Logger.getLogger(ComponentValidator.class);
@@ -32,6 +40,16 @@ public class ComponentValidator extends Validator<ComponentResource> {
 
     @Inject
     StageResourceClient stageResourceClient;
+
+    /**
+     * We have to register the resource within {@link KubernetesDeserializer} so
+     * that it can deserialize attached object as part of the incoming
+     * AdmissionReview.
+     */
+    void onStart(@Observes StartupEvent ev) {
+        KubernetesDeserializer.registerCustomKind(HasMetadata.getApiVersion(ComponentResource.class),
+                HasMetadata.getKind(ComponentResource.class), ComponentResource.class);
+    }
 
     @Override
     protected void validateResource(ComponentResource resource, AdmissionResponseBuilder responseBuilder) {

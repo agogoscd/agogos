@@ -26,7 +26,7 @@ public class Validator<T extends KubernetesResource> {
     }
 
     @SuppressWarnings("unchecked")
-    public final AdmissionReview validate(AdmissionReview admissionReview) {
+    public AdmissionReview validate(AdmissionReview admissionReview) {
         KubernetesResource resource = admissionReview.getRequest().getObject();
 
         AdmissionResponseBuilder responseBuilder = new AdmissionResponseBuilder() //
