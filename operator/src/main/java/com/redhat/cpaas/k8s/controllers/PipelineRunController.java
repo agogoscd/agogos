@@ -9,9 +9,9 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import com.redhat.cpaas.k8s.client.TektonResourceClient;
-import com.redhat.cpaas.k8s.model.PipelineRunResource;
-import com.redhat.cpaas.k8s.model.PipelineRunResource.RunStatus;
-import com.redhat.cpaas.k8s.model.PipelineRunResource.Status;
+import com.redhat.cpaas.v1alpha1.PipelineRunResource;
+import com.redhat.cpaas.v1alpha1.PipelineRunResource.RunStatus;
+import com.redhat.cpaas.v1alpha1.PipelineRunResource.Status;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;

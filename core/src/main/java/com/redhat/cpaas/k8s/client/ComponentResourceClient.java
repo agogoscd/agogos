@@ -5,8 +5,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.redhat.cpaas.k8s.model.ComponentResource;
-import com.redhat.cpaas.k8s.model.ComponentResourceList;
+import com.redhat.cpaas.v1alpha1.ComponentResource;
+import com.redhat.cpaas.v1alpha1.ComponentResourceList;
 
 import org.jboss.logging.Logger;
 

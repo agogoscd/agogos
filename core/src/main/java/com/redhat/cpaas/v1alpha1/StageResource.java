@@ -1,4 +1,4 @@
-package com.redhat.cpaas.k8s.model;
+package com.redhat.cpaas.v1alpha1;
 
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.model.annotation.Group;

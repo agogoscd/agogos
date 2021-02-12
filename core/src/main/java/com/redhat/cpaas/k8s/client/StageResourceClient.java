@@ -4,9 +4,9 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import com.redhat.cpaas.k8s.model.AbstractStage.Phase;
-import com.redhat.cpaas.k8s.model.StageResource;
-import com.redhat.cpaas.k8s.model.StageResourceList;
+import com.redhat.cpaas.v1alpha1.AbstractStage.Phase;
+import com.redhat.cpaas.v1alpha1.StageResource;
+import com.redhat.cpaas.v1alpha1.StageResourceList;
 
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;

@@ -1,9 +1,9 @@
-package com.redhat.cpaas.k8s.model;
+package com.redhat.cpaas.v1alpha1;
 
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.redhat.cpaas.k8s.model.ComponentBuildResource.BuildSpec;
-import com.redhat.cpaas.k8s.model.ComponentBuildResource.BuildStatus;
+import com.redhat.cpaas.v1alpha1.ComponentBuildResource.BuildSpec;
+import com.redhat.cpaas.v1alpha1.ComponentBuildResource.BuildStatus;
 
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;

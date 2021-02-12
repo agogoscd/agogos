@@ -1,4 +1,4 @@
-package com.redhat.cpaas.k8s.model;
+package com.redhat.cpaas.v1alpha1;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 

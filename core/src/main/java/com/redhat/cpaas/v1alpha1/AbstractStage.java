@@ -1,12 +1,12 @@
-package com.redhat.cpaas.k8s.model;
+package com.redhat.cpaas.v1alpha1;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.redhat.cpaas.k8s.model.AbstractStage.StageSpec;
-import com.redhat.cpaas.k8s.model.AbstractStage.StageStatus;
+import com.redhat.cpaas.v1alpha1.AbstractStage.StageSpec;
+import com.redhat.cpaas.v1alpha1.AbstractStage.StageStatus;
 
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.client.CustomResource;

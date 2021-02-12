@@ -4,8 +4,8 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import com.redhat.cpaas.k8s.model.ComponentBuildResource;
-import com.redhat.cpaas.k8s.model.ComponentBuildResourceList;
+import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
+import com.redhat.cpaas.v1alpha1.ComponentBuildResourceList;
 
 import org.jboss.logging.Logger;
 

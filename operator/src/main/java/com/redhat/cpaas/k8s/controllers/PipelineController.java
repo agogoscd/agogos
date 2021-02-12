@@ -8,8 +8,8 @@ import javax.inject.Inject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.cpaas.k8s.client.ComponentGroupResourceClient;
-import com.redhat.cpaas.k8s.model.PipelineResource;
-import com.redhat.cpaas.k8s.model.PipelineResource.PipelineSpec.StageReference;
+import com.redhat.cpaas.v1alpha1.PipelineResource;
+import com.redhat.cpaas.v1alpha1.PipelineResource.PipelineSpec.StageReference;
 
 import org.jboss.logging.Logger;
 

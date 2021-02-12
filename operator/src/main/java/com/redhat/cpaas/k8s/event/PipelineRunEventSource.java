@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import com.redhat.cpaas.k8s.model.ComponentBuildResource;
+import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
 
 import org.jboss.logging.Logger;
 

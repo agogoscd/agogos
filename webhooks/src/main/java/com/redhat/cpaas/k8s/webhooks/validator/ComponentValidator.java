@@ -3,19 +3,18 @@ package com.redhat.cpaas.k8s.webhooks.validator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redhat.cpaas.errors.ApplicationException;
+import com.redhat.cpaas.errors.MissingResourceException;
+import com.redhat.cpaas.errors.ValidationException;
 import com.redhat.cpaas.k8s.client.StageResourceClient;
-import com.redhat.cpaas.k8s.errors.ApplicationException;
-import com.redhat.cpaas.k8s.errors.MissingResourceException;
-import com.redhat.cpaas.k8s.errors.ValidationException;
-import com.redhat.cpaas.k8s.model.AbstractStage.Phase;
-import com.redhat.cpaas.k8s.model.ComponentResource;
-import com.redhat.cpaas.k8s.model.StageResource;
+import com.redhat.cpaas.v1alpha1.AbstractStage.Phase;
+import com.redhat.cpaas.v1alpha1.ComponentResource;
+import com.redhat.cpaas.v1alpha1.StageResource;
 
 import org.jboss.logging.Logger;
 import org.openapi4j.core.exception.ResolutionException;
@@ -27,10 +26,7 @@ import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
 import io.fabric8.kubernetes.internal.KubernetesDeserializer;
 import io.quarkus.runtime.StartupEvent;
-import io.quarkus.runtime.annotations.RegisterForReflection;
 
-@ApplicationScoped
-@RegisterForReflection
 public class ComponentValidator extends Validator<ComponentResource> {
 
     private static final Logger LOG = Logger.getLogger(ComponentValidator.class);
@@ -69,14 +65,14 @@ public class ComponentValidator extends Validator<ComponentResource> {
     }
 
     private void validateComponent(ComponentResource component) throws ApplicationException {
+        LOG.infov("Validating component ''{0}''", component.getMetadata().getName());
+
         StageResource builder = stageResourceClient.getByName(component.getSpec().getBuilder(), Phase.BUILD);
 
         if (builder == null) {
             throw new MissingResourceException(String.format("Selected builder '%s' is not registered in the system",
                     component.getSpec().getBuilder()));
         }
-
-        LOG.infov("Validating component ''{0}''", component.getMetadata().getName());
 
         ValidationData<Void> validation = new ValidationData<>();
 

@@ -8,17 +8,17 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import com.redhat.cpaas.errors.ApplicationException;
+import com.redhat.cpaas.errors.MissingResourceException;
 import com.redhat.cpaas.k8s.client.ComponentBuildResourceClient;
 import com.redhat.cpaas.k8s.client.ComponentResourceClient;
 import com.redhat.cpaas.k8s.client.TektonResourceClient;
-import com.redhat.cpaas.k8s.errors.ApplicationException;
-import com.redhat.cpaas.k8s.errors.MissingResourceException;
 import com.redhat.cpaas.k8s.event.PipelineRunEvent;
 import com.redhat.cpaas.k8s.event.PipelineRunEventSource;
-import com.redhat.cpaas.k8s.model.ComponentBuildResource;
-import com.redhat.cpaas.k8s.model.ComponentBuildResource.BuildStatus;
-import com.redhat.cpaas.k8s.model.ComponentBuildResource.Status;
-import com.redhat.cpaas.k8s.model.ComponentResource;
+import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
+import com.redhat.cpaas.v1alpha1.ComponentBuildResource.BuildStatus;
+import com.redhat.cpaas.v1alpha1.ComponentBuildResource.Status;
+import com.redhat.cpaas.v1alpha1.ComponentResource;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;

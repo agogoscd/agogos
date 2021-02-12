@@ -1,4 +1,4 @@
-package com.redhat.cpaas.k8s.errors;
+package com.redhat.cpaas.errors;
 
 import java.util.ArrayList;
 import java.util.List;

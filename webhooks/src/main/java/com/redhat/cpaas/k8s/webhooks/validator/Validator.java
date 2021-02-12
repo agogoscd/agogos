@@ -1,9 +1,6 @@
 package com.redhat.cpaas.k8s.webhooks.validator;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.spi.CDI;
-
-import com.redhat.cpaas.k8s.model.ComponentResource;
 
 import org.jboss.logging.Logger;
 
@@ -11,23 +8,20 @@ import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
 import io.fabric8.kubernetes.api.model.admission.AdmissionReview;
 import io.fabric8.kubernetes.api.model.admission.AdmissionReviewBuilder;
+import io.fabric8.kubernetes.client.CustomResource;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @ApplicationScoped
-public class Validator<T extends KubernetesResource> {
+@RegisterForReflection
+public abstract class Validator<T extends CustomResource<?, ?>> {
     private static final Logger LOG = Logger.getLogger(Validator.class);
-
-    @SuppressWarnings("rawtypes")
-    public static Validator validatorFor(KubernetesResource resource) {
-        if (resource instanceof ComponentResource) {
-            return CDI.current().select(ComponentValidator.class).get();
-        }
-
-        return new Validator();
-    }
 
     @SuppressWarnings("unchecked")
     public AdmissionReview validate(AdmissionReview admissionReview) {
         KubernetesResource resource = admissionReview.getRequest().getObject();
+
+        LOG.debugv("New validation request incoming, resource: ''{0}'', requester: ''{1}''",
+                resource.getClass().getSimpleName(), admissionReview.getRequest().getUserInfo().getUsername());
 
         AdmissionResponseBuilder responseBuilder = new AdmissionResponseBuilder() //
                 .withUid(admissionReview.getRequest().getUid());

@@ -11,22 +11,16 @@ import javax.inject.Inject;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redhat.cpaas.errors.ApplicationException;
 import com.redhat.cpaas.k8s.client.ComponentResourceClient;
-import com.redhat.cpaas.k8s.client.StageResourceClient;
-import com.redhat.cpaas.k8s.client.TektonResourceClient;
-import com.redhat.cpaas.k8s.errors.ApplicationException;
-import com.redhat.cpaas.k8s.errors.MissingResourceException;
-import com.redhat.cpaas.k8s.model.AbstractStage.Phase;
-import com.redhat.cpaas.k8s.model.ComponentResource;
-import com.redhat.cpaas.k8s.model.ComponentResource.ComponentStatus;
-import com.redhat.cpaas.k8s.model.ComponentResource.Status;
-import com.redhat.cpaas.k8s.model.StageResource;
+import com.redhat.cpaas.v1alpha1.ComponentResource;
+import com.redhat.cpaas.v1alpha1.ComponentResource.ComponentStatus;
+import com.redhat.cpaas.v1alpha1.ComponentResource.Status;
 
 import org.jboss.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineBuilder;
@@ -52,16 +46,7 @@ public class ComponentController implements ResourceController<ComponentResource
     private static final Logger LOG = Logger.getLogger(ComponentController.class);
 
     @Inject
-    KubernetesClient kubernetesClient;
-
-    @Inject
     ComponentResourceClient componentResourceClient;
-
-    @Inject
-    TektonResourceClient tektonResourceClient;
-
-    @Inject
-    StageResourceClient stageResourceClient;
 
     @Inject
     ObjectMapper objectMapper;
@@ -155,15 +140,6 @@ public class ComponentController implements ResourceController<ComponentResource
     }
 
     private Pipeline createBuildPipeline(ComponentResource component) throws ApplicationException {
-        // Find the builder defined by the component
-        // TODO: This validation should be done as part of ValidatingAdmissionWebhook
-        StageResource builder = stageResourceClient.getByName(component.getSpec().getBuilder(), Phase.BUILD);
-
-        if (builder == null) {
-            throw new MissingResourceException(String.format("Selected builder '%s' is not registered in the system",
-                    component.getSpec().getBuilder()));
-        }
-
         String componentJson;
 
         // Convert Component metadata to JSON

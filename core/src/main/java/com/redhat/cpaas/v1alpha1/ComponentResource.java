@@ -1,4 +1,4 @@
-package com.redhat.cpaas.k8s.model;
+package com.redhat.cpaas.v1alpha1;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,8 +6,8 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.redhat.cpaas.k8s.model.ComponentResource.ComponentSpec;
-import com.redhat.cpaas.k8s.model.ComponentResource.ComponentStatus;
+import com.redhat.cpaas.v1alpha1.ComponentResource.ComponentSpec;
+import com.redhat.cpaas.v1alpha1.ComponentResource.ComponentStatus;
 
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;

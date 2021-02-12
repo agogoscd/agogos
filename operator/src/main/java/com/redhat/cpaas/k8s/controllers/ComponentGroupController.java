@@ -1,6 +1,6 @@
 package com.redhat.cpaas.k8s.controllers;
 
-import com.redhat.cpaas.k8s.model.ComponentGroupResource;
+import com.redhat.cpaas.v1alpha1.ComponentGroupResource;
 
 import io.javaoperatorsdk.operator.api.Context;
 import io.javaoperatorsdk.operator.api.Controller;

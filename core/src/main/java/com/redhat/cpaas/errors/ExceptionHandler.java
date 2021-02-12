@@ -1,4 +1,4 @@
-package com.redhat.cpaas.k8s.errors;
+package com.redhat.cpaas.errors;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
