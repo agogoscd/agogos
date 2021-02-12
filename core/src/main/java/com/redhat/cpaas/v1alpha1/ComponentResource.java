@@ -1,14 +1,10 @@
 package com.redhat.cpaas.v1alpha1;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.cpaas.v1alpha1.ComponentResource.ComponentSpec;
 import com.redhat.cpaas.v1alpha1.ComponentResource.ComponentStatus;
-
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.client.CustomResource;
@@ -19,6 +15,9 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @ToString
 @RegisterForReflection
@@ -85,21 +84,15 @@ public class ComponentResource extends CustomResource<ComponentSpec, ComponentSt
     /**
      * Returns a {@link Map} with the most relevant fields from the
      * {@link ComponentResource}.
-     * 
-     * TODO: Can we find a nicer way to do it?
-     * 
-     * @return A {@link Map}
+     *
+     * @return An Immutable {@link Map}
      */
     @JsonIgnore
     public Map<String, Object> toEasyMap() {
-        Map<String, Object> easyMap = new HashMap<>();
-
-        easyMap.put("name", this.getMetadata().getName());
-        easyMap.put("status", this.getStatus().getStatus());
-        easyMap.put("builder", this.getSpec().getBuilder());
-        easyMap.put("data", this.getSpec().getData());
-
-        return easyMap;
+        return Map.of("builder", this.getSpec().getBuilder(),
+                      "data", this.getSpec().getData(),
+                      "name", this.getMetadata().getName(),
+                      "status", this.getStatus().getStatus());
     }
 
     @Getter
