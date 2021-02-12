@@ -11,7 +11,7 @@ webhooks:
       service:
         namespace: default
         name: agogos-admission
-        path: /webhooks/validate
+        path: /webhooks/validate/component
         port: 443
     rules:
       - operations: ["CREATE", "UPDATE"]

@@ -3,12 +3,12 @@ kind: ValidatingWebhookConfiguration
 metadata:
   name: config.webhook.cpaas.redhat.com
 webhooks:
-  - name: validation.webhook.cpaas.redhat.com
+  - name: components.webhook.cpaas.redhat.com
     sideEffects: None
     failurePolicy: Fail
     admissionReviewVersions: ["v1"]
     clientConfig:
-      url: "https://192.168.39.1:8443/webhooks/validate"
+      url: "https://192.168.39.1:8443/webhooks/validate/component"
     rules:
       - operations: ["CREATE", "UPDATE"]
         apiGroups: ["cpaas.redhat.com"]
