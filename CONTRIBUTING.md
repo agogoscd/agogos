@@ -1,4 +1,0 @@
-# Contributing resources
-
-TBD
-

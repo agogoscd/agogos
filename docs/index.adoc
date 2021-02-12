@@ -5,6 +5,17 @@ CP Development Team <cp-devel@redhat.com>
 :numbered:
 :source-highlighter: highlightjs
 
+== About
+
+#TBD#
+
+== Agogos pieces
+
 * link:operator/index{outfilesuffix}[Operator]
 * link:webhooks/index{outfilesuffix}[Webhooks]
+
+== Development
+
 * link:development{outfilesuffix}[Development]
+* link:contributing{outfilesuffix}[Contributing]
+* link:testing{outfilesuffix}[Testing]
