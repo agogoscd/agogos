@@ -1,0 +1,9 @@
+= Stage Development
+CP Development Team <cp-devel@redhat.com>
+:toc:
+:icons: font
+:numbered:
+:source-highlighter: highlightjs
+
+* link:stage-api{outfilesuffix}[Stage API]
+* link:builder-tutorial{outfilesuffix}[Builder tutorial]

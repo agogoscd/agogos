@@ -22,6 +22,7 @@ Please make sure you have following requirements installed:
 
 If you see error similar to what can be found below, just start Minikube again. It will work.
 
+[source,bash]
 ----
 ❯ minikube start
 😄  minikube v1.17.1 on Fedora 33
