@@ -17,7 +17,7 @@ spec:
       targetPort: 7070
   type: ClusterIP
   selector:
-    app: curling
+    app: agogos
 ---
 # Give general "view" permission to the service account
 apiVersion: rbac.authorization.k8s.io/v1
@@ -35,18 +35,18 @@ subjects:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: curling-deployment
+  name: agogos-deployment
   labels:
-    app: curling
+    app: agogos
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: curling
+      app: agogos
   template:
     metadata:
       labels:
-        app: curling
+        app: agogos
     spec:
       containers:
         - name: service

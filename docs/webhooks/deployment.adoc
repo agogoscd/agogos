@@ -5,6 +5,17 @@ CP Development Team <cp-devel@redhat.com>
 :numbered:
 :source-highlighter: highlightjs
 
+== Building And Pushing Container Image
+
+It is possible to build and push container images with the application automatically using
+link:https://cloud.google.com/java/getting-started/jib[Jib].
+
+[source,bash]
+.Building and pushing Webhooks image
+----
+❯ ./mvnw clean package -pl webhooks -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true
+----
+
 == Webhook Registration
 
 In order to utilize our service to make decisions to allow or reject requests,

@@ -1,6 +1,0 @@
-apiVersion: cpaas.redhat.com/v1alpha1
-kind: ComponentBuild
-metadata:
-  generateName: sample-container-
-spec:
-  component: sample-container
