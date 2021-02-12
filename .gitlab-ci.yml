@@ -3,19 +3,19 @@ image: asciidoctor/docker-asciidoctor:1.3.0
 docs:
   stage: test
   script:
-    - find docs -type f -name '*.adoc' -print | xargs asciidoctor -D target -R docs
+    - find docs -type f -name '*.adoc' -print | xargs asciidoctor -D public -R docs
   artifacts:
     paths:
-      - target
+      - public
   only: [merge_requests]
   tags: [docker]
 
 pages:
   stage: deploy
   script:
-    - find docs -type f -name '*.adoc' -print | xargs asciidoctor -D target -R docs
+    - find docs -type f -name '*.adoc' -print | xargs asciidoctor -D public -R docs
   artifacts:
     paths:
-      - target
+      - public
   only: [master]
   tags: [docker]
