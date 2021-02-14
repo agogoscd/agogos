@@ -17,8 +17,6 @@ import com.redhat.cpaas.v1alpha1.ComponentResource;
 import com.redhat.cpaas.v1alpha1.ComponentResource.ComponentStatus;
 import com.redhat.cpaas.v1alpha1.ComponentResource.Status;
 
-import org.jboss.logging.Logger;
-
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.client.TektonClient;
@@ -39,11 +37,13 @@ import io.javaoperatorsdk.operator.api.DeleteControl;
 import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
 import io.javaoperatorsdk.operator.processing.event.internal.CustomResourceEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Controller
 public class ComponentController implements ResourceController<ComponentResource> {
 
-    private static final Logger LOG = Logger.getLogger(ComponentController.class);
+    private static final Logger LOG = LoggerFactory.getLogger( ComponentController.class);
 
     @Inject
     ComponentResourceClient componentResourceClient;
@@ -75,16 +75,16 @@ public class ComponentController implements ResourceController<ComponentResource
 
     private void createPipeline(ComponentResource component) {
         try {
-            LOG.debugv("Preparing pipeline for component ''{0}''", component.getMetadata().getName());
+            LOG.debug("Preparing pipeline for component '{}'", component.getMetadata().getName());
 
             this.createBuildPipeline(component);
 
             setStatus(component, Status.Initializing, "Preparing pipeline");
 
-            LOG.infov("Pipeline for component ''{0}'' updated", component.getMetadata().getName());
+            LOG.info("Pipeline for component '{}' updated", component.getMetadata().getName());
         } catch (ApplicationException e) {
-            LOG.errorv(e, "Error occurred while creating pipeline for component ''{0}''",
-                    component.getMetadata().getName());
+            LOG.error("Error occurred while creating pipeline for component '{}'",
+                    component.getMetadata().getName(), e);
 
             setStatus(component, Status.Failed, "Could not create component pipeline");
 
@@ -93,13 +93,13 @@ public class ComponentController implements ResourceController<ComponentResource
 
     @Override
     public DeleteControl deleteResource(ComponentResource component, Context<ComponentResource> context) {
-        LOG.infov("Removing component ''{0}''", component.getMetadata().getName());
+        LOG.info("Removing component '{}'", component.getMetadata().getName());
         return DeleteControl.DEFAULT_DELETE;
     }
 
     public UpdateControl<ComponentResource> onResourceUpdate(ComponentResource component,
             Context<ComponentResource> context) {
-        LOG.infov("Component ''{0}'' modified", component.getMetadata().getName());
+        LOG.info("Component '{}' modified", component.getMetadata().getName());
 
         // TODO: Handle component updates
 
@@ -146,8 +146,8 @@ public class ComponentController implements ResourceController<ComponentResource
         try {
             componentJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(component.toEasyMap());
         } catch (JsonProcessingException e) {
-            throw new ApplicationException(String.format("Internal error; could not serialize component '%s'",
-                    component.getMetadata().getName()), e);
+            throw new ApplicationException("Internal error; could not serialize component '{}'",
+                    component.getMetadata().getName(), e);
         }
 
         List<PipelineTask> tasks = new ArrayList<>();

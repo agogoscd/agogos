@@ -14,7 +14,6 @@ import com.redhat.cpaas.v1alpha1.PipelineRunResource.RunStatus;
 import com.redhat.cpaas.v1alpha1.PipelineRunResource.Status;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.jboss.logging.Logger;
 
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
@@ -35,11 +34,13 @@ import io.javaoperatorsdk.operator.api.Controller;
 import io.javaoperatorsdk.operator.api.DeleteControl;
 import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Controller
 public class PipelineRunController implements ResourceController<PipelineRunResource> {
 
-    private static final Logger LOG = Logger.getLogger(PipelineRunController.class);
+    private static final Logger LOG = LoggerFactory.getLogger( PipelineRunController.class);
 
     @ConfigProperty(name = "agogos.service-account")
     Optional<String> serviceAccount;
@@ -61,12 +62,12 @@ public class PipelineRunController implements ResourceController<PipelineRunReso
     @Override
     public UpdateControl<PipelineRunResource> createOrUpdateResource(PipelineRunResource run,
             Context<PipelineRunResource> context) {
-        LOG.infov("PipelineRun ''{0}'' modified", run.getMetadata().getName());
+        LOG.info("PipelineRun '{}' modified", run.getMetadata().getName());
 
         try {
             switch (Status.valueOf(run.getStatus().getStatus())) {
                 case New:
-                    LOG.infov("Handling new pipeline run ''{0}''", run.getMetadata().getName());
+                    LOG.info("Handling new pipeline run '{}'", run.getMetadata().getName());
 
                     // TODO: Externalize it!
                     // TODO: This code can be made generic to work for any pipelines
@@ -144,8 +145,8 @@ public class PipelineRunController implements ResourceController<PipelineRunReso
                     break;
             }
         } catch (Exception ex) {
-            LOG.errorv(ex, "An error occurred while handling PipelineRun object ''{0}'' modification",
-                    run.getMetadata().getName());
+            LOG.error("An error occurred while handling PipelineRun object '{}' modification",
+                    run.getMetadata().getName(), ex);
 
             // Set build status to "Failed"
             setStatus(run, Status.Failed, ex.getMessage());
