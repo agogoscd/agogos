@@ -37,7 +37,7 @@ kubernetes:
     log:
       category:
         "com.redhat.cpaas":
-          level: DEBUG
+          level: TRACE
         # "io.javaoperatorsdk":
         #   level: TRACE
     kubernetes-client:

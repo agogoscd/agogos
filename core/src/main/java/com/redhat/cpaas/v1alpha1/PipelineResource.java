@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.cpaas.v1alpha1.PipelineResource.PipelineSpec;
@@ -59,6 +60,18 @@ public class PipelineResource extends CustomResource<PipelineSpec, Void> impleme
         @Setter
         private List<StageReference> stages = new ArrayList<>();
 
+    }
+
+    /**
+     * <p>
+     * Returns object name together with namespace. Useful for logging.
+     * </p>
+     * 
+     * @return String in format: <code>[NAMESPACE]/[NAME]</code>
+     */
+    @JsonIgnore
+    public String getNamespacedName() {
+        return this.getMetadata().getNamespace() + "/" + this.getMetadata().getName();
     }
 
     @Getter

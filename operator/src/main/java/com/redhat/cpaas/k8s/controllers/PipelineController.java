@@ -53,7 +53,7 @@ public class PipelineController implements ResourceController<PipelineResource> 
     @Override
     public UpdateControl<PipelineResource> createOrUpdateResource(PipelineResource pipeline,
             Context<PipelineResource> context) {
-        LOG.info("Pipeline '{}' modified", pipeline.getMetadata().getName());
+        LOG.info("Pipeline '{}' modified", pipeline.getNamespacedName());
 
         // Prepare workspace for main task to share content between steps
         WorkspacePipelineTaskBinding pipelineWsBinding = new WorkspacePipelineTaskBindingBuilder() //

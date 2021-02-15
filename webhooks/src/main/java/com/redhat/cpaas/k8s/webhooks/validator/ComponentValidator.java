@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 public class ComponentValidator extends Validator<ComponentResource> {
 
-    private static final Logger LOG = LoggerFactory.getLogger( ComponentValidator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ComponentValidator.class);
 
     @Inject
     ObjectMapper objectMapper;
@@ -66,7 +66,7 @@ public class ComponentValidator extends Validator<ComponentResource> {
     }
 
     private void validateComponent(ComponentResource component) throws ApplicationException {
-        LOG.info("Validating component '{}'", component.getMetadata().getName());
+        LOG.info("Validating component '{}'", component.getNamespacedName());
 
         StageResource builder = stageResourceClient.getByName(component.getSpec().getBuilder(), Phase.BUILD);
 
@@ -80,8 +80,8 @@ public class ComponentValidator extends Validator<ComponentResource> {
         JsonNode schemaNode = objectMapper.valueToTree(builder.getSpec().getSchema().getOpenAPIV3Schema());
         JsonNode contentNode = objectMapper.valueToTree(component.getSpec().getData());
 
-        LOG.debug("Validating component '{}' content: '{}' with schema: '{}'",
-                component.getMetadata().getName(), contentNode, schemaNode);
+        LOG.debug("Validating component '{}' content: '{}' with schema: '{}'", component.getNamespacedName(),
+                contentNode, schemaNode);
 
         SchemaValidator schemaValidator;
 
@@ -99,14 +99,13 @@ public class ComponentValidator extends Validator<ComponentResource> {
                     .map(item -> item.message().replaceAll("\\.+$", "")).collect(Collectors.toList());
 
             errorMessages.forEach(message -> {
-                LOG.error("Validation error for '{}' component: '{}'", component.getMetadata().getName(),
-                        message);
+                LOG.error("Validation error for '{}' component: '{}'", component.getNamespacedName(), message);
             });
 
-            throw new ValidationException(
-                    "Component definition '{}' is not valid: {}", component.getMetadata().getName(), errorMessages);
+            throw new ValidationException("Component definition '{}' is not valid: {}", component.getNamespacedName(),
+                    errorMessages);
         }
 
-        LOG.info("Component '{}' is valid!", component.getMetadata().getName());
+        LOG.info("Component '{}' is valid!", component.getNamespacedName());
     }
 }

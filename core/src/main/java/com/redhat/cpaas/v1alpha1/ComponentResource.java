@@ -82,6 +82,18 @@ public class ComponentResource extends CustomResource<ComponentSpec, ComponentSt
     }
 
     /**
+     * <p>
+     * Returns object name together with namespace. Useful for logging.
+     * </p>
+     * 
+     * @return String in format: <code>[NAMESPACE]/[NAME]</code>
+     */
+    @JsonIgnore
+    public String getNamespacedName() {
+        return this.getMetadata().getNamespace() + "/" + this.getMetadata().getName();
+    }
+
+    /**
      * Returns a {@link Map} with the most relevant fields from the
      * {@link ComponentResource}.
      *
@@ -89,10 +101,8 @@ public class ComponentResource extends CustomResource<ComponentSpec, ComponentSt
      */
     @JsonIgnore
     public Map<String, Object> toEasyMap() {
-        return Map.of("builder", this.getSpec().getBuilder(),
-                      "data", this.getSpec().getData(),
-                      "name", this.getMetadata().getName(),
-                      "status", this.getStatus().getStatus());
+        return Map.of("builder", this.getSpec().getBuilder(), "data", this.getSpec().getData(), "name",
+                this.getMetadata().getName(), "status", this.getStatus().getStatus());
     }
 
     @Getter

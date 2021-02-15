@@ -56,8 +56,10 @@ public class ComponentController implements ResourceController<ComponentResource
     TektonClient tektonClient;
 
     /**
+     * <p>
      * Method triggered when a {@link ComponentResource} is removed from the
      * cluster.
+     * </p>
      * 
      * @param component {@link ComponentResource}
      * @param context   {@link Context}
@@ -65,13 +67,15 @@ public class ComponentController implements ResourceController<ComponentResource
      */
     @Override
     public DeleteControl deleteResource(ComponentResource component, Context<ComponentResource> context) {
-        LOG.info("Removing component '{}'", component.getMetadata().getName());
+        LOG.info("Removing component '{}'", component.getNamespacedName());
         return DeleteControl.DEFAULT_DELETE;
     }
 
     /**
+     * <p>
      * Main method that is triggered when a change on the {@link ComponentResource}
      * object is detected.
+     * </p>
      * 
      * @param component {@link ComponentResource}
      * @param context   {@link Context}
@@ -94,11 +98,11 @@ public class ComponentController implements ResourceController<ComponentResource
     }
 
     /**
+     * <p>
      * Updates {@link ComponentResource.ComponentStatus} of the particular
      * {@link ComponentResource}.
+     * <p/>
      * 
-     * This is useful when the are hooks executed which influence the ability of
-     * usage of the Component.
      * 
      * @param component {@link ComponentResource} object
      * @param status    One of available statuses
@@ -113,24 +117,25 @@ public class ComponentController implements ResourceController<ComponentResource
     }
 
     /**
-     * Creates or updates Tekton Pipeline based on the {@link ComponentResource}
+     * <p>
+     * Creates or updates Tekton pipeline based on the {@link ComponentResource}
      * data passed and sets the status subresource on {@link ComponentResource}
      * depending on the outcome of the pipeline update.
+     * </p>
      * 
      * @param component Component resource to create the pipeline for
      */
     private void updateBuildPipeline(ComponentResource component) {
         try {
-            LOG.debug("Preparing pipeline for component '{}'", component.getMetadata().getName());
+            LOG.debug("Preparing pipeline for component '{}'", component.getNamespacedName());
 
             this.updateTektonBuildPipeline(component);
 
             setStatus(component, Status.Initializing, "Preparing pipeline");
 
-            LOG.info("Pipeline for component '{}' updated", component.getMetadata().getName());
+            LOG.info("Pipeline for component '{}' updated", component.getNamespacedName());
         } catch (ApplicationException e) {
-            LOG.error("Error occurred while creating pipeline for component '{}'", component.getMetadata().getName(),
-                    e);
+            LOG.error("Error occurred while creating pipeline for component '{}'", component.getNamespacedName(), e);
 
             setStatus(component, Status.Failed, "Could not create component pipeline");
         }
@@ -138,7 +143,7 @@ public class ComponentController implements ResourceController<ComponentResource
 
     private UpdateControl<ComponentResource> onResourceUpdate(ComponentResource component,
             Context<ComponentResource> context) {
-        LOG.info("Component '{}' modified", component.getMetadata().getName());
+        LOG.info("Component '{}' modified", component.getNamespacedName());
 
         // Create or update pipeline in any case
         this.updateBuildPipeline(component);
@@ -157,8 +162,10 @@ public class ComponentController implements ResourceController<ComponentResource
     }
 
     /**
+     * <p>
      * Creates or updates Tekton pipeline based on the {@link ComponentResource}
      * data passed.
+     * </p>
      * 
      * @param component {@link ComponentResource} to create the pipeline for
      * @return {@link Pipeline} object for the updated pipeline
@@ -173,7 +180,7 @@ public class ComponentController implements ResourceController<ComponentResource
             componentJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(component.toEasyMap());
         } catch (JsonProcessingException e) {
             throw new ApplicationException("Internal error; could not serialize component '{}'",
-                    component.getMetadata().getName(), e);
+                    component.getNamespacedName(), e);
         }
 
         List<PipelineTask> tasks = new ArrayList<>();

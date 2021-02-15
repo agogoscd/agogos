@@ -1,5 +1,6 @@
 package com.redhat.cpaas.v1alpha1;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.cpaas.v1alpha1.ComponentBuildResource.BuildSpec;
@@ -58,6 +59,18 @@ public class ComponentBuildResource extends CustomResource<BuildSpec, BuildStatu
 
     public ComponentBuildResource() {
         super();
+    }
+
+    /**
+     * <p>
+     * Returns object name together with namespace. Useful for logging.
+     * </p>
+     * 
+     * @return String in format: <code>[NAMESPACE]/[NAME]</code>
+     */
+    @JsonIgnore
+    public String getNamespacedName() {
+        return this.getMetadata().getNamespace() + "/" + this.getMetadata().getName();
     }
 
     @Getter

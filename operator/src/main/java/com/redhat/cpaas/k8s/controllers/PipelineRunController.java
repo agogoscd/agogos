@@ -62,12 +62,12 @@ public class PipelineRunController implements ResourceController<PipelineRunReso
     @Override
     public UpdateControl<PipelineRunResource> createOrUpdateResource(PipelineRunResource run,
             Context<PipelineRunResource> context) {
-        LOG.info("PipelineRun '{}' modified", run.getMetadata().getName());
+        LOG.info("PipelineRun '{}' modified", run.getNamespacedName());
 
         try {
             switch (Status.valueOf(run.getStatus().getStatus())) {
                 case New:
-                    LOG.info("Handling new pipeline run '{}'", run.getMetadata().getName());
+                    LOG.info("Handling new pipeline run '{}'", run.getNamespacedName());
 
                     // TODO: Externalize it!
                     // TODO: This code can be made generic to work for any pipelines
@@ -146,7 +146,7 @@ public class PipelineRunController implements ResourceController<PipelineRunReso
             }
         } catch (Exception ex) {
             LOG.error("An error occurred while handling PipelineRun object '{}' modification",
-                    run.getMetadata().getName(), ex);
+                    run.getNamespacedName(), ex);
 
             // Set build status to "Failed"
             setStatus(run, Status.Failed, ex.getMessage());

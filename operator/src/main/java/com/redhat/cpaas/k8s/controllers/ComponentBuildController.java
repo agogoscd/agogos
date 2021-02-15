@@ -21,6 +21,8 @@ import com.redhat.cpaas.v1alpha1.ComponentBuildResource.Status;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.fabric8.knative.internal.pkg.apis.Condition;
 import io.fabric8.kubernetes.api.model.OwnerReference;
@@ -28,7 +30,6 @@ import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaimBuilder;
 import io.fabric8.kubernetes.api.model.Quantity;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRef;
@@ -45,8 +46,7 @@ import io.javaoperatorsdk.operator.api.DeleteControl;
 import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
 import io.javaoperatorsdk.operator.processing.event.EventSourceManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.javaoperatorsdk.operator.processing.event.internal.CustomResourceEvent;
 
 @Controller(generationAwareEventProcessing = false)
 public class ComponentBuildController implements ResourceController<ComponentBuildResource> {
@@ -60,12 +60,6 @@ public class ComponentBuildController implements ResourceController<ComponentBui
 
     @ConfigProperty(name = "kubernetes.storage-class")
     Optional<String> storageClass;
-
-    @Inject
-    KubernetesClient kubernetesClient;
-
-    @Inject
-    ComponentBuildResourceClient buildResourceClient;
 
     @Inject
     ComponentResourceClient componentResourceClient;
@@ -82,8 +76,126 @@ public class ComponentBuildController implements ResourceController<ComponentBui
     @Inject
     TektonClient tektonClient;
 
-    private boolean hasLabels(ComponentBuildResource build) {
-        Map<String, String> labels = build.getMetadata().getLabels();
+    /**
+     * <p>
+     * Register the {@link io.fabric8.tekton.pipeline.v1alpha1.PipelineRun} event
+     * source so that we can receive events from PipelineRun's that are related to
+     * {@link ComponentResource}'s.
+     * </p>
+     */
+    @Override
+    public void init(EventSourceManager eventSourceManager) {
+        eventSourceManager.registerEventSource("pipeline-run", pipelineRunEventSource);
+    }
+
+    /**
+     * <p>
+     * Method triggered when a {@link ComponentBuildResource} is removed from the
+     * cluster.
+     * </p>
+     * 
+     * @param component {@link ComponentBuildResource}
+     * @param context   {@link Context}
+     * @return {@link DeleteControl}
+     */
+    @Override
+    public DeleteControl deleteResource(ComponentBuildResource build, Context<ComponentBuildResource> context) {
+        return DeleteControl.DEFAULT_DELETE;
+    }
+
+    /**
+     * <p>
+     * Triggers or updates the Tekton Pipeline based on the
+     * {@link ComponentBuildResource} data passed and sets the status subresource on
+     * {@link ComponentBuildResource} depending on the outcome of the pipeline
+     * update.
+     * </p>
+     * 
+     * @param componentBuild {@link ComponentBuildResource}
+     */
+    @Override
+    public UpdateControl<ComponentBuildResource> createOrUpdateResource(ComponentBuildResource componentBuild,
+            Context<ComponentBuildResource> context) {
+
+        Optional<CustomResourceEvent> crEvent = context.getEvents().getLatestOfType(CustomResourceEvent.class);
+
+        // TODO: Set labels
+        // TODO: Set ownership?
+
+        if (crEvent.isPresent()) {
+            LOG.info("Build '{}' modified", componentBuild.getNamespacedName());
+
+            try {
+                if (Status.valueOf(componentBuild.getStatus().getStatus()) == Status.New) {
+                    LOG.info("Handling new build '{}'", componentBuild.getNamespacedName());
+
+                    // Run pipeline
+                    runBuildPipeline(componentBuild);
+
+                    // Set build status to "Running"
+                    setStatus(componentBuild, Status.Running, "Pipeline triggered");
+                    return UpdateControl.updateStatusSubResource(componentBuild);
+                }
+            } catch (Exception ex) {
+                LOG.error("An error occurred while handling build object '{}' modification",
+                        componentBuild.getNamespacedName(), ex);
+
+                // Set build status to "Failed"
+                setStatus(componentBuild, Status.Failed, ex.getMessage());
+
+                return UpdateControl.updateStatusSubResource(componentBuild);
+            }
+        }
+
+        Optional<PipelineRunEvent> pipelineRunEvent = context.getEvents().getLatestOfType(PipelineRunEvent.class);
+
+        if (pipelineRunEvent.isPresent()) {
+            return handlePipelineRunEvent(componentBuild, pipelineRunEvent.get());
+        }
+
+        return UpdateControl.noUpdate();
+    }
+
+    /**
+     * <p>
+     * Currently unused
+     * </p>
+     * TODO: Move to admission webhook
+     */
+    private void setLabel(ComponentBuildResource componentBuild) {
+        if (Status.valueOf(componentBuild.getStatus().getStatus()) == Status.New && hasComponentLabel(componentBuild)) {
+            return;
+        }
+
+        LOG.info("Adding '{}' label to new build '{}'", COMPONENT_LABEL, componentBuild.getNamespacedName());
+
+        // Prepare label
+        Map<String, String> labels = new HashMap<>();
+        labels.put(COMPONENT_LABEL, componentBuild.getSpec().getComponent());
+
+        // Set label
+        componentBuild.getMetadata().setLabels(labels);
+    }
+
+    /**
+     * <p>
+     * Currently unused
+     * </p>
+     * 
+     * <p>
+     * Checks whether the {@link ComponentBuildResource} has appropriate label that
+     * maps to {@link ComponentResource}.
+     * </p>
+     * 
+     * <p>
+     * Name of the label is <code>cpaas.redhat.com/component</code>.
+     * </p>
+     * 
+     * @param componentBuild A {@link ComponentBuildResource} instance
+     * @return <code>true</code> is label exists, <code>false</code> otherwise
+     */
+    private boolean hasComponentLabel(ComponentBuildResource componentBuild) {
+        Map<String, String> labels = componentBuild.getMetadata().getLabels();
 
         if (labels == null) {
             return false;
@@ -96,6 +208,17 @@ public class ComponentBuildController implements ResourceController<ComponentBui
         return false;
     }
 
+    /**
+     * <p>
+     * Updates {@link ComponentBuildResource.BuildStatus} of the particular
+     * {@link ComponentBuildResource}.
+     * <p/>
+     * 
+     * 
+     * @param component {@link ComponentBuildResource} object
+     * @param status    One of available statuses
+     * @param reason    Description of the reason for last status change
+     */
     private boolean setStatus(ComponentBuildResource build, Status status, String reason) {
         BuildStatus buildStatus = build.getStatus();
 
@@ -110,93 +233,50 @@ public class ComponentBuildController implements ResourceController<ComponentBui
         return true;
     }
 
-    // TODO: Use proper exceptions!
-    private void runPipeline(ComponentBuildResource build) throws Exception {
-        LOG.info("New build, triggering pipeline for this build");
+    /**
+     * <p>
+     * Triggers Tekton pipeline of that is linked to the {@link ComponentResource}
+     * the {@link ComponentBuildResource} is pointing to.
+     * </p>
+     * 
+     * @param componentBuild The {@link ComponentBuildResource}
+     * @throws ApplicationException in case the pipeline cannot be triggered
+     */
+    private void runBuildPipeline(ComponentBuildResource componentBuild) throws ApplicationException {
+        LOG.info("Triggering pipeline for build '{}'", componentBuild.getNamespacedName());
 
-        ComponentResource component = componentResourceClient.getByName(build.getSpec().getComponent());
+        ComponentResource component = componentResourceClient.getByName(componentBuild.getSpec().getComponent());
 
         if (component == null) {
-            throw new Exception("Could not find component with name '{}'" + build.getSpec().getComponent() + "'");
+            throw new ApplicationException("Could not find component with name '{}' in namespace '{}'",
+                    componentBuild.getSpec().getComponent(), componentBuild.getMetadata().getNamespace());
         }
 
         if (!component.isReady()) {
-            throw new Exception("Component is not ready to build it");
+            throw new ApplicationException("Component '{}'' is not ready to build it", component.getNamespacedName());
         }
 
         try {
-            this.runBuildPipeline(build.getSpec().getComponent(), build.getMetadata().getName());
+            this.tektonRunBuildPipeline(componentBuild.getSpec().getComponent(),
+                    componentBuild.getMetadata().getName());
         } catch (ApplicationException e) {
-            throw new Exception("Error occurred while triggering the pipeline for component '{}'", e);
+            throw new ApplicationException("Error occurred while triggering the pipeline for component '{}'",
+                    component.getNamespacedName(), e);
         }
-    }
-
-    @Override
-    public void init(EventSourceManager eventSourceManager) {
-        eventSourceManager.registerEventSource("pipeline-run", pipelineRunEventSource);
-    }
-
-    @Override
-    public DeleteControl deleteResource(ComponentBuildResource build, Context<ComponentBuildResource> context) {
-        return DeleteControl.DEFAULT_DELETE;
-    }
-
-    public UpdateControl<ComponentBuildResource> onResourceUpdate(ComponentBuildResource build,
-            Context<ComponentBuildResource> context) {
-
-        LOG.info("Build '{}' modified", build.getMetadata().getName());
-
-        try {
-            switch (Status.valueOf(build.getStatus().getStatus())) {
-                case New:
-                    LOG.info("Handling new build '{}'", build.getMetadata().getName());
-
-                    if (hasLabels(build)) {
-                        // Run pipeline
-                        runPipeline(build);
-
-                        // Set build status to "Running"
-                        setStatus(build, Status.Running, "Pipeline triggered");
-                        return UpdateControl.updateStatusSubResource(build);
-                    } else {
-                        // Prepare labels
-                        Map<String, String> labels = new HashMap<>();
-                        labels.put(COMPONENT_LABEL, build.getSpec().getComponent());
-
-                        // Set labels
-                        build.getMetadata().setLabels(labels);
-
-                        // Update build
-                        return UpdateControl.updateCustomResource(build);
-                    }
-                case Running:
-                    // Check back later to see what is the status
-                    break;
-                default:
-                    break;
-            }
-        } catch (Exception ex) {
-            LOG.error("An error occurred while handling build object '{}' modification", build.getMetadata().getName(),
-                    ex);
-
-            // Set build status to "Failed"
-            setStatus(build, Status.Failed, ex.getMessage());
-
-            return UpdateControl.updateStatusSubResource(build);
-        }
-
-        return UpdateControl.noUpdate();
     }
 
     /**
+     * <p>
      * Updates the status of particular {@link ComponentBuildResource} based on the
      * event received from a {@link io.fabric8.tekton.pipeline.v1beta1.PipelineRun}.
+     * </p>
      * 
      * @param build the build to
      * @param event
      * @return
      */
-    public UpdateControl<ComponentBuildResource> updateStatus(ComponentBuildResource build, PipelineRunEvent event) {
+    public UpdateControl<ComponentBuildResource> handlePipelineRunEvent(ComponentBuildResource build,
+            PipelineRunEvent event) {
 
         PipelineRunStatus status = event.getStatus();
 
@@ -231,7 +311,7 @@ public class ComponentBuildController implements ResourceController<ComponentBui
         }
 
         if (update) {
-            LOG.debug("Updating build '{}' with PipelineRun status '{}'", build.getMetadata().getName(),
+            LOG.debug("Updating build '{}' with PipelineRun status '{}'", build.getNamespacedName(),
                     condition.getReason());
             return UpdateControl.updateStatusSubResource(build);
         }
@@ -240,40 +320,7 @@ public class ComponentBuildController implements ResourceController<ComponentBui
 
     }
 
-    public UpdateControl<ComponentBuildResource> onEvent(ComponentBuildResource resource,
-            Context<ComponentBuildResource> context) {
-        LOG.info(resource.toString());
-        return UpdateControl.noUpdate();
-    }
-
-    /**
-     * Triggers or updates the Tekton Pipeline based on the
-     * {@link ComponentBuildResource} data passed and sets the status subresource on
-     * {@link ComponentBuildResource} depending on the outcome of the pipeline
-     * update.
-     * 
-     * @param componentBuild {@link ComponentBuildResource}
-     */
-    @Override
-    public UpdateControl<ComponentBuildResource> createOrUpdateResource(ComponentBuildResource componentBuild,
-            Context<ComponentBuildResource> context) {
-
-        Optional<PipelineRunEvent> event = context.getEvents().getLatestOfType(PipelineRunEvent.class);
-
-        if (event.isPresent()) {
-            return updateStatus(componentBuild, event.get());
-        }
-
-        return onResourceUpdate(componentBuild, context);
-        // final var customResourceEvent =
-        // context.getEvents().getLatestOfType(PipelineRunEvent.class);
-        // if (customResourceEvent.isPresent()) {
-        // return onResourceUpdate(resource, context);
-        // }
-        // return onEvent(resource, context);
-    }
-
-    private PipelineRun runBuildPipeline(String componentName, String buildName) throws ApplicationException {
+    private PipelineRun tektonRunBuildPipeline(String componentName, String buildName) throws ApplicationException {
         Pipeline pipeline = tektonResourceClient.getPipelineByName(componentName);
 
         if (pipeline == null) {
