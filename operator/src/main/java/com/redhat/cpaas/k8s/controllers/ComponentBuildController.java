@@ -210,6 +210,21 @@ public class ComponentBuildController implements ResourceController<ComponentBui
         return false;
     }
 
+    /**
+     * <p>
+     * Updates {@link ComponentBuildResource.BuildStatus} of the particular
+     * {@link ComponentBuildResource}.
+     * <p/>
+     * 
+     * <p>
+     * It sets result of the status to <code>null</code>.
+     * </p>
+     * 
+     * 
+     * @param component {@link ComponentBuildResource} object
+     * @param status    One of available statuses
+     * @param reason    Description of the reason for last status change
+     */
     private boolean setStatus(ComponentBuildResource build, Status status, String reason) {
         return setStatus(build, status, reason, null);
     }
