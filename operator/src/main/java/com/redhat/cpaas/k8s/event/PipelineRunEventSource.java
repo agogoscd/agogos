@@ -6,19 +6,19 @@ import javax.enterprise.context.ApplicationScoped;
 
 import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
 
-import org.jboss.logging.Logger;
-
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.javaoperatorsdk.operator.processing.event.AbstractEventSource;
 import lombok.ToString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 @ToString
 public class PipelineRunEventSource extends AbstractEventSource implements ResourceEventHandler<PipelineRun> {
-    private static final Logger LOG = Logger.getLogger(PipelineRunEventSource.class);
+    private static final Logger LOG = LoggerFactory.getLogger( PipelineRunEventSource.class);
 
     /**
      * <p>
@@ -52,17 +52,17 @@ public class PipelineRunEventSource extends AbstractEventSource implements Resou
     }
 
     private void handleEvent(PipelineRun pipelineRun) {
-        LOG.tracev("Event received for PipelineRun ''{0}''", pipelineRun.getMetadata().getName());
+        LOG.trace("Event received for PipelineRun '{}'", pipelineRun.getMetadata().getName());
 
         String uid = findBuildOwnerUid(pipelineRun);
 
         if (uid != null) {
-            LOG.tracev("Handling event for PipelineRun ''{0}'' with owner ''{1}''", pipelineRun.getMetadata().getName(),
+            LOG.trace("Handling event for PipelineRun '{}' with owner '{}'", pipelineRun.getMetadata().getName(),
                     uid);
             eventHandler.handleEvent(new PipelineRunEvent(pipelineRun, this, uid));
         }
 
-        LOG.tracev("Ignoring event for PipelineRun ''{0}''", pipelineRun.getMetadata().getName());
+        LOG.trace("Ignoring event for PipelineRun '{}'", pipelineRun.getMetadata().getName());
     }
 
     @Override
@@ -77,7 +77,7 @@ public class PipelineRunEventSource extends AbstractEventSource implements Resou
 
     @Override
     public void onDelete(PipelineRun pipelineRun, boolean deletedFinalStateUnknown) {
-        LOG.debugv("PipelineRun ''{0}'' deleted", pipelineRun.getMetadata().getName());
+        LOG.debug("PipelineRun '{}' deleted", pipelineRun.getMetadata().getName());
         handleEvent(pipelineRun);
     }
 

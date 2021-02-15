@@ -21,7 +21,6 @@ import com.redhat.cpaas.v1alpha1.ComponentBuildResource.Status;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.jboss.logging.Logger;
 
 import io.fabric8.knative.internal.pkg.apis.Condition;
 import io.fabric8.kubernetes.api.model.OwnerReference;
@@ -46,11 +45,13 @@ import io.javaoperatorsdk.operator.api.DeleteControl;
 import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
 import io.javaoperatorsdk.operator.processing.event.EventSourceManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Controller(generationAwareEventProcessing = false)
 public class ComponentBuildController implements ResourceController<ComponentBuildResource> {
 
-    private static final Logger LOG = Logger.getLogger(ComponentBuildController.class);
+    private static final Logger LOG = LoggerFactory.getLogger( ComponentBuildController.class);
 
     private static final String COMPONENT_LABEL = "cpaas.redhat.com/component";
 
@@ -116,7 +117,7 @@ public class ComponentBuildController implements ResourceController<ComponentBui
         ComponentResource component = componentResourceClient.getByName(build.getSpec().getComponent());
 
         if (component == null) {
-            throw new Exception("Could not find component with name '" + build.getSpec().getComponent() + "'");
+            throw new Exception("Could not find component with name '{}'" + build.getSpec().getComponent() + "'");
         }
 
         if (!component.isReady()) {
@@ -126,7 +127,7 @@ public class ComponentBuildController implements ResourceController<ComponentBui
         try {
             this.runBuildPipeline(build.getSpec().getComponent(), build.getMetadata().getName());
         } catch (ApplicationException e) {
-            throw new Exception("Error occurred while triggering the pipeline for component ''{0}''", e);
+            throw new Exception("Error occurred while triggering the pipeline for component '{}'", e);
         }
     }
 
@@ -143,12 +144,12 @@ public class ComponentBuildController implements ResourceController<ComponentBui
     public UpdateControl<ComponentBuildResource> onResourceUpdate(ComponentBuildResource build,
             Context<ComponentBuildResource> context) {
 
-        LOG.infov("Build ''{0}'' modified", build.getMetadata().getName());
+        LOG.info("Build '{}' modified", build.getMetadata().getName());
 
         try {
             switch (Status.valueOf(build.getStatus().getStatus())) {
                 case New:
-                    LOG.infov("Handling new build ''{0}''", build.getMetadata().getName());
+                    LOG.info("Handling new build '{}'", build.getMetadata().getName());
 
                     if (hasLabels(build)) {
                         // Run pipeline
@@ -175,8 +176,8 @@ public class ComponentBuildController implements ResourceController<ComponentBui
                     break;
             }
         } catch (Exception ex) {
-            LOG.errorv(ex, "An error occurred while handling build object ''{0}'' modification",
-                    build.getMetadata().getName());
+            LOG.error("An error occurred while handling build object '{}' modification",
+                    build.getMetadata().getName(), ex);
 
             // Set build status to "Failed"
             setStatus(build, Status.Failed, ex.getMessage());
@@ -230,7 +231,7 @@ public class ComponentBuildController implements ResourceController<ComponentBui
         }
 
         if (update) {
-            LOG.debugv("Updating build ''{0}'' with PipelineRun status ''{1}''", build.getMetadata().getName(),
+            LOG.debug("Updating build '{}' with PipelineRun status '{}'", build.getMetadata().getName(),
                     condition.getReason());
             return UpdateControl.updateStatusSubResource(build);
         }
@@ -241,7 +242,7 @@ public class ComponentBuildController implements ResourceController<ComponentBui
 
     public UpdateControl<ComponentBuildResource> onEvent(ComponentBuildResource resource,
             Context<ComponentBuildResource> context) {
-        LOG.info(resource);
+        LOG.info(resource.toString());
         return UpdateControl.noUpdate();
     }
 
@@ -268,7 +269,7 @@ public class ComponentBuildController implements ResourceController<ComponentBui
         Pipeline pipeline = tektonResourceClient.getPipelineByName(componentName);
 
         if (pipeline == null) {
-            throw new MissingResourceException(String.format("Pipeline '%s' not found in the system", componentName));
+            throw new MissingResourceException("Pipeline '{}' not found in the system", componentName);
         }
 
         PipelineRef pipelineRef = new PipelineRefBuilder(true).withName(pipeline.getMetadata().getName()).build();
@@ -304,7 +305,7 @@ public class ComponentBuildController implements ResourceController<ComponentBui
         ComponentBuildResource build = componentBuildResourceClient.getByName(buildName);
 
         if (build == null) {
-            throw new MissingResourceException(String.format("Selected build '%s' does not exist", buildName));
+            throw new MissingResourceException("Selected build '{}' does not exist", buildName);
         }
 
         Map<String, String> labels = new HashMap<>();

@@ -11,8 +11,6 @@ import com.redhat.cpaas.k8s.client.ComponentGroupResourceClient;
 import com.redhat.cpaas.v1alpha1.PipelineResource;
 import com.redhat.cpaas.v1alpha1.PipelineResource.PipelineSpec.StageReference;
 
-import org.jboss.logging.Logger;
-
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.client.TektonClient;
@@ -30,11 +28,13 @@ import io.javaoperatorsdk.operator.api.Controller;
 import io.javaoperatorsdk.operator.api.DeleteControl;
 import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Controller
 public class PipelineController implements ResourceController<PipelineResource> {
 
-    private static final Logger LOG = Logger.getLogger(PipelineController.class);
+    private static final Logger LOG = LoggerFactory.getLogger( PipelineController.class);
 
     @Inject
     TektonClient tektonClient;
@@ -53,7 +53,7 @@ public class PipelineController implements ResourceController<PipelineResource> 
     @Override
     public UpdateControl<PipelineResource> createOrUpdateResource(PipelineResource pipeline,
             Context<PipelineResource> context) {
-        LOG.infov("Pipeline ''{0}'' modified", pipeline.getMetadata().getName());
+        LOG.info("Pipeline '{}' modified", pipeline.getMetadata().getName());
 
         // Prepare workspace for main task to share content between steps
         WorkspacePipelineTaskBinding pipelineWsBinding = new WorkspacePipelineTaskBindingBuilder() //
@@ -84,10 +84,6 @@ public class PipelineController implements ResourceController<PipelineResource> 
             } catch (JsonProcessingException e) {
 
                 return UpdateControl.noUpdate();
-
-                // throw new ApplicationException(String
-                // .format("Internal error; could not serialize configuration for stage '%s'",
-                // stageRef.getName()), e);
             }
 
             // Prepare workspace for main task to store results

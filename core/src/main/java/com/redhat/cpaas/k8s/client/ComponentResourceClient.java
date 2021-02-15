@@ -8,19 +8,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
 import com.redhat.cpaas.v1alpha1.ComponentResourceList;
 
-import org.jboss.logging.Logger;
-
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 @RegisterForReflection
 public class ComponentResourceClient {
-    private static final Logger LOG = Logger.getLogger(ComponentResourceClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger( ComponentResourceClient.class);
 
     @Inject
     KubernetesClient kubernetesClient;
@@ -49,7 +49,7 @@ public class ComponentResourceClient {
         ComponentResourceList componentResources = componentClient.list(options);
 
         if (componentResources.getItems().isEmpty() || componentResources.getItems().size() > 1) {
-            LOG.debugv("Component ''{0}'' cannot be found", name);
+            LOG.debug("Component '{}' cannot be found", name);
             return null;
         }
 

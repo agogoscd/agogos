@@ -7,14 +7,14 @@ import javax.inject.Inject;
 import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
 import com.redhat.cpaas.v1alpha1.ComponentBuildResourceList;
 
-import org.jboss.logging.Logger;
-
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Build CR client.
@@ -26,7 +26,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 @ApplicationScoped
 @RegisterForReflection
 public class ComponentBuildResourceClient {
-    private static final Logger LOG = Logger.getLogger(ComponentBuildResourceClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger( ComponentBuildResourceClient.class);
 
     @Inject
     KubernetesClient kubernetesClient;
@@ -53,7 +53,7 @@ public class ComponentBuildResourceClient {
         ComponentBuildResourceList buildResources = componentBuildClient.list(options);
 
         if (buildResources.getItems().isEmpty() || buildResources.getItems().size() > 1) {
-            LOG.debugv("ComponentBuild ''{0}'' cannot be found", name);
+            LOG.debug("ComponentBuild '{}' cannot be found", name);
             return null;
         }
 
