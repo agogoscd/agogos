@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
 @Controller(generationAwareEventProcessing = false)
 public class ComponentBuildController implements ResourceController<ComponentBuildResource> {
 
-    private static final Logger LOG = LoggerFactory.getLogger( ComponentBuildController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ComponentBuildController.class);
 
     private static final String COMPONENT_LABEL = "cpaas.redhat.com/component";
 
@@ -176,8 +176,8 @@ public class ComponentBuildController implements ResourceController<ComponentBui
                     break;
             }
         } catch (Exception ex) {
-            LOG.error("An error occurred while handling build object '{}' modification",
-                    build.getMetadata().getName(), ex);
+            LOG.error("An error occurred while handling build object '{}' modification", build.getMetadata().getName(),
+                    ex);
 
             // Set build status to "Failed"
             setStatus(build, Status.Failed, ex.getMessage());
@@ -246,17 +246,25 @@ public class ComponentBuildController implements ResourceController<ComponentBui
         return UpdateControl.noUpdate();
     }
 
+    /**
+     * Triggers or updates the Tekton Pipeline based on the
+     * {@link ComponentBuildResource} data passed and sets the status subresource on
+     * {@link ComponentBuildResource} depending on the outcome of the pipeline
+     * update.
+     * 
+     * @param componentBuild {@link ComponentBuildResource}
+     */
     @Override
-    public UpdateControl<ComponentBuildResource> createOrUpdateResource(ComponentBuildResource resource,
+    public UpdateControl<ComponentBuildResource> createOrUpdateResource(ComponentBuildResource componentBuild,
             Context<ComponentBuildResource> context) {
 
         Optional<PipelineRunEvent> event = context.getEvents().getLatestOfType(PipelineRunEvent.class);
 
         if (event.isPresent()) {
-            return updateStatus(resource, event.get());
+            return updateStatus(componentBuild, event.get());
         }
 
-        return onResourceUpdate(resource, context);
+        return onResourceUpdate(componentBuild, context);
         // final var customResourceEvent =
         // context.getEvents().getLatestOfType(PipelineRunEvent.class);
         // if (customResourceEvent.isPresent()) {

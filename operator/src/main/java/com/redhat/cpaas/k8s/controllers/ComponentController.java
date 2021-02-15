@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -43,7 +44,7 @@ import org.slf4j.LoggerFactory;
 @Controller
 public class ComponentController implements ResourceController<ComponentResource> {
 
-    private static final Logger LOG = LoggerFactory.getLogger( ComponentController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ComponentController.class);
 
     @Inject
     ComponentResourceClient componentResourceClient;
@@ -53,6 +54,44 @@ public class ComponentController implements ResourceController<ComponentResource
 
     @Inject
     TektonClient tektonClient;
+
+    /**
+     * Method triggered when a {@link ComponentResource} is removed from the
+     * cluster.
+     * 
+     * @param component {@link ComponentResource}
+     * @param context   {@link Context}
+     * @return {@link DeleteControl}
+     */
+    @Override
+    public DeleteControl deleteResource(ComponentResource component, Context<ComponentResource> context) {
+        LOG.info("Removing component '{}'", component.getMetadata().getName());
+        return DeleteControl.DEFAULT_DELETE;
+    }
+
+    /**
+     * Main method that is triggered when a change on the {@link ComponentResource}
+     * object is detected.
+     * 
+     * @param component {@link ComponentResource}
+     * @param context   {@link Context}
+     * @return {@link UpdateControl}
+     */
+    @Override
+    public UpdateControl<ComponentResource> createOrUpdateResource(ComponentResource component,
+            Context<ComponentResource> context) {
+
+        // Try to find the latest event
+        final Optional<CustomResourceEvent> customResourceEvent = context.getEvents()
+                .getLatestOfType(CustomResourceEvent.class);
+
+        // Handle it if available
+        if (customResourceEvent.isPresent()) {
+            return onResourceUpdate(component, context);
+        }
+
+        return UpdateControl.noUpdate();
+    }
 
     /**
      * Updates {@link ComponentResource.ComponentStatus} of the particular
@@ -73,76 +112,63 @@ public class ComponentController implements ResourceController<ComponentResource
         componentStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
     }
 
-    private void createPipeline(ComponentResource component) {
+    /**
+     * Creates or updates Tekton Pipeline based on the {@link ComponentResource}
+     * data passed and sets the status subresource on {@link ComponentResource}
+     * depending on the outcome of the pipeline update.
+     * 
+     * @param component Component resource to create the pipeline for
+     */
+    private void updateBuildPipeline(ComponentResource component) {
         try {
             LOG.debug("Preparing pipeline for component '{}'", component.getMetadata().getName());
 
-            this.createBuildPipeline(component);
+            this.updateTektonBuildPipeline(component);
 
             setStatus(component, Status.Initializing, "Preparing pipeline");
 
             LOG.info("Pipeline for component '{}' updated", component.getMetadata().getName());
         } catch (ApplicationException e) {
-            LOG.error("Error occurred while creating pipeline for component '{}'",
-                    component.getMetadata().getName(), e);
+            LOG.error("Error occurred while creating pipeline for component '{}'", component.getMetadata().getName(),
+                    e);
 
             setStatus(component, Status.Failed, "Could not create component pipeline");
-
         }
     }
 
-    @Override
-    public DeleteControl deleteResource(ComponentResource component, Context<ComponentResource> context) {
-        LOG.info("Removing component '{}'", component.getMetadata().getName());
-        return DeleteControl.DEFAULT_DELETE;
-    }
-
-    public UpdateControl<ComponentResource> onResourceUpdate(ComponentResource component,
+    private UpdateControl<ComponentResource> onResourceUpdate(ComponentResource component,
             Context<ComponentResource> context) {
         LOG.info("Component '{}' modified", component.getMetadata().getName());
 
-        // TODO: Handle component updates
+        // Create or update pipeline in any case
+        this.updateBuildPipeline(component);
 
-        switch (Status.valueOf(component.getStatus().getStatus())) {
-            case New:
-                createPipeline(component);
-                // TODO
-                // Add handling of additional hooks required to be run before the
-                // component can be built
+        // switch (Status.valueOf(component.getStatus().getStatus())) {
+        // case New:
+        // // TODO: set resurce metadata here (labels)
+        // default:
+        // break;
+        // }
 
-                setStatus(component, Status.Ready, "");
-                return UpdateControl.updateStatusSubResource(component);
-            // case Initializing:
-            // // TODO
-            // // This is not how it should be, we need to find a way to watch resources to
-            // // make the component ready when it is ready
-            // setStatus(component, Status.Ready, "");
-            // return UpdateControl.updateStatusSubResource(component);
-            default:
-                break;
-        }
+        // Update Coomponent status
+        setStatus(component, Status.Ready, "");
 
-        return UpdateControl.noUpdate();
+        return UpdateControl.updateStatusSubResource(component);
     }
 
-    public UpdateControl<ComponentResource> onEvent(ComponentResource resource, Context<ComponentResource> context) {
-        return UpdateControl.updateStatusSubResource(resource);
-    }
-
-    @Override
-    public UpdateControl<ComponentResource> createOrUpdateResource(ComponentResource resource,
-            Context<ComponentResource> context) {
-        final var customResourceEvent = context.getEvents().getLatestOfType(CustomResourceEvent.class);
-        if (customResourceEvent.isPresent()) {
-            return onResourceUpdate(resource, context);
-        }
-        return onEvent(resource, context);
-    }
-
-    private Pipeline createBuildPipeline(ComponentResource component) throws ApplicationException {
+    /**
+     * Creates or updates Tekton pipeline based on the {@link ComponentResource}
+     * data passed.
+     * 
+     * @param component {@link ComponentResource} to create the pipeline for
+     * @return {@link Pipeline} object for the updated pipeline
+     * @throws ApplicationException in case the pipeline cannot be updated
+     */
+    private Pipeline updateTektonBuildPipeline(ComponentResource component) throws ApplicationException {
         String componentJson;
 
         // Convert Component metadata to JSON
+        // TODO: Find a better way to pass it
         try {
             componentJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(component.toEasyMap());
         } catch (JsonProcessingException e) {
@@ -178,7 +204,6 @@ public class ComponentController implements ResourceController<ComponentResource
 
         tasks.add(initTask);
 
-        // TODO: Make pre and post-tasks configurable?
         // Prepare main task
         PipelineTask buildTask = new PipelineTaskBuilder() //
                 .withName(component.getMetadata().getName()) //
