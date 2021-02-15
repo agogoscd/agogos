@@ -1,0 +1,37 @@
+= Agogos Minikube Development Setup
+CP Development Team <cp-devel@redhat.com>
+:toc:
+:icons: font
+:numbered:
+:source-highlighter: highlightjs
+
+This document describes the suggested local development setup.
+
+== System requirements
+
+Please make sure you have following requirements installed:
+
+* link:https://minikube.sigs.k8s.io/docs/start/[Minikube]
+** link:https://kubernetes.io/docs/tasks/tools/install-kubectl/[kubectl]
+* link:https://tekton.dev/docs/getting-started/#installation[Tekton]
+* link:https://sdkman.io/jdks#jdk.java.net[JDK 11]
+
+== Known issues
+
+This section describes known issues and limitations with the setup.
+
+=== Minikube failing to start due to `PROVIDER_KVM2_ERROR`
+
+If you see error similar to what can be found below, just start Minikube again. It will work.
+
+[source,bash]
+----
+❯ minikube start
+😄  minikube v1.17.1 on Fedora 33
+✨  Using the kvm2 driver based on existing profile
+
+💣  Exiting due to PROVIDER_KVM2_ERROR: /usr/bin/virsh domcapabilities --virttype kvm failed:
+
+💡  Suggestion: Follow your Linux distribution instructions for configuring KVM
+📘  Documentation: https://minikube.sigs.k8s.io/docs/reference/drivers/kvm2
+----
