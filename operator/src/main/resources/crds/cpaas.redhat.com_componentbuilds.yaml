@@ -35,18 +35,21 @@ spec:
               type: object
             spec:
               type: object
-              description: Defines the desired state of Build
+              description: Defines the desired state of ComponentBuild
               properties:
                 component:
-                  description: "The Component name the Build refers to"
+                  description: "The Component name the ComponentBuild refers to"
                   type: string
               required:
                 - "component"
             status:
-              description: BuildStatus defines the observed state of Build
+              description: Status defines the observed state of ComponentBuild
               properties:
                 lastUpdate:
                   format: date-time
+                  type: string
+                result:
+                  description: "ComponentBuild result metadata"
                   type: string
                 reason:
                   type: string

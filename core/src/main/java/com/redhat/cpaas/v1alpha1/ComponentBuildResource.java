@@ -37,6 +37,9 @@ public class ComponentBuildResource extends CustomResource<BuildSpec, BuildStatu
 
         @Getter
         @Setter
+        private String result;
+        @Getter
+        @Setter
         private String status = String.valueOf(Status.New);
         @Getter
         @Setter
@@ -61,6 +64,14 @@ public class ComponentBuildResource extends CustomResource<BuildSpec, BuildStatu
         super();
     }
 
+    @Getter
+    @Setter
+    private BuildSpec spec = new BuildSpec();
+
+    @Getter
+    @Setter
+    private BuildStatus status = new BuildStatus();
+
     /**
      * <p>
      * Returns object name together with namespace. Useful for logging.
@@ -73,11 +84,15 @@ public class ComponentBuildResource extends CustomResource<BuildSpec, BuildStatu
         return this.getMetadata().getNamespace() + "/" + this.getMetadata().getName();
     }
 
-    @Getter
-    @Setter
-    private BuildSpec spec = new BuildSpec();
-
-    @Getter
-    @Setter
-    private BuildStatus status = new BuildStatus();
+    /**
+     * <p>
+     * Get the result of the build.
+     * </p>
+     * 
+     * @return String formatted result
+     */
+    @JsonIgnore
+    public String getResult() {
+        return this.getStatus().getResult();
+    }
 }

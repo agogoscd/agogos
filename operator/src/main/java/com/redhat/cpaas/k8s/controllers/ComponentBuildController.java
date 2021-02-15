@@ -3,6 +3,7 @@ package com.redhat.cpaas.k8s.controllers;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -36,6 +37,7 @@ import io.fabric8.tekton.pipeline.v1beta1.PipelineRef;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRefBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRunBuilder;
+import io.fabric8.tekton.pipeline.v1beta1.PipelineRunResult;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRunSpecBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRunStatus;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBinding;
@@ -208,6 +210,10 @@ public class ComponentBuildController implements ResourceController<ComponentBui
         return false;
     }
 
+    private boolean setStatus(ComponentBuildResource build, Status status, String reason) {
+        return setStatus(build, status, reason, null);
+    }
+
     /**
      * <p>
      * Updates {@link ComponentBuildResource.BuildStatus} of the particular
@@ -218,16 +224,19 @@ public class ComponentBuildController implements ResourceController<ComponentBui
      * @param component {@link ComponentBuildResource} object
      * @param status    One of available statuses
      * @param reason    Description of the reason for last status change
+     * @param result    String formatted result, if any
      */
-    private boolean setStatus(ComponentBuildResource build, Status status, String reason) {
+    private boolean setStatus(ComponentBuildResource build, Status status, String reason, String result) {
         BuildStatus buildStatus = build.getStatus();
 
-        if (buildStatus.getStatus().equals(String.valueOf(status)) && buildStatus.getReason().equals(reason)) {
+        if (buildStatus.getStatus().equals(String.valueOf(status)) && buildStatus.getReason().equals(reason)
+                && buildStatus.getResult() != null && buildStatus.getResult().equals(result)) {
             return false;
         }
 
         buildStatus.setStatus(String.valueOf(status));
         buildStatus.setReason(reason);
+        buildStatus.setResult(result);
         buildStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
 
         return true;
@@ -278,37 +287,56 @@ public class ComponentBuildController implements ResourceController<ComponentBui
     public UpdateControl<ComponentBuildResource> handlePipelineRunEvent(ComponentBuildResource build,
             PipelineRunEvent event) {
 
-        PipelineRunStatus status = event.getStatus();
+        PipelineRunStatus pipelineRunStatus = event.getStatus();
 
-        if (status == null) {
+        if (pipelineRunStatus == null) {
             return UpdateControl.noUpdate();
         }
 
         // Get latest condition
-        Condition condition = status.getConditions().get(0);
+        Condition condition = pipelineRunStatus.getConditions().get(0);
+
+        Status status = null;
+        String message = null;
+        String result = null;
 
         boolean update = false;
 
         switch (condition.getStatus()) {
             case "Unknown":
-                update = setStatus(build, Status.Running, "Build in progress");
+                status = Status.Running;
+                message = "Build in progress";
                 break;
             case "True":
-                if (condition.getReason().equals("Succeeded")) {
-                    update = setStatus(build, Status.Passed, "Build finished");
-                } else {
-                    update = setStatus(build, Status.Passed, "Build finished but some tasks were skipped");
+                status = Status.Passed;
+                message = "Build finished";
+
+                List<PipelineRunResult> pipelineResults = pipelineRunStatus.getPipelineResults();
+
+                if (!pipelineResults.isEmpty()) {
+                    result = pipelineResults.get(0).getValue();
+                }
+
+                // TODO: For successful run we should cleanup Tekton's PipelineRun
+
+                if (!condition.getReason().equals("Succeeded")) {
+                    message = "Build finished but some tasks were skipped";
                 }
                 break;
             case "False":
                 if (condition.getReason().equals("PipelineRunCancelled")) {
-                    update = setStatus(build, Status.Aborted, "Build aborted");
+                    status = Status.Aborted;
+                    message = "Build aborted";
                 } else {
-                    update = setStatus(build, Status.Failed, "Build failed");
+                    status = Status.Failed;
+                    message = "Build failed";
                 }
 
                 break;
         }
+
+        // Update status in the object and check whether it was necessary
+        update = setStatus(build, status, message, result);
 
         if (update) {
             LOG.debug("Updating build '{}' with PipelineRun status '{}'", build.getNamespacedName(),

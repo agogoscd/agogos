@@ -18,12 +18,13 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 @ToString
 public class PipelineRunEventSource extends AbstractEventSource implements ResourceEventHandler<PipelineRun> {
-    private static final Logger LOG = LoggerFactory.getLogger( PipelineRunEventSource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PipelineRunEventSource.class);
 
     /**
      * <p>
-     * Finds if the owner of the {@link PipelineRun} is a {@link ComponentBuildResource}. If
-     * this is the case, it returns the {@link OwnerReference#getUid()} value.
+     * Finds if the owner of the {@link PipelineRun} is a
+     * {@link ComponentBuildResource}. If this is the case, it returns the
+     * {@link OwnerReference#getUid()} value.
      * </p>
      * 
      * <p>
@@ -52,17 +53,14 @@ public class PipelineRunEventSource extends AbstractEventSource implements Resou
     }
 
     private void handleEvent(PipelineRun pipelineRun) {
-        LOG.trace("Event received for PipelineRun '{}'", pipelineRun.getMetadata().getName());
-
         String uid = findBuildOwnerUid(pipelineRun);
 
-        if (uid != null) {
-            LOG.trace("Handling event for PipelineRun '{}' with owner '{}'", pipelineRun.getMetadata().getName(),
-                    uid);
-            eventHandler.handleEvent(new PipelineRunEvent(pipelineRun, this, uid));
+        if (uid == null) {
+            return;
         }
 
-        LOG.trace("Ignoring event for PipelineRun '{}'", pipelineRun.getMetadata().getName());
+        LOG.trace("Handling event for PipelineRun '{}' with owner '{}'", pipelineRun.getMetadata().getName(), uid);
+        eventHandler.handleEvent(new PipelineRunEvent(pipelineRun, this, uid));
     }
 
     @Override
