@@ -16,6 +16,5 @@ CP Development Team <cp-devel@redhat.com>
 
 == Development
 
-* link:development{outfilesuffix}[Development]
+* link:development/index{outfilesuffix}[Development]
 * link:contributing{outfilesuffix}[Contributing]
-* link:testing{outfilesuffix}[Testing]
