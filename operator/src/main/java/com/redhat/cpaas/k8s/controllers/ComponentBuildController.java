@@ -55,8 +55,6 @@ public class ComponentBuildController implements ResourceController<ComponentBui
 
     private static final Logger LOG = LoggerFactory.getLogger(ComponentBuildController.class);
 
-    private static final String COMPONENT_LABEL = "cpaas.redhat.com/component";
-
     @ConfigProperty(name = "agogos.service-account")
     Optional<String> serviceAccount;
 
@@ -156,58 +154,6 @@ public class ComponentBuildController implements ResourceController<ComponentBui
         }
 
         return UpdateControl.noUpdate();
-    }
-
-    /**
-     * <p>
-     * Currently unused
-     * </p>
-     * TODO: Move to admission webhook
-     */
-    private void setLabel(ComponentBuildResource componentBuild) {
-        if (Status.valueOf(componentBuild.getStatus().getStatus()) == Status.New && hasComponentLabel(componentBuild)) {
-            return;
-        }
-
-        LOG.info("Adding '{}' label to new build '{}'", COMPONENT_LABEL, componentBuild.getNamespacedName());
-
-        // Prepare label
-        Map<String, String> labels = new HashMap<>();
-        labels.put(COMPONENT_LABEL, componentBuild.getSpec().getComponent());
-
-        // Set label
-        componentBuild.getMetadata().setLabels(labels);
-    }
-
-    /**
-     * <p>
-     * Currently unused
-     * </p>
-     * 
-     * <p>
-     * Checks whether the {@link ComponentBuildResource} has appropriate label that
-     * maps to {@link ComponentResource}.
-     * </p>
-     * 
-     * <p>
-     * Name of the label is <code>cpaas.redhat.com/component</code>.
-     * </p>
-     * 
-     * @param componentBuild A {@link ComponentBuildResource} instance
-     * @return <code>true</code> is label exists, <code>false</code> otherwise
-     */
-    private boolean hasComponentLabel(ComponentBuildResource componentBuild) {
-        Map<String, String> labels = componentBuild.getMetadata().getLabels();
-
-        if (labels == null) {
-            return false;
-        }
-
-        if (labels.get(COMPONENT_LABEL) != null) {
-            return true;
-        }
-
-        return false;
     }
 
     /**

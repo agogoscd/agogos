@@ -57,6 +57,10 @@
             <artifactId>quarkus-config-yaml</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jsonp</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.redhat.cpaas</groupId>
             <artifactId>agogos-core</artifactId>
             <version>${project.version}</version>

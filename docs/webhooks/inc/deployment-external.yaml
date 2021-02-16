@@ -3,7 +3,7 @@ kind: ValidatingWebhookConfiguration
 metadata:
   name: config.webhook.cpaas.redhat.com
 webhooks:
-  - name: components.webhook.cpaas.redhat.com
+  - name: components.validate.webhook.cpaas.redhat.com
     sideEffects: None
     failurePolicy: Fail
     admissionReviewVersions: ["v1"]
@@ -14,4 +14,22 @@ webhooks:
         apiGroups: ["cpaas.redhat.com"]
         apiVersions: ["v1alpha1"]
         resources: ["components"]
+        scope: "Namespaced"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: config.webhook.cpaas.redhat.com
+webhooks:
+  - name: componentbuilds.mutate.webhook.cpaas.redhat.com
+    sideEffects: None
+    failurePolicy: Fail
+    admissionReviewVersions: ["v1"]
+    clientConfig:
+      url: "https://192.168.39.1:8443/webhooks/mutate/componentbuild"
+    rules:
+      - operations: ["CREATE"]
+        apiGroups: ["cpaas.redhat.com"]
+        apiVersions: ["v1alpha1"]
+        resources: ["componentbuilds"]
         scope: "Namespaced"

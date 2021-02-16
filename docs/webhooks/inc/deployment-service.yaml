@@ -3,7 +3,7 @@ kind: ValidatingWebhookConfiguration
 metadata:
   name: config.webhook.cpaas.redhat.com
 webhooks:
-  - name: validation.webhook.cpaas.redhat.com
+  - name: components.validate.webhook.cpaas.redhat.com
     sideEffects: None
     failurePolicy: Fail
     admissionReviewVersions: ["v1"]
@@ -15,6 +15,28 @@ webhooks:
         port: 443
     rules:
       - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["cpaas.redhat.com"]
+        apiVersions: ["v1alpha1"]
+        resources: ["components"]
+        scope: "Namespaced"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: config.webhook.cpaas.redhat.com
+webhooks:
+  - name: componentbuilds.mutate.webhook.cpaas.redhat.com
+    sideEffects: None
+    failurePolicy: Fail
+    admissionReviewVersions: ["v1"]
+    clientConfig:
+      service:
+        namespace: default
+        name: agogos-admission
+        path: /webhooks/validate/component
+        port: 443
+    rules:
+      - operations: ["CREATE"]
         apiGroups: ["cpaas.redhat.com"]
         apiVersions: ["v1alpha1"]
         resources: ["components"]
