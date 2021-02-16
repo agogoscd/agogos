@@ -119,9 +119,6 @@ public class ComponentBuildController implements ResourceController<ComponentBui
 
         Optional<CustomResourceEvent> crEvent = context.getEvents().getLatestOfType(CustomResourceEvent.class);
 
-        // TODO: Set labels
-        // TODO: Set ownership?
-
         if (crEvent.isPresent()) {
             LOG.info("Build '{}' modified", componentBuild.getNamespacedName());
 

@@ -1,34 +1,35 @@
 
 package com.redhat.cpaas.k8s.webhooks.mutator;
 
-import java.util.Map;
-
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonObject;
 
+import com.redhat.cpaas.k8s.client.ComponentResourceClient;
 import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.admission.AdmissionRequest;
 import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
 
 @ApplicationScoped
 public class ComponentBuildMutator extends Mutator<ComponentBuildResource> {
-    private static final Logger LOG = LoggerFactory.getLogger(ComponentBuildMutator.class);
-
     private static final String COMPONENT_LABEL = "cpaas.redhat.com/component";
+
+    @Inject
+    ComponentResourceClient componentResourceClient;
 
     @Override
     protected void mutateResource(ComponentBuildResource componentBuild, AdmissionRequest request,
             AdmissionResponseBuilder responseBuilder) {
 
-        if (!hasComponentLabel(componentBuild)) {
-            setComponentLabel(componentBuild, responseBuilder);
-        }
+        applyPatch(responseBuilder, patchBuilder -> {
+            patchBuilder.add("/metadata/labels", generateLabels(componentBuild));
+            patchBuilder.add("/metadata/ownerReferences", generateOwner(componentBuild));
+        });
 
         responseBuilder.withAllowed(true);
     }
@@ -38,43 +39,40 @@ public class ComponentBuildMutator extends Mutator<ComponentBuildResource> {
      * Sets the <code>cpaas.redhat.com/component</code> label pointing to the
      * {@link ComponentResource}.
      * </p>
+     * 
+     * @param componentBuild
+     * @return Json object containing the label
      */
-    private void setComponentLabel(ComponentBuildResource componentBuild, AdmissionResponseBuilder responseBuilder) {
-        // We cannot rely on the component build name here, because at this time it will
-        // not exist
-        LOG.debug("Adding to new component build request '{}' label pointing to '{}' component", COMPONENT_LABEL,
-                componentBuild.getSpec().getComponent());
-
+    private JsonObject generateLabels(ComponentBuildResource componentBuild) {
         JsonObject labels = Json.createObjectBuilder() //
                 .add(COMPONENT_LABEL, componentBuild.getSpec().getComponent()) //
                 .build();
 
-        applyPatch(responseBuilder, patchBuilder -> patchBuilder.add("/metadata/labels", labels));
+        return labels;
     }
 
     /**
-     * 
      * <p>
-     * Checks whether the {@link ComponentBuildResource} has a
-     * <code>cpaas.redhat.com/component</code> label that maps to
-     * {@link ComponentResource}.
+     * Sets the Component resource as the owner for to the Component Build.
      * </p>
      * 
-     * 
-     * @param componentBuild A {@link ComponentBuildResource} instance
-     * @return <code>true</code> is label exists, <code>false</code> otherwise
+     * @param componentBuild
+     * @return Json array with one entry pointing to the Component
      */
-    private boolean hasComponentLabel(ComponentBuildResource componentBuild) {
-        Map<String, String> labels = componentBuild.getMetadata().getLabels();
+    private JsonArray generateOwner(ComponentBuildResource componentBuild) {
+        ComponentResource component = componentResourceClient.getByName(componentBuild.getSpec().getComponent());
 
-        if (labels == null) {
-            return false;
-        }
+        JsonObject owner = Json.createObjectBuilder() //
+                .add("apiVersion", HasMetadata.getApiVersion(ComponentResource.class)) //
+                .add("kind", HasMetadata.getKind(ComponentResource.class)) //
+                .add("name", component.getMetadata().getName()) //
+                .add("uid", component.getMetadata().getUid()) //
+                .add("blockOwnerDeletion", true) //
+                .build();
 
-        if (labels.get(COMPONENT_LABEL) != null) {
-            return true;
-        }
+        JsonArray owners = Json.createArrayBuilder() //
+                .add(owner).build();
 
-        return false;
+        return owners;
     }
 }

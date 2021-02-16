@@ -1,7 +1,7 @@
 package com.redhat.cpaas.k8s.webhooks.mutator;
 
 import java.util.Base64;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.Json;
@@ -55,9 +55,12 @@ public abstract class Mutator<T extends CustomResource<?, ?>> extends AdmissionH
      * @param responseBuilder The response that should be added
      * @param builder
      */
-    public void applyPatch(AdmissionResponseBuilder responseBuilder, Function<JsonPatchBuilder, JsonPatchBuilder> fn) {
+    public void applyPatch(AdmissionResponseBuilder responseBuilder, Consumer<JsonPatchBuilder> consumer) {
         JsonPatchBuilder patchBuilder = Json.createPatchBuilder();
-        JsonPatch jsonPatch = fn.apply(patchBuilder).build();
+
+        consumer.accept(patchBuilder);
+
+        JsonPatch jsonPatch = patchBuilder.build();
 
         LOG.trace(jsonPatch.toString());
 
