@@ -68,6 +68,7 @@ public class ComponentBuildMutator extends Mutator<ComponentBuildResource> {
                 .add("name", component.getMetadata().getName()) //
                 .add("uid", component.getMetadata().getUid()) //
                 .add("blockOwnerDeletion", true) //
+                .add("controller", true) //
                 .build();
 
         JsonArray owners = Json.createArrayBuilder() //

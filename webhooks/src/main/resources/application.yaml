@@ -15,6 +15,13 @@ quarkus:
     name: agogos-poc-webhooks
     registry: quay.io
 
+"%test":
+  quarkus:
+    log:
+      category:
+        "com.redhat.cpaas":
+          level: TRACE
+
 "%dev":
   quarkus:
     http:

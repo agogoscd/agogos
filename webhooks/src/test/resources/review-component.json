@@ -1,0 +1,67 @@
+{
+  "apiVersion": "admission.k8s.io/v1",
+  "kind": "AdmissionReview",
+  "request": {
+    "uid": "bc1c421c-412c-40ae-86e3-52bc51b961a4",
+    "kind": {
+      "group": "cpaas.redhat.com",
+      "version": "v1alpha1",
+      "kind": "Component"
+    },
+    "resource": {
+      "group": "cpaas.redhat.com",
+      "version": "v1alpha1",
+      "resource": "components"
+    },
+    "requestKind": {
+      "group": "cpaas.redhat.com",
+      "version": "v1alpha1",
+      "kind": "Component"
+    },
+    "requestResource": {
+      "group": "cpaas.redhat.com",
+      "version": "v1alpha1",
+      "resource": "components"
+    },
+    "name": "cpaas-test-maven",
+    "namespace": "default",
+    "operation": "UPDATE",
+    "userInfo": {
+      "username": "minikube-user",
+      "groups": ["system:masters", "system:authenticated"]
+    },
+    "object": {
+      "apiVersion": "cpaas.redhat.com/v1alpha1",
+      "kind": "Component",
+      "metadata": {
+        "name": "component-name",
+        "namespace": "default"
+      },
+      "spec": {
+        "builder": "maven",
+        "data": {
+          "someKey": "someValue"
+        }
+      }
+    },
+    "oldObject": {
+      "apiVersion": "cpaas.redhat.com/v1alpha1",
+      "kind": "Component",
+      "metadata": {
+        "name": "component-name",
+        "namespace": "default"
+      },
+      "spec": {
+        "builder": "maven",
+        "data": {
+          "someKey": "someValue"
+        }
+      }
+    },
+    "dryRun": false,
+    "options": {
+      "apiVersion": "meta.k8s.io/v1",
+      "kind": "UpdateOptions"
+    }
+  }
+}
