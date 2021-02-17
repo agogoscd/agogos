@@ -13,6 +13,7 @@ import com.redhat.cpaas.v1alpha1.StageResource;
 
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -40,6 +41,7 @@ public class ComponentValidatorTest {
     }
 
     @Test
+    @DisplayName("Validate correct review request")
     public void validateCorrect() throws IOException {
         // Mock the stage validation to return a stage
         Mockito.when(stageResourceClient.getByName("maven", Phase.BUILD)).thenReturn(new StageResource());
@@ -51,6 +53,7 @@ public class ComponentValidatorTest {
     }
 
     @Test
+    @DisplayName("Validate review request for a component with non-existing builder")
     public void validateInvalidBuilder() throws IOException {
         // Mock the stage validation to not find a stage
         Mockito.when(stageResourceClient.getByName("maven", Phase.BUILD)).thenReturn(null);
@@ -61,6 +64,7 @@ public class ComponentValidatorTest {
     }
 
     @Test
+    @DisplayName("Validate valid data passed to builder")
     public void validateCorrectBuilderData() throws IOException {
         StageResource stage = new StageResource();
         stage.getSpec().getSchema().getOpenAPIV3Schema().putAll(TestResources.asMap("openapi-schema-valid.json"));
@@ -73,6 +77,7 @@ public class ComponentValidatorTest {
     }
 
     @Test
+    @DisplayName("Validate invalid data passed to builder")
     public void validateIncorrectBuilderData() throws IOException {
         StageResource stage = new StageResource();
         stage.getSpec().getSchema().getOpenAPIV3Schema().putAll(TestResources.asMap("openapi-schema-invalid.json"));
