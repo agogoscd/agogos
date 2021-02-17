@@ -43,17 +43,13 @@ public class WebhookHandler {
             return componentValidator.validate(admissionReview);
         }
 
-        if (resource instanceof ComponentBuildResource) {
-            return componentBuildValidator.validate(admissionReview);
-        }
-
         // By default allow requests
         return allow(admissionReview);
     }
 
     @POST
     @Path("mutate")
-    public AdmissionReview mutateComponentBuild(AdmissionReview admissionReview) {
+    public AdmissionReview mutate(AdmissionReview admissionReview) {
         KubernetesResource resource = admissionReview.getRequest().getObject();
 
         if (resource instanceof ComponentBuildResource) {

@@ -8,7 +8,7 @@ import javax.ws.rs.core.MediaType;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class ApplicationException extends Exception {
+public class ApplicationException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     private final Object[] params;

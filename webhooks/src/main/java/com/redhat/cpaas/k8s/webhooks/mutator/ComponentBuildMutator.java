@@ -1,6 +1,8 @@
 
 package com.redhat.cpaas.k8s.webhooks.mutator;
 
+import java.util.MissingResourceException;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.Json;
@@ -61,6 +63,11 @@ public class ComponentBuildMutator extends Mutator<ComponentBuildResource> {
      */
     private JsonArray generateOwner(ComponentBuildResource componentBuild) {
         ComponentResource component = componentResourceClient.getByName(componentBuild.getSpec().getComponent());
+
+        if (component == null) {
+            throw new MissingResourceException("Selected Component '{}' does not exist in '{}' namespace",
+                    componentBuild.getSpec().getComponent(), componentBuild.getMetadata().getNamespace());
+        }
 
         JsonObject owner = Json.createObjectBuilder() //
                 .add("apiVersion", HasMetadata.getApiVersion(ComponentResource.class)) //

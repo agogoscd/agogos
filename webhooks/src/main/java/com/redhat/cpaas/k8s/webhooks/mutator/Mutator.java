@@ -8,12 +8,14 @@ import javax.json.Json;
 import javax.json.JsonPatch;
 import javax.json.JsonPatchBuilder;
 
+import com.redhat.cpaas.errors.ApplicationException;
 import com.redhat.cpaas.k8s.webhooks.AdmissionHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.fabric8.kubernetes.api.model.KubernetesResource;
+import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.AdmissionRequest;
 import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
 import io.fabric8.kubernetes.api.model.admission.AdmissionReview;
@@ -40,7 +42,17 @@ public abstract class Mutator<T extends CustomResource<?, ?>> extends AdmissionH
         AdmissionReviewBuilder reviewBuilder = new AdmissionReviewBuilder() //
                 .withApiVersion(admissionReview.getApiVersion());
 
-        mutateResource((T) resource, request, responseBuilder);
+        try {
+            mutateResource((T) resource, request, responseBuilder);
+        } catch (ApplicationException e) {
+            LOG.error("An error occurred while mutating", e);
+
+            responseBuilder.withAllowed(false) //
+                    .withStatus(new StatusBuilder() //
+                            .withCode(400) //
+                            .withMessage(e.getMessage()) //
+                            .build());
+        }
 
         return reviewBuilder.withResponse(responseBuilder.build()).build();
     }
