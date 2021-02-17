@@ -2,15 +2,16 @@ package com.redhat.cpaas.k8s.webhooks.validator;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import com.redhat.cpaas.errors.ApplicationException;
 import com.redhat.cpaas.k8s.webhooks.AdmissionHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.fabric8.kubernetes.api.model.KubernetesResource;
+import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
 import io.fabric8.kubernetes.api.model.admission.AdmissionReview;
-import io.fabric8.kubernetes.api.model.admission.AdmissionReviewBuilder;
 import io.fabric8.kubernetes.client.CustomResource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
@@ -23,18 +24,19 @@ public abstract class Validator<T extends CustomResource<?, ?>> extends Admissio
     public AdmissionReview validate(AdmissionReview admissionReview) {
         KubernetesResource resource = admissionReview.getRequest().getObject();
 
-        LOG.debug("New validation request incoming, resource: '{}', requester: '{}'",
-                resource.getClass().getSimpleName(), admissionReview.getRequest().getUserInfo().getUsername());
+        return AdmissionHandler.review(admissionReview, response -> {
+            try {
+                validateResource((T) resource, response);
+            } catch (ApplicationException e) {
+                LOG.error("An error occurred while validating", e);
 
-        AdmissionResponseBuilder responseBuilder = new AdmissionResponseBuilder() //
-                .withUid(admissionReview.getRequest().getUid());
-
-        AdmissionReviewBuilder reviewBuilder = new AdmissionReviewBuilder() //
-                .withApiVersion(admissionReview.getApiVersion());
-
-        validateResource((T) resource, responseBuilder);
-
-        return reviewBuilder.withResponse(responseBuilder.build()).build();
+                response.withAllowed(false) //
+                        .withStatus(new StatusBuilder() //
+                                .withCode(400) //
+                                .withMessage(e.getMessage()) //
+                                .build());
+            }
+        });
     }
 
     protected void validateResource(T resource, AdmissionResponseBuilder responseBuilder) {

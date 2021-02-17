@@ -27,7 +27,6 @@ public class ComponentBuildValidator extends Validator<ComponentBuildResource> {
     protected void validateResource(ComponentBuildResource componentBuild, AdmissionResponseBuilder responseBuilder) {
         try {
             validateComponentBuild(componentBuild);
-
             responseBuilder.withAllowed(true);
         } catch (ApplicationException e) {
             LOG.error("An error occurred while validating Component Build", e);

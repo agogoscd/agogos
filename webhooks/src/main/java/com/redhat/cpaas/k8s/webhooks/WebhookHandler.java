@@ -14,16 +14,19 @@ import com.redhat.cpaas.k8s.webhooks.validator.ComponentValidator;
 import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.fabric8.kubernetes.api.model.KubernetesResource;
-import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
 import io.fabric8.kubernetes.api.model.admission.AdmissionReview;
-import io.fabric8.kubernetes.api.model.admission.AdmissionReviewBuilder;
 
 @Path("/webhooks")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @ApplicationScoped
 public class WebhookHandler {
+
+    private static final Logger LOG = LoggerFactory.getLogger(WebhookHandler.class);
 
     @Inject
     ComponentValidator componentValidator;
@@ -39,12 +42,15 @@ public class WebhookHandler {
     public AdmissionReview validate(AdmissionReview admissionReview) {
         KubernetesResource resource = admissionReview.getRequest().getObject();
 
+        LOG.debug("New validation request incoming, resource: '{}', requester: '{}'",
+                resource.getClass().getSimpleName(), admissionReview.getRequest().getUserInfo().getUsername());
+
         if (resource instanceof ComponentResource) {
             return componentValidator.validate(admissionReview);
         }
 
-        // By default allow requests
-        return allow(admissionReview);
+        // If there is no specific handling needed, allow the request
+        return AdmissionHandler.allow(admissionReview);
     }
 
     @POST
@@ -52,21 +58,14 @@ public class WebhookHandler {
     public AdmissionReview mutate(AdmissionReview admissionReview) {
         KubernetesResource resource = admissionReview.getRequest().getObject();
 
+        LOG.debug("New mutation request incoming, resource: '{}', requester: '{}'", resource.getClass().getSimpleName(),
+                admissionReview.getRequest().getUserInfo().getUsername());
+
         if (resource instanceof ComponentBuildResource) {
             return componentBuildMutator.mutate(admissionReview);
         }
 
-        // By default allow requests
-        return allow(admissionReview);
-    }
-
-    private AdmissionReview allow(AdmissionReview admissionReview) {
-        AdmissionResponseBuilder responseBuilder = new AdmissionResponseBuilder() //
-                .withUid(admissionReview.getRequest().getUid()).withAllowed(true);
-
-        AdmissionReviewBuilder reviewBuilder = new AdmissionReviewBuilder() //
-                .withApiVersion(admissionReview.getApiVersion());
-
-        return reviewBuilder.withResponse(responseBuilder.build()).build();
+        // If there is no specific handling needed, allow the request
+        return AdmissionHandler.allow(admissionReview);
     }
 }

@@ -19,7 +19,6 @@ import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.AdmissionRequest;
 import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
 import io.fabric8.kubernetes.api.model.admission.AdmissionReview;
-import io.fabric8.kubernetes.api.model.admission.AdmissionReviewBuilder;
 import io.fabric8.kubernetes.client.CustomResource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
@@ -28,33 +27,31 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 public abstract class Mutator<T extends CustomResource<?, ?>> extends AdmissionHandler<T> {
     private static final Logger LOG = LoggerFactory.getLogger(Mutator.class);
 
+    /**
+     * Main method that is called to request mutation on an object received with the
+     * {@link AdmissionReview}.
+     * 
+     * @param admissionReview Incoming {@link AdmissionReview} object
+     * @return An admission review object returned by the webhook
+     */
     @SuppressWarnings("unchecked")
     public AdmissionReview mutate(AdmissionReview admissionReview) {
         AdmissionRequest request = admissionReview.getRequest();
         KubernetesResource resource = request.getObject();
 
-        LOG.debug("New mutation request incoming, resource: '{}', requester: '{}'", resource.getClass().getSimpleName(),
-                request.getUserInfo().getUsername());
+        return AdmissionHandler.review(admissionReview, response -> {
+            try {
+                mutateResource((T) resource, request, response);
+            } catch (ApplicationException e) {
+                LOG.error("An error occurred while mutating", e);
 
-        AdmissionResponseBuilder responseBuilder = new AdmissionResponseBuilder() //
-                .withUid(request.getUid());
-
-        AdmissionReviewBuilder reviewBuilder = new AdmissionReviewBuilder() //
-                .withApiVersion(admissionReview.getApiVersion());
-
-        try {
-            mutateResource((T) resource, request, responseBuilder);
-        } catch (ApplicationException e) {
-            LOG.error("An error occurred while mutating", e);
-
-            responseBuilder.withAllowed(false) //
-                    .withStatus(new StatusBuilder() //
-                            .withCode(400) //
-                            .withMessage(e.getMessage()) //
-                            .build());
-        }
-
-        return reviewBuilder.withResponse(responseBuilder.build()).build();
+                response.withAllowed(false) //
+                        .withStatus(new StatusBuilder() //
+                                .withCode(400) //
+                                .withMessage(e.getMessage()) //
+                                .build());
+            }
+        });
     }
 
     protected void mutateResource(T resource, AdmissionRequest request, AdmissionResponseBuilder responseBuilder) {
