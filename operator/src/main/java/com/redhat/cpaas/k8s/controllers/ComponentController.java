@@ -1,15 +1,5 @@
 package com.redhat.cpaas.k8s.controllers;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.inject.Inject;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.cpaas.errors.ApplicationException;
@@ -17,7 +7,6 @@ import com.redhat.cpaas.k8s.client.ComponentResourceClient;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
 import com.redhat.cpaas.v1alpha1.ComponentResource.ComponentStatus;
 import com.redhat.cpaas.v1alpha1.ComponentResource.Status;
-
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.client.TektonClient;
@@ -38,6 +27,14 @@ import io.javaoperatorsdk.operator.api.DeleteControl;
 import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
 import io.javaoperatorsdk.operator.processing.event.internal.CustomResourceEvent;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +59,7 @@ public class ComponentController implements ResourceController<ComponentResource
      * </p>
      * 
      * @param component {@link ComponentResource}
-     * @param context   {@link Context}
+     * @param context {@link Context}
      * @return {@link DeleteControl}
      */
     @Override
@@ -78,7 +75,7 @@ public class ComponentController implements ResourceController<ComponentResource
      * </p>
      * 
      * @param component {@link ComponentResource}
-     * @param context   {@link Context}
+     * @param context {@link Context}
      * @return {@link UpdateControl}
      */
     @Override
@@ -105,8 +102,8 @@ public class ComponentController implements ResourceController<ComponentResource
      * 
      * 
      * @param component {@link ComponentResource} object
-     * @param status    One of available statuses
-     * @param reason    Description of the reason for last status change
+     * @param status One of available statuses
+     * @param reason Description of the reason for last status change
      */
     private void setStatus(final ComponentResource component, final Status status, final String reason) {
         ComponentStatus componentStatus = component.getStatus();

@@ -1,16 +1,14 @@
 package com.redhat.cpaas.v1alpha1;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.cpaas.v1alpha1.AbstractStage.StageSpec;
 import com.redhat.cpaas.v1alpha1.AbstractStage.StageStatus;
-
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.client.CustomResource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -20,7 +18,9 @@ import lombok.ToString;
 public abstract class AbstractStage extends CustomResource<StageSpec, StageStatus> {
 
     public enum Phase {
-        BUILD, TEST, DELIVERY;
+        BUILD,
+        TEST,
+        DELIVERY;
     }
 
     private static final long serialVersionUID = 7447807439691538160L;

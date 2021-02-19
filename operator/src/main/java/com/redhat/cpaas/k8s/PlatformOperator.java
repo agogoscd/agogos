@@ -1,17 +1,14 @@
 package com.redhat.cpaas.k8s;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
-
 import com.redhat.cpaas.k8s.controllers.ComponentController;
-
-import org.jboss.logging.Logger;
-
 import io.javaoperatorsdk.operator.Operator;
 import io.javaoperatorsdk.operator.api.config.ConfigurationService;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class PlatformOperator {

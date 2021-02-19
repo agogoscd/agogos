@@ -1,19 +1,17 @@
 package com.redhat.cpaas.k8s.client;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import com.redhat.cpaas.v1alpha1.AbstractStage.Phase;
 import com.redhat.cpaas.v1alpha1.StageResource;
 import com.redhat.cpaas.v1alpha1.StageResourceList;
-
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.tekton.client.TektonClient;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 /**
  * Stage CR client.
@@ -41,7 +39,7 @@ public class StageResourceClient {
     /**
      * Finds {@link StageResource} by name and returns it.
      * 
-     * @param name  Name of the stage
+     * @param name Name of the stage
      * @param phase Phase of the stage, one of: build, test, delivery
      * @return {@link StageResource} object.
      */

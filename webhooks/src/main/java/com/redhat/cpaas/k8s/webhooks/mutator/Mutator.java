@@ -1,19 +1,7 @@
 package com.redhat.cpaas.k8s.webhooks.mutator;
 
-import java.util.Base64;
-import java.util.function.Consumer;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.json.Json;
-import javax.json.JsonPatch;
-import javax.json.JsonPatchBuilder;
-
 import com.redhat.cpaas.errors.ApplicationException;
 import com.redhat.cpaas.k8s.webhooks.AdmissionHandler;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.AdmissionRequest;
@@ -21,6 +9,14 @@ import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
 import io.fabric8.kubernetes.api.model.admission.AdmissionReview;
 import io.fabric8.kubernetes.client.CustomResource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import java.util.Base64;
+import java.util.function.Consumer;
+import javax.enterprise.context.ApplicationScoped;
+import javax.json.Json;
+import javax.json.JsonPatch;
+import javax.json.JsonPatchBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 @RegisterForReflection

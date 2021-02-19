@@ -1,11 +1,5 @@
 package com.redhat.cpaas.k8s.webhooks.validator;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.cpaas.errors.ApplicationException;
@@ -15,15 +9,17 @@ import com.redhat.cpaas.k8s.client.StageResourceClient;
 import com.redhat.cpaas.v1alpha1.AbstractStage.Phase;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
 import com.redhat.cpaas.v1alpha1.StageResource;
-
+import io.fabric8.kubernetes.api.model.StatusBuilder;
+import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import org.openapi4j.core.exception.ResolutionException;
 import org.openapi4j.schema.validator.ValidationData;
 import org.openapi4j.schema.validator.v3.SchemaValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.fabric8.kubernetes.api.model.StatusBuilder;
-import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
 
 @ApplicationScoped
 public class ComponentValidator extends Validator<ComponentResource> {

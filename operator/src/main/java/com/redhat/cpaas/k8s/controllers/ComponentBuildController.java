@@ -1,14 +1,5 @@
 package com.redhat.cpaas.k8s.controllers;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.inject.Inject;
-
 import com.redhat.cpaas.errors.ApplicationException;
 import com.redhat.cpaas.errors.MissingResourceException;
 import com.redhat.cpaas.k8s.client.ComponentBuildResourceClient;
@@ -20,11 +11,6 @@ import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
 import com.redhat.cpaas.v1alpha1.ComponentBuildResource.BuildStatus;
 import com.redhat.cpaas.v1alpha1.ComponentBuildResource.Status;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.fabric8.knative.internal.pkg.apis.Condition;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
@@ -49,6 +35,16 @@ import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
 import io.javaoperatorsdk.operator.processing.event.EventSourceManager;
 import io.javaoperatorsdk.operator.processing.event.internal.CustomResourceEvent;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Controller(generationAwareEventProcessing = false)
 public class ComponentBuildController implements ResourceController<ComponentBuildResource> {
@@ -95,7 +91,7 @@ public class ComponentBuildController implements ResourceController<ComponentBui
      * </p>
      * 
      * @param component {@link ComponentBuildResource}
-     * @param context   {@link Context}
+     * @param context {@link Context}
      * @return {@link DeleteControl}
      */
     @Override
@@ -165,8 +161,8 @@ public class ComponentBuildController implements ResourceController<ComponentBui
      * 
      * 
      * @param component {@link ComponentBuildResource} object
-     * @param status    One of available statuses
-     * @param reason    Description of the reason for last status change
+     * @param status One of available statuses
+     * @param reason Description of the reason for last status change
      */
     private boolean setStatus(ComponentBuildResource build, Status status, String reason) {
         return setStatus(build, status, reason, null);
@@ -180,9 +176,9 @@ public class ComponentBuildController implements ResourceController<ComponentBui
      * 
      * 
      * @param component {@link ComponentBuildResource} object
-     * @param status    One of available statuses
-     * @param reason    Description of the reason for last status change
-     * @param result    String formatted result, if any
+     * @param status One of available statuses
+     * @param reason Description of the reason for last status change
+     * @param result String formatted result, if any
      */
     private boolean setStatus(ComponentBuildResource build, Status status, String reason, String result) {
         BuildStatus buildStatus = build.getStatus();

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.cpaas.v1alpha1.PipelineRunResource.RunSpec;
 import com.redhat.cpaas.v1alpha1.PipelineRunResource.RunStatus;
-
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.client.CustomResource;
@@ -26,7 +25,12 @@ public class PipelineRunResource extends CustomResource<RunSpec, RunStatus> impl
     private static final long serialVersionUID = 6688424087008846788L;
 
     public enum Status {
-        New, Initialized, Running, Passed, Failed, Aborted;
+        New,
+        Initialized,
+        Running,
+        Passed,
+        Failed,
+        Aborted;
     }
 
     @ToString

@@ -1,19 +1,16 @@
 package com.redhat.cpaas.k8s.webhooks.validator;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import com.redhat.cpaas.errors.ApplicationException;
 import com.redhat.cpaas.errors.MissingResourceException;
 import com.redhat.cpaas.k8s.client.ComponentResourceClient;
 import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class ComponentBuildValidator extends Validator<ComponentBuildResource> {

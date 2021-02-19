@@ -1,21 +1,18 @@
 
 package com.redhat.cpaas.k8s.webhooks.mutator;
 
+import com.redhat.cpaas.k8s.client.ComponentResourceClient;
+import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
+import com.redhat.cpaas.v1alpha1.ComponentResource;
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.admission.AdmissionRequest;
+import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
 import java.util.MissingResourceException;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
-
-import com.redhat.cpaas.k8s.client.ComponentResourceClient;
-import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
-import com.redhat.cpaas.v1alpha1.ComponentResource;
-
-import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.api.model.admission.AdmissionRequest;
-import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
 
 @ApplicationScoped
 public class ComponentBuildMutator extends Mutator<ComponentBuildResource> {

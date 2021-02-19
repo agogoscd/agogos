@@ -1,26 +1,24 @@
 package com.redhat.cpaas.k8s.client;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.cpaas.v1alpha1.ComponentGroupResource;
 import com.redhat.cpaas.v1alpha1.ComponentGroupResourceList;
-
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 @RegisterForReflection
 public class ComponentGroupResourceClient {
-    private static final Logger LOG = LoggerFactory.getLogger( ComponentGroupResourceClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ComponentGroupResourceClient.class);
 
     @Inject
     KubernetesClient kubernetesClient;

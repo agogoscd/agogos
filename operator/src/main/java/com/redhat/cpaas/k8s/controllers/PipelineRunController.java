@@ -1,20 +1,9 @@
 package com.redhat.cpaas.k8s.controllers;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.inject.Inject;
-
 import com.redhat.cpaas.k8s.client.TektonResourceClient;
 import com.redhat.cpaas.v1alpha1.PipelineRunResource;
 import com.redhat.cpaas.v1alpha1.PipelineRunResource.RunStatus;
 import com.redhat.cpaas.v1alpha1.PipelineRunResource.Status;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
@@ -34,13 +23,20 @@ import io.javaoperatorsdk.operator.api.Controller;
 import io.javaoperatorsdk.operator.api.DeleteControl;
 import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import javax.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Controller
 public class PipelineRunController implements ResourceController<PipelineRunResource> {
 
-    private static final Logger LOG = LoggerFactory.getLogger( PipelineRunController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PipelineRunController.class);
 
     @ConfigProperty(name = "agogos.service-account")
     Optional<String> serviceAccount;

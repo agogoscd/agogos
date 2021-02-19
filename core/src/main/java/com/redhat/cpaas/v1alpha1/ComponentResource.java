@@ -12,12 +12,11 @@ import io.fabric8.kubernetes.model.annotation.Group;
 import io.fabric8.kubernetes.model.annotation.Kind;
 import io.fabric8.kubernetes.model.annotation.Version;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @ToString
 @RegisterForReflection
@@ -26,7 +25,10 @@ import java.util.Map;
 @Version("v1alpha1")
 public class ComponentResource extends CustomResource<ComponentSpec, ComponentStatus> implements Namespaced {
     public enum Status {
-        New, Initializing, Ready, Failed;
+        New,
+        Initializing,
+        Ready,
+        Failed;
     }
 
     private static final long serialVersionUID = 9122121231081986174L;

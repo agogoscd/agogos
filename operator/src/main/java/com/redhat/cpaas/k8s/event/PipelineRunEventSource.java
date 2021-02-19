@@ -1,16 +1,13 @@
 package com.redhat.cpaas.k8s.event;
 
-import java.util.List;
-
-import javax.enterprise.context.ApplicationScoped;
-
 import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
-
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.javaoperatorsdk.operator.processing.event.AbstractEventSource;
+import java.util.List;
+import javax.enterprise.context.ApplicationScoped;
 import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

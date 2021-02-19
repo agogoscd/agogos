@@ -1,16 +1,10 @@
 package com.redhat.cpaas.k8s.controllers;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.cpaas.k8s.client.ComponentGroupResourceClient;
 import com.redhat.cpaas.v1alpha1.PipelineResource;
 import com.redhat.cpaas.v1alpha1.PipelineResource.PipelineSpec.StageReference;
-
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.client.TektonClient;
@@ -28,13 +22,16 @@ import io.javaoperatorsdk.operator.api.Controller;
 import io.javaoperatorsdk.operator.api.DeleteControl;
 import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
+import java.util.ArrayList;
+import java.util.List;
+import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Controller
 public class PipelineController implements ResourceController<PipelineResource> {
 
-    private static final Logger LOG = LoggerFactory.getLogger( PipelineController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PipelineController.class);
 
     @Inject
     TektonClient tektonClient;
