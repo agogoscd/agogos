@@ -75,12 +75,6 @@ clustertask.tekton.dev/init created
 
 == Running Agogos In The Development Mode
 
-[source,bash]
-.Compiling and installing the application
-----
-❯ ./mvnw install
-----
-
 You can run the Operator in dev mode that enables live coding using:
 
 [source,bash]
@@ -89,7 +83,7 @@ You can run the Operator in dev mode that enables live coding using:
 ❯ ./mvnw quarkus:dev -pl operator -am
 ----
 
-Similarly you can run webhooks application:
+Similarly, you can run Webhooks application:
 
 [source,bash]
 .Running the webhooks code
