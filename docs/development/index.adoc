@@ -86,7 +86,7 @@ You can run the Operator in dev mode that enables live coding using:
 [source,bash]
 .Running the Operator
 ----
-❯ ./mvnw quarkus:dev -pl operator
+❯ ./mvnw quarkus:dev -pl operator -am
 ----
 
 Similarly you can run webhooks application:
@@ -94,8 +94,10 @@ Similarly you can run webhooks application:
 [source,bash]
 .Running the webhooks code
 ----
-❯ ./mvnw quarkus:dev -pl webhooks
+❯ ./mvnw quarkus:dev -pl webhooks -am
 ----
+
+To enable hot reload, visit `http://localhost:7070/` and refresh the page.
 
 == Testing
 
