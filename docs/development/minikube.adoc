@@ -16,6 +16,48 @@ Please make sure you have following requirements installed:
 * link:https://tekton.dev/docs/getting-started/#installation[Tekton]
 * link:https://sdkman.io/jdks#jdk.java.net[JDK 11]
 
+== Gotchas
+
+=== Managing contexts
+
+Kubernetes contexts are managed globally. This means that any time you will have
+one active context.
+
+[NOTE]
+====
+Kubernetes documentation references:
+
+* link:https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/[Organizing Cluster Access Using kubeconfig Files]
+* link:https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/[Configure Access to Multiple Clusters]
+====
+
+After starting Minikube, the current context is switched to `minikube`. This means
+that any commands executed using `kubectl` or `oc` will be run against your local
+Minikube cluster.
+
+There are many ways how multiple contexts can be managed, two of them:
+
+1. Manage contexts with `kubectl config` commands
++
+To switch to a different use the `kubectl config use-context` command.
+To list all available contexts run `kubectl config get-contexts`.
+2. Use separate kubeconfig files for different use cases
++
+You can maintain the minikube context in a separate kubeconfig file.
+This will make it possible to switch to Minikube context by setting an environment variable.
+Run the below command to create (or update) your minikube context in specified file.
++
+[source,bash]
+----
+❯ export KUBECONFIG=~/.kube/minikube.yaml
+❯ minikube update-context
+🎉  "minikube" context has been updated to point to 192.168.39.112:8443
+💗  Current context is "minikube"
+----
++
+To use the Minikube context you will need to run `export KUBECONFIG=~/.kube/minikube.yaml`
+in the terminal before interacting with the cluster.
+
 == Known issues
 
 This section describes known issues and limitations with the setup.
