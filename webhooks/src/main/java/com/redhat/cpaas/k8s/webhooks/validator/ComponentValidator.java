@@ -10,7 +10,7 @@ import com.redhat.cpaas.v1alpha1.AbstractStage.Phase;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
 import com.redhat.cpaas.v1alpha1.StageResource;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
-import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
+import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;

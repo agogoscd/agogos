@@ -6,7 +6,7 @@ import com.redhat.cpaas.k8s.webhooks.validator.ComponentValidator;
 import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
-import io.fabric8.kubernetes.api.model.admission.AdmissionReview;
+import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReview;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;

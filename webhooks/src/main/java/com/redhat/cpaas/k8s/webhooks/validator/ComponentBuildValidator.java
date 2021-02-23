@@ -6,7 +6,7 @@ import com.redhat.cpaas.k8s.client.ComponentResourceClient;
 import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
-import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
+import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import org.slf4j.Logger;
