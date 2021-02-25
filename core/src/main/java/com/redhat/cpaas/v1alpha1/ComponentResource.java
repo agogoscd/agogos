@@ -66,7 +66,7 @@ public class ComponentResource extends CustomResource<ComponentSpec, ComponentSt
 
         @Getter
         @Setter
-        private Map<String, String> data = new HashMap<>();
+        private Map<Object, Object> data = new HashMap<>();
 
     }
 

@@ -45,10 +45,10 @@ spec:
                   description: Validation definition that should be applied on the Stage configuration defined.
                   properties:
                     openAPIV3Schema:
+                      x-kubernetes-preserve-unknown-fields: true
                       type: object
                       description: "OpenAPI v3 formatted validation.
                         More info: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md"
-                      additionalProperties: true
                   required:
                     - "openAPIV3Schema"
               required:

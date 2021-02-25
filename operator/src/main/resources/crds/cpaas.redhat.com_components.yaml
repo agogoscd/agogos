@@ -38,15 +38,14 @@ spec:
               description: ComponentSpec defines the desired state of Component
               properties:
                 data:
-                  additionalProperties:
-                    type: string
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
                   description:
                     "Additional data containing the information about the Component.
                     It can be metadata as well as source coordinates.
                     This content needs to be supported by the particular builder
                     used to build this component. Builder defines schema that this
                     content is checked against."
-                  type: object
                 builder:
                   description: Builder used to build this component
                   type: string

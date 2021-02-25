@@ -45,7 +45,7 @@ public class PipelineResource extends CustomResource<PipelineSpec, Void> impleme
 
             @Getter
             @Setter
-            private Map<String, String> config = new HashMap<>();
+            private Map<Object, Object> config = new HashMap<>();
         }
 
         private static final long serialVersionUID = 3644066384389447653L;
