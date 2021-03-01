@@ -1,8 +1,8 @@
 package com.redhat.cpaas.k8s.webhooks;
 
-import io.fabric8.kubernetes.api.model.admission.AdmissionResponseBuilder;
-import io.fabric8.kubernetes.api.model.admission.AdmissionReview;
-import io.fabric8.kubernetes.api.model.admission.AdmissionReviewBuilder;
+import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
+import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReview;
+import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReviewBuilder;
 import io.fabric8.kubernetes.client.CustomResource;
 import java.util.function.Consumer;
 
