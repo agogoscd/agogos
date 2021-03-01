@@ -53,8 +53,7 @@ spec:
                       config:
                         type: object
                         description: "Additional configuration properties passed to the stage implementation"
-                        additionalProperties:
-                          type: string
+                        x-kubernetes-preserve-unknown-fields: true
                     required:
                       - "name"
               required:
