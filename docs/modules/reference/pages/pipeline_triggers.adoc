@@ -1,0 +1,181 @@
+= Pipeline Triggers
+CP Development Team <cp-devel@redhat.com>
+:toclevels: 4
+:icons: font
+:source-highlighter: highlight.js
+
+This guide will help you understand how Triggers work and what are the best
+practices related to triggering _Pipelines_.
+
+== Introduction
+
+Every _Pipeline_ can be run manually but this is not sufficient for automated systems.
+This is where _Triggers_ come into play.
+
+_Triggers_ are a way to define *when* a particular _Pipeline_ should be run. A _Trigger_
+is a mapping between some event in the system and the _Pipeline_ definition.
+There are multiple event types within the system and there are multiple _Trigger_ types
+as well to cover these cases.
+
+Triggers are specified in the _Pipeline_ definition, in the `triggers` section:
+
+[source,yaml]
+----
+triggers:
+  - # Triggers here
+----
+
+Every _Pipeline_ can have multiple triggers defined. Multiple triggers specified on
+the same _Pipeline_ are evaluated separately. This means that
+the _Pipeline_ will be run when any _Trigger_ will be satisfied.
+
+It can happen that in case of misconfiguration a _Pipeline_ will be triggered
+*multiple times* because of the same event.
+
+There are multiple types of _Triggers_ available within the system:
+
+. Timed triggers used to periodically run a _Pipeline_
+. _Component_ build triggers used to run _Pipeline_ after a particular _Component_ build is finished
+. _Pipeline_ triggers used to run _Pipeline_ after another _Pipeline_ finishes
+
+== Pipeline triggers
+
+#TODO#
+
+== Timed triggers
+
+#TODO#: Cron
+
+== Build triggers
+
+Build triggers are defined inside of the `build` section.
+
+[source,yaml]
+----
+triggers:
+  - build:
+      # Specific trigger here
+----
+
+_Pipeline_ can be triggered after a _Component_ build is finished. We can identify which builds should trigger
+which pipelines by defining component build pipeline triggers.
+
+There are different ways how such triggers can be defined. Correct usage depends on the use case.
+It can be as generic or as detailed as the user wants.
+
+We can watch builds of a specific _Component_. Or a _Component Group_
+a _Component_ belongs to. Finally, we can utilize link:https://github.com/json-path/JsonPath[JsonPath]
+to have full control over source of a component build.
+
+Below table should help with the decision which Component build trigger is the right one to use.
+
+.Component build triggers
+[cols="1,2",options=header]
+|===
+|Build differentiator
+|Usage
+
+|_Component_ name 
+|Useful when the pipeline works only on one _Component_ (or just a few) and we know exactly what _Components_ we want.
+
+This is the most common use case in case of small number of _Components_ and _Pipelines_. This is a good starting point.
+
+|Group name
+a|Useful when the are _Pipelines_ that work on the same set of _Components_. In such case it is convenient to
+put all _Components_ into a _Group_ and reference this _Group_.
+
+NOTE: Builds of any _Components_ from the _Group_ will trigger the _Pipeline_.
+
+|JsonPath
+|To have fine-grained control over which _Component Build_ triggers the _Pipeline_.
+
+This is useful when we do not know the name of the _Component_ which should trigger the _Pipeline_.
+|=== 
+
+=== Component name trigger
+
+.Example of a component build trigger
+[source,yaml]
+----
+triggers:
+  - build:
+      component: "component1"
+  - build:
+      component: "component2"
+----
+
+Triggered when a build is finished of the `component1` or `component2` _Component_.
+
+=== Group name trigger
+
+.Example of a component group build trigger
+[source,yaml]
+----
+triggers:
+  - build:
+      group: "group1"
+----
+
+Triggered when a build is finished for any of the components referenced in the the `group1` group.
+
+=== JSONPath trigger
+
+JSONPath triggers are the most powerful out of all build triggers.
+
+#TODO#
+
+The JSONPath triggers are evaluated on a JSON representation of the _Component_ object which is 
+associated with the finished _Component Build_.
+This makes it very easy to define fine-grained rules on when the _Trigger_ should fire the _Pipeline_.
+
+TIP: Online tools like link:https://jsonpath.herokuapp.com/[JSONPath evaluator] can help with
+understanding the required format.
+
+In case of JSONPath triggers the decision whether to trigger the pipeline or not is happening
+after the expression is evaluated. In case the expression returns any result that is not `null`
+or empty list, the pipeline is run. Returned content is ignored.
+
+.Example of a JSONPath build trigger
+[source,yaml]
+----
+triggers:
+  - build:
+      jsonPath: "$[?(@.spec.builder == "brew" && @.spec.data.type == "bundle")]"
+----
+
+In above example trigger will be fired when the _Component_ defines the `brew` _Builder_
+and the data that is passed to the _Builder_ contains `type` set to `bundle`. Any _Build_
+of a _Component_ that satisfies this requirement will trigger the _Pipeline_.
+
+Below you can see an example _Component_ resource in JSON format.
+
+[source,json]
+----
+{
+   "apiVersion": "cpaas.redhat.com/v1alpha1",
+   "kind": "Component",
+   "metadata": {
+      "name": "operator-bundle"
+   },
+   "spec": {
+      "dependencies": {
+         "components": [
+            {
+               "name": "operator",
+               "resolver": "latest"
+            }
+         ]
+      },
+      "builder": "brew",
+      "data": {
+         "type": "bundle",
+         "sourceRepo": "containers/cpaas-test-operator-bundle",
+         "sourceRef": "cpaas-tp-1.7-rhel-7",
+         "target": "cpaas-tp-2.0-rhel-7-containers-candidate"
+      }
+   }
+}
+----
+
+TIP:    You can use the `kubectl get componentbuild.cpaas.redhat.com [COMPONENT_NAME] -o json` command to get
+        a JSON formatted output that could be helpful to write correct JSONPath expressions.

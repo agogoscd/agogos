@@ -1,11 +1,10 @@
-= Agogos Stages
+= Pipeline Stages
 CP Development Team <cp-devel@redhat.com>
-:toc:
 :icons: font
 :numbered:
 :source-highlighter: highlightjs
 
-WARNING: #This content is outdated and needs to be updated#
+WARNING: This content is outdated and needs to be updated
 
 == About Stages
 

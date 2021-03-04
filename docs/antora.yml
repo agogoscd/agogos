@@ -1,0 +1,10 @@
+name: agogos
+title: Agogos
+version: master
+
+start_page: ROOT:index.adoc
+
+nav:
+  - modules/concepts/nav.adoc
+  - modules/reference/nav.adoc
+  - modules/development/nav.adoc

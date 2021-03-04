@@ -1,6 +1,5 @@
 = Agogos Webhooks Deployment Guide
 CP Development Team <cp-devel@redhat.com>
-:toc:
 :icons: font
 :numbered:
 :source-highlighter: highlightjs
@@ -34,7 +33,7 @@ NOTE: This should be used in production deployment.
 [source,yaml]
 .Webhook registration within the cluster
 ----
-include::inc/deployment-service.yaml[]
+include::example$webhooks/deployment-service.yaml[]
 ----
 
 === External Deployment
@@ -47,7 +46,7 @@ NOTE: This deployment should be used only at development time.
 [source,yaml]
 .Webhook registration within the cluster
 ----
-include::inc/deployment-external.yaml[]
+include::example$webhooks/deployment-external.yaml[]
 ----
 
 [NOTE]

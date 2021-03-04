@@ -1,6 +1,5 @@
 = Agogos Operator Deployment Guide
 CP Development Team <cp-devel@redhat.com>
-:toc:
 :icons: font
 :numbered:
 :source-highlighter: highlightjs
@@ -25,7 +24,7 @@ TBD
 [source,yaml]
 .RBAC
 ----
-include::inc/rbac.yaml[]
+include::example$operator/rbac.yaml[]
 ----
 
 == OpenShift specific resources
@@ -33,5 +32,5 @@ include::inc/rbac.yaml[]
 [source,yaml]
 .OpenShift route definition
 ----
-include::inc/openshift.yaml[]
+include::example$operator/openshift.yaml[]
 ----

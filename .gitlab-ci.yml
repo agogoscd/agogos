@@ -1,19 +1,12 @@
-image: asciidoctor/docker-asciidoctor:1.3.0
-
-docs:
-  stage: test
-  script:
-    - find docs -type f -name '*.adoc' -print | xargs asciidoctor -D public -R docs
-  artifacts:
-    paths:
-      - public
-  only: [merge_requests]
-  tags: [docker]
+image: antora/antora:2.3.4
 
 pages:
   stage: deploy
+  cache:
+    paths:
+      - .cache/
   script:
-    - find docs -type f -name '*.adoc' -print | xargs asciidoctor -D public -R docs
+    - NODE_TLS_REJECT_UNAUTHORIZED=0 antora --fetch --cache-dir .cache/antora --attribute page-pagination= --to-dir public antora-playbook.yml
   artifacts:
     paths:
       - public

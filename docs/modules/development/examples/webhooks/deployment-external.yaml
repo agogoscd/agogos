@@ -31,5 +31,5 @@ webhooks:
       - operations: ["CREATE"]
         apiGroups: ["cpaas.redhat.com"]
         apiVersions: ["v1alpha1"]
-        resources: ["*"]
+        resources: ["*/*"]
         scope: "Namespaced"
