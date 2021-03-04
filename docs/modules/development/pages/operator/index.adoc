@@ -1,0 +1,7 @@
+= Agogos Operator
+CP Development Team <cp-devel@redhat.com>
+:icons: font
+:numbered:
+:source-highlighter: highlightjs
+
+* link:deployment{outfilesuffix}[Deployment]

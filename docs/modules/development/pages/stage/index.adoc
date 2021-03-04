@@ -1,6 +1,5 @@
 = Stage Development
 CP Development Team <cp-devel@redhat.com>
-:toc:
 :icons: font
 :numbered:
 :source-highlighter: highlightjs

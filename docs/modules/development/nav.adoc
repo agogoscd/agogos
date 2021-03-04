@@ -1,0 +1,15 @@
+* xref:index.adoc[]
+** xref:contributing.adoc[]
+** xref:minikube.adoc[]
+** xref:testing.adoc[]
+
+** xref:stage/index.adoc[]
+*** xref:stage/builder_tutorial.adoc[]
+*** xref:stage/stage_api.adoc[]
+
+** xref:webhooks/index.adoc[]
+*** xref:webhooks/deployment.adoc[]
+*** xref:webhooks/ssl_certificates.adoc[]
+
+** xref:operator/index.adoc[]
+*** xref:operator/deployment.adoc[]
