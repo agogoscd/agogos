@@ -1,0 +1,18 @@
+= Component Name Filter Trigger
+
+TIP: Read more about the xref:concepts:components.adoc[_Component_ concept].
+
+_Component_ triggers are a type of xref:reference:triggers/build/index.adoc[_Component Build_ triggers].
+
+A _Component_ name trigger can be used in case we want to run a _Pipeline_ after a build is finished
+of a specific _Component_ and we know it's name.
+
+.Example of a Component build trigger
+[source,yaml]
+----
+triggers:
+  - build:
+      component: "one"
+----
+
+In above example the pipeline will be triggered when a build of _Component_ `one` is finished.

@@ -1,0 +1,28 @@
+= Group Name Filter Trigger
+
+TIP: Read more about the xref:concepts:groups.adoc[_Group_ concept].
+
+_Group_ triggers are a type of xref:reference:triggers/build/index.adoc[_Component Build_ triggers].
+
+_Group_ name triggers are similar to _Component_ name triggers. Group name triggers
+can be used in case there is a _Group_ defined and we want to trigger the pipeline
+if any of the _Components_ referenced in the _Group_ should trigger the pipeline.
+
+.Example of a Component Group build trigger
+[source,yaml]
+----
+triggers:
+  - build:
+      group: "group1"
+----
+
+In above example the pipeline will be triggered when a build of any _Component_ referenced
+in the `group1` _Group_ is finished.
+
+Assuming the `group1` _Group_ will have two _Components_ referenced: `one` and `two`,
+the pipeline will be triggered when either a build of the _Component_ `one` or the
+ _Component_ `two` finishes.
+
+WARNING:    See xref:reference:triggers/index#multiple-triggers[note about multiple triggers].
+            _Group_ name build triggers are implemented as multiple _Component_ name
+            triggers internally.

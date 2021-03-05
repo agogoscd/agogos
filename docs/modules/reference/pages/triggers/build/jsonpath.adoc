@@ -1,0 +1,94 @@
+= JSONPath Trigger
+
+JSONPath triggers are a type of xref:reference:triggers/build/index.adoc[_Component Build_ triggers].
+
+JSONPath triggers are the most powerful out of all build triggers. These use the JSONPath
+expression language to decide whether the trigger should be fired.
+
+JSONPath build triggers are evaluated on a JSON object with the following schema:
+
+[source,json]
+----
+{
+   "component": {}, <1>
+   "build": {} <2>
+}
+----
+<1> The `component` key contains the _Component_ custom resource representation in the JSON format
+<2> The `build` key contains the _Component Build_ representation in the JSON format
+
+Example of such JSON file can be found below.
+
+[source,json]
+----
+{
+  "component": {
+    "apiVersion": "cpaas.redhat.com/v1alpha1",
+    "kind": "Component",
+    "metadata": {
+      "name": "operator-bundle"
+    },
+    "spec": {
+      "builder": "brew",
+      "data": {
+        "type": "bundle",
+        "sourceRepo": "containers/cpaas-test-operator-bundle",
+        "sourceRef": "cpaas-tp-1.7-rhel-7",
+        "target": "cpaas-tp-2.0-rhel-7-containers-candidate"
+      }
+    }
+  },
+  "build": {
+    "apiVersion": "cpaas.redhat.com/v1alpha1",
+    "kind": "ComponentBuild",
+    "metadata": {
+      "name": "operator-bundle-2cfvx",
+      "namespace": "default",
+      "resourceVersion": "3743272",
+      "uid": "b62c3d68-619a-4bc1-8293-342515095d4e"
+    },
+    "spec": {
+      "component": "operator-bundle"
+    },
+    "status": {
+      "lastUpdate": "2021-03-03T16:54:46+01:00",
+      "reason": "Build finished",
+      "result": {
+        "build-id": 1388246,
+        "task-id": 33155498
+      },
+      "status": "Passed"
+    }
+  }
+}
+----
+
+TIP: Online tools like link:https://jsonpath.herokuapp.com/[JSONPath evaluator] can help with
+understanding the required format.
+
+The decision whether to trigger the pipeline or not is happening
+once the expression is evaluated. A trigger is fired only when all of following
+requirements are met:
+
+. Expression is valid,
+. Expression does not return `null`
+. Expression does not return empty array
+. Expression returns some data
+
+NOTE: Content returned by the evaluation of the expression is not used anywhere and is *ignored*.
+
+.Example of a JSONPath build trigger
+[source,yaml]
+----
+triggers:
+  - build:
+      jsonPath: "$.component[?(@.spec.builder == "brew" && @.spec.data.type == "bundle")]"
+----
+
+In above example trigger will be fired when the _Component_ uses the `brew` _Builder_
+and the data that is passed to the _Builder_ contains `type` set to `bundle`. Any _Build_
+of a _Component_ that satisfies this requirement will trigger the _Pipeline_.
+
+TIP:    You can use the `kubectl` command with the `-o json` switch to get the relevant
+        _Component_ and/or _Component Build_ data to have better understanding how
+        to craft your JSONPath expression.

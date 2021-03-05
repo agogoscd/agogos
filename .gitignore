@@ -39,4 +39,4 @@ release.properties
 
 tmp
 node_modules
-build
+/build

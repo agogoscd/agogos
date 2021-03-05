@@ -1,0 +1,50 @@
+= Successful Build Triggers
+
+WARNING: #TODO#
+
+Successful _Build_ triggers are defined inside of the `build` section.
+
+[source,yaml]
+----
+triggers:
+  - build:
+      # Specific trigger here
+----
+
+// TODO: Probably builds and pipelines and not only pipelines
+
+_Pipeline_ can be triggered after a _Component_ build is finished. We can identify which builds should trigger
+which pipelines by defining component build triggers.
+
+There are different ways how such triggers can be defined. Correct usage depends on the use case.
+It can be as generic or as detailed as the user wants.
+
+We can watch builds of a specific _Component_. Or a _Component Group_
+a _Component_ belongs to. Finally, we can utilize link:https://github.com/json-path/JsonPath[JSONPath]
+to have full control over source of a component build.
+
+Below table should help with the decision which Component build trigger is the right one to use.
+
+.Component build triggers
+[cols="1,2",options=header]
+|===
+|Build differentiator
+|Usage
+
+|_Component_ name 
+|Useful when the pipeline works only on one _Component_ (or just a few) and we know exactly what _Components_ we want.
+
+This is the most common use case in case of small number of _Components_ and _Pipelines_. This is a good starting point.
+
+|Group name
+a|Useful when the are _Pipelines_ that work on the same set of _Components_. In such case it is convenient to
+put all _Components_ into a _Group_ and reference this _Group_.
+
+NOTE: Builds of any _Components_ from the _Group_ will trigger the _Pipeline_.
+
+|JSONPath
+|To have fine-grained control over which _Component Build_ triggers the _Pipeline_.
+
+This is useful when we do not know the name of the _Component_ or _Group_ that is related to the _Build_,
+but at the same time we know that _Component_ or _Component Build_ metadata contains required information.
+|=== 
