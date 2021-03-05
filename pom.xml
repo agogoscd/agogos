@@ -30,6 +30,7 @@
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
         <quarkus.platform.version>1.12.0.Final</quarkus.platform.version>
         <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
+        <failsafe-plugin.version>3.0.0-M5</failsafe-plugin.version>
         <operator-framework.version>1.7.2</operator-framework.version>
         <openapi-schema-validator.version>1.0.5</openapi-schema-validator.version>
         <lombok.version>1.18.16</lombok.version>
@@ -94,8 +95,11 @@
                             </indent>
                             <includes>
                                 <include>webhooks/src/main/java/**/*.java</include>
+                                <include>webhooks/src/test/java/**/*.java</include>
                                 <include>operator/src/main/java/**/*.java</include>
+                                <include>operator/src/test/java/**/*.java</include>
                                 <include>core/src/main/java/**/*.java</include>
+                                <include>core/src/test/java/**/*.java</include>
                             </includes>
                             <removeUnusedImports />
                             <importOrder />
@@ -122,6 +126,27 @@
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
+
+                <plugin>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${failsafe-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                            <configuration>
+                                <systemPropertyVariables>
+                                    <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
+                                    <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                                    <maven.home>${maven.home}</maven.home>
+                                </systemPropertyVariables>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
             </plugins>
         </pluginManagement>
 

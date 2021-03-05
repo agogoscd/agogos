@@ -1,3 +1,8 @@
-= Pipeline Trigger
+= Successful Pipeline Run Trigger
 
 WARNING: #TODO#
+
+Pipeline triggers are used when we want to perform an action after a particular
+_Pipeline_ finishes successfully.
+
+Common use case for _Pipeline_ triggers is chaining of _Pipelines_.

@@ -50,7 +50,8 @@ spec:
                   type: string
                 result:
                   description: "ComponentBuild result metadata"
-                  type: string
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
                 reason:
                   type: string
                 status:
@@ -63,6 +64,9 @@ spec:
                     - Failed
                     - Aborted
                   type: string
+                componentSpec:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
               type: object
           type: object
       served: true
@@ -76,6 +80,9 @@ spec:
         - name: Component
           jsonPath: .metadata.labels.cpaas\.redhat\.com/component
           type: string
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
 status:
   acceptedNames:
     kind: ""

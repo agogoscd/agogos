@@ -1,5 +1,7 @@
 package com.redhat.cpaas.k8s.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.cpaas.errors.ApplicationException;
 import com.redhat.cpaas.errors.MissingResourceException;
 import com.redhat.cpaas.k8s.client.ComponentBuildResourceClient;
@@ -71,6 +73,9 @@ public class ComponentBuildController implements ResourceController<ComponentBui
 
     @Inject
     TektonClient tektonClient;
+
+    @Inject
+    ObjectMapper objectMapper;
 
     /**
      * <p>
@@ -180,11 +185,13 @@ public class ComponentBuildController implements ResourceController<ComponentBui
      * @param reason Description of the reason for last status change
      * @param result String formatted result, if any
      */
-    private boolean setStatus(ComponentBuildResource build, Status status, String reason, String result) {
+    private boolean setStatus(ComponentBuildResource build, Status status, String reason, Map<Object, Object> result) {
         BuildStatus buildStatus = build.getStatus();
 
-        if (buildStatus.getStatus().equals(String.valueOf(status)) && buildStatus.getReason().equals(reason)
-                && buildStatus.getResult() != null && buildStatus.getResult().equals(result)) {
+        if (buildStatus.getStatus().equals(String.valueOf(status))
+                && buildStatus.getReason().equals(reason)
+                && buildStatus.getResult() != null
+                && buildStatus.getResult().equals(result)) {
             return false;
         }
 
@@ -252,7 +259,7 @@ public class ComponentBuildController implements ResourceController<ComponentBui
 
         Status status = null;
         String message = null;
-        String result = null;
+        Map<Object, Object> result = null;
 
         boolean update = false;
 
@@ -265,17 +272,23 @@ public class ComponentBuildController implements ResourceController<ComponentBui
                 status = Status.Passed;
                 message = "Build finished";
 
+                if (!condition.getReason().equals("Succeeded")) {
+                    message = "Build finished but some tasks were skipped";
+                }
+
                 List<PipelineRunResult> pipelineResults = pipelineRunStatus.getPipelineResults();
 
                 if (!pipelineResults.isEmpty()) {
-                    result = pipelineResults.get(0).getValue();
+                    try {
+                        result = objectMapper.readValue(pipelineResults.get(0).getValue(), Map.class);
+                    } catch (JsonProcessingException e) {
+                        status = Status.Failed;
+                        message = "Build finished, but returned metadata is not valid JSON content";
+                    }
                 }
 
                 // TODO: For successful run we should cleanup Tekton's PipelineRun
 
-                if (!condition.getReason().equals("Succeeded")) {
-                    message = "Build finished but some tasks were skipped";
-                }
                 break;
             case "False":
                 if (condition.getReason().equals("PipelineRunCancelled")) {
