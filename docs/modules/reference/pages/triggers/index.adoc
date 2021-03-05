@@ -34,3 +34,15 @@ For example in case of a _Pipeline_ it will mean that it will be run
 every time any _Trigger_ defined on this _Pipeline_ will be satisfied.
 
 WARNING: In case of misconfiguration a resource can be triggered *multiple times* because of the same event.
+
+
+== Supported Resources
+
+Resource types that support _Triggers_ are:
+
+. _Components_
+. _Pipelines_
+
+== Examples
+
+The xref:reference:triggers/examples.adoc[examples page] contains examples usage of _Triggers_.

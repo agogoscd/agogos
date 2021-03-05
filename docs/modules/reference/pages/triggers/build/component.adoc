@@ -2,12 +2,12 @@
 
 TIP: Read more about the xref:concepts:components.adoc[_Component_ concept].
 
-_Component_ triggers are a type of xref:reference:triggers/build/index.adoc[_Component Build_ triggers].
+NOTE: _Component_ name filter triggers are part of xref:reference:triggers/build/index.adoc[_Component Build_ triggers].
 
-A _Component_ name trigger can be used in case we want to run a _Pipeline_ after a build is finished
-of a specific _Component_ and we know it's name.
+A _Component_ name trigger can be used to trigger a resource after a build of a specific _Component_ is finished and we know exactly
+what is the _Component_ name.
 
-.Example of a Component build trigger
+.Example of a Component name build trigger
 [source,yaml]
 ----
 triggers:
@@ -15,4 +15,4 @@ triggers:
       component: "one"
 ----
 
-In above example the pipeline will be triggered when a build of _Component_ `one` is finished.
+In above example the resource will be triggered when a build of _Component_ `one` is finished.

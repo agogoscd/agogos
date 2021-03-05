@@ -10,3 +10,4 @@
 *** xref:triggers/timed.adoc[]
 *** xref:triggers/pipeline.adoc[]
 *** xref:triggers/event.adoc[]
+*** xref:triggers/examples.adoc[]

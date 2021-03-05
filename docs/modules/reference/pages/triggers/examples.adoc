@@ -1,0 +1,51 @@
+= Examples
+
+This page contains examples of common use cases for xref:reference:triggers/index.adoc[_Trigger_].
+
+== Component Resource
+
+=== Rebuild a _Component_ after other _Component_ is built
+
+[source,yaml]
+----
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Component
+metadata:
+  name: cpaas-test-brew-container
+spec:
+  triggers:
+    - build:
+        component: "other-component"
+  builder: brew
+  data:
+    type: container
+    sourceRepo: "containers/cpaas-test-brew-container"
+    sourceRef: "cpaas-tp-2.0-rhel-7"
+    target: "cpaas-tp-2.0-rhel-7-containers-candidate"
+----
+
+Above _Component_ will be rebuilt after a successful build of the `other-component` is finished.
+
+== Pipeline Resource
+
+[source,yaml]
+----
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Pipeline
+metadata:
+  name: containers-test
+  labels:
+    "agogos/pipeline-type": test
+spec:
+  input:
+    - group: containers
+  triggers:
+    - build:
+        group: containers
+  stages:
+    - name: "one"
+    - name: "two"
+----
+
+This _Pipeline_ will be run every time a container from the `containers` _Group_
+is built.
