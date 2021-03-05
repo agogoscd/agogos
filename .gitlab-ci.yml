@@ -1,6 +1,18 @@
-image: antora/antora:2.3.4
+verify:
+  image: maven:3.6-openjdk-11
+  variables:
+    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  cache:
+    paths:
+      - .m2/repository
+  stage: test
+  script:
+    - mvn verify
+  only: [merge_requests]
+  tags: [docker]
 
 pages:
+  image: antora/antora:2.3.4
   stage: deploy
   cache:
     paths:

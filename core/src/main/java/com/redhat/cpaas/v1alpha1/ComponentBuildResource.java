@@ -12,6 +12,8 @@ import io.fabric8.kubernetes.model.annotation.Group;
 import io.fabric8.kubernetes.model.annotation.Kind;
 import io.fabric8.kubernetes.model.annotation.Version;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -41,7 +43,7 @@ public class ComponentBuildResource extends CustomResource<BuildSpec, BuildStatu
 
         @Getter
         @Setter
-        private String result;
+        private Map<Object, Object> result = new HashMap<>();
         @Getter
         @Setter
         private String status = String.valueOf(Status.New);
@@ -96,7 +98,7 @@ public class ComponentBuildResource extends CustomResource<BuildSpec, BuildStatu
      * @return String formatted result
      */
     @JsonIgnore
-    public String getResult() {
+    public Map<Object, Object> getResult() {
         return this.getStatus().getResult();
     }
 }
