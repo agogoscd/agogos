@@ -1,2 +1,12 @@
 * xref:index.adoc[]
-** xref:pipeline_triggers.adoc[]
+
+** xref:triggers/index.adoc[]
+
+*** xref:triggers/build/index.adoc[]
+**** xref:triggers/build/component.adoc[]
+**** xref:triggers/build/group.adoc[]
+**** xref:triggers/build/jsonpath.adoc[]
+
+*** xref:triggers/timed.adoc[]
+*** xref:triggers/pipeline.adoc[]
+*** xref:triggers/event.adoc[]

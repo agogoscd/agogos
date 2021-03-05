@@ -1,4 +1,5 @@
 * xref:index.adoc[]
 ** xref:components.adoc[]
+** xref:groups.adoc[]
 ** xref:stages.adoc[]
 ** xref:pipelines.adoc[]

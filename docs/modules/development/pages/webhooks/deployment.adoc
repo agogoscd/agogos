@@ -1,8 +1,4 @@
 = Agogos Webhooks Deployment Guide
-CP Development Team <cp-devel@redhat.com>
-:icons: font
-:numbered:
-:source-highlighter: highlightjs
 
 == Building And Pushing Container Image
 

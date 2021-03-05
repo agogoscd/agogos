@@ -38,3 +38,5 @@ pom.xml.versionsBackup
 release.properties
 
 tmp
+node_modules
+build

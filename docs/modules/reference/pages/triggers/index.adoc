@@ -1,0 +1,36 @@
+= Triggers
+
+This guide will help you understand how _Triggers_ work and what are the best
+practices related to _Triggers_.
+
+== Introduction
+
+Every _Build_ or _Pipeline_ can be run manually but this is not sufficient for automated systems.
+This is where _Triggers_ come into play.
+
+_Triggers_ are a way to define *when* a particular _Pipeline_ (or _Build_) should be run. A _Trigger_
+is a binding between some event in the system and some action. Examples of actions are:
+running a pipeline or kicking a build.
+
+There are multiple event types within the system and there are multiple _Trigger_ types
+as well to cover these cases.
+
+Triggers are specified in the particular resource definition using the `triggers` section:
+
+[source,yaml]
+----
+triggers:
+  - # Triggers here
+----
+
+[#multiple-triggers]
+
+== Multiple Triggers
+
+Every resource that supports triggers can have multiple triggers defined. Multiple
+triggers specified on the same resource are *evaluated separately*.
+
+For example in case of a _Pipeline_ it will mean that it will be run
+every time any _Trigger_ defined on this _Pipeline_ will be satisfied.
+
+WARNING: In case of misconfiguration a resource can be triggered *multiple times* because of the same event.

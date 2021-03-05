@@ -1,7 +1,6 @@
 = Reference
 CP Development Team <cp-devel@redhat.com>
-:icons: font
-:numbered:
-:source-highlighter: highlightjs
 
-* link:pipeline_triggers{outfilesuffix}[Pipeline Triggers]
+WARNING: #TODO# Welcome page for reference documents
+
+xref:triggers/index.adoc[]

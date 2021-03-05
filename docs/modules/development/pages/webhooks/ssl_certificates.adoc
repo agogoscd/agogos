@@ -1,8 +1,4 @@
 = Kubernetes SSL Certificate Tutorial
-CP Development Team <cp-devel@redhat.com>
-:icons: font
-:numbered:
-:source-highlighter: highlightjs
 :cfssl-version: 1.5.0
 
 == Requirements

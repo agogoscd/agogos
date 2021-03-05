@@ -1,8 +1,4 @@
 = Development
-CP Development Team <cp-devel@redhat.com>
-:icons: font
-:numbered:
-:source-highlighter: highlightjs
 
 This document describes the development workflow.
 

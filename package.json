@@ -1,0 +1,15 @@
+{
+  "name": "agogos",
+  "version": "1.0.0",
+  "description": "The CI/CD platform",
+  "main": "gulpfile.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "@antora/site-generator-default": "^2.3.4",
+    "gulp": "^4.0.2",
+    "gulp-connect": "^5.7.0",
+    "js-yaml": "^4.0.0"
+  }
+}

@@ -1,5 +1,6 @@
 * xref:index.adoc[]
 ** xref:contributing.adoc[]
+** xref:documentation.adoc[]
 ** xref:minikube.adoc[]
 ** xref:testing.adoc[]
 

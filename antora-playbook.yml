@@ -1,7 +1,7 @@
 site:
   title: Agogos
   url: https://agogos.pages.redhat.com/agogos/
-  start_page: agogos::index.adoc
+  start_page: docs::index.adoc
 content:
   sources:
     - url: https://gitlab.cee.redhat.com/agogos/agogos.git

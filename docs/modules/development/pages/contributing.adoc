@@ -1,7 +1,4 @@
 = Contributing to Agogos
 CP Development Team <cp-devel@redhat.com>
-:icons: font
-:numbered:
-:source-highlighter: highlightjs
 
-#TBD#
+WARNING: #TODO# Define rules

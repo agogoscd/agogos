@@ -1,5 +1,5 @@
-name: agogos
-title: Agogos
+name: docs
+title: Agogos Documentation
 version: master
 
 start_page: ROOT:index.adoc

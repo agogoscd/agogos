@@ -1,0 +1,11 @@
+= Event Trigger
+
+WARNING: #TODO#
+
+.Example of a CloudEvent build trigger
+[source,yaml]
+----
+triggers:
+  - event:
+      jsonPath: "$[?(@.annotations.type == "scm-change" && @.annotations.repository == "https://ssd")]"
+----
