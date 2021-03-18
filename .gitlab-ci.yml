@@ -18,14 +18,24 @@ verify:
   only: [merge_requests]
   tags: [docker]
 
+docs:
+  image: antora/antora:2.3.4
+  stage: test
+  script:
+    - npm i
+    - NODE_TLS_REJECT_UNAUTHORIZED=0 antora --fetch --to-dir public antora-playbook.yml
+  artifacts:
+    paths:
+      - public
+  only: [merge_requests]
+  tags: [docker]
+
 pages:
   image: antora/antora:2.3.4
   stage: deploy
-  cache:
-    paths:
-      - .cache/
   script:
-    - NODE_TLS_REJECT_UNAUTHORIZED=0 antora --fetch --cache-dir .cache/antora --to-dir public antora-playbook.yml
+    - npm i
+    - NODE_TLS_REJECT_UNAUTHORIZED=0 antora --fetch --to-dir public antora-playbook.yml
   artifacts:
     paths:
       - public
