@@ -13,6 +13,7 @@ kind: Component
 metadata:
   name: cpaas-test-brew-container
 spec:
+  # Inline trigger specification below
   triggers:
     - build:
         component: "other-component"
@@ -26,7 +27,13 @@ spec:
 
 Above _Component_ will be rebuilt after a successful build of the `other-component` is finished.
 
+And here is the same trigger, but defined outside of the _Component_ resource.
+
+
+
 == Pipeline Resource
+
+=== Run Pipeline when a component from a group is built
 
 [source,yaml]
 ----
@@ -49,3 +56,26 @@ spec:
 
 This _Pipeline_ will be run every time a container from the `containers` _Group_
 is built.
+
+=== Run the Pipeline when a specific component type is built
+
+[source,yaml]
+----
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Pipeline
+metadata:
+  name: other-test
+  labels:
+    "agogos/pipeline-type": test
+spec:
+  triggers:
+    - build:
+        cel: "body.component.spec.builder == 'brew' && body.component.spec.data.type == 'bundle'"
+  stages:
+    - name: "one"
+    - name: "two"
+----
+
+This _Pipeline_ will run when a _Component_ that is using the `brew` builder
+and the configuration data passed to the Builder contains a `type` key
+with value `bundle`.

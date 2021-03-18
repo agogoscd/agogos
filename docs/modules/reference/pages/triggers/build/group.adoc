@@ -1,9 +1,10 @@
-= Group Name Filter Trigger
+= Group Name Filter Build Trigger
+
+include::common:partial$draft.adoc[]
 
 TIP: Read more about the xref:concepts:groups.adoc[_Group_ concept].
 
-_Group_ triggers are a type of xref:reference:triggers/build/index.adoc[_Component Build_ triggers].
-
+NOTE: This Trigger is part of xref:reference:triggers/build/index.adoc[Component Build triggers].
 _Group_ name triggers are similar to _Component_ name triggers. Group name triggers
 can be used in case there is a _Group_ defined and we want to trigger the pipeline
 if any of the _Components_ referenced in the _Group_ should trigger the pipeline.

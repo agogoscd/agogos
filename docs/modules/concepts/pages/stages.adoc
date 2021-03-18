@@ -1,6 +1,6 @@
 = Pipeline Stages
 
-WARNING: This content is outdated and needs to be updated
+include::common:partial$draft.adoc[]
 
 == About Stages
 

@@ -6,21 +6,30 @@ practices related to _Triggers_.
 == Introduction
 
 Every _Build_ or _Pipeline_ can be run manually but this is not sufficient for automated systems.
+
 This is where _Triggers_ come into play.
 
 _Triggers_ are a way to define *when* a particular _Pipeline_ (or _Build_) should be run. A _Trigger_
 is a binding between some event in the system and some action. Examples of actions are:
-running a pipeline or kicking a build.
+running a pipeline to test a build or kicking a build itself.
 
 There are multiple event types within the system and there are multiple _Trigger_ types
 as well to cover these cases.
 
-Triggers are specified in the particular resource definition using the `triggers` section:
+#TODO#
+
+There are two ways how _Triggers_ can be defined:
+
+. Within the resource that is supposed to be triggered (inline)
+. Using the xref:concepts:triggers.adoc[Trigger resource] (external)
+
+For inline Trigger specification the `triggers` section is used in
+the particular resource definition:
 
 [source,yaml]
 ----
 triggers:
-  - # Triggers here
+  - # Your triggers here
 ----
 
 [#multiple-triggers]
@@ -28,20 +37,18 @@ triggers:
 == Multiple Triggers
 
 Every resource that supports triggers can have multiple triggers defined. Multiple
-triggers specified on the same resource are *evaluated separately*.
+triggers specified on the same resource are *evaluated separately*. This means that
+every time a _Trigger_ defined on the resource will be satisfied -- the resource
+wil be triggered.
 
-For example in case of a _Pipeline_ it will mean that it will be run
-every time any _Trigger_ defined on this _Pipeline_ will be satisfied.
-
-WARNING: In case of misconfiguration a resource can be triggered *multiple times* because of the same event.
-
+WARNING: In case of misconfiguration -- resource can be triggered *multiple times* because of the same event.
 
 == Supported Resources
 
 Resource types that support _Triggers_ are:
 
-. _Components_
-. _Pipelines_
+* xref:concepts:components.adoc[_Component_]
+* xref:concepts:pipelines.adoc[_Pipeline_]
 
 == Examples
 

@@ -1,8 +1,9 @@
 = Successful Build Triggers
 
-WARNING: #TODO#
+include::common:partial$draft.adoc[]
 
-Successful _Build_ triggers are defined inside of the `build` section.
+Successful _Build_ triggers are defined inside of the `build` section in the
+_Component_ resource.
 
 [source,yaml]
 ----
@@ -20,12 +21,11 @@ There are different ways how such triggers can be defined. Correct usage depends
 It can be as generic or as detailed as the user wants.
 
 We can watch builds of a specific _Component_. Or a _Component Group_
-a _Component_ belongs to. Finally, we can utilize link:https://github.com/json-path/JsonPath[JSONPath]
-to have full control over source of a component build.
+a _Component_ belongs to. Finally, we can utilize link:https://github.com/google/cel-spec/blob/master/doc/langdef.md[CEL expressions]
+to have full control.
 
 Below table should help with the decision which Component build trigger is the right one to use.
 
-.Component build triggers
 [cols="1,2",options=header]
 |===
 |Build differentiator
@@ -42,7 +42,7 @@ put all _Components_ into a _Group_ and reference this _Group_.
 
 NOTE: Builds of any _Components_ from the _Group_ will trigger the _Pipeline_.
 
-|JSONPath
+|CEL expression
 |To have fine-grained control over which _Component Build_ triggers the _Pipeline_.
 
 This is useful when we do not know the name of the _Component_ or _Group_ that is related to the _Build_,

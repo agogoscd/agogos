@@ -11,3 +11,9 @@ ui:
   bundle:
     url: https://gitlab.cee.redhat.com/agogos/antora-ui/-/jobs/artifacts/main/raw/build/ui-bundle.zip?job=bundle-stable
     snapshot: true
+
+asciidoc:
+  attributes:
+    warning-caption: ⚠️ warning
+  extensions:
+    - asciidoctor-kroki

@@ -1,0 +1,80 @@
+= Events
+
+include::common:partial$draft.adoc[]
+
+== CloudEvents
+
+Agogos uses link:https://cloudevents.io/[CloudEvents].
+
+This is the primary and only type of events within the system.
+In order to expose an event in Agogos it needs to be converted into CloudEvent first in
+case it is using a different format.
+
+Agogos exposes a single HTTP endpoint to which events can be delivered. Once the event
+is published, it becomes available within the system for consumption and certain
+actions can be performed according to the event type and content.
+
+[TIP]
+====
+Agogos itself emits CloudEvents as well!
+
+Please refer to the xref:reference:events/agogos.adoc[Agogos Events reference guide]
+for a full list of CloudEvents emitted by Agogos.
+
+====
+
+== Overview
+
+Below you can find a diagram which explains CloudEvent flow within the
+system.
+
+A link:https://knative.dev/docs/eventing/broker/[Knative Eventing Broker] is used as
+the central piece of the architecture.
+
+For development environment an In-Memory implementation of the Broker is used.
+For production deployment an link:https://knative.dev/docs/eventing/broker/kafka-broker/[Apache Kafka Broker] is used.
+
+Additionally multiple link:https://knative.dev/docs/eventing/triggers/[Knative Triggers] are used to send filtered events to particular event handlers.
+
+[#eventing-overview]
+[graphviz,eventing,svg]
+....
+digraph G {
+splines="false";
+rankdir="LR";
+graph [fontname="helvetica",ranksep=0.5,nodesep=0.5];
+node [fontname="helvetica",shape="box",style="rounded",fontsize="12"];
+edge [fontname="helvetica",arrowsize="1",penwidth="1",fontsize="10"];
+
+operator [style="filled,rounded",fillcolor="#770000",fontcolor="white",penwidth="0",label="Agogos"];
+other [label="...",style="dashed,rounded"];
+
+broker [style="filled",fillcolor="#4a81c0",fontcolor="white",penwidth="0",shape="polygon",sides=4,skew=".3",label="Broker"];
+
+tekton_trigger [style="filled,rounded",fillcolor="#4a81c0",fontcolor="white",penwidth="0",label="Trigger"]
+
+tekton_el [style="filled,rounded",penwidth="0",label="Tekton EventListener"];
+
+operator -> broker [headport="w",label="Agogos CloudEvents"];
+other -> broker [headport="w",label="External CloudEvents",style="dashed"];
+
+broker -> tekton_trigger;
+
+tekton_trigger -> tekton_el [label="Events"];
+}
+....
+
+== Event Sources
+
+There are two main event sources within the system:
+
+. Agogos itself
+. External sources
+
+Agogos is a CloudEvent emitter as well. Sometimes these messages will be
+processed by the system again to perform certain actions such as
+xref:reference:triggers/index.adoc[triggering] builds or running pipelines.
+
+Besides this Agogos handles all other types of CloudEvents that become
+available within the system. Source of such events can be located inside of
+cluster or outside of it.

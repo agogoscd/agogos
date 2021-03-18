@@ -1,8 +1,10 @@
-= Component Name Filter Trigger
+= Component Name Filter Build Trigger
+
+include::common:partial$draft.adoc[]
 
 TIP: Read more about the xref:concepts:components.adoc[_Component_ concept].
 
-NOTE: _Component_ name filter triggers are part of xref:reference:triggers/build/index.adoc[_Component Build_ triggers].
+NOTE: This Trigger is part of xref:reference:triggers/build/index.adoc[Component Build triggers].
 
 A _Component_ name trigger can be used to trigger a resource after a build of a specific _Component_ is finished and we know exactly
 what is the _Component_ name.

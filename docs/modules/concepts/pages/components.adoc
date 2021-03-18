@@ -1,4 +1,3 @@
 = Components
-CP Development Team <cp-devel@redhat.com>
 
-WARNING: WIP
+include::common:partial$draft.adoc[]
