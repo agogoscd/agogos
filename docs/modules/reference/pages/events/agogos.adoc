@@ -1,0 +1,121 @@
+= Agogos Events
+
+include::common:partial$draft.adoc[]
+
+This page describes all available CloudEvents that are emitted by the Agogos platform.
+
+[cols="1m,1"]
+|===
+|Event type |Sent when 
+
+2+s|xref:#componentbuild-events[Component build events]
+
+|com.redhat.agogos.event.componentbuild.success.v1alpha1
+|Component build finishes successfully.
+
+|com.redhat.agogos.event.componentbuild.failure.v1alpha1
+|Component build fails.
+
+2+s|xref:#pipelinerun-events[Pipeline run events]
+
+|com.redhat.agogos.event.pipelinerun.success.v1alpha1
+|Pipeline run finishes successfully.
+
+|com.redhat.agogos.event.pipelinerun.failure.v1alpha1
+|Pipeline run fails.
+|=== 
+
+== Event Types vs. Versions
+
+Every event emitted by the system has assigned a type which is versioned.
+This is to ensure that the payload available within the event has
+predictable content.
+
+Versions are bound to the particular resource versions the event is providing.
+
+== Event Structure
+
+[#componentbuild-events]
+=== Component Build Events
+
+====
+Applies to:
+
+* `com.redhat.agogos.event.componentbuild.success.v1alpha1`
+* `com.redhat.agogos.event.componentbuild.failure.v1alpha1`
+====
+
+Every Component build event contains a JSON payload with following structure:
+
+[source,json]
+----
+{
+   "component": {}, <1>
+   "build": {} <2>
+}
+----
+<1> The `component` key contains the Component custom resource representation in the JSON format
+<2> The `build` key contains the Component build resource representation in the JSON format
+
+Example of such JSON file can be found below.
+
+[source,json]
+----
+{
+  "component": {
+    "apiVersion": "cpaas.redhat.com/v1alpha1",
+    "kind": "Component",
+    "metadata": {
+      "name": "operator-bundle"
+    },
+    "spec": {
+      "builder": "brew",
+      "data": {
+        "type": "bundle",
+        "sourceRepo": "containers/cpaas-test-operator-bundle",
+        "sourceRef": "cpaas-tp-1.7-rhel-7",
+        "target": "cpaas-tp-2.0-rhel-7-containers-candidate"
+      }
+    }
+  },
+  "build": {
+    "apiVersion": "cpaas.redhat.com/v1alpha1",
+    "kind": "ComponentBuild",
+    "metadata": {
+      "name": "operator-bundle-2cfvx",
+      "namespace": "default",
+      "resourceVersion": "3743272",
+      "uid": "b62c3d68-619a-4bc1-8293-342515095d4e"
+    },
+    "spec": {
+      "component": "operator-bundle"
+    },
+    "status": {
+      "lastUpdate": "2021-03-03T16:54:46+01:00",
+      "reason": "Build finished",
+      "result": {
+        "build-id": 1388246,
+        "task-id": 33155498
+      },
+      "status": "Passed"
+    }
+  }
+}
+----
+
+NOTE: Such event can contain more fields in case 
+
+[#pipelinerun-events]
+=== Pipeline Run Events
+
+====
+Applies to:
+
+* `com.redhat.agogos.event.pipelinerun.success.v1alpha1`
+* `com.redhat.agogos.event.pipelinerun.failure.v1alpha1`
+====
+
+Every Pipeline run event is sending the JSON representation of an Agogos
+`PipelineRun` resource.
+
+#TODO#

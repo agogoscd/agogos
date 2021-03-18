@@ -1,6 +1,5 @@
 = Reference
-CP Development Team <cp-devel@redhat.com>
 
-WARNING: #TODO# Welcome page for reference documents
+include::common:partial$draft.adoc[]
 
-xref:triggers/index.adoc[]
+#TODO#

@@ -1,11 +1,31 @@
 = Event Trigger
 
-WARNING: #TODO#
+include::common:partial$draft.adoc[]
+
+#TODO#
+
+Event triggers use the
+link:https://github.com/google/cel-spec/blob/master/doc/langdef.md[CEL expression expression language]
+to decide whether the trigger should be fired.
+
+The decision whether to fire the trigger or not is happening
+once the expression is evaluated. A trigger is fired only when the expression
+returns `true`.
 
 .Example of a CloudEvent build trigger
 [source,yaml]
 ----
 triggers:
   - event:
-      jsonPath: "$[?(@.annotations.type == "scm-change" && @.annotations.repository == "https://ssd")]"
+      cel: "body.component.spec.builder == 'maven' && body.component.spec.data.source.url.contains('github.com')"
 ----
+
+[TIP]
+====
+You can use the `kubectl` command with the `-o json` switch to obtain relevant
+resources to have better understanding how to craft your CEL expression.
+====
+
+== Event Trigger Evaluator
+
+#TODO#

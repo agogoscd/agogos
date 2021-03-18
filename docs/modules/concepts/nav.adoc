@@ -3,3 +3,4 @@
 ** xref:groups.adoc[]
 ** xref:stages.adoc[]
 ** xref:pipelines.adoc[]
+** xref:triggers.adoc[]
