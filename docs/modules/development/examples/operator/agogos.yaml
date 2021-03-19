@@ -1,4 +1,5 @@
 ---
+# this requires secret/quay-pull-secret 
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -30,7 +31,7 @@ roleRef:
   name: view
 subjects:
   - kind: ServiceAccount
-    name: service
+    name: agogos
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -50,7 +51,7 @@ spec:
     spec:
       containers:
         - name: service
-          image: quay.io/cpaas/agogos-operator:latest
+          image: quay.io/cpaas/agogos-poc-operator:1.0-SNAPSHOT
           imagePullPolicy: Always
           ports:
             - containerPort: 7070
@@ -69,4 +70,4 @@ spec:
             limits:
               memory: "256Mi"
               cpu: "500m"
-      serviceAccount: service
+      serviceAccount: agogos
