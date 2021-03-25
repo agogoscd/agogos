@@ -8,6 +8,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -37,6 +38,14 @@ public class ComponentBuildResourceClient {
                 ComponentBuildResourceList.class);
     }
 
+    public List<ComponentBuildResource> findByLabel(String namespace, String label, String value) {
+        return componentBuildClient.inNamespace(namespace).withLabel(label, value).list().getItems();
+    }
+
+    public List<ComponentBuildResource> findByLabel(String namespace, String label) {
+        return componentBuildClient.inNamespace(namespace).withLabel(label).list().getItems();
+    }
+
     /**
      * Find the {@link ComponentBuildResource} by name.
      * 
@@ -56,5 +65,21 @@ public class ComponentBuildResourceClient {
         }
 
         return buildResources.getItems().get(0);
+    }
+
+    public ComponentBuildResource create(String name, String namespace) {
+
+        ComponentBuildResource build = new ComponentBuildResource();
+
+        build.getMetadata().setGenerateName(name + "-");
+        build.getSpec().setComponent(name);
+
+        // TODO: Add exception handling
+        return componentBuildClient.inNamespace(namespace).create(build);
+    }
+
+    public ComponentBuildResource create(ComponentBuildResource build) {
+        // TODO: Add exception handling
+        return componentBuildClient.create(build);
     }
 }

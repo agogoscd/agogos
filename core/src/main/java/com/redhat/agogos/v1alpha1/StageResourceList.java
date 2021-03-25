@@ -1,4 +1,4 @@
-package com.redhat.cpaas.v1alpha1;
+package com.redhat.agogos.v1alpha1;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.fabric8.kubernetes.client.CustomResourceList;

@@ -52,6 +52,8 @@ spec:
                         description: Name of the stage to run
                       runAfter:
                         type: array
+                        items:
+                          type: string
                         description: A list of stages that must finish BEFORE this stage runs
                       config:
                         type: object

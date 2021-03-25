@@ -1,50 +1,47 @@
-= Successful Build Triggers
+= Build Triggers
 
 include::common:partial$draft.adoc[]
 
-Successful _Build_ triggers are defined inside of the `build` section in the
-_Component_ resource.
-
-[source,yaml]
-----
-triggers:
-  - build:
-      # Specific trigger here
-----
-
-// TODO: Probably builds and pipelines and not only pipelines
-
-_Pipeline_ can be triggered after a _Component_ build is finished. We can identify which builds should trigger
-which pipelines by defining component build triggers.
+Build Triggers are a way to define what action should be performed in case of
+a successful Build event.
 
 There are different ways how such triggers can be defined. Correct usage depends on the use case.
 It can be as generic or as detailed as the user wants.
 
-We can watch builds of a specific _Component_. Or a _Component Group_
-a _Component_ belongs to. Finally, we can utilize link:https://github.com/google/cel-spec/blob/master/doc/langdef.md[CEL expressions]
+We can watch builds of a specific Component. Or a Group
+a Component belongs to. Finally, we can utilize link:https://github.com/google/cel-spec/blob/master/doc/langdef.md[CEL expressions]
 to have full control.
 
 Below table should help with the decision which Component build trigger is the right one to use.
 
-[cols="1,2",options=header]
+[cols="1,1,3",options=header]
 |===
-|Build differentiator
-|Usage
+|What information you have?
+|Suggested Trigger type
+|More information
 
-|_Component_ name 
-|Useful when the pipeline works only on one _Component_ (or just a few) and we know exactly what _Components_ we want.
+|Component name
+|xref:triggers/build/component.adoc[Component]
+|Useful when we have important Components within the system for which builds
+some actions should be performed.
 
-This is the most common use case in case of small number of _Components_ and _Pipelines_. This is a good starting point.
+Using Component build triggers is a common use case in case of small number of
+Components and Pipelines as well.
+
+Component build triggers are a good starting point.
 
 |Group name
-a|Useful when the are _Pipelines_ that work on the same set of _Components_. In such case it is convenient to
-put all _Components_ into a _Group_ and reference this _Group_.
+|xref:triggers/build/group.adoc[Group]
+a|Useful when the are Pipelines that work on the same set of Components. In such case it
+is convenient to put all relevant Components into a Group and reference this Group in Trigger.
 
-NOTE: Builds of any _Components_ from the _Group_ will trigger the _Pipeline_.
-
-|CEL expression
-|To have fine-grained control over which _Component Build_ triggers the _Pipeline_.
-
-This is useful when we do not know the name of the _Component_ or _Group_ that is related to the _Build_,
-but at the same time we know that _Component_ or _Component Build_ metadata contains required information.
+NOTE: Builds of any Components from the Group will trigger the Pipeline.
 |=== 
+
+[TIP]
+====
+To have fine-grained control over which Build triggers some action the xref:triggers/build/cel.adoc[CEL Build] Trigger could be used.
+
+This is useful when we do not know the name of the Component or Group that is related to the Build,
+but at the same time we know that Component or Build metadata contains required information.
+====

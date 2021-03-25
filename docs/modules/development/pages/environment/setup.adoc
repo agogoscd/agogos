@@ -1,0 +1,116 @@
+= Agogos Setup
+
+include::common:partial$draft.adoc[]
+
+This page describes the initial setup that needs to be performed
+in order to be able to develop Agogos.
+
+[NOTE]
+====
+Any files referenced in this guide are relative to the root of the main Agogos repository.
+====
+
+[NOTE]
+====
+It is assumed that you are logged in to the cluster and using the the correct target namespace.
+In case of xref:environment/local.adoc[local environment] this would be a Minikube cluster and `default` namespace.
+====
+
+== Resource Initialization
+
+In order to be able to use Agogos you need to register required resources within the cluster.
+
+WARNING: Registration of resources needs to be performed before you start the service.
+
+=== CRD's Registration
+
+Once you have required tools installed and running on your system the next thing
+to do is to register CRD's within the system. This can be done by running this command:
+
+[source,bash]
+.Registering CRD's
+----
+❯ ./operator/src/main/resources/crds/apply.sh
+----
+
+NOTE: Each time after you change the CRD you need to run above command again.
+
+=== Namespace
+
+Some Agogos services are run in the `agogos` namespace which needs to be created.
+
+[source,bash]
+----
+❯ kubectl create namespace agogos
+namespace/agogos created
+----
+
+[#pull-secret]
+=== (Optional) Pull Secret
+
+In case the need to access container images in a secured private registry, you need to
+grant access to it by preparing a pull secret.
+
+[source,bash]
+.Secret creation
+----
+❯ kubectl create secret docker-registry agogos-pull-secret --docker-server=<hostname> --docker-username=<username> --docker-password=<password> --docker-email=agogos@domain.com
+secret/agogos-pull-secret created
+----
+
+=== Service Account
+
+An `agogos` Service Account is required to ensure propagating
+correct permissions for services run by Agogos.
+
+Service Account is used to provide xref:#pull-secret[image pull secrets]
+for secured registries and images that are not
+freely accessible.
+
+[source,yaml]
+.sa.yaml
+----
+include::example$operator/sa.yaml[]
+----
+
+[source,bash]
+.Service Account creation
+----
+❯ kubectl apply -f ./docs/modules/development/examples/operator/sa.yaml
+serviceaccount/agogos created
+----
+
+=== Knative Eventing Broker
+
+[source,yaml]
+.broker.yaml
+----
+include::example$operator/broker.yaml[]
+----
+
+[source,bash]
+.Service Account creation
+----
+❯ kubectl apply -f ./docs/modules/development/examples/operator/broker.yaml
+broker.eventing.knative.dev/default created
+----
+
+=== Platform Stages Registration
+
+Last step is to register Agogos-provided Stages that are a required building block.
+
+[source,bash]
+----
+❯ ./operator/src/main/resources/stages/apply.sh
+----
+
+== You Are Ready!
+
+Now that Agogos resources are prepared in your development environment you are
+ready to start!
+
+What to do next?
+
+* Try to start the Agogos Operator!
+
+// TODO: Add next steps links here

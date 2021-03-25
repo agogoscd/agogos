@@ -48,9 +48,48 @@
             <artifactId>quarkus-config-yaml</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-quartz</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest-client-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.cloudevents</groupId>
+            <artifactId>cloudevents-json-jackson</artifactId>
+            <version>${cloudevents.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.cloudevents</groupId>
+            <artifactId>cloudevents-http-restful-ws</artifactId>
+            <version>${cloudevents.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.redhat.cpaas</groupId>
             <artifactId>agogos-core</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <!-- TODO: Change this! This is temporary unless a new version of Farbric8 kubernetes client will be released (>5.2.1) -->
+        <dependency>
+            <groupId>com.github.fabric8io.kubernetes-client</groupId>
+            <artifactId>tekton-model-triggers</artifactId>
+            <version>24d34f0e18</version>
+        </dependency>
+        <!-- TODO: Change this! This is temporary unless a new version of Farbric8 kubernetes client will be released (>5.2.1) -->
+        <dependency>
+            <groupId>com.github.fabric8io.kubernetes-client</groupId>
+            <artifactId>tekton-client</artifactId>
+            <version>24d34f0e18</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.fabric8io.kubernetes-client</groupId>
+            <artifactId>knative-client</artifactId>
+            <version>24d34f0e18</version>
         </dependency>
         <dependency>
             <groupId>io.quarkiverse.tektonclient</groupId>
@@ -69,10 +108,10 @@
             <version>${openapi-schema-validator.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.javaoperatorsdk</groupId>
-            <artifactId>operator-framework-quarkus-extension</artifactId>
-            <version>${operator-framework.version}</version>
-        </dependency>
+            <groupId>io.quarkiverse.operatorsdk</groupId>
+            <artifactId>quarkus-operator-sdk</artifactId>
+            <version>${quarkus-operatorsdk.version}</version>
+          </dependency>
         <dependency>
             <groupId>io.javaoperatorsdk</groupId>
             <artifactId>operator-framework</artifactId>

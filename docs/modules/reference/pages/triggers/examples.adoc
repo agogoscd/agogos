@@ -4,78 +4,69 @@ This page contains examples of common use cases for xref:reference:triggers/inde
 
 == Component Resource
 
-=== Rebuild a _Component_ after other _Component_ is built
+=== Rebuild a Component after other Component is built
 
 [source,yaml]
 ----
 apiVersion: agogos.redhat.com/v1alpha1
-kind: Component
+kind: Trigger
 metadata:
-  name: cpaas-test-brew-container
+  name: component-to-component
 spec:
-  # Inline trigger specification below
-  triggers:
-    - build:
-        component: "other-component"
-  builder: brew
-  data:
-    type: container
-    sourceRepo: "containers/cpaas-test-brew-container"
-    sourceRef: "cpaas-tp-2.0-rhel-7"
-    target: "cpaas-tp-2.0-rhel-7-containers-candidate"
+  events:
+    - component:
+        name: cpaas-test-brew-rpm
+  target:
+    kind: Component
+    name: cpaas-test-brew-container
 ----
 
-Above _Component_ will be rebuilt after a successful build of the `other-component` is finished.
-
-And here is the same trigger, but defined outside of the _Component_ resource.
-
-
+Once the `cpaas-test-brew-rpm` Component build finishes, the `cpaas-test-brew-container`
+Component build will be started.
 
 == Pipeline Resource
 
-=== Run Pipeline when a component from a group is built
+=== Run Pipeline when a Component from a Group is built
 
 [source,yaml]
 ----
 apiVersion: agogos.redhat.com/v1alpha1
-kind: Pipeline
+kind: Trigger
 metadata:
-  name: containers-test
-  labels:
-    "agogos/pipeline-type": test
+  name: group-to-pipeline
 spec:
-  input:
-    - group: containers
-  triggers:
-    - build:
-        group: containers
-  stages:
-    - name: "one"
-    - name: "two"
+  events:
+    - group:
+        name: cpaas-test-example
+  target:
+    kind: Pipeline
+    name: testing
 ----
 
-This _Pipeline_ will be run every time a container from the `containers` _Group_
-is built.
+After a Component from the `cpaas-test-example` Group is built, the `testing` Pipeline
+will be run.
 
-=== Run the Pipeline when a specific component type is built
+=== Run a Pipeline after a specific component type is built
 
 [source,yaml]
 ----
 apiVersion: agogos.redhat.com/v1alpha1
-kind: Pipeline
+kind: Trigger
 metadata:
-  name: other-test
-  labels:
-    "agogos/pipeline-type": test
+  name: build-to-pipeline
 spec:
-  triggers:
+  events:
     - build:
-        cel: "body.component.spec.builder == 'brew' && body.component.spec.data.type == 'bundle'"
-  stages:
-    - name: "one"
-    - name: "two"
+        filter: "body.component.spec.builder == 'brew' && body.component.spec.data.type == 'bundle'"
+  target:
+    kind: Pipeline
+    name: test
 ----
 
-This _Pipeline_ will run when a _Component_ that is using the `brew` builder
-and the configuration data passed to the Builder contains a `type` key
-with value `bundle`.
+Run the `test` Pipeline after a Component is built which meets following requirements:
+
+* `brew` builder was used
+*  within the configuration passed to the Builder `type` key was set with value `bundle`
+
+NOTE: The `test` Pipeline will be run for any Component that matches above criteria. We don't
+"bind" the Trigger to any particular Component instance here.

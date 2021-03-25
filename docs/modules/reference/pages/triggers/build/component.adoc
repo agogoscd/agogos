@@ -1,20 +1,28 @@
-= Component Name Filter Build Trigger
+= Component Build Trigger
 
 include::common:partial$draft.adoc[]
 
 TIP: Read more about the xref:concepts:components.adoc[_Component_ concept].
 
-NOTE: This Trigger is part of xref:reference:triggers/build/index.adoc[Component Build triggers].
+NOTE: This Trigger is part of xref:reference:triggers/build/index.adoc[Build triggers].
 
-A _Component_ name trigger can be used to trigger a resource after a build of a specific _Component_ is finished and we know exactly
-what is the _Component_ name.
+A Component build trigger can be used to trigger a resource after a build of a specific Component is finished and we know exactly what is the Component name.
 
-.Example of a Component name build trigger
+.Example of a Component build trigger
 [source,yaml]
 ----
-triggers:
-  - build:
-      component: "one"
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Trigger
+metadata:
+  name: component-to-component
+spec:
+  events:
+    - component:
+        name: "one"
+  target:
+    kind: Component
+    name: two
 ----
 
-In above example the resource will be triggered when a build of _Component_ `one` is finished.
+In above example the `two` Component build will be started
+when a build of Component `one` is finished.

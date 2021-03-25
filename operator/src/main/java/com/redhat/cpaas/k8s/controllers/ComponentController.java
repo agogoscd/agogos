@@ -3,7 +3,8 @@ package com.redhat.cpaas.k8s.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.cpaas.errors.ApplicationException;
-import com.redhat.cpaas.k8s.client.ComponentResourceClient;
+import com.redhat.cpaas.k8s.ResourceLabels;
+import com.redhat.cpaas.k8s.client.PipelineClient;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
 import com.redhat.cpaas.v1alpha1.ComponentResource.ComponentStatus;
 import com.redhat.cpaas.v1alpha1.ComponentResource.Status;
@@ -44,7 +45,7 @@ public class ComponentController implements ResourceController<ComponentResource
     private static final Logger LOG = LoggerFactory.getLogger(ComponentController.class);
 
     @Inject
-    ComponentResourceClient componentResourceClient;
+    PipelineClient componentResourceClient;
 
     @Inject
     ObjectMapper objectMapper;
@@ -144,13 +145,97 @@ public class ComponentController implements ResourceController<ComponentResource
 
         // Create or update pipeline in any case
         this.updateBuildPipeline(component);
+        // TODO implement triggers
+        // this.updateTriggers(component);
 
-        // switch (Status.valueOf(component.getStatus().getStatus())) {
-        // case New:
-        // // TODO: set resurce metadata here (labels)
-        // default:
-        // break;
-        // }
+        // new TriggerBindingBuilder().
+
+        // EventListener eventListener = new
+        // EventListenerBuilder().withNewMetadata().withName("default").endMetadata()
+        // .withNewSpec().withServiceAccountName("agogos-el").withNewNamespaceSelector()
+        // .addNewMatchName(component.getMetadata().getNamespace()).endNamespaceSelector().endSpec().build();
+
+        // eventListener.getSpec().setTriggers(null);
+
+        // tektonClient.v1alpha1().eventListeners().inNamespace(component.getMetadata().getNamespace())
+        // .createOrReplace(eventListener);
+
+        // Trigger trigger = new
+        // TriggerBuilder().withNewMetadata().withName("default").endMetadata().withNewSpec()
+        // .withBroker("default").withNewSubscriber().withUri("http://el-default.default.svc.cluster.local:8080")
+        // .endSubscriber().endSpec().build();
+
+        // // TriggerInterceptor typeInterceptor = new
+        // // TriggerInterceptorBuilder().withNewCel()
+        // // .withFilter("header.match('ce-type',
+        // // 'com.redhat.agogos.event.componentbuild.success.v1')").endCel()
+        // // .build();
+
+        // // TriggerInterceptor nameInterceptor = new
+        // // TriggerInterceptorBuilder().withNewCel()
+        // // .withFilter("body.component.metadata.name ==
+        // // 'cpaas-test-brew-rpm'").endCel().build();
+
+        // Map<String, Quantity> requests = new HashMap<>();
+        // requests.put("storage", Quantity.parse("1Gi"));
+
+        // PersistentVolumeClaim pvc = new
+        // PersistentVolumeClaimBuilder().withNewSpec().withAccessModes("ReadWriteOnce")
+        // .withNewResources().withRequests(requests).endResources().withStorageClassName("standard").endSpec()
+        // .build();
+
+        // WorkspaceBinding wsBinding = new
+        // WorkspaceBindingBuilder().withName("ws").withVolumeClaimTemplate(pvc).build();
+
+        // PipelineRun ppr = new
+        // PipelineRunBuilder().withNewMetadata().withGenerateName("$(tt.params.component)-")
+        // .withNamespace(component.getMetadata().getNamespace()).endMetadata().withNewSpec().withNewPipelineRef()
+        // .withName("$(tt.params.component)").endPipelineRef().withServiceAccountName("agogos")
+        // .withWorkspaces(wsBinding).endSpec().build();
+
+        // io.fabric8.tekton.triggers.v1alpha1.Trigger tknTrigger = new
+        // io.fabric8.tekton.triggers.v1alpha1.TriggerBuilder()
+        // .withNewMetadata().withName("component-cpaas-test-opr").endMetadata() //
+        // .withNewSpec() //
+        // .addNewInterceptor() //
+        // .withNewCel() //
+        // .withFilter("header.match('ce-type',
+        // 'com.redhat.agogos.event.componentbuild.success.v1')") //
+        // .endCel() //
+        // .and() //
+        // .addNewInterceptor() //
+        // .withNewCel() //
+        // .withFilter("body.component.metadata.name == 'cpaas-test-brew-rpm'") //
+        // .endCel() //
+        // .and() //
+        // .addNewBinding() //
+        // .withNewName("component").withNewValue("$(body.component.metadata.name)")//
+        // .and() //
+        // .withNewTemplate() //
+        // .withNewSpec() //
+        // .addNewParam().withName("component").endParam() //
+        // .withResourcetemplates(ppr) //
+        // .endSpec() //
+        // .endTemplate() //
+        // .and() //
+        // .build();
+
+        // System.out.println("CREATING TRIGGER");
+        // tektonClient.v1alpha1().triggers().createOrReplace(tknTrigger);
+
+        // // new DefaultTektonClient().v1alpha1().trig
+
+        // Broker broker = new
+        // BrokerBuilder().withNewMetadata().withName("default").endMetadata().build();
+
+        // DefaultKnativeClient knc = new DefaultKnativeClient();
+
+        // knc.brokers().inNamespace("agogos").createOrReplace(broker);
+        // knc.triggers().inNamespace("agogos").createOrReplace(trigger);
+
+        // knc.close();
+
+        // tektonClient.v1beta1().
 
         // Update Coomponent status
         setStatus(component, Status.Ready, "");
@@ -250,7 +335,7 @@ public class ComponentController implements ResourceController<ComponentResource
 
         // Add any useful/required labels
         Map<String, String> labels = new HashMap<>();
-        labels.put("cpaas.redhat.com/component", component.getMetadata().getName());
+        labels.put(ResourceLabels.COMPONENT.getValue(), component.getMetadata().getName());
 
         // Make sure the Pipeline is owned by the Component
         OwnerReference ownerReference = new OwnerReferenceBuilder() //

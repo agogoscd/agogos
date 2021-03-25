@@ -25,14 +25,24 @@ quarkus:
     name: agogos-poc-operator
     registry: quay.io
 
+  quartz:
+    start-mode: FORCED
+
 agogos:
   service-account: agogos
+  cloud-events:
+    publish: true
 
 kubernetes:
   # Default storage class name in minikube
   storage-class: "standard"
 
 "%dev":
+  cloud-events-service:
+    mp-rest:
+      url: http://localhost:8111
+      hostnameVerifier: io.quarkus.restclient.NoopHostnameVerifier
+
   quarkus:
     log:
       category:
@@ -42,6 +52,8 @@ kubernetes:
         #   level: TRACE
     kubernetes-client:
       trust-certs: true
+
+  "broker/mp-rest/url": "http://localhost:8111"
 
 "%prod":
   quarkus:

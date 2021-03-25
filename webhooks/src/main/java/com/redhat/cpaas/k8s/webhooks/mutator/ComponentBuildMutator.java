@@ -1,6 +1,7 @@
 
 package com.redhat.cpaas.k8s.webhooks.mutator;
 
+import com.redhat.cpaas.k8s.ResourceLabels;
 import com.redhat.cpaas.k8s.client.ComponentResourceClient;
 import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
@@ -16,8 +17,6 @@ import javax.json.JsonObject;
 
 @ApplicationScoped
 public class ComponentBuildMutator extends Mutator<ComponentBuildResource> {
-    private static final String COMPONENT_LABEL = "cpaas.redhat.com/component";
-
     @Inject
     ComponentResourceClient componentResourceClient;
 
@@ -35,7 +34,7 @@ public class ComponentBuildMutator extends Mutator<ComponentBuildResource> {
 
     /**
      * <p>
-     * Sets the <code>cpaas.redhat.com/component</code> label pointing to the
+     * Sets the <code>agogos.redhat.com/component</code> label pointing to the
      * {@link ComponentResource}.
      * </p>
      * 
@@ -44,7 +43,7 @@ public class ComponentBuildMutator extends Mutator<ComponentBuildResource> {
      */
     private JsonObject generateLabels(ComponentBuildResource componentBuild) {
         JsonObject labels = Json.createObjectBuilder() //
-                .add(COMPONENT_LABEL, componentBuild.getSpec().getComponent()) //
+                .add(ResourceLabels.COMPONENT.getValue(), componentBuild.getSpec().getComponent()) //
                 .build();
 
         return labels;

@@ -16,5 +16,6 @@ ui:
 asciidoc:
   attributes:
     warning-caption: ⚠️ warning
+    kroki-fetch-diagram: true
   extensions:
     - asciidoctor-kroki

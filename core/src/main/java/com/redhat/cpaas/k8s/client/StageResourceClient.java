@@ -1,8 +1,8 @@
 package com.redhat.cpaas.k8s.client;
 
-import com.redhat.cpaas.v1alpha1.AbstractStage.Phase;
-import com.redhat.cpaas.v1alpha1.StageResource;
-import com.redhat.cpaas.v1alpha1.StageResourceList;
+import com.redhat.agogos.v1alpha1.AbstractStage.Phase;
+import com.redhat.agogos.v1alpha1.StageResource;
+import com.redhat.agogos.v1alpha1.StageResourceList;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;

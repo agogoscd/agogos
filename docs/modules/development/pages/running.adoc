@@ -1,0 +1,61 @@
+= Running Agogos
+
+include::common:partial$draft.adoc[]
+
+NOTE: Make sure you have xref:environment/index.adoc[prepared your environment] first.
+
+== Cluster Connection
+
+Before running Agogos, please make sure you are logged in into correct cluster.
+
+TIP: If you use Minikube, see the xref:environment/local.adoc#managing-contexts[note about managing contexts].
+
+== Running Agogos Operator
+
+=== Setting Up Broker Port Forwarding
+
+To be able to publish CloudEvents we need to expose the Broker outside of the cluster.
+The `kubectl port-forward` command could be used to achieve this goal.
+
+[source,bash]
+----
+❯ kubectl port-forward service/broker-ingress 8111:80 -n knative-eventing
+----
+
+=== Running the Operator
+
+You can run the Operator in dev mode that enables live coding using:
+
+[source,bash]
+.Running the Operator
+----
+❯ ./mvnw quarkus:dev -pl operator -am
+----
+
+After running this command you should see the Agogos Operator running.
+
+----
+2021-04-06 10:18:46,079 INFO  [io.jav.ope.Operator] (Quarkus Main Thread) Registered Controller: 'PipelineController_ClientProxy' for CRD: 'class com.redhat.cpaas.v1alpha1.PipelineResource' for namespaces: [all namespaces]
+2021-04-06 10:18:46,080 INFO  [com.red.cpa.k8s.PlatformOperator] (Quarkus Main Thread) Starting operator
+2021-04-06 10:18:46,156 INFO  [io.quarkus] (Quarkus Main Thread) agogos-operator 1.0-SNAPSHOT on JVM (powered by Quarkus 1.12.0.Final) started in 1.332s. Listening on: http://localhost:7070
+2021-04-06 10:18:46,158 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+2021-04-06 10:18:46,158 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, config-yaml, hibernate-validator, kubernetes, kubernetes-client, openshift-client, operator-sdk, quarkiverse-tekton-client, quartz, rest-client, rest-client-jackson, resteasy, resteasy-jackson, scheduler, smallrye-health]
+----
+
+[TIP]
+====
+To enable hot reload, visit http://localhost:7070/ and refresh the page.
+
+This page provides a useful development UI available at http://localhost:7070/q/dev/ as well!
+====
+
+== Running Webhooks
+
+Similarly, you can run Webhooks application:
+
+[source,bash]
+.Running Webhooks
+----
+❯ ./mvnw quarkus:dev -pl webhooks -am
+----
+

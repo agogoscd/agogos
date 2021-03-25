@@ -1,153 +1,157 @@
 package com.redhat.cpaas.k8s.controllers;
 
-import com.redhat.cpaas.k8s.client.TektonResourceClient;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redhat.cpaas.errors.MissingResourceException;
+import com.redhat.cpaas.eventing.CloudEventPublisher;
+import com.redhat.cpaas.eventing.CloudEventType;
+import com.redhat.cpaas.k8s.TektonPipelineHelper;
+import com.redhat.cpaas.k8s.client.PipelineClient;
+import com.redhat.cpaas.k8s.event.PipelinePipelineRunEventSource;
+import com.redhat.cpaas.k8s.event.PipelineRunEvent;
+import com.redhat.cpaas.v1alpha1.ComponentResource;
+import com.redhat.cpaas.v1alpha1.PipelineResource;
 import com.redhat.cpaas.v1alpha1.PipelineRunResource;
 import com.redhat.cpaas.v1alpha1.PipelineRunResource.RunStatus;
 import com.redhat.cpaas.v1alpha1.PipelineRunResource.Status;
-import io.fabric8.kubernetes.api.model.OwnerReference;
-import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
-import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
-import io.fabric8.kubernetes.api.model.PersistentVolumeClaimBuilder;
-import io.fabric8.kubernetes.api.model.Quantity;
-import io.fabric8.tekton.client.TektonClient;
-import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineRef;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineRefBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineRunBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineRunSpecBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBinding;
-import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBindingBuilder;
 import io.javaoperatorsdk.operator.api.Context;
 import io.javaoperatorsdk.operator.api.Controller;
 import io.javaoperatorsdk.operator.api.DeleteControl;
 import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
+import io.javaoperatorsdk.operator.processing.event.EventSourceManager;
+import io.javaoperatorsdk.operator.processing.event.internal.CustomResourceEvent;
+import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import javax.json.Json;
+import javax.json.JsonObjectBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Controller
+@Controller(generationAwareEventProcessing = false)
 public class PipelineRunController implements ResourceController<PipelineRunResource> {
 
     private static final Logger LOG = LoggerFactory.getLogger(PipelineRunController.class);
 
-    @ConfigProperty(name = "agogos.service-account")
-    Optional<String> serviceAccount;
-
-    @ConfigProperty(name = "kubernetes.storage-class")
-    Optional<String> storageClass;
+    @Inject
+    TektonPipelineHelper pipelineHelper;
 
     @Inject
-    TektonClient tektonClient;
+    PipelineClient pipelineClient;
 
     @Inject
-    TektonResourceClient tektonResourceClient;
+    CloudEventPublisher cloudEventPublisher;
+
+    @Inject
+    PipelinePipelineRunEventSource pipelineRunEventSource;
+
+    @Inject
+    ObjectMapper objectMapper;
 
     @Override
     public DeleteControl deleteResource(PipelineRunResource run, Context<PipelineRunResource> context) {
         return DeleteControl.DEFAULT_DELETE;
     }
 
+    /**
+     * <p>
+     * Register the {@link io.fabric8.tekton.pipeline.v1alpha1.PipelineRun} event
+     * source so that we can receive events from PipelineRun's that are related to
+     * {@link ComponentResource}'s.
+     * </p>
+     */
     @Override
-    public UpdateControl<PipelineRunResource> createOrUpdateResource(PipelineRunResource run,
+    public void init(EventSourceManager eventSourceManager) {
+        eventSourceManager.registerEventSource("pipeline-run", pipelineRunEventSource);
+    }
+
+    @Override
+    public UpdateControl<PipelineRunResource> createOrUpdateResource(PipelineRunResource pipelineRun,
             Context<PipelineRunResource> context) {
-        LOG.info("PipelineRun '{}' modified", run.getNamespacedName());
 
-        try {
-            switch (Status.valueOf(run.getStatus().getStatus())) {
-                case New:
-                    LOG.info("Handling new pipeline run '{}'", run.getNamespacedName());
+        Optional<CustomResourceEvent> crEvent = context.getEvents().getLatestOfType(CustomResourceEvent.class);
 
-                    // TODO: Externalize it!
-                    // TODO: This code can be made generic to work for any pipelines
-                    Pipeline pipeline = tektonResourceClient.getPipelineByName(run.getSpec().getPipeline());
+        if (crEvent.isPresent()) {
 
-                    if (pipeline == null) {
-                        setStatus(run, Status.Failed, "Pipeline not found");
-                        return UpdateControl.updateStatusSubResource(run);
-                    }
+            LOG.info("PipelineRun '{}' modified", pipelineRun.getNamespacedName());
 
-                    PipelineRef pipelineRef = new PipelineRefBuilder(true).withName(pipeline.getMetadata().getName())
-                            .build();
+            try {
+                switch (Status.valueOf(pipelineRun.getStatus().getStatus())) {
+                    case New:
+                        LOG.info("Handling new Pipeline run '{}'", pipelineRun.getNamespacedName());
 
-                    Map<String, Quantity> requests = new HashMap<String, Quantity>();
-                    requests.put("storage", new Quantity("1Gi"));
+                        PipelineResource pipeline = null;
 
-                    String storageClassName = "";
+                        try {
+                            pipeline = pipelineClient.getByName(pipelineRun.getSpec().getPipeline(),
+                                    pipelineRun.getMetadata().getNamespace());
+                        } catch (MissingResourceException e) {
+                            LOG.error("Could not find Pipeline '{}' in '{}' namespace", pipelineRun.getSpec().getPipeline(),
+                                    pipelineRun.getMetadata().getNamespace(), e);
 
-                    if (storageClass.isPresent()) {
-                        storageClassName = storageClass.get();
-                    }
+                            setStatus(pipelineRun, Status.Failed, e.getMessage());
+                            return UpdateControl.updateStatusSubResource(pipelineRun);
+                        }
 
-                    String serviceAccountName = null;
+                        JsonObjectBuilder ceDataBuilder = Json.createObjectBuilder();
 
-                    if (serviceAccount.isPresent()) {
-                        serviceAccountName = serviceAccount.get();
-                    }
+                        try {
+                            ceDataBuilder.add("run",
+                                    Json.createReader(new StringReader(objectMapper.writeValueAsString(pipelineRun)))
+                                            .readValue());
+                            ceDataBuilder.add("pipeline", Json
+                                    .createReader(new StringReader(objectMapper.writeValueAsString(pipeline))).readValue());
+                        } catch (JsonProcessingException e) {
+                            LOG.error("Error while preparing CloudEvent resource", e);
 
-                    PersistentVolumeClaim pvc = new PersistentVolumeClaimBuilder() //
-                            .withNewSpec() //
-                            .withNewResources().withRequests(requests).endResources() //
-                            .withStorageClassName(storageClassName) //
-                            .withAccessModes("ReadWriteOnce") //
-                            .endSpec()//
-                            .build();
+                            setStatus(pipelineRun, Status.Failed,
+                                    "Internal error occurred while generating PipelineRun metadata");
 
-                    WorkspaceBinding workspaceBinding = new WorkspaceBindingBuilder() //
-                            .withName("ws") //
-                            .withVolumeClaimTemplate(pvc) //
-                            .build();
+                            return UpdateControl.updateStatusSubResource(pipelineRun);
+                        }
 
-                    OwnerReference ownerReference = new OwnerReferenceBuilder() //
-                            .withApiVersion(run.getApiVersion()) //
-                            .withKind(run.getKind()) //
-                            .withName(run.getMetadata().getName()) //
-                            .withUid(run.getMetadata().getUid()) //
-                            .withBlockOwnerDeletion(true) //
-                            .withController(true) //
-                            .build();
+                        // Run Tekton pipeline
+                        try {
+                            PipelineRun tektonPipelineRun = pipelineHelper.run(pipeline.getKind(),
+                                    pipelineRun.getSpec().getPipeline(), pipelineRun.getMetadata().getNamespace(),
+                                    pipelineRun);
 
-                    PipelineRunSpecBuilder pipelineRunSpecBuilder = new PipelineRunSpecBuilder() //
-                            .withPipelineRef(pipelineRef) //
-                            .withWorkspaces(workspaceBinding); //
+                            LOG.info("Tekton Pipeline '{}' was run as '{}' in '{}' namespace",
+                                    pipeline.getMetadata().getName(), tektonPipelineRun.getMetadata().getName(),
+                                    tektonPipelineRun.getMetadata().getNamespace());
 
-                    if (serviceAccountName != null) {
-                        pipelineRunSpecBuilder.withServiceAccountName(serviceAccountName);
-                    }
+                        } catch (MissingResourceException e) {
+                            LOG.error("Error while running Tekton Pipeline '{}'", pipelineRun.getSpec().getPipeline(), e);
 
-                    PipelineRun pipelineRun = new PipelineRunBuilder() //
-                            .withNewMetadata() //
-                            .withOwnerReferences(ownerReference) //
-                            .withName(run.getMetadata().getName()) //
-                            // .withLabels(labels) //
-                            .endMetadata() //
-                            .withSpec(pipelineRunSpecBuilder.build()) //
-                            .build();
+                            setStatus(pipelineRun, Status.Failed, e.getMessage());
+                            return UpdateControl.updateStatusSubResource(pipelineRun);
+                        }
 
-                    tektonClient.v1beta1().pipelineRuns().inNamespace(run.getMetadata().getNamespace())
-                            .create(pipelineRun);
+                        setStatus(pipelineRun, Status.Running, "Pipeline is running");
+                        cloudEventPublisher.publish(CloudEventType.PIPELINE_START, ceDataBuilder.build().toString());
+                        return UpdateControl.updateStatusSubResource(pipelineRun);
+                    default:
+                        break;
+                }
+            } catch (Exception ex) {
+                LOG.error("An error occurred while handling PipelineRun object '{}' modification",
+                        pipelineRun.getNamespacedName(), ex);
 
-                    // Set build status to "Running"
-                    setStatus(run, Status.Running, "Pipeline triggered");
-                    return UpdateControl.updateStatusSubResource(run);
-                default:
-                    break;
+                // Set build status to "Failed"
+                setStatus(pipelineRun, Status.Failed, ex.getMessage());
+
+                return UpdateControl.updateStatusSubResource(pipelineRun);
             }
-        } catch (Exception ex) {
-            LOG.error("An error occurred while handling PipelineRun object '{}' modification",
-                    run.getNamespacedName(), ex);
+        }
 
-            // Set build status to "Failed"
-            setStatus(run, Status.Failed, ex.getMessage());
+        Optional<PipelineRunEvent> pipelineRunEvent = context.getEvents().getLatestOfType(PipelineRunEvent.class);
 
-            return UpdateControl.updateStatusSubResource(run);
+        if (pipelineRunEvent.isPresent()) {
+            // return handlePipelineRunEvent(componentBuild, pipelineRunEvent.get());
         }
 
         return UpdateControl.noUpdate();

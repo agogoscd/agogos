@@ -64,9 +64,9 @@ spec:
                     - Failed
                     - Aborted
                   type: string
-                componentSpec:
-                  type: object
-                  x-kubernetes-preserve-unknown-fields: true
+                # componentSpec:
+                #   type: object
+                #   x-kubernetes-preserve-unknown-fields: true
               type: object
           type: object
       served: true
@@ -78,7 +78,7 @@ spec:
           jsonPath: .status.status
           type: string
         - name: Component
-          jsonPath: .metadata.labels.cpaas\.redhat\.com/component
+          jsonPath: .metadata.labels.agogos\.redhat\.com/component
           type: string
         - name: Age
           type: date

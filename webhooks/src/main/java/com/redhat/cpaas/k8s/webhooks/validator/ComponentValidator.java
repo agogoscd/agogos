@@ -2,13 +2,13 @@ package com.redhat.cpaas.k8s.webhooks.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redhat.agogos.v1alpha1.AbstractStage.Phase;
+import com.redhat.agogos.v1alpha1.StageResource;
 import com.redhat.cpaas.errors.ApplicationException;
 import com.redhat.cpaas.errors.MissingResourceException;
 import com.redhat.cpaas.errors.ValidationException;
 import com.redhat.cpaas.k8s.client.StageResourceClient;
-import com.redhat.cpaas.v1alpha1.AbstractStage.Phase;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
-import com.redhat.cpaas.v1alpha1.StageResource;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
 import java.util.List;

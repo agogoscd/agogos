@@ -1,0 +1,27 @@
+= Development Environment
+
+include::common:partial$draft.adoc[]
+
+This document describes the development workflow.
+
+== Requirements
+
+Agogos can be developed in environments that provide following basic requirements:
+
+* Kubernetes 1.19+
+* Tekton Pipelines 0.22+
+* Tekton Triggers 0.12+
+* Knative Eventing 0.21+
+* JDK 11
+
+== Setting up Local Environment
+
+We provide instructions for xref:environment/local.adoc[local development using Minikube].
+
+== Running Agogos
+
+See xref:running.adoc[dedicated page].
+
+== Testing
+
+See xref:testing/index.adoc[dedicated page].

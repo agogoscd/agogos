@@ -1,8 +1,13 @@
-* xref:index.adoc[]
+* Development
 ** xref:contributing.adoc[]
-** xref:documentation.adoc[]
-** xref:minikube.adoc[]
-** xref:testing.adoc[]
+
+** xref:environment/index.adoc[]
+*** xref:environment/local.adoc[]
+*** xref:environment/setup.adoc[]
+
+** xref:running.adoc[]
+
+** xref:testing/index.adoc[]
 
 ** xref:stage/index.adoc[]
 *** xref:stage/builder_tutorial.adoc[]
