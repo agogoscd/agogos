@@ -50,6 +50,9 @@ spec:
                       name:
                         type: string
                         description: Name of the stage to run
+                      runAfter:
+                        type: array
+                        description: A list of stages that must finish BEFORE this stage runs
                       config:
                         type: object
                         description: "Additional configuration properties passed to the stage implementation"

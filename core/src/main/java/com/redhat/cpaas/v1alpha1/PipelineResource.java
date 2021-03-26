@@ -45,6 +45,10 @@ public class PipelineResource extends CustomResource<PipelineSpec, Void> impleme
 
             @Getter
             @Setter
+            private List<String> runAfter;
+
+            @Getter
+            @Setter
             private Map<Object, Object> config = new HashMap<>();
         }
 
