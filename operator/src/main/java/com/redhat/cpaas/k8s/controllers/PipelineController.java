@@ -44,6 +44,7 @@ public class PipelineController implements ResourceController<PipelineResource> 
 
     @Override
     public DeleteControl deleteResource(PipelineResource resource, Context<PipelineResource> context) {
+        LOG.info("Pipeline '{}' deleted", resource.getNamespacedName());
         return DeleteControl.DEFAULT_DELETE;
     }
 
@@ -77,9 +78,10 @@ public class PipelineController implements ResourceController<PipelineResource> 
 
             // Convert Component metadata to JSON
             try {
+                LOG.debug("Converting stage '{}' to JSON", stageRef.getName());
                 stageConfig = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(stageRef.getConfig());
             } catch (JsonProcessingException e) {
-
+                LOG.debug("Unable to convert stage '{}' to JSON", stageRef.getName());
                 return UpdateControl.noUpdate();
             }
 
@@ -100,6 +102,11 @@ public class PipelineController implements ResourceController<PipelineResource> 
                     .endParam() //
                     .withWorkspaces(stageWsBinding, pipelineWsBinding) //
                     .build();
+
+            // set additional task property
+            if (stageRef.getRunAfter() != null) {
+                task.setRunAfter(stageRef.getRunAfter());
+            }
 
             tasks.add(task);
         }
