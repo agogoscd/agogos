@@ -7,7 +7,7 @@ import com.redhat.cpaas.eventing.CloudEventPublisher;
 import com.redhat.cpaas.eventing.CloudEventType;
 import com.redhat.cpaas.k8s.TektonPipelineHelper;
 import com.redhat.cpaas.k8s.client.PipelineClient;
-import com.redhat.cpaas.k8s.event.PipelinePipelineRunEventSource;
+import com.redhat.cpaas.k8s.event.PipelineEventSource;
 import com.redhat.cpaas.k8s.event.PipelineRunEvent;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
 import com.redhat.cpaas.v1alpha1.PipelineResource;
@@ -47,7 +47,7 @@ public class PipelineRunController implements ResourceController<PipelineRunReso
     CloudEventPublisher cloudEventPublisher;
 
     @Inject
-    PipelinePipelineRunEventSource pipelineRunEventSource;
+    PipelineEventSource pipelineRunEventSource;
 
     @Inject
     ObjectMapper objectMapper;

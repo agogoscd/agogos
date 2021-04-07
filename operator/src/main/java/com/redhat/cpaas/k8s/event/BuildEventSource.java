@@ -1,6 +1,6 @@
 package com.redhat.cpaas.k8s.event;
 
-import com.redhat.cpaas.k8s.ResourceLabels;
+import com.redhat.cpaas.k8s.Resource;
 import com.redhat.cpaas.k8s.client.ComponentBuildResourceClient;
 import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -14,7 +14,7 @@ import lombok.ToString;
 
 @ApplicationScoped
 @ToString
-public class BuildPipelineRunEventSource extends PipelineRunEventSource<ComponentBuildResource> {
+public class BuildEventSource extends PipelineRunEventSource<ComponentBuildResource> {
     @Inject
     ComponentBuildResourceClient componentBuildClient;
 
@@ -25,11 +25,11 @@ public class BuildPipelineRunEventSource extends PipelineRunEventSource<Componen
 
         Map<String, String> labels = pipelineRun.getMetadata().getLabels();
 
-        String component = labels.get(ResourceLabels.COMPONENT.getValue());
+        String component = labels.get(Resource.COMPONENT.getLabel());
 
         if (component == null) {
             LOG.warn("Tekton PipelineRun '{}' for Component resource has no '{}' label specified, ignoring",
-                    pipelineRunName, ResourceLabels.COMPONENT.getValue());
+                    pipelineRunName, Resource.COMPONENT.getLabel());
             return null;
         }
 
@@ -38,7 +38,7 @@ public class BuildPipelineRunEventSource extends PipelineRunEventSource<Componen
         ComponentBuildResource build = new ComponentBuildResource();
 
         Map<String, String> buildLabels = new HashMap<>();
-        buildLabels.put(ResourceLabels.PIPELINE_RUN.getValue(), pipelineRun.getMetadata().getName());
+        buildLabels.put(Resource.PIPELINE_RUN.getLabel(), pipelineRun.getMetadata().getName());
 
         build.getMetadata().setGenerateName(component + "-");
         build.getMetadata().setLabels(buildLabels);

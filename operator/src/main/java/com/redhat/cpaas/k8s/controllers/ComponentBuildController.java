@@ -6,10 +6,10 @@ import com.redhat.cpaas.errors.ApplicationException;
 import com.redhat.cpaas.errors.MissingResourceException;
 import com.redhat.cpaas.eventing.CloudEventPublisher;
 import com.redhat.cpaas.eventing.CloudEventType;
-import com.redhat.cpaas.k8s.ResourceLabels;
+import com.redhat.cpaas.k8s.Resource;
 import com.redhat.cpaas.k8s.TektonPipelineHelper;
 import com.redhat.cpaas.k8s.client.ComponentResourceClient;
-import com.redhat.cpaas.k8s.event.BuildPipelineRunEventSource;
+import com.redhat.cpaas.k8s.event.BuildEventSource;
 import com.redhat.cpaas.k8s.event.PipelineRunEvent;
 import com.redhat.cpaas.v1alpha1.ComponentBuildResource;
 import com.redhat.cpaas.v1alpha1.ComponentBuildResource.BuildStatus;
@@ -49,7 +49,7 @@ public class ComponentBuildController implements ResourceController<ComponentBui
     TektonPipelineHelper pipelineHelper;
 
     @Inject
-    BuildPipelineRunEventSource pipelineRunEventSource;
+    BuildEventSource pipelineRunEventSource;
 
     @Inject
     TektonClient tektonClient;
@@ -117,11 +117,11 @@ public class ComponentBuildController implements ResourceController<ComponentBui
                             labels = new HashMap<>();
                         }
 
-                        if (!labels.containsKey(ResourceLabels.PIPELINE_RUN.getValue())) {
+                        if (!labels.containsKey(Resource.PIPELINE_RUN.getLabel())) {
                             // Run pipeline
                             PipelineRun pipelineRun = runBuildPipeline(componentBuild);
 
-                            labels.put(ResourceLabels.PIPELINE_RUN.getValue(), pipelineRun.getMetadata().getName());
+                            labels.put(Resource.PIPELINE_RUN.getLabel(), pipelineRun.getMetadata().getName());
 
                             componentBuild.getMetadata().setLabels(labels);
 
@@ -239,7 +239,7 @@ public class ComponentBuildController implements ResourceController<ComponentBui
         // We always set labels, so this is safe
         Map<String, String> labels = pipelineRun.getMetadata().getLabels();
 
-        labels.put(ResourceLabels.COMPONENT.getValue(), component.getMetadata().getName());
+        labels.put(Resource.COMPONENT.getLabel(), component.getMetadata().getName());
 
         pipelineRun.getMetadata().setLabels(labels);
 

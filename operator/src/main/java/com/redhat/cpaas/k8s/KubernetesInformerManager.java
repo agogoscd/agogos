@@ -13,7 +13,6 @@ import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
@@ -24,35 +23,29 @@ public class KubernetesInformerManager {
     KubernetesClient kubernetesClient;
 
     @Inject
-    PipelineRunEventHandler pipelineRunEventHandler;
+    PipelineRunEventHandler eventHandler;
 
-    SharedInformerFactory sharedInformerFactory;
+    SharedInformerFactory factory;
 
     private final long resyncPeriod = 60 * 1000L;
 
-    @PostConstruct
-    void init() {
-        sharedInformerFactory = kubernetesClient.informers();
-    }
-
     void onStart(@Observes StartupEvent ev) {
-        Map<String, String[]> labels = new HashMap<>();
+        factory = kubernetesClient.informers();
 
-        labels.put(ResourceLabels.RESOURCE.getValue(),
+        Map<String, String[]> labels = new HashMap<>(1);
+        labels.put(Resource.RESOURCE.getLabel(),
                 new String[] { HasMetadata.getKind(ComponentResource.class).toLowerCase(),
                         HasMetadata.getKind(PipelineResource.class).toLowerCase() });
 
-        System.out.println(labels);
-
-        SharedIndexInformer<PipelineRun> informer = sharedInformerFactory.sharedIndexInformerFor(PipelineRun.class,
+        SharedIndexInformer<PipelineRun> informer = factory.sharedIndexInformerFor(PipelineRun.class,
                 new OperationContext().withLabelsIn(labels), resyncPeriod);
 
-        informer.addEventHandler(pipelineRunEventHandler);
+        informer.addEventHandler(eventHandler);
 
-        sharedInformerFactory.startAllRegisteredInformers();
+        factory.startAllRegisteredInformers();
     }
 
     void onStop(@Observes ShutdownEvent ev) {
-        sharedInformerFactory.stopAllRegisteredInformers();
+        factory.stopAllRegisteredInformers();
     }
 }

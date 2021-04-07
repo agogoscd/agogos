@@ -3,7 +3,7 @@ package com.redhat.cpaas.k8s.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.cpaas.errors.ApplicationException;
-import com.redhat.cpaas.k8s.ResourceLabels;
+import com.redhat.cpaas.k8s.Resource;
 import com.redhat.cpaas.k8s.client.PipelineClient;
 import com.redhat.cpaas.v1alpha1.ComponentResource;
 import com.redhat.cpaas.v1alpha1.ComponentResource.ComponentStatus;
@@ -335,7 +335,7 @@ public class ComponentController implements ResourceController<ComponentResource
 
         // Add any useful/required labels
         Map<String, String> labels = new HashMap<>();
-        labels.put(ResourceLabels.COMPONENT.getValue(), component.getMetadata().getName());
+        labels.put(Resource.COMPONENT.getLabel(), component.getMetadata().getName());
 
         // Make sure the Pipeline is owned by the Component
         OwnerReference ownerReference = new OwnerReferenceBuilder() //

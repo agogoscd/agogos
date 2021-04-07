@@ -106,7 +106,7 @@ public class TektonPipelineHelper {
                 .build();
 
         Map<String, String> labels = new HashMap<>();
-        labels.put(ResourceLabels.RESOURCE.getValue(), kind.toLowerCase());
+        labels.put(Resource.RESOURCE.getLabel(), kind.toLowerCase());
 
         PipelineRun pipelineRun = new PipelineRunBuilder() //
                 .withNewMetadata() //

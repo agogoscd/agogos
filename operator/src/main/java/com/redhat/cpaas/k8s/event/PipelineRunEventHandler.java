@@ -1,47 +1,51 @@
 package com.redhat.cpaas.k8s.event;
 
-import com.redhat.cpaas.errors.ApplicationException;
-import com.redhat.cpaas.k8s.ResourceLabels;
+import com.redhat.cpaas.k8s.Resource;
 import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
+import io.quarkus.runtime.StartupEvent;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class PipelineRunEventHandler implements ResourceEventHandler<PipelineRun> {
+
     protected static final Logger LOG = LoggerFactory.getLogger(PipelineRunEventHandler.class);
 
     @Inject
-    BuildPipelineRunEventSource buildPipelineRunEventSource;
+    BuildEventSource buildEventSource;
 
     @Inject
-    PipelinePipelineRunEventSource pipelinePipelineRunEventSource;
+    PipelineEventSource pipelineEventSource;
 
-    @SuppressWarnings("rawtypes")
-    private PipelineRunEventSource getEventSource(PipelineRun pipelineRun) {
+    void onStart(@Observes StartupEvent ev) {
+    }
 
-        String resource = pipelineRun.getMetadata().getLabels().get(ResourceLabels.RESOURCE.getValue());
+    private void handleEvent(PipelineRun pipelineRun, boolean isNew) {
+        String type = pipelineRun.getMetadata().getLabels().get(Resource.RESOURCE.getLabel());
 
-        switch (resource) {
-            case "component":
-                return buildPipelineRunEventSource;
-            case "pipeline":
-                return pipelinePipelineRunEventSource;
+        switch (Resource.fromType(type)) {
+            case COMPONENT:
+                buildEventSource.handleEvent(pipelineRun, isNew);
+                break;
+            case PIPELINE:
+                pipelineEventSource.handleEvent(pipelineRun, isNew);
             default:
-                throw new ApplicationException("Unsupported resource type: '{}'", resource);
+                break;
         }
     }
 
     @Override
     public void onAdd(PipelineRun pipelineRun) {
-        getEventSource(pipelineRun).handleEvent(pipelineRun, true);
+        handleEvent(pipelineRun, true);
     }
 
     @Override
     public void onUpdate(PipelineRun oldPipelineRun, PipelineRun pipelineRun) {
-        getEventSource(pipelineRun).handleEvent(pipelineRun, false);
+        handleEvent(pipelineRun, false);
     }
 
     @Override

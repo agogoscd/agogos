@@ -1,13 +1,12 @@
 package com.redhat.cpaas.k8s.event;
 
-import com.redhat.cpaas.k8s.ResourceLabels;
+import com.redhat.cpaas.k8s.Resource;
 import io.fabric8.kubernetes.api.builder.Visitor;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.ObjectMetaBuilder;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.kubernetes.client.KubernetesClientException;
-import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
 import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.javaoperatorsdk.operator.processing.event.AbstractEventSource;
@@ -17,12 +16,15 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class PipelineRunEventSource<T extends HasMetadata> extends AbstractEventSource
-        implements ResourceEventHandler<PipelineRun> {
+public abstract class PipelineRunEventSource<T extends HasMetadata> extends AbstractEventSource {
     protected static final Logger LOG = LoggerFactory.getLogger(PipelineRunEventSource.class);
 
     @Inject
     protected TektonClient tektonClient;
+
+    protected abstract T createResource(PipelineRun pipelineRun);
+
+    protected abstract boolean isOwner(OwnerReference ownerReference);
 
     /**
      * <p>
@@ -54,8 +56,6 @@ public abstract class PipelineRunEventSource<T extends HasMetadata> extends Abst
         return null;
     }
 
-    protected abstract T createResource(PipelineRun pipelineRun);
-
     private boolean isEventValid(PipelineRun pipelineRun) {
         String pipelineRunName = String.format("%s/%s", pipelineRun.getMetadata().getNamespace(),
                 pipelineRun.getMetadata().getName());
@@ -67,18 +67,16 @@ public abstract class PipelineRunEventSource<T extends HasMetadata> extends Abst
             return false;
         }
 
-        String resource = labels.get(ResourceLabels.RESOURCE.getValue());
+        String resource = labels.get(Resource.RESOURCE.getLabel());
 
         if (resource == null) {
             LOG.warn("Tekton PipelineRun '{}' label '{}' is not set, ignoring", pipelineRunName,
-                    ResourceLabels.RESOURCE.getValue());
+                    Resource.RESOURCE.getLabel());
             return false;
         }
 
         return true;
     }
-
-    protected abstract boolean isOwner(OwnerReference ownerReference);
 
     public void handleEvent(PipelineRun pipelineRun, boolean isNew) {
         if (!isEventValid(pipelineRun)) {
@@ -153,21 +151,6 @@ public abstract class PipelineRunEventSource<T extends HasMetadata> extends Abst
             LOG.error("Could not set {} '{}' as the owner of Tekton PipelineRun '{}'", owner.getKind(), ownerName,
                     pipelineRunName, e);
         }
-    }
-
-    @Override
-    public void onAdd(PipelineRun pipelineRun) {
-        handleEvent(pipelineRun, true);
-    }
-
-    @Override
-    public void onUpdate(PipelineRun oldPipelineRun, PipelineRun pipelineRun) {
-        handleEvent(pipelineRun, false);
-    }
-
-    @Override
-    public void onDelete(PipelineRun pipelineRun, boolean deletedFinalStateUnknown) {
-
     }
 
 }

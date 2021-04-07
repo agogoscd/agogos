@@ -11,7 +11,7 @@ import com.redhat.agogos.v1alpha1.triggers.Trigger;
 import com.redhat.agogos.v1alpha1.triggers.TriggerTarget;
 import com.redhat.cpaas.cron.TriggerEventScheduler;
 import com.redhat.cpaas.errors.ApplicationException;
-import com.redhat.cpaas.k8s.ResourceLabels;
+import com.redhat.cpaas.k8s.Resource;
 import com.redhat.cpaas.k8s.TektonPipelineHelper;
 import com.redhat.cpaas.k8s.client.ComponentResourceClient;
 import com.redhat.cpaas.k8s.client.PipelineClient;
@@ -113,7 +113,7 @@ public class TriggerController implements ResourceController<Trigger> {
                     labels = new HashMap<>();
                 }
 
-                labels.put(ResourceLabels.COMPONENT.getValue(), component.getMetadata().getName());
+                labels.put(Resource.COMPONENT.getLabel(), component.getMetadata().getName());
 
                 pipelineRun.getMetadata().setLabels(labels);
                 break;
@@ -135,7 +135,7 @@ public class TriggerController implements ResourceController<Trigger> {
                 throw new ApplicationException("Unsupported Trigger target resource type: '{}'", target.getKind());
         }
 
-        pipelineRun.getMetadata().getLabels().putIfAbsent(ResourceLabels.RESOURCE.getValue(), target.getKind().toLowerCase());
+        pipelineRun.getMetadata().getLabels().putIfAbsent(Resource.RESOURCE.getLabel(), target.getKind().toLowerCase());
 
         TriggerSpecBuilder triggerSpecBuilder = new TriggerSpecBuilder() //
                 .withNewTemplate() //
