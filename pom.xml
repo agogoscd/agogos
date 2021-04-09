@@ -35,18 +35,10 @@
         <cloudevents.version>2.0.0</cloudevents.version>
         <openapi-schema-validator.version>1.0.5</openapi-schema-validator.version>
         <lombok.version>1.18.16</lombok.version>
-        <quarkus-tekton-client.version>0.4.0-SNAPSHOT</quarkus-tekton-client.version>
+        <quarkus-tekton-client.version>0.4.0</quarkus-tekton-client.version>
         <quarkus-operatorsdk.version>1.8.0</quarkus-operatorsdk.version>
         <kubernetes-client.version>5.3.0</kubernetes-client.version>
     </properties>
-
-    <!-- TODO: Remove this! This is temporary unless a new version of Farbric8 kubernetes client will be released (>5.2.1) -->
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
 
     <dependencyManagement>
         <dependencies>

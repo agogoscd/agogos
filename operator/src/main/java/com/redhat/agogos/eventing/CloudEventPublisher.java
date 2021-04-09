@@ -68,28 +68,6 @@ public class CloudEventPublisher {
         publish(type, data);
     }
 
-    // public void publish(String type, Map<String, ? extends HasMetadata> data) {
-    // JsonObjectBuilder dataBuilder = Json.createObjectBuilder();
-
-    // data.forEach((key, o) -> {
-    // try {
-    // dataBuilder.add(key,
-    // Json.createReader(new
-    // StringReader(objectMapper.writeValueAsString(o))).readValue());
-    // } catch (JsonProcessingException e) {
-    // throw new ApplicationException("Error while preparing CloudEvent data for
-    // '{}' key and '{}' object",
-    // key, o, e);
-    // }
-    // });
-
-    // publish(type, dataBuilder.build().toString());
-    // }
-
-    // public void publish(CloudEventData data) {
-    // publish(data.getType(), data.getData());
-    // }
-
     public void publish(String type, String data) {
         if (!publish.orElse(true)) {
             LOG.debug(
@@ -112,13 +90,4 @@ public class CloudEventPublisher {
 
         broker.sendEvent(cloudEvent);
     }
-
-    // public void publish(CloudEventType type, String data) {
-    // publish(type.getValue(), data);
-    // }
-
-    // public void publish(CloudEventType type, Map<String, ? extends HasMetadata>
-    // data) {
-    // publish(type.getValue(), data);
-    // }
 }
