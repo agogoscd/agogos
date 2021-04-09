@@ -1,9 +1,12 @@
 package com.redhat.agogos.v1alpha1.triggers;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.redhat.cpaas.errors.ApplicationException;
-import com.redhat.cpaas.k8s.client.ComponentGroupResourceClient;
-import com.redhat.cpaas.v1alpha1.ComponentGroupResource;
+import com.redhat.agogos.CloudEventHelper;
+import com.redhat.agogos.PipelineRunState;
+import com.redhat.agogos.errors.ApplicationException;
+import com.redhat.agogos.k8s.client.GroupClient;
+import com.redhat.agogos.v1alpha1.Build;
+import com.redhat.agogos.v1alpha1.GroupResource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -22,17 +25,15 @@ public class GroupTriggerEvent implements TriggerEvent {
     private static final long serialVersionUID = -2379042700549506262L;
 
     private String name;
-    private String type = "com.redhat.agogos.event.componentbuild.success.v1alpha1";
 
     @Override
     public List<String> toCel(Trigger trigger) {
         // Obtain component group client so we can get information about
         // the referenced Group
-        ComponentGroupResourceClient componentGroupClient = CDI.current().select(ComponentGroupResourceClient.class)
-                .get();
+        GroupClient groupClient = CDI.current().select(GroupClient.class).get();
 
         // Fetch the Group information
-        ComponentGroupResource componentGroup = componentGroupClient.getByName(name);
+        GroupResource componentGroup = groupClient.getByName(name);
 
         // TODO: This should be part of the validation webhook
         // But it doesn't hurt to have it here as well
@@ -52,7 +53,8 @@ public class GroupTriggerEvent implements TriggerEvent {
         }
 
         return Arrays.asList( //
-                String.format("header.match('ce-type', '%s')", type), //
+                String.format("header.match('ce-type', '%s')",
+                        CloudEventHelper.type(Build.class, PipelineRunState.SUCCEEDED)), //
                 builder.toString()//
         );
     }

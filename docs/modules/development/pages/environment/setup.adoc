@@ -58,14 +58,17 @@ grant access to it by preparing a pull secret.
 secret/agogos-pull-secret created
 ----
 
-=== Service Account
+=== Service Accounts
 
-An `agogos` Service Account is required to ensure propagating
+The `agogos` Service Account is required to ensure propagating
 correct permissions for services run by Agogos.
 
 Service Account is used to provide xref:#pull-secret[image pull secrets]
 for secured registries and images that are not
 freely accessible.
+
+The `agogos-el` Service Account is used by Tekton Event Listener
+so that it could create appropriate resources in the cluster.
 
 [source,yaml]
 .sa.yaml
@@ -74,10 +77,27 @@ include::example$operator/sa.yaml[]
 ----
 
 [source,bash]
-.Service Account creation
+.Service Accounts creation
 ----
 ❯ kubectl apply -f ./docs/modules/development/examples/operator/sa.yaml
 serviceaccount/agogos created
+serviceaccount/agogos-el created
+----
+
+=== RBAC
+
+[source,yaml]
+.sa.yaml
+----
+include::example$operator/el-rbac.yaml[]
+----
+
+[source,bash]
+.RBAC configuration
+----
+❯ kubectl apply -f ./docs/modules/development/examples/operator/el-rbac.yaml
+role.rbac.authorization.k8s.io/agogos-el created
+rolebinding.rbac.authorization.k8s.io/agogos-el created
 ----
 
 === Knative Eventing Broker
@@ -89,10 +109,45 @@ include::example$operator/broker.yaml[]
 ----
 
 [source,bash]
-.Service Account creation
+.Broker creation
 ----
 ❯ kubectl apply -f ./docs/modules/development/examples/operator/broker.yaml
 broker.eventing.knative.dev/default created
+----
+
+=== Tekton Event Listener
+
+To make it possible to react on CloudEvents it is necessary to create
+an Event Listener.
+
+[source,yaml]
+.el.yaml
+----
+include::example$operator/el.yaml[]
+----
+
+[source,bash]
+.Tekton Event Listener creation
+----
+❯ kubectl apply -f ./docs/modules/development/examples/operator/el.yaml
+eventlistener.triggers.tekton.dev/default created
+----
+
+=== Knative Eventing Trigger
+
+Trigger is responsible for binding Tekton Event Listener and the Broker instances.
+
+[source,yaml]
+.broker.yaml
+----
+include::example$operator/trigger.yaml[]
+----
+
+[source,bash]
+.Trigger creation
+----
+❯ kubectl apply -f ./docs/modules/development/examples/operator/trigger.yaml
+trigger.eventing.knative.dev/default created
 ----
 
 === Platform Stages Registration

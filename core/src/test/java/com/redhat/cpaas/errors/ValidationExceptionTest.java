@@ -3,6 +3,7 @@ package com.redhat.cpaas.errors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+import com.redhat.agogos.errors.ValidationException;
 import org.junit.jupiter.api.Test;
 
 class ValidationExceptionTest {

@@ -74,22 +74,20 @@
             <artifactId>agogos-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- TODO: Change this! This is temporary unless a new version of Farbric8 kubernetes client will be released (>5.2.1) -->
         <dependency>
-            <groupId>com.github.fabric8io.kubernetes-client</groupId>
+            <groupId>io.fabric8</groupId>
             <artifactId>tekton-model-triggers</artifactId>
-            <version>24d34f0e18</version>
+            <version>${kubernetes-client.version}</version>
         </dependency>
-        <!-- TODO: Change this! This is temporary unless a new version of Farbric8 kubernetes client will be released (>5.2.1) -->
         <dependency>
-            <groupId>com.github.fabric8io.kubernetes-client</groupId>
+            <groupId>io.fabric8</groupId>
             <artifactId>tekton-client</artifactId>
-            <version>24d34f0e18</version>
+            <version>${kubernetes-client.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.fabric8io.kubernetes-client</groupId>
+            <groupId>io.fabric8</groupId>
             <artifactId>knative-client</artifactId>
-            <version>24d34f0e18</version>
+            <version>${kubernetes-client.version}</version>
         </dependency>
         <dependency>
             <groupId>io.quarkiverse.tektonclient</groupId>

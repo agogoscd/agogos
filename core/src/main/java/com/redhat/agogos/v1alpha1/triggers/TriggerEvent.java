@@ -16,8 +16,7 @@ import java.util.List;
         @JsonSubTypes.Type(CelTriggerEvent.class), //
         @JsonSubTypes.Type(GroupTriggerEvent.class), //
         @JsonSubTypes.Type(PipelineTriggerEvent.class), //
-        @JsonSubTypes.Type(ComponentTriggerEvent.class), //
-        @JsonSubTypes.Type(TimedTriggerEvent.class) //
+        @JsonSubTypes.Type(ComponentTriggerEvent.class) //
 })
 @JsonDeserialize(using = JsonDeserializer.None.class)
 public interface TriggerEvent extends KubernetesResource {

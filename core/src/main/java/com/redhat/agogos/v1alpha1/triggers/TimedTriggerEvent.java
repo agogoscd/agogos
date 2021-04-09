@@ -17,13 +17,9 @@ public class TimedTriggerEvent implements TriggerEvent {
     private static final long serialVersionUID = -8379042711549506262L;
 
     private String cron;
-    private String type = "com.redhat.agogos.event.trigger.v1alpha1";
 
     @Override
     public List<String> toCel(Trigger trigger) {
-        return Arrays.asList( //
-                String.format("header.match('ce-type', '%s')", type), //
-                String.format("body.name == '%s'", trigger.getNamespacedName()) //
-        );
+        return Arrays.asList();
     }
 }

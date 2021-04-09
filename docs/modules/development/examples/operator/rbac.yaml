@@ -7,7 +7,7 @@ metadata:
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
 rules:
-  - apiGroups: ["cpaas.redhat.com"]
+  - apiGroups: ["agogos.redhat.com"]
     resources: ["*"]
     verbs:
       [
@@ -60,6 +60,6 @@ subjects:
 #     rbac.authorization.k8s.io/aggregate-to-view: "true"
 #     rbac.authorization.k8s.io/aggregate-to-cluster-reader: "true"
 # rules:
-#   - apiGroups: ["cpaas.redhat.com"]
+#   - apiGroups: ["agogos.redhat.com"]
 #     resources: ["*"]
 #     verbs: ["get", "list", "watch"]

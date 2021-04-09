@@ -1,0 +1,28 @@
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Stage
+metadata:
+  name: dummy
+  labels:
+    "agogos.redhat.com/phase": test # TODO: Move to Builder
+spec:
+  task: agogos-stage-dummy
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: agogos-stage-dummy
+spec:
+  workspaces:
+    - name: "pipeline"
+    - name: "stage"
+  params:
+    - name: "image"
+      type: "string"
+      default: "quay.io/cpaas/agogos-poc-stage-dummy:latest"
+    - name: "config"
+      type: "string"
+  steps:
+    - name: "execute"
+      image: "$(params.image)"
+      command: ["/bin/python3"]
+      args: ["/run.py", "$(workspaces.stage.path)"]

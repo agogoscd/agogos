@@ -84,7 +84,7 @@ Minimal template:
 
 [source,yaml]
 ----
-apiVersion: cpaas.redhat.com/v1alpha1
+apiVersion: agogos.redhat.com/v1alpha1
 kind: Builder
 metadata:
   name: "[BUILDER_NAME]"

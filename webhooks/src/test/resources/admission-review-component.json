@@ -4,22 +4,22 @@
   "request": {
     "uid": "bc1c421c-412c-40ae-86e3-52bc51b961a4",
     "kind": {
-      "group": "cpaas.redhat.com",
+      "group": "agogos.redhat.com",
       "version": "v1alpha1",
       "kind": "Component"
     },
     "resource": {
-      "group": "cpaas.redhat.com",
+      "group": "agogos.redhat.com",
       "version": "v1alpha1",
       "resource": "components"
     },
     "requestKind": {
-      "group": "cpaas.redhat.com",
+      "group": "agogos.redhat.com",
       "version": "v1alpha1",
       "kind": "Component"
     },
     "requestResource": {
-      "group": "cpaas.redhat.com",
+      "group": "agogos.redhat.com",
       "version": "v1alpha1",
       "resource": "components"
     },
@@ -31,7 +31,7 @@
       "groups": ["system:masters", "system:authenticated"]
     },
     "object": {
-      "apiVersion": "cpaas.redhat.com/v1alpha1",
+      "apiVersion": "agogos.redhat.com/v1alpha1",
       "kind": "Component",
       "metadata": {
         "name": "component-name",
@@ -45,7 +45,7 @@
       }
     },
     "oldObject": {
-      "apiVersion": "cpaas.redhat.com/v1alpha1",
+      "apiVersion": "agogos.redhat.com/v1alpha1",
       "kind": "Component",
       "metadata": {
         "name": "component-name",

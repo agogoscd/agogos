@@ -1,0 +1,37 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: agogos-el
+rules:
+  # EventListeners need to be able to fetch any clustertriggerbindings
+  - apiGroups: ["triggers.tekton.dev"]
+    resources: ["clustertriggerbindings"]
+    verbs: ["get", "list", "watch"]
+  # EventListeners need to be able to fetch all namespaced resources
+  - apiGroups: ["triggers.tekton.dev"]
+    resources:
+      ["eventlisteners", "triggerbindings", "triggertemplates", "triggers"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+    # Permissions to create resources in associated TriggerTemplates
+  - apiGroups: ["tekton.dev"]
+    resources: ["pipelineruns"]
+    verbs: ["create"]
+  - apiGroups: [""]
+    resources: ["serviceaccounts"]
+    verbs: ["impersonate"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: agogos-el
+subjects:
+  - kind: ServiceAccount
+    name: agogos-el
+    namespace: default # TODO: change this
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: agogos-el

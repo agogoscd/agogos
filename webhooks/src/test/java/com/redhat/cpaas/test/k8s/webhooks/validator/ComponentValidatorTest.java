@@ -1,10 +1,10 @@
 package com.redhat.cpaas.test.k8s.webhooks.validator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redhat.agogos.k8s.client.StageClient;
+import com.redhat.agogos.k8s.webhooks.WebhookHandler;
 import com.redhat.agogos.v1alpha1.AbstractStage.Phase;
-import com.redhat.agogos.v1alpha1.StageResource;
-import com.redhat.cpaas.k8s.client.StageResourceClient;
-import com.redhat.cpaas.k8s.webhooks.WebhookHandler;
+import com.redhat.agogos.v1alpha1.Stage;
 import com.redhat.cpaas.test.TestResources;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
@@ -24,7 +24,7 @@ import org.mockito.Mockito;
 public class ComponentValidatorTest {
 
     @InjectMock
-    StageResourceClient stageResourceClient;
+    StageClient stageClient;
 
     @Inject
     ObjectMapper objectMapper;
@@ -40,7 +40,7 @@ public class ComponentValidatorTest {
     @DisplayName("Validate correct review request")
     public void validateCorrect() throws IOException {
         // Mock the stage validation to return a stage
-        Mockito.when(stageResourceClient.getByName("maven", Phase.BUILD)).thenReturn(new StageResource());
+        Mockito.when(stageClient.getByName("maven", Phase.BUILD)).thenReturn(new Stage());
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
                 .then().statusCode(200).body("response.allowed", CoreMatchers.equalTo(true))
@@ -52,7 +52,7 @@ public class ComponentValidatorTest {
     @DisplayName("Validate review request for a component with non-existing builder")
     public void validateInvalidBuilder() throws IOException {
         // Mock the stage validation to not find a stage
-        Mockito.when(stageResourceClient.getByName("maven", Phase.BUILD)).thenReturn(null);
+        Mockito.when(stageClient.getByName("maven", Phase.BUILD)).thenReturn(null);
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
                 .then().statusCode(200).body("response.allowed", CoreMatchers.equalTo(false))
@@ -62,10 +62,10 @@ public class ComponentValidatorTest {
     @Test
     @DisplayName("Validate valid data passed to builder")
     public void validateCorrectBuilderData() throws IOException {
-        StageResource stage = new StageResource();
+        Stage stage = new Stage();
         stage.getSpec().getSchema().getOpenAPIV3Schema().putAll(TestResources.asMap("openapi-schema-valid.json"));
 
-        Mockito.when(stageResourceClient.getByName("maven", Phase.BUILD)).thenReturn(stage);
+        Mockito.when(stageClient.getByName("maven", Phase.BUILD)).thenReturn(stage);
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
                 .then().statusCode(200).body("response.allowed", CoreMatchers.equalTo(true))
@@ -75,10 +75,10 @@ public class ComponentValidatorTest {
     @Test
     @DisplayName("Validate invalid data passed to builder")
     public void validateIncorrectBuilderData() throws IOException {
-        StageResource stage = new StageResource();
+        Stage stage = new Stage();
         stage.getSpec().getSchema().getOpenAPIV3Schema().putAll(TestResources.asMap("openapi-schema-invalid.json"));
 
-        Mockito.when(stageResourceClient.getByName("maven", Phase.BUILD)).thenReturn(stage);
+        Mockito.when(stageClient.getByName("maven", Phase.BUILD)).thenReturn(stage);
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
                 .then().statusCode(200).body("response.allowed", CoreMatchers.equalTo(false))

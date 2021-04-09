@@ -63,7 +63,7 @@ Example of such JSON file can be found below.
 ----
 {
   "component": {
-    "apiVersion": "cpaas.redhat.com/v1alpha1",
+    "apiVersion": "agogos.redhat.com/v1alpha1",
     "kind": "Component",
     "metadata": {
       "name": "operator-bundle"
@@ -79,7 +79,7 @@ Example of such JSON file can be found below.
     }
   },
   "build": {
-    "apiVersion": "cpaas.redhat.com/v1alpha1",
+    "apiVersion": "agogos.redhat.com/v1alpha1",
     "kind": "ComponentBuild",
     "metadata": {
       "name": "operator-bundle-2cfvx",
