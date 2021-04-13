@@ -7,6 +7,7 @@ content:
     - url: ./
       branches: HEAD
       start_path: docs
+      edit_url: false
 ui:
   bundle:
     url: https://gitlab.cee.redhat.com/agogos/antora-ui/-/jobs/artifacts/main/raw/build/ui-bundle.zip?job=bundle-stable
@@ -15,5 +16,6 @@ ui:
 asciidoc:
   attributes:
     warning-caption: ⚠️ warning
+    kroki-fetch-diagram: true
   extensions:
     - asciidoctor-kroki

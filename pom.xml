@@ -28,14 +28,16 @@
 
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-        <quarkus.platform.version>1.12.0.Final</quarkus.platform.version>
+        <quarkus.platform.version>1.13.1.Final</quarkus.platform.version>
         <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
         <failsafe-plugin.version>3.0.0-M5</failsafe-plugin.version>
-        <operator-framework.version>1.7.2</operator-framework.version>
+        <operator-framework.version>1.8.2</operator-framework.version>
+        <cloudevents.version>2.0.0</cloudevents.version>
         <openapi-schema-validator.version>1.0.5</openapi-schema-validator.version>
         <lombok.version>1.18.16</lombok.version>
-        <quarkus-tekton-client.version>0.3.0</quarkus-tekton-client.version>
-        <kubernetes-client.version>5.1.0</kubernetes-client.version>
+        <quarkus-tekton-client.version>0.4.0</quarkus-tekton-client.version>
+        <quarkus-operatorsdk.version>1.8.0</quarkus-operatorsdk.version>
+        <kubernetes-client.version>5.3.0</kubernetes-client.version>
     </properties>
 
     <dependencyManagement>

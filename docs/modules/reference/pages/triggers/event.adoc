@@ -1,23 +1,43 @@
-= Event Trigger
+= CEL Trigger
 
 include::common:partial$draft.adoc[]
-
-#TODO#
 
 Event triggers use the
 link:https://github.com/google/cel-spec/blob/master/doc/langdef.md[CEL expression expression language]
 to decide whether the trigger should be fired.
 
+The expression is evaluated on a raw CloudEvent object. This means that the body as well as
+headers are available.
+
+[TIP]
+====
+Please refer to xref:reference:events/agogos.adoc[Agogos Events] page that describes
+the structure of events sent by the Agogos platform.
+
+Besides Agogos events there could be other CloudEvents available to filter on.
+Please refer to the documentation for these events in the event source documentation.
+====
+
 The decision whether to fire the trigger or not is happening
-once the expression is evaluated. A trigger is fired only when the expression
+once the expression is evaluated. A Trigger is fired only when the expression
 returns `true`.
 
-.Example of a CloudEvent build trigger
+.Example of a Event build trigger
 [source,yaml]
 ----
-triggers:
-  - event:
-      cel: "body.component.spec.builder == 'maven' && body.component.spec.data.source.url.contains('github.com')"
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Trigger
+metadata:
+  name: cel-to-component
+spec:
+  events:
+    - cel:
+        filter: "header.match('ce-type', 'com.redhat.agogos.event.componentbuild.success.v1alpha1')"
+    - cel:
+        filter: "body.component.spec.builder == 'maven' && body.component.spec.data.source.url.contains('github.com')"
+  target:
+    kind: Component
+    name: c1
 ----
 
 [TIP]
@@ -26,6 +46,7 @@ You can use the `kubectl` command with the `-o json` switch to obtain relevant
 resources to have better understanding how to craft your CEL expression.
 ====
 
-== Event Trigger Evaluator
+== Best Practices
 
-#TODO#
+Always filter on the CloudEvent type. If this will be skipped you may get action performed on
+events that meet the filter expression, but are of type you do not expect.

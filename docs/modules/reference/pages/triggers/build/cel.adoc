@@ -2,7 +2,7 @@
 
 include::common:partial$draft.adoc[]
 
-NOTE: This Trigger is part of xref:reference:triggers/build/index.adoc[Component Build triggers].
+NOTE: This Trigger is part of xref:reference:triggers/build/index.adoc[Build triggers].
 
 The CEL trigger is a variation of the xref:triggers/event.adoc[Event trigger]
 which is evaluated on the payload of the
@@ -11,9 +11,17 @@ xref:events/agogos.adoc#componentbuild-events[successful Component build CloudEv
 .Example of a CEL build trigger
 [source,yaml]
 ----
-triggers:
-  - build:
-      cel: "body.component.spec.builder == 'brew' && body.component.spec.data.type == 'bundle'"
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Trigger
+metadata:
+  name: build-to-component
+spec:
+  events:
+    - build:
+        filter: "body.component.metadata.name == 'cpaas-test-brew-rpm'"
+  target:
+    kind: Pipeline
+    name: p1
 ----
 
 In above example trigger will be fired when the Component uses the `brew` Builder

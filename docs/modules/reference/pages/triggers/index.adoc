@@ -1,36 +1,64 @@
 = Triggers
 
-This guide will help you understand how _Triggers_ work and what are the best
-practices related to _Triggers_.
+This guide will help you understand how Triggers work and what are the best
+practices related to Triggers.
 
 == Introduction
 
-Every _Build_ or _Pipeline_ can be run manually but this is not sufficient for automated systems.
+Every xref:concepts:builds.adoc[Build] or xref:concepts:pipelines.adoc[Pipeline] can be run manually but this is not sufficient for automated systems.
 
-This is where _Triggers_ come into play.
+This is where Triggers come into play.
 
-_Triggers_ are a way to define *when* a particular _Pipeline_ (or _Build_) should be run. A _Trigger_
-is a binding between some event in the system and some action. Examples of actions are:
-running a pipeline to test a build or kicking a build itself.
+Triggers are a way to define *when* a particular Pipeline (or Build) should be run.
 
-There are multiple event types within the system and there are multiple _Trigger_ types
+A Trigger is a binding between some event in the system and some action. Defined action
+is performed only when an event meets the required criteria defined by the Trigger
+making Triggers event filters.
+
+Most common actions are:
+
+* running a pipeline after a build is completed
+* running next pipeline after some pipeline finishes
+
+Triggers are evaluated for every event within the system. This is shown in the
+diagram below.
+
+[graphviz,eventing,svg]
+....
+digraph G {
+rankdir="LR";
+splines="false";
+graph [fontname="helvetica",ranksep=1,nodesep=0.6];
+node [fontname="helvetica",shape="box",style="rounded",fontsize="12"];
+edge [fontname="helvetica",arrowsize="1",penwidth="1",fontsize="10"];
+
+event1 [label="Event",color="#a83232",penwidth="2"];
+event2 [label="Event",color="#328da8",penwidth="2"];
+event3 [label="Event"];
+trigger1 [label="Trigger",color="#328da8",penwidth="2"];
+trigger2 [label="Trigger",color="#a83232",penwidth="2"];
+component [style="",shape="parallelogram",label="Component",color="#328da8",penwidth="2"];
+pipeline [style="",shape="parallelogram",label="Pipeline",color="#a83232",penwidth="2"];
+
+event1 -> trigger1 [style="dashed"];
+event1 -> trigger2 [color="#a83232",penwidth="2"];
+event2 -> trigger1 [color="#328da8",penwidth="2"];
+event2 -> trigger2 [style="dashed"];
+event3 -> trigger1 [style="dashed"];
+event3 -> trigger2 [style="dashed"];
+
+// event1 -> pipeline [style="dashed",color="#dddddd",label="Triggers"];
+// event2 -> component [style="dashed",color="#dddddd",label="Triggers"];
+
+trigger1 -> component [color="#328da8",penwidth="2",label="Build"];
+trigger2 -> pipeline [color="#a83232",penwidth="2",label="Run"];
+}
+....
+
+There are multiple event types within the system and there are multiple Trigger types
 as well to cover these cases.
 
-#TODO#
-
-There are two ways how _Triggers_ can be defined:
-
-. Within the resource that is supposed to be triggered (inline)
-. Using the xref:concepts:triggers.adoc[Trigger resource] (external)
-
-For inline Trigger specification the `triggers` section is used in
-the particular resource definition:
-
-[source,yaml]
-----
-triggers:
-  - # Your triggers here
-----
+Triggers are defined using the xref:concepts:triggers.adoc[Trigger resource].
 
 [#multiple-triggers]
 
@@ -43,12 +71,12 @@ wil be triggered.
 
 WARNING: In case of misconfiguration -- resource can be triggered *multiple times* because of the same event.
 
-== Supported Resources
+== Supported Target Resources
 
-Resource types that support _Triggers_ are:
+Resource that can be defined as Trigger targets:
 
-* xref:concepts:components.adoc[_Component_]
-* xref:concepts:pipelines.adoc[_Pipeline_]
+* xref:concepts:components.adoc[Component] -- a new build will be started
+* xref:concepts:pipelines.adoc[Pipeline] -- a new run will be executed
 
 == Examples
 

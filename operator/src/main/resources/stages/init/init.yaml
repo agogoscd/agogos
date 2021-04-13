@@ -1,4 +1,4 @@
-apiVersion: cpaas.redhat.com/v1alpha1
+apiVersion: agogos.redhat.com/v1alpha1
 kind: ClusterStage
 metadata:
   name: init

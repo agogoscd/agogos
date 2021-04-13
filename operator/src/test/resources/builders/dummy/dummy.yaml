@@ -1,0 +1,27 @@
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Builder
+metadata:
+  name: dummy
+spec:
+  task: agogos-builder-dummy
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task # TODO: Move to ClusterTask
+metadata:
+  name: agogos-builder-dummy
+spec:
+  workspaces:
+    - name: "pipeline"
+    - name: "stage"
+  params:
+    - name: "image"
+      type: "string"
+      default: "quay.io/cpaas/agogos-poc-builder-dummy:latest"
+  results:
+    - name: "data"
+      description: "A JSON formatted result"
+  steps:
+    - name: "execute"
+      image: "$(params.image)"
+      command: ["/bin/python3"]
+      args: ["/run.py", "$(workspaces.stage.path)"]

@@ -1,4 +1,3 @@
 = Contributing to Agogos
-CP Development Team <cp-devel@redhat.com>
 
-WARNING: #TODO# Define rules
+include::common:partial$draft.adoc[]
