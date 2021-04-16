@@ -55,7 +55,8 @@ public class BuildController extends AbstractController<Build> {
     protected AgogosResource<?, ?> parentResource(Build build) {
         LOG.debug("Finding parent resource for Build '{}'", build.getFullName());
 
-        ComponentResource component = componentClient.getByName(build.getSpec().getComponent());
+        ComponentResource component = componentClient.getByName(build.getSpec().getComponent(),
+                build.getMetadata().getNamespace());
 
         if (component == null) {
             throw new ApplicationException("Could not find Component with name '{}' in namespace '{}'",

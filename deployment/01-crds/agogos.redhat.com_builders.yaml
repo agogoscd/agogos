@@ -10,7 +10,7 @@ spec:
     listKind: BuilderList
     plural: builders
     singular: builder
-  scope: Namespaced
+  scope: Cluster
   versions:
     - name: v1alpha1
       schema:

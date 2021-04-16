@@ -115,6 +115,10 @@
             <artifactId>operator-framework</artifactId>
             <version>${operator-framework.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-container-image-jib</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

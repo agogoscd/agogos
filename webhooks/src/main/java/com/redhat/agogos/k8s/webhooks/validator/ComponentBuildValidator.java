@@ -39,7 +39,8 @@ public class ComponentBuildValidator extends Validator<Build> {
     private void validateComponentBuild(Build componentBuild) throws ApplicationException {
         LOG.info("Validating component build '{}'", componentBuild.getFullName());
 
-        ComponentResource component = componentClient.getByName(componentBuild.getSpec().getComponent());
+        ComponentResource component = componentClient.getByName(componentBuild.getSpec().getComponent(),
+                componentBuild.getMetadata().getNamespace());
 
         if (component == null) {
             throw new MissingResourceException("Selected Component '{}' does not exist in '{}' namespace",

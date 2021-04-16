@@ -47,9 +47,20 @@ spec:
                     type: object
                     description: Stage reference with required configuration
                     properties:
-                      name:
-                        type: string
-                        description: Name of the stage to run
+                      stageRef:
+                        type: object
+                        description: Stage reference
+                        properties:                         
+                          name:
+                            type: string
+                            description: Name of the stage to run
+                          kind:
+                            type: string
+                            description: "The type of the stage, one of: Stage or ClusterStage"
+                            enum: ["Stage", "ClusterStage"]
+                        required:
+                          - name
+                          - kind
                       runAfter:
                         type: array
                         items:
@@ -60,7 +71,7 @@ spec:
                         description: "Additional configuration properties passed to the stage implementation"
                         x-kubernetes-preserve-unknown-fields: true
                     required:
-                      - "name"
+                      - "stageRef"
               required:
                 - "stages"
           type: object

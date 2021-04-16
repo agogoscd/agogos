@@ -5,7 +5,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @JsonDeserialize
 @RegisterForReflection
-public class StageList extends AbstractStageList<Stage> {
+public class ClusterStageList extends AbstractStageList<ClusterStage> {
 
     private static final long serialVersionUID = -4327366831588566317L;
 

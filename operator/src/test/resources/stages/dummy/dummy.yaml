@@ -1,5 +1,5 @@
 apiVersion: agogos.redhat.com/v1alpha1
-kind: Stage
+kind: ClusterStage
 metadata:
   name: dummy
   labels:
@@ -8,7 +8,7 @@ spec:
   task: agogos-stage-dummy
 ---
 apiVersion: tekton.dev/v1beta1
-kind: Task
+kind: ClusterTask
 metadata:
   name: agogos-stage-dummy
 spec:

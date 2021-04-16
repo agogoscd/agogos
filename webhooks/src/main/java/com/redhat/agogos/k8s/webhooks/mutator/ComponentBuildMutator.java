@@ -58,7 +58,8 @@ public class ComponentBuildMutator extends Mutator<Build> {
      * @return Json array with one entry pointing to the Component
      */
     private JsonArray generateOwner(Build componentBuild) {
-        ComponentResource component = componentClient.getByName(componentBuild.getSpec().getComponent());
+        ComponentResource component = componentClient.getByName(componentBuild.getSpec().getComponent(),
+                componentBuild.getMetadata().getNamespace());
 
         if (component == null) {
             throw new MissingResourceException("Selected Component '{}' does not exist in '{}' namespace",

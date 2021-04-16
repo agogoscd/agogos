@@ -77,8 +77,8 @@ public class BuildClient {
         return componentBuildClient.inNamespace(namespace).create(build);
     }
 
-    public Build create(Build build) {
+    public Build create(Build build, String namespace) {
         // TODO: Add exception handling
-        return componentBuildClient.create(build);
+        return componentBuildClient.inNamespace(namespace).create(build);
     }
 }
