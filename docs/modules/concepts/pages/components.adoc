@@ -1,3 +1,43 @@
 = Components
 
 include::common:partial$draft.adoc[]
+
+Component is a concept that describes a single buildable element.
+
+We can identify following Component's tasks:
+
+. Define where the source is located
+. Define what xref:builders.adoc[Builder] should be used to build it
+. Optionally define data influencing xref:builders.adoc[Builder's] behavior
+
+Component is an abstract concept which is not directly tied to any build tool
+that should be used to build the source code. This is where xref:builders.adoc[Builders]
+come into play which expose a particular tool (or a build service!)
+in the system.
+
+A particular Component can be registered only when the specified
+Builder is available in the system.
+
+Once a Component is successfully created a build could be run which uses the
+specified Builder to perform the task of transforming the Component
+(metadata) into one or more artifacts.
+
+[graphviz,component,svg]
+....
+digraph G {
+rankdir="LR";
+
+graph [fontname="helvetica",ranksep=1,nodesep=0.5];
+node [fontname="helvetica",shape="box",style="rounded",fontsize="12"];
+edge [fontname="helvetica",arrowsize="1",penwidth="1",fontsize="10"];
+
+component [label="Component",color="#a83232",penwidth="2"];
+builder [style="",label="Builder",color="#328da8",penwidth="2",shape="parallelogram",fixedsize="true",width="1.5",height="0.8"];
+artifact1 [label="Artifact",style="",shape="folder",color="#a83232",penwidth="2"];
+artifact2 [label="Artifact",style="",shape="folder",color="#a83232",penwidth="2"];
+
+component -> builder;
+builder -> artifact1;
+builder -> artifact2;
+}
+....
