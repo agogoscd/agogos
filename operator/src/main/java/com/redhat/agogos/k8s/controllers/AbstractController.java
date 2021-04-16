@@ -63,7 +63,7 @@ public abstract class AbstractController<T extends AgogosResource<?, StatusResou
         String type = resource.getKind().toLowerCase();
         Status status = event.getStatus().toStatus();
         String message = null;
-        Map<Object, Object> result = null;
+        Map<?, ?> result = null;
 
         switch (event.getStatus()) {
             case STARTED:
@@ -222,7 +222,7 @@ public abstract class AbstractController<T extends AgogosResource<?, StatusResou
      * @param result Map of results, if any
      */
     protected boolean setStatus(StatusResource status, Status newStatus, String newReason,
-            Map<Object, Object> newResult) {
+            Map<?, ?> newResult) {
 
         if (status.getStatus().equals(String.valueOf(newStatus)) //
                 && status.getReason().equals(newReason) //

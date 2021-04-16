@@ -54,7 +54,7 @@ public class Build extends AgogosResource<BuildSpec, StatusResource> implements 
      * @return String formatted result
      */
     @JsonIgnore
-    public Map<Object, Object> getResult() {
+    public Map<?, ?> getResult() {
         return this.getStatus().getResult();
     }
 }

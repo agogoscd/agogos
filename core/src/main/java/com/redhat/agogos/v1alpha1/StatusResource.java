@@ -19,7 +19,7 @@ public class StatusResource implements KubernetesResource {
 
     @Getter
     @Setter
-    private Map<Object, Object> result;
+    private Map<?, ?> result;
     @Getter
     @Setter
     private String status = String.valueOf(Status.New);
