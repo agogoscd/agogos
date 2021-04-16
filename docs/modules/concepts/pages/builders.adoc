@@ -1,0 +1,12 @@
+= Builders
+
+include::common:partial$draft.adoc[]
+
+Builders are responsible for building xref:components.adoc[Components].
+
+Builders registered in the system influence what Component types
+can be added to the system.
+
+Builders define schema for a Component so that it can be accepted by the Builder.
+This means that if a Component uses a particular Builder
+it's definition needs to pass the schema validation defined by the Builder.

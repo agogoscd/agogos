@@ -1,4 +1,4 @@
-= Pipeline Stages
+= Stages
 
 include::common:partial$draft.adoc[]
 

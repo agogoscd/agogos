@@ -1,3 +1,6 @@
-= Component Groups
+= Groups
 
 include::common:partial$draft.adoc[]
+
+Group is a concept which combines multiple xref:components.adoc[Components]
+together.
