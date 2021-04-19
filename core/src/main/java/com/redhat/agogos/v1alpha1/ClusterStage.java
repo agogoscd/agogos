@@ -9,7 +9,7 @@ import lombok.ToString;
 @Kind("ClusterStage")
 @Group("agogos.redhat.com")
 @Version("v1alpha1")
-public class ClusterStageResource extends AbstractStage {
+public class ClusterStage extends AbstractStage {
     private static final long serialVersionUID = -3567450974238504463L;
 
 }

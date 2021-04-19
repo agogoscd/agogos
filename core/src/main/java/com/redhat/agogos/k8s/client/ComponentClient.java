@@ -40,11 +40,11 @@ public class ComponentClient {
      * @return The {@link ComponentResource} or <code>null</code> in case it cannot
      *         be found
      */
-    public ComponentResource getByName(String name) {
+    public ComponentResource getByName(String name, String namespace) {
         ListOptions options = new ListOptionsBuilder().withFieldSelector(String.format("metadata.name=%s", name))
                 .build();
 
-        ComponentResourceList componentResources = componentClient.list(options);
+        ComponentResourceList componentResources = componentClient.inNamespace(namespace).list(options);
 
         if (componentResources.getItems().isEmpty() || componentResources.getItems().size() > 1) {
             LOG.debug("Component '{}' cannot be found", name);

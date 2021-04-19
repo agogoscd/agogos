@@ -1,0 +1,16 @@
+= First Steps
+
+include::common:partial$draft.adoc[]
+
+It's great to see your interest in Agogos!
+
+#TODO#
+
+* Install
+* Register a builder
+* Register a component
+* Run a build
+* Register a stage
+* Create a pipeline
+* Run pipeline
+* Create a trigger

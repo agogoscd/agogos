@@ -6,7 +6,7 @@ spec:
   task: agogos-builder-dummy
 ---
 apiVersion: tekton.dev/v1beta1
-kind: Task # TODO: Move to ClusterTask
+kind: ClusterTask
 metadata:
   name: agogos-builder-dummy
 spec:

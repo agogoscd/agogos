@@ -44,7 +44,7 @@ public class BuildEventSource extends PipelineRunEventSource<Build> {
         build.getMetadata().setLabels(buildLabels);
         build.getSpec().setComponent(component);
 
-        build = componentBuildClient.create(build);
+        build = componentBuildClient.create(build, pipelineRun.getMetadata().getNamespace());
 
         LOG.info("Build '{}' created out of an existing Tekton PipelineRun '{}'", build.getFullName(),
                 pipelineRunName);

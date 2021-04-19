@@ -1,7 +1,9 @@
 * xref:index.adoc[]
 
 ** xref:events/index.adoc[]
-*** xref:events/kafka.adoc[]
-*** xref:events/external.adoc[]
+// *** xref:events/kafka.adoc[]
+// *** xref:events/external.adoc[]
 
 ** xref:triggers.adoc[]
+
+** xref:security/index.adoc[]

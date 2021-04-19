@@ -38,10 +38,9 @@ kubernetes:
   storage-class: "standard"
 
 "%dev":
-  cloud-events-service:
-    mp-rest:
-      url: http://localhost:8111
-      hostnameVerifier: io.quarkus.restclient.NoopHostnameVerifier
+  broker/mp-rest/url: http://localhost:8111
+  
+  #hostnameVerifier: io.quarkus.restclient.NoopHostnameVerifier
 
   quarkus:
     log:
@@ -55,22 +54,19 @@ kubernetes:
     kubernetes-client:
       trust-certs: true
 
-  "broker/mp-rest/url": "http://localhost:8111"
-
 "%prod":
-  quarkus:
-    http:
-      ssl:
-        certificate:
-          file: /server.crt
-          key-file: /server.key
+  broker/mp-rest/url: "http://broker-ingress.knative-eventing.svc.cluster.local"
 
-    # log:
-    #   category:
-    #     "io.javaoperatorsdk.operator.processing":
-    #       level: WARN
-    #     "io.fabric8.kubernetes.client.informers.cache":
-    #       level: WARN
+  quarkus:
+    # http:
+    #   ssl:
+    #     certificate:
+    #       file: /server.crt
+    #       key-file: /server.key
+    log:
+      category:
+        "com.redhat.agogos":
+          level: DEBUG
 
     # TODO: change this
     kubernetes-client:

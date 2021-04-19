@@ -1,0 +1,3 @@
+= Installation
+
+Currently we support only xref:installation/manual.adoc[manual installation].

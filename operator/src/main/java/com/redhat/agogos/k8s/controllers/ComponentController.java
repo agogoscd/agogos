@@ -219,7 +219,7 @@ public class ComponentController implements ResourceController<ComponentResource
         // Prepare main task
         PipelineTask buildTask = new PipelineTaskBuilder() //
                 .withName(component.getMetadata().getName()) //
-                .withTaskRef(new TaskRef("tekton.dev/v1beta1", "Task", builder.getSpec().getTask())) //
+                .withTaskRef(new TaskRef("tekton.dev/v1beta1", "ClusterTask", builder.getSpec().getTask())) // TODO: Remove hardcoded ClusterTask
                 .withWorkspaces(stageWsBinding, pipelineWsBinding) //
                 .withRunAfter("init") //
                 .build();

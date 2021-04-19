@@ -98,7 +98,7 @@ public class TriggerController implements ResourceController<Trigger> {
 
         switch (target.getKind()) {
             case "Component":
-                ComponentResource component = componentClient.getByName(target.getName());
+                ComponentResource component = componentClient.getByName(target.getName(), trigger.getMetadata().getNamespace());
 
                 // TODO: Move to validation admission webhook
                 if (component == null) {

@@ -1,5 +1,6 @@
 package com.redhat.agogos.v1alpha1;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -35,12 +36,12 @@ public class Pipeline extends AgogosResource<PipelineSpec, Void> implements Name
         @ToString
         @JsonDeserialize(using = JsonDeserializer.None.class)
         @RegisterForReflection
-        public static class StageReference implements KubernetesResource {
+        public static class StageEntry implements KubernetesResource {
             private static final long serialVersionUID = -7474791004592310761L;
 
             @Getter
             @Setter
-            private String name;
+            private StageReference stageRef = new StageReference();
 
             @Getter
             @Setter
@@ -51,6 +52,26 @@ public class Pipeline extends AgogosResource<PipelineSpec, Void> implements Name
             private Map<Object, Object> config = new HashMap<>();
         }
 
+        @ToString
+        @JsonDeserialize(using = JsonDeserializer.None.class)
+        @RegisterForReflection
+        public static class StageReference implements KubernetesResource {
+            private static final long serialVersionUID = -7474791004592310761L;
+
+            @Getter
+            @Setter
+            private String name;
+
+            @Getter
+            @Setter
+            private String kind;
+
+            @JsonBackReference
+            @Getter
+            @Setter
+            public Pipeline pipeline;
+        }
+
         private static final long serialVersionUID = 3644066384389447653L;
 
         @Getter
@@ -59,7 +80,7 @@ public class Pipeline extends AgogosResource<PipelineSpec, Void> implements Name
 
         @Getter
         @Setter
-        private List<StageReference> stages = new ArrayList<>();
+        private List<StageEntry> stages = new ArrayList<>();
 
     }
 

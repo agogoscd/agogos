@@ -8,21 +8,27 @@ This page describes all available CloudEvents that are emitted by the Agogos pla
 |===
 |Event type |Sent when 
 
-2+s|xref:#componentbuild-events[Component build events]
+2+s|xref:#build-events[Build events]
 
-|com.redhat.agogos.event.componentbuild.success.v1alpha1
+|com.redhat.agogos.event.build.started.v1alpha1
+|Component build was started.
+
+|com.redhat.agogos.event.build.succeeded.v1alpha1
 |Component build finishes successfully.
 
-|com.redhat.agogos.event.componentbuild.failure.v1alpha1
+|com.redhat.agogos.event.build.failed.v1alpha1
 |Component build fails.
 
-2+s|xref:#pipelinerun-events[Pipeline run events]
+2+s|xref:#pipeline-events[Pipeline events]
 
-|com.redhat.agogos.event.pipelinerun.success.v1alpha1
-|Pipeline run finishes successfully.
+|com.redhat.agogos.event.pipeline.started.v1alpha1
+|Pipeline was started.
 
-|com.redhat.agogos.event.pipelinerun.failure.v1alpha1
-|Pipeline run fails.
+|com.redhat.agogos.event.pipeline.succeeded.v1alpha1
+|Pipeline finished successfully.
+
+|com.redhat.agogos.event.pipeline.failed.v1alpha1
+|Pipeline failed.
 |=== 
 
 == Event Types vs. Versions
@@ -35,14 +41,15 @@ Versions are bound to the particular resource versions the event is providing.
 
 == Event Structure
 
-[#componentbuild-events]
+[#build-events]
 === Component Build Events
 
 ====
 Applies to:
 
-* `com.redhat.agogos.event.componentbuild.success.v1alpha1`
-* `com.redhat.agogos.event.componentbuild.failure.v1alpha1`
+* `com.redhat.agogos.event.build.started.v1alpha1`
+* `com.redhat.agogos.event.build.succeeded.v1alpha1`
+* `com.redhat.agogos.event.build.failed.v1alpha1`
 ====
 
 Every Component build event contains a JSON payload with following structure:
@@ -54,8 +61,8 @@ Every Component build event contains a JSON payload with following structure:
    "build": {} <2>
 }
 ----
-<1> The `component` key contains the Component custom resource representation in the JSON format
-<2> The `build` key contains the Component build resource representation in the JSON format
+<1> The `component` key contains the `Component` custom resource representation in the JSON format
+<2> The `build` key contains the `Build` custom resource representation in the JSON format
 
 Example of such JSON file can be found below.
 
@@ -105,17 +112,26 @@ Example of such JSON file can be found below.
 
 NOTE: Such event can contain more fields in case 
 
-[#pipelinerun-events]
+[#pipeline-events]
 === Pipeline Run Events
 
 ====
 Applies to:
 
-* `com.redhat.agogos.event.pipelinerun.success.v1alpha1`
-* `com.redhat.agogos.event.pipelinerun.failure.v1alpha1`
+* `com.redhat.agogos.event.pipeline.started.v1alpha1`
+* `com.redhat.agogos.event.pipeline.succeeded.v1alpha1`
+* `com.redhat.agogos.event.pipeline.failed.v1alpha1`
 ====
 
-Every Pipeline run event is sending the JSON representation of an Agogos
-`PipelineRun` resource.
+Every Pipeline event is sending the JSON representation of an Agogos
+`Pipeline` and `Run` resources.
 
-#TODO#
+[source,json]
+----
+{
+   "pipeline": {}, <1>
+   "run": {} <2>
+}
+----
+<1> The `pipeline` key contains the `Pipeline` custom resource representation in the JSON format
+<2> The `run` key contains the `Run` custom resource representation in the JSON format

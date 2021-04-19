@@ -5,10 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.errors.ValidationException;
-import com.redhat.agogos.k8s.client.StageClient;
-import com.redhat.agogos.v1alpha1.AbstractStage.Phase;
+import com.redhat.agogos.k8s.client.BuilderClient;
+import com.redhat.agogos.v1alpha1.BuilderResource;
 import com.redhat.agogos.v1alpha1.ComponentResource;
-import com.redhat.agogos.v1alpha1.Stage;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
 import java.util.List;
@@ -30,7 +29,7 @@ public class ComponentValidator extends Validator<ComponentResource> {
     ObjectMapper objectMapper;
 
     @Inject
-    StageClient stageClient;
+    BuilderClient builderClient;
 
     @Override
     protected void validateResource(ComponentResource resource, AdmissionResponseBuilder responseBuilder) {
@@ -52,7 +51,7 @@ public class ComponentValidator extends Validator<ComponentResource> {
     private void validateComponent(ComponentResource component) throws ApplicationException {
         LOG.info("Validating component '{}'", component.getNamespacedName());
 
-        Stage builder = stageClient.getByName(component.getSpec().getBuilder(), Phase.BUILD);
+        BuilderResource builder = builderClient.getByName(component.getSpec().getBuilder());
 
         if (builder == null) {
             throw new MissingResourceException("Selected builder '{}' is not registered in the system",

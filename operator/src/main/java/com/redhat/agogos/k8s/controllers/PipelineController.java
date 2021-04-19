@@ -2,12 +2,15 @@ package com.redhat.agogos.k8s.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
+import com.redhat.agogos.k8s.client.ClusterStageClient;
 import com.redhat.agogos.k8s.client.GroupClient;
 import com.redhat.agogos.k8s.client.StageClient;
+import com.redhat.agogos.v1alpha1.AbstractStage;
 import com.redhat.agogos.v1alpha1.Pipeline;
+import com.redhat.agogos.v1alpha1.Pipeline.PipelineSpec.StageEntry;
 import com.redhat.agogos.v1alpha1.Pipeline.PipelineSpec.StageReference;
-import com.redhat.agogos.v1alpha1.Stage;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.client.TektonClient;
@@ -42,7 +45,10 @@ public class PipelineController implements ResourceController<Pipeline> {
     GroupClient groupClient;
 
     @Inject
-    StageClient stageResourceClient;
+    StageClient stageClient;
+
+    @Inject
+    ClusterStageClient clusterStageClient;
 
     @Inject
     ObjectMapper objectMapper;
@@ -54,8 +60,7 @@ public class PipelineController implements ResourceController<Pipeline> {
     }
 
     @Override
-    public UpdateControl<Pipeline> createOrUpdateResource(Pipeline pipeline,
-            Context<Pipeline> context) {
+    public UpdateControl<Pipeline> createOrUpdateResource(Pipeline pipeline, Context<Pipeline> context) {
         LOG.info("Pipeline '{}' modified", pipeline.getNamespacedName());
 
         // Prepare workspace for main task to share content between steps
@@ -76,16 +81,32 @@ public class PipelineController implements ResourceController<Pipeline> {
 
         List<PipelineTask> tasks = new ArrayList<>();
 
-        groupClient.getByName(pipeline.getSpec().getGroup());
+        // groupClient.getByName(pipeline.getSpec().getGroup()); TODO
 
-        for (StageReference stageRef : pipeline.getSpec().getStages()) {
-            LOG.debug("Processing '{}' Stage", stageRef.getName());
+        for (StageEntry stageEntry : pipeline.getSpec().getStages()) {
+            StageReference stageRef = stageEntry.getStageRef();
 
-            Stage stage = stageResourceClient.getByName(stageRef.getName());
+            LOG.debug("Processing {} '{}' ", stageRef.getKind(), stageRef.getName());
+
+            AbstractStage stage = null;
+            String taskType = "Task";
+
+            switch (stageRef.getKind()) {
+                case "Stage":
+                    stage = stageClient.getByName(stageRef.getName(), pipeline.getMetadata().getNamespace());
+
+                    break;
+                case "ClusterStage":
+                    stage = clusterStageClient.getByName(stageRef.getName());
+                    taskType = "ClusterTask";
+                    break;
+                default:
+                    throw new ApplicationException("Invalid Stage kind: {}", stageRef.getKind());
+            }
 
             if (stage == null) {
-                throw new MissingResourceException("Selected Stage '{}' is not available in the system",
-                        stageRef.getName());
+                throw new MissingResourceException("Selected {} '{}' is not available in the system",
+                        stageRef.getKind(), stageRef.getName());
             }
 
             String stageConfig;
@@ -93,7 +114,7 @@ public class PipelineController implements ResourceController<Pipeline> {
             // Convert Component metadata to JSON
             try {
                 LOG.debug("Converting Stage '{}' configuration to JSON", stageRef.getName());
-                stageConfig = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(stageRef.getConfig());
+                stageConfig = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(stageEntry.getConfig());
             } catch (JsonProcessingException e) {
                 LOG.debug("Unable to convert Stage '{}' configuration to JSON", stageRef.getName());
                 return UpdateControl.noUpdate();
@@ -109,7 +130,7 @@ public class PipelineController implements ResourceController<Pipeline> {
             // Prepare task
             PipelineTask task = new PipelineTaskBuilder() //
                     .withName(stageRef.getName()) //
-                    .withTaskRef(new TaskRef("tekton.dev/v1beta1", "Task", stage.getSpec().getTask())) //
+                    .withTaskRef(new TaskRef("tekton.dev/v1beta1", taskType, stage.getSpec().getTask())) //
                     .addNewParam() //
                     .withName("config") //
                     .withNewValue(stageConfig) //
@@ -118,8 +139,8 @@ public class PipelineController implements ResourceController<Pipeline> {
                     .build();
 
             // set additional task property
-            if (stageRef.getRunAfter() != null) {
-                task.setRunAfter(stageRef.getRunAfter());
+            if (stageEntry.getRunAfter() != null) {
+                task.setRunAfter(stageEntry.getRunAfter());
             }
 
             tasks.add(task);
