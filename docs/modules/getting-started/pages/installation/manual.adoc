@@ -1,0 +1,123 @@
+= Manual Installation
+:tekton-pipelines-version: 0.22.0
+:tekton-triggers-version: 0.12.1
+:knative-eventing-version: 0.21.3
+
+Agogos has a few dependencies. To run Agogos we need to ensure these dependencies
+are available in the cluster.
+
+[NOTE]
+====
+Before you start make sure you have the
+link:https://kubernetes.io/docs/tasks/tools/install-kubectl/[kubectl]
+CLI tool installed.
+====
+
+== Dependencies
+
+* xref:installation/manual.adoc#tekton-pipelines[Tekton Pipelines]
+* xref:installation/manual.adoc#tekton-triggers[Tekton Triggers]
+* xref:installation/manual.adoc#knative-eventing[Knative Eventing]
+
+Above requirements could be provided already provided in the cluster you use.
+If this is not the case, you can use instructions below to install these on your
+cluster (assuming you have required privileges).
+
+[TIP]
+====
+If you do not have a cluster you can use
+xref:development:environment.adoc[Minikube environment] to run Agogos locally.
+====
+
+[#tekton-pipelines]
+=== Tekton Pipelines
+
+Recommended version:: `{tekton-pipelines-version}`
+Documentation:: See official documentation for link:https://tekton.dev/docs/getting-started/#installation[Tekton Pipelines] installation.
+
+For your convenience we are providing required commands below (version `{tekton-pipelines-version}`).
+
+[source,bash,subs="attributes+"]
+----
+❯ kubectl apply -f https://storage.googleapis.com/tekton-releases/pipeline/previous/v{tekton-pipelines-version}/release.yaml
+----
+
+[#tekton-triggers]
+=== Tekton Triggers
+
+Recommended version:: `{tekton-triggers-version}`
+Documentation:: See official documentation for link:https://tekton.dev/docs/triggers/install/[Tekton Triggers] installation.
+
+For your convenience we are providing required commands below (version `{tekton-triggers-version}`).
+
+[source,bash,subs="attributes+"]
+----
+❯ kubectl apply -f https://storage.googleapis.com/tekton-releases/triggers/previous/v{tekton-triggers-version}/release.yaml
+----
+
+[#knative-eventing]
+=== Knative Eventing
+
+Recommended version:: `{knative-eventing-version}`
+Documentation:: Official documentation on link:https://knative.dev/docs/install/any-kubernetes-cluster/#installing-the-eventing-component[how to install Knative Eventing].
+
+For your convenience we are providing required commands below (version `{knative-eventing-version}`).
+
+. Install the Custom Resource Definitions.
++
+[source,bash,subs="attributes+"]
+----
+❯ kubectl apply --filename https://github.com/knative/eventing/releases/download/v{knative-eventing-version}/eventing-crds.yaml
+----
++
+. Install Eventing core components.
++
+[source,bash,subs="attributes+"]
+----
+❯ kubectl apply --filename https://github.com/knative/eventing/releases/download/v{knative-eventing-version}/eventing-core.yaml
+----
++
+. Install a In-Memory (standalone) default Channel.
++
+[source,bash,subs="attributes+"]
+----
+❯ kubectl apply --filename https://github.com/knative/eventing/releases/download/v{knative-eventing-version}/in-memory-channel.yaml
+----
++
+. Install a MT-Channel-based Broker.
++
+[source,bash,subs="attributes+"]
+----
+❯ kubectl apply --filename https://github.com/knative/eventing/releases/download/v{knative-eventing-version}/mt-channel-broker.yaml
+----
+
+You can monitor the status of Knative Eventing pods using this command:
+
+[source,bash]
+----
+❯ kubectl get pods -n knative-eventing
+----
+
+== Agogos
+
+To install latest development version of Agogos run this command:
+
+[source,bash]
+----
+❯ kubectl apply --filename https://gitlab.cee.redhat.com/agogos/agogos/-/raw/main/deployment/agogos.yaml
+----
+
+This command will create all teh required resources within the cluster and deploy
+Agogos operator in the `agogos` namespace.
+
+At this point the operator should be starting, you can follow logs by running
+this command:
+
+[source,bash]
+----
+❯ kubectl logs -n agogos -lapp.kubernetes.io/component=operator,app.kubernetes.io/part-of=agogos -f
+----
+
+Congrats, Agogos is running!
+
+// TODO: Next steps

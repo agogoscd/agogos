@@ -1,4 +1,4 @@
-= Security
+= Architecture
 
 include::common:partial$draft.adoc[]
 

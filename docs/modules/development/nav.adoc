@@ -1,21 +1,17 @@
 * Development
-** xref:contributing.adoc[]
+// ** xref:contributing.adoc[]
 
-** xref:environment/index.adoc[]
-*** xref:environment/local.adoc[]
-*** xref:environment/setup.adoc[]
-
+** xref:environment.adoc[]
 ** xref:running.adoc[]
-
 ** xref:testing/index.adoc[]
 
-** xref:stage/index.adoc[]
-*** xref:stage/builder_tutorial.adoc[]
-*** xref:stage/stage_api.adoc[]
+// ** xref:stage/index.adoc[]
+// *** xref:stage/builder_tutorial.adoc[]
+// *** xref:stage/stage_api.adoc[]
 
-** xref:webhooks/index.adoc[]
-*** xref:webhooks/deployment.adoc[]
-*** xref:webhooks/ssl_certificates.adoc[]
+// ** xref:webhooks/index.adoc[]
+// *** xref:webhooks/deployment.adoc[]
+// *** xref:webhooks/ssl_certificates.adoc[]
 
-** xref:operator/index.adoc[]
-*** xref:operator/deployment.adoc[]
+// ** xref:operator/index.adoc[]
+// *** xref:operator/deployment.adoc[]
