@@ -62,7 +62,7 @@ public abstract class AbstractStage extends CustomResource<StageSpec, StageStatu
 
         @Getter
         @Setter
-        private String task;
+        private Map<String, String> taskRef = new HashMap<>();
 
         @Getter
         @Setter

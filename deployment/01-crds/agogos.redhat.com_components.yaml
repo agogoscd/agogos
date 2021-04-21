@@ -46,12 +46,19 @@ spec:
                     This content needs to be supported by the particular builder
                     used to build this component. Builder defines schema that this
                     content is checked against."
-                builder:
-                  description: Builder used to build this component
-                  type: string
+                builderRef:
+                  type: object
+                  description: Defines the builder reference
+                  properties:
+                    name:
+                      type: string
+                      description: Name of the builder being referenced.
+                    kind:
+                      type: string
+                      description: The kind. Can be either builder or ClusterBuilder
               required:
                 - "data"
-                - "builder"
+                - "builderRef"
             status:
               description: ComponentStatus defines the observed state of Component
               properties:

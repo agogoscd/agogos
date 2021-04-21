@@ -180,11 +180,11 @@ public class ComponentController implements ResourceController<ComponentResource
                     component.getNamespacedName(), e);
         }
 
-        BuilderResource builder = builderClient.getByName(component.getSpec().getBuilder());
+        BuilderResource builder = builderClient.getByName(component.getSpec().getBuilderRef().get("name"));
 
         if (builder == null) {
             throw new MissingResourceException("Selected Builder '{}' is not available in the system",
-                    component.getSpec().getBuilder());
+                    component.getSpec().getBuilderRef().get("name"));
         }
 
         List<PipelineTask> tasks = new ArrayList<>();
@@ -216,10 +216,19 @@ public class ComponentController implements ResourceController<ComponentResource
 
         tasks.add(initTask);
 
+        TaskRef buildTaskRef = new TaskRef(
+                "tekton.dev/v1beta1",
+                builder.getSpec().getTaskRef().get("kind"),
+                builder.getSpec().getTaskRef().get("name")
+        );
         // Prepare main task
         PipelineTask buildTask = new PipelineTaskBuilder() //
                 .withName(component.getMetadata().getName()) //
-                .withTaskRef(new TaskRef("tekton.dev/v1beta1", "ClusterTask", builder.getSpec().getTask())) // TODO: Remove hardcoded ClusterTask
+                .withTaskRef(buildTaskRef)
+                .addNewParam() //
+                .withName("component") //
+                .withNewValue(componentJson) //
+                .endParam() //
                 .withWorkspaces(stageWsBinding, pipelineWsBinding) //
                 .withRunAfter("init") //
                 .build();

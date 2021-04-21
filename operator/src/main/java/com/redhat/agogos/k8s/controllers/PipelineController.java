@@ -130,7 +130,7 @@ public class PipelineController implements ResourceController<Pipeline> {
             // Prepare task
             PipelineTask task = new PipelineTaskBuilder() //
                     .withName(stageRef.getName()) //
-                    .withTaskRef(new TaskRef("tekton.dev/v1beta1", taskType, stage.getSpec().getTask())) //
+                    .withTaskRef(new TaskRef("tekton.dev/v1beta1", taskType, stage.getSpec().getTaskRef().get("name"))) //
                     .addNewParam() //
                     .withName("config") //
                     .withNewValue(stageConfig) //
