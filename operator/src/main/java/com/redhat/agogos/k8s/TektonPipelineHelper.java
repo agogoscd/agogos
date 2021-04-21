@@ -1,7 +1,7 @@
 package com.redhat.agogos.k8s;
 
 import com.redhat.agogos.errors.MissingResourceException;
-import com.redhat.agogos.v1alpha1.ComponentResource;
+import com.redhat.agogos.v1alpha1.Component;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
@@ -75,7 +75,7 @@ public class TektonPipelineHelper {
      * Prepares a {@link PipelineRun} resource to trigger a new Tekton pipeline
      * responsible for running a pipeline defined by the resource type.
      * 
-     * For a {@link ComponentResource} a new build will be created. For a
+     * For a {@link Component} a new build will be created. For a
      * {@link Pipeline} a new run will be created.
      * 
      * @param component

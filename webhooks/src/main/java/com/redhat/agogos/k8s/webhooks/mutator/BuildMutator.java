@@ -5,7 +5,7 @@ import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.k8s.Resource;
 import com.redhat.agogos.k8s.client.ComponentClient;
 import com.redhat.agogos.v1alpha1.Build;
-import com.redhat.agogos.v1alpha1.ComponentResource;
+import com.redhat.agogos.v1alpha1.Component;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionRequest;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
@@ -37,7 +37,7 @@ public class BuildMutator extends Mutator<Build> {
     /**
      * <p>
      * Sets the <code>agogos.redhat.com/component</code> label pointing to the
-     * {@link ComponentResource}.
+     * {@link Component}.
      * </p>
      * 
      * @param componentBuild
@@ -60,7 +60,7 @@ public class BuildMutator extends Mutator<Build> {
      * @return Json array with one entry pointing to the Component
      */
     private JsonArray generateOwner(Build build, String namespace) {
-        ComponentResource component = componentClient.getByName(build.getSpec().getComponent(),
+        Component component = componentClient.getByName(build.getSpec().getComponent(),
                 namespace);
 
         if (component == null) {
@@ -69,8 +69,8 @@ public class BuildMutator extends Mutator<Build> {
         }
 
         JsonObject owner = Json.createObjectBuilder() //
-                .add("apiVersion", HasMetadata.getApiVersion(ComponentResource.class)) //
-                .add("kind", HasMetadata.getKind(ComponentResource.class)) //
+                .add("apiVersion", HasMetadata.getApiVersion(Component.class)) //
+                .add("kind", HasMetadata.getKind(Component.class)) //
                 .add("name", component.getMetadata().getName()) //
                 .add("uid", component.getMetadata().getUid()) //
                 .add("blockOwnerDeletion", true) //

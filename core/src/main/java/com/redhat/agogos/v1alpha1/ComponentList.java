@@ -6,6 +6,6 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @JsonDeserialize
 @RegisterForReflection
-public class ComponentResourceList extends CustomResourceList<ComponentResource> {
+public class ComponentList extends CustomResourceList<Component> {
     private static final long serialVersionUID = 9154628827053441220L;
 }

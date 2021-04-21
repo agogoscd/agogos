@@ -4,7 +4,7 @@ import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.k8s.client.ComponentClient;
 import com.redhat.agogos.v1alpha1.Build;
-import com.redhat.agogos.v1alpha1.ComponentResource;
+import com.redhat.agogos.v1alpha1.Component;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
 import javax.enterprise.context.ApplicationScoped;
@@ -39,7 +39,7 @@ public class ComponentBuildValidator extends Validator<Build> {
     private void validateComponentBuild(Build componentBuild) throws ApplicationException {
         LOG.info("Validating component build '{}'", componentBuild.getFullName());
 
-        ComponentResource component = componentClient.getByName(componentBuild.getSpec().getComponent(),
+        Component component = componentClient.getByName(componentBuild.getSpec().getComponent(),
                 componentBuild.getMetadata().getNamespace());
 
         if (component == null) {

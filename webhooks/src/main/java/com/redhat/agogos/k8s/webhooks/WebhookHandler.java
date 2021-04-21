@@ -5,7 +5,7 @@ import com.redhat.agogos.k8s.webhooks.mutator.RunMutator;
 import com.redhat.agogos.k8s.webhooks.validator.ComponentBuildValidator;
 import com.redhat.agogos.k8s.webhooks.validator.ComponentValidator;
 import com.redhat.agogos.v1alpha1.Build;
-import com.redhat.agogos.v1alpha1.ComponentResource;
+import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.Run;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReview;
@@ -47,7 +47,7 @@ public class WebhookHandler {
         LOG.debug("New validation request incoming, resource: '{}', requester: '{}'",
                 resource.getClass().getSimpleName(), admissionReview.getRequest().getUserInfo().getUsername());
 
-        if (resource instanceof ComponentResource) {
+        if (resource instanceof Component) {
             return componentValidator.validate(admissionReview);
         }
 

@@ -1,8 +1,8 @@
 package com.redhat.agogos.k8s.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.redhat.agogos.v1alpha1.ComponentResource;
-import com.redhat.agogos.v1alpha1.ComponentResourceList;
+import com.redhat.agogos.v1alpha1.Component;
+import com.redhat.agogos.v1alpha1.ComponentList;
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -26,25 +26,25 @@ public class ComponentClient {
     @Inject
     ObjectMapper objectMapper;
 
-    MixedOperation<ComponentResource, ComponentResourceList, Resource<ComponentResource>> componentClient;
+    MixedOperation<Component, ComponentList, Resource<Component>> componentClient;
 
     @PostConstruct
     void init() {
-        componentClient = kubernetesClient.customResources(ComponentResource.class, ComponentResourceList.class);
+        componentClient = kubernetesClient.customResources(Component.class, ComponentList.class);
     }
 
     /**
-     * Find the {@link ComponentResource} by name.
+     * Find the {@link Component} by name.
      * 
      * @param name Name of the Component.
-     * @return The {@link ComponentResource} or <code>null</code> in case it cannot
+     * @return The {@link Component} or <code>null</code> in case it cannot
      *         be found
      */
-    public ComponentResource getByName(String name, String namespace) {
+    public Component getByName(String name, String namespace) {
         ListOptions options = new ListOptionsBuilder().withFieldSelector(String.format("metadata.name=%s", name))
                 .build();
 
-        ComponentResourceList componentResources = componentClient.inNamespace(namespace).list(options);
+        ComponentList componentResources = componentClient.inNamespace(namespace).list(options);
 
         if (componentResources.getItems().isEmpty() || componentResources.getItems().size() > 1) {
             LOG.debug("Component '{}' cannot be found in the '{}' namespace", name, namespace);

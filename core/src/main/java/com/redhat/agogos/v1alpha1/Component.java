@@ -3,8 +3,8 @@ package com.redhat.agogos.v1alpha1;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.redhat.agogos.v1alpha1.ComponentResource.ComponentSpec;
-import com.redhat.agogos.v1alpha1.ComponentResource.ComponentStatus;
+import com.redhat.agogos.v1alpha1.Component.ComponentSpec;
+import com.redhat.agogos.v1alpha1.Component.ComponentStatus;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.model.annotation.Group;
@@ -22,7 +22,7 @@ import lombok.ToString;
 @Kind("Component")
 @Group("agogos.redhat.com")
 @Version("v1alpha1")
-public class ComponentResource extends AgogosResource<ComponentSpec, ComponentStatus> implements Namespaced {
+public class Component extends AgogosResource<ComponentSpec, ComponentStatus> implements Namespaced {
     public enum Status {
         New,
         Initializing,
@@ -69,7 +69,7 @@ public class ComponentResource extends AgogosResource<ComponentSpec, ComponentSt
 
     }
 
-    public ComponentResource() {
+    public Component() {
         super();
     }
 
@@ -96,7 +96,7 @@ public class ComponentResource extends AgogosResource<ComponentSpec, ComponentSt
 
     /**
      * Returns a {@link Map} with the most relevant fields from the
-     * {@link ComponentResource}.
+     * {@link Component}.
      *
      * @return An Immutable {@link Map}
      */
