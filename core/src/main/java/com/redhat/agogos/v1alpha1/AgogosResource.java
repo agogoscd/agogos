@@ -33,32 +33,4 @@ public class AgogosResource<S, T> extends CustomResource<S, T> {
     public boolean isReady() {
         return true;
     }
-
-    // @JsonIgnore
-    // public CloudEventType event(PipelineRunStatus status, AgogosResource<?, ?> parent) {
-    //     if (status == null) {
-    //         return null;
-    //     }
-
-    //     ObjectMapper objectMapper = new ObjectMapper();
-
-    //     Map<String, ? extends AgogosResource<?, ?>> payload = Map.of(this.getKind().toLowerCase(), this,
-    //             parent.getKind().toLowerCase(), parent);
-
-    //     JsonObjectBuilder dataBuilder = Json.createObjectBuilder();
-
-    //     payload.forEach((key, o) -> {
-    //         try {
-    //             dataBuilder.add(key,
-    //                     Json.createReader(new StringReader(objectMapper.writeValueAsString(o))).readValue());
-    //         } catch (JsonProcessingException e) {
-    //             throw new ApplicationException("Error while preparing CloudEvent data for '{}' key and '{}' object",
-    //                     key, o, e);
-    //         }
-    //     });
-
-    //     String type = String.format("com.redhat.agogos.event.%s.%s.v1alpha1", this.getKind().toLowerCase(),
-    //             status.toEvent().toString().toLowerCase());
-    //     String data = dataBuilder.build().toString();
-    // }
 }

@@ -43,7 +43,7 @@ spec:
         app.kubernetes.io/part-of: agogos
     spec:
       containers:
-        - name: service
+        - name: operator
           image: quay.io/cpaas/agogos-poc-operator:devel
           imagePullPolicy: Always
           ports:

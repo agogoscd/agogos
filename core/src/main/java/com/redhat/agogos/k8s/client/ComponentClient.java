@@ -47,7 +47,7 @@ public class ComponentClient {
         ComponentResourceList componentResources = componentClient.inNamespace(namespace).list(options);
 
         if (componentResources.getItems().isEmpty() || componentResources.getItems().size() > 1) {
-            LOG.debug("Component '{}' cannot be found", name);
+            LOG.debug("Component '{}' cannot be found in the '{}' namespace", name, namespace);
             return null;
         }
 

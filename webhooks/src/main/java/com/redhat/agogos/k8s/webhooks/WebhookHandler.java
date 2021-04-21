@@ -1,10 +1,12 @@
 package com.redhat.agogos.k8s.webhooks;
 
-import com.redhat.agogos.k8s.webhooks.mutator.ComponentBuildMutator;
+import com.redhat.agogos.k8s.webhooks.mutator.BuildMutator;
+import com.redhat.agogos.k8s.webhooks.mutator.RunMutator;
 import com.redhat.agogos.k8s.webhooks.validator.ComponentBuildValidator;
 import com.redhat.agogos.k8s.webhooks.validator.ComponentValidator;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.ComponentResource;
+import com.redhat.agogos.v1alpha1.Run;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReview;
 import javax.enterprise.context.ApplicationScoped;
@@ -29,10 +31,13 @@ public class WebhookHandler {
     ComponentValidator componentValidator;
 
     @Inject
-    ComponentBuildValidator componentBuildValidator;
+    ComponentBuildValidator buildValidator;
 
     @Inject
-    ComponentBuildMutator componentBuildMutator;
+    BuildMutator buildMutator;
+
+    @Inject
+    RunMutator runMutator;
 
     @POST
     @Path("validate")
@@ -59,7 +64,11 @@ public class WebhookHandler {
                 admissionReview.getRequest().getUserInfo().getUsername());
 
         if (resource instanceof Build) {
-            return componentBuildMutator.mutate(admissionReview);
+            return buildMutator.mutate(admissionReview);
+        }
+
+        if (resource instanceof Run) {
+            return runMutator.mutate(admissionReview);
         }
 
         // If there is no specific handling needed, allow the request

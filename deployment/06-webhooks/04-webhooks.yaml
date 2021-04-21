@@ -1,0 +1,44 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: webhook.agogos.redhat.com
+webhooks:
+  - name: validate.webhook.agogos.redhat.com
+    sideEffects: None
+    failurePolicy: Fail
+    admissionReviewVersions: ["v1"]
+    clientConfig:
+      service:
+        namespace: agogos
+        name: agogos-webhooks
+        path: /webhooks/validate
+        port: 443
+    rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["agogos.redhat.com"]
+        apiVersions: ["v1alpha1"]
+        resources: ["builds", "components"]
+        scope: "*"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: webhook.agogos.redhat.com
+webhooks:
+  - name: mutate.webhook.agogos.redhat.com
+    sideEffects: None
+    failurePolicy: Fail
+    admissionReviewVersions: ["v1"]
+    clientConfig:
+      service:
+        namespace: agogos
+        name: agogos-webhooks
+        path: /webhooks/mutate
+        port: 443
+    rules:
+      - operations: ["CREATE"]
+        apiGroups: ["agogos.redhat.com"]
+        apiVersions: ["v1alpha1"]
+        resources: ["builds", "runs"]
+        scope: "*"

@@ -1,7 +1,9 @@
 package com.redhat.agogos.k8s.webhooks.mutator;
 
 import com.redhat.agogos.errors.ApplicationException;
+import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.k8s.webhooks.AdmissionHandler;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionRequest;
@@ -48,6 +50,38 @@ public abstract class Mutator<T extends CustomResource<?, ?>> extends AdmissionH
                                 .build());
             }
         });
+    }
+
+    /**
+     * <p>
+     * Returns the namespace for the object which is subject of the {@link AdmissionRequest}.
+     * </p>
+     * 
+     * <p>
+     * For some requests the namespace in the object itself may not be set. This applies to object creation requests. We are
+     * intercepting the request before the object is created and the namespace is set. In such cases we will use the
+     * {@link AdmissionRequest} namespace.
+     * </p>
+     * 
+     * 
+     * @param resource
+     * @param request
+     * @return Namespace
+     */
+    protected String resourceNamespace(T resource, AdmissionRequest request) {
+        if (resource.getMetadata().getNamespace() == null) {
+            // Object creation, namespace is not yet set
+
+            if (request.getNamespace() == null) {
+                // No namespace set for the request either?
+                throw new MissingResourceException("Could not find namespace for new {} request",
+                        HasMetadata.getKind(resource.getClass()));
+            }
+
+            return request.getNamespace();
+        }
+
+        return resource.getMetadata().getNamespace();
     }
 
     protected void mutateResource(T resource, AdmissionRequest request, AdmissionResponseBuilder responseBuilder) {

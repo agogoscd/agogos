@@ -2,7 +2,7 @@ package com.redhat.agogos.k8s.controllers;
 
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.k8s.client.PipelineClient;
-import com.redhat.agogos.k8s.event.PipelineEventSource;
+import com.redhat.agogos.k8s.event.RunEventSource;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.Run;
@@ -23,7 +23,7 @@ public class PipelineRunController extends AbstractController<Run> {
     PipelineClient pipelineClient;
 
     @Inject
-    PipelineEventSource pipelineRunEventSource;
+    RunEventSource pipelineRunEventSource;
 
     @Override
     public DeleteControl deleteResource(Run run, Context<Run> context) {

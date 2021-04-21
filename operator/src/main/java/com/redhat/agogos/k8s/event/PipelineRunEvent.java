@@ -22,7 +22,7 @@ public class PipelineRunEvent extends AbstractEvent {
     @Getter
     String result;
 
-    public PipelineRunEvent(PipelineRun pipelineRun, PipelineRunEventSource<? extends HasMetadata> eventSource,
+    public PipelineRunEvent(PipelineRun pipelineRun, AbstractTektonEventSource<? extends HasMetadata> eventSource,
             String ownerUid) {
         super(ownerUid, eventSource);
 

@@ -16,8 +16,8 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class PipelineRunEventSource<T extends HasMetadata> extends AbstractEventSource {
-    protected static final Logger LOG = LoggerFactory.getLogger(PipelineRunEventSource.class);
+public abstract class AbstractTektonEventSource<T extends HasMetadata> extends AbstractEventSource {
+    protected static final Logger LOG = LoggerFactory.getLogger(AbstractTektonEventSource.class);
 
     @Inject
     protected TektonClient tektonClient;

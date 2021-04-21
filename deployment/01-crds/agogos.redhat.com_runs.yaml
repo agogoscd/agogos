@@ -66,6 +66,9 @@ spec:
       subresources:
         status: {}
       additionalPrinterColumns:
+        - name: Pipeline
+          jsonPath: .spec.pipeline
+          type: string
         - name: Status
           jsonPath: .status.status
           type: string

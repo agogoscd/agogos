@@ -136,9 +136,6 @@ spec:
                     - Failed
                     - Aborted
                   type: string
-                # componentSpec:
-                #   type: object
-                #   x-kubernetes-preserve-unknown-fields: true
               type: object
           type: object
       served: true
@@ -146,11 +143,11 @@ spec:
       subresources:
         status: {}
       additionalPrinterColumns:
+        - name: Component
+          jsonPath: .spec.component
+          type: string
         - name: Status
           jsonPath: .status.status
-          type: string
-        - name: Component
-          jsonPath: .metadata.labels.agogos\.redhat\.com/component
           type: string
         - name: Age
           type: date
@@ -516,6 +513,9 @@ spec:
       subresources:
         status: {}
       additionalPrinterColumns:
+        - name: Pipeline
+          jsonPath: .spec.pipeline
+          type: string
         - name: Status
           jsonPath: .status.status
           type: string
@@ -810,6 +810,16 @@ spec:
   subscriber:
     uri: http://el-default.default.svc.cluster.local:8080
 ---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: default
+spec:
+  serviceAccountName: agogos-el
+  namespaceSelector:
+    matchNames:
+      - default
+---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -952,7 +962,7 @@ spec:
         app.kubernetes.io/part-of: agogos
     spec:
       containers:
-        - name: service
+        - name: operator
           image: quay.io/cpaas/agogos-poc-operator:devel
           imagePullPolicy: Always
           ports:
@@ -974,12 +984,201 @@ spec:
               cpu: "1000m"
       serviceAccount: agogos-operator
 ---
-apiVersion: triggers.tekton.dev/v1alpha1
-kind: EventListener
+apiVersion: v1
+kind: ServiceAccount
 metadata:
-  name: default
+  name: agogos-webhooks
+  namespace: agogos
+  labels:
+    app.kubernetes.io/component: webhooks
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: agogos
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: agogos-webhooks-view
+  labels:
+    app.kubernetes.io/component: webhooks
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: agogos
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: view
+subjects:
+  - kind: ServiceAccount
+    name: agogos-webhooks
+    namespace: agogos
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: agogos-webhooks-admin
+  labels:
+    app.kubernetes.io/component: webhooks
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: agogos
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+rules:
+  - apiGroups: ["agogos.redhat.com"]
+    resources: ["*"]
+    verbs:
+      [
+        "get",
+        "list",
+        "watch",
+        "create",
+        "update",
+        "patch",
+        "delete",
+        "deletecollection",
+      ]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: agogos-webhooks-admin
+  labels:
+    app.kubernetes.io/component: webhooks
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: agogos
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: agogos-webhooks-admin
+subjects:
+  - kind: ServiceAccount
+    name: agogos-webhooks
+    namespace: agogos
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agogos-webhooks
+  namespace: agogos
+  labels:
+    app.kubernetes.io/component: webhooks
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: agogos
 spec:
-  serviceAccountName: agogos-el
-  namespaceSelector:
-    matchNames:
-      - default
+  ports:
+    - name: http
+      port: 80
+      targetPort: 7080
+    - port: 443
+      protocol: TCP
+      name: https
+      targetPort: 8443
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/component: webhooks
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: agogos
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agogos-webhooks
+  namespace: agogos
+  labels:
+    app.kubernetes.io/component: webhooks
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: agogos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: webhooks
+      app.kubernetes.io/instance: default
+      app.kubernetes.io/part-of: agogos
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: webhooks
+        app.kubernetes.io/instance: default
+        app.kubernetes.io/part-of: agogos
+    spec:
+      containers:
+        - name: webhooks
+          image: quay.io/cpaas/agogos-poc-webhooks:devel
+          imagePullPolicy: Always
+          env:
+            - name: QUARKUS_HTTP_SSL_CERTIFICATE_FILE
+              value: /certs/tls.crt
+            - name: QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE
+              value: /certs/tls.key
+          volumeMounts:
+            - name: certs
+              mountPath: "/certs"
+              readOnly: true
+          ports:
+            - containerPort: 7080
+              name: http
+              protocol: TCP
+            - containerPort: 8443
+              name: https
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 7080
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "400m"
+            limits:
+              memory: "512Mi"
+              cpu: "800m"
+      volumes:
+        - name: certs
+          secret:
+            secretName: webhooks-cert
+      serviceAccount: agogos-webhooks
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: webhook.agogos.redhat.com
+webhooks:
+  - name: validate.webhook.agogos.redhat.com
+    sideEffects: None
+    failurePolicy: Fail
+    admissionReviewVersions: ["v1"]
+    clientConfig:
+      service:
+        namespace: agogos
+        name: agogos-webhooks
+        path: /webhooks/validate
+        port: 443
+    rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["agogos.redhat.com"]
+        apiVersions: ["v1alpha1"]
+        resources: ["builds", "components"]
+        scope: "*"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: webhook.agogos.redhat.com
+webhooks:
+  - name: mutate.webhook.agogos.redhat.com
+    sideEffects: None
+    failurePolicy: Fail
+    admissionReviewVersions: ["v1"]
+    clientConfig:
+      service:
+        namespace: agogos
+        name: agogos-webhooks
+        path: /webhooks/mutate
+        port: 443
+    rules:
+      - operations: ["CREATE"]
+        apiGroups: ["agogos.redhat.com"]
+        apiVersions: ["v1alpha1"]
+        resources: ["builds", "runs"]
+        scope: "*"

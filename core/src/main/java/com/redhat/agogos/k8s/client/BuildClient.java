@@ -2,8 +2,6 @@ package com.redhat.agogos.k8s.client;
 
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.BuildResourceList;
-import io.fabric8.kubernetes.api.model.ListOptions;
-import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
@@ -43,27 +41,6 @@ public class BuildClient {
 
     public List<Build> findByLabel(String namespace, String label) {
         return componentBuildClient.inNamespace(namespace).withLabel(label).list().getItems();
-    }
-
-    /**
-     * Find the {@link ComponentBuildResource} by name.
-     * 
-     * @param name Name of the ComponentBuild.
-     * @return The {@link ComponentBuildResource} or <code>null</code> in case it
-     *         cannot be found
-     */
-    public Build getByName(String name) {
-        ListOptions options = new ListOptionsBuilder().withFieldSelector(String.format("metadata.name=%s", name))
-                .build();
-
-        BuildResourceList buildResources = componentBuildClient.list(options);
-
-        if (buildResources.getItems().isEmpty() || buildResources.getItems().size() > 1) {
-            LOG.debug("ComponentBuild '{}' cannot be found", name);
-            return null;
-        }
-
-        return buildResources.getItems().get(0);
     }
 
     public Build create(String name, String namespace) {

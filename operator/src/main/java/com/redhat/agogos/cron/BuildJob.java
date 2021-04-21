@@ -1,6 +1,7 @@
 package com.redhat.agogos.cron;
 
 import com.redhat.agogos.k8s.client.BuildClient;
+import com.redhat.agogos.k8s.client.ComponentClient;
 import com.redhat.agogos.v1alpha1.Build;
 import io.cloudevents.CloudEvent;
 import javax.enterprise.context.ApplicationScoped;
@@ -20,7 +21,10 @@ public class BuildJob implements Job {
     public static final String COMPONENT_NAMESPACE = "namespace";
 
     @Inject
-    BuildClient componentBuildClient;
+    ComponentClient componentClient;
+
+    @Inject
+    BuildClient buildClient;
 
     /**
      * Function to send a {@link CloudEvent} with as specified by the data available
@@ -34,11 +38,16 @@ public class BuildJob implements Job {
         String name = dataMap.getString(COMPONENT_NAME);
         String namespace = dataMap.getString(COMPONENT_NAMESPACE);
 
-        LOG.info("Scheduling a new ComponentBuild for '{}' Component from '{}' namespace", name, namespace);
+        LOG.info("Scheduling a new Build for '{}' Component from '{}' namespace", name, namespace);
 
-        Build build = componentBuildClient.create(name, namespace);
+        Build build = new Build();
+        build.getMetadata().setGenerateName(name + "-");
+        build.getMetadata().setNamespace(namespace);
+        build.getSpec().setComponent(name);
 
-        LOG.info("ComponentBuild '{}' scheduled, next run at {}", build.getMetadata().getName(),
+        build = buildClient.create(build, namespace);
+
+        LOG.info("Build '{}' scheduled, next run at {}", build.getFullName(),
                 context.getNextFireTime());
     }
 }

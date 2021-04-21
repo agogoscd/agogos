@@ -46,10 +46,10 @@ public class TriggerEventScheduler {
 
         switch (trigger.getSpec().getTarget().getKind()) {
             case "Pipeline":
-                quartzJob = JobBuilder.newJob(PipelineRunJob.class)
+                quartzJob = JobBuilder.newJob(RunJob.class)
                         .withIdentity(trigger.getMetadata().getName(), trigger.getMetadata().getNamespace()) //
-                        .usingJobData(PipelineRunJob.PIPELINE_NAME, trigger.getSpec().getTarget().getName()) //
-                        .usingJobData(PipelineRunJob.PIPELINE_NAMESPACE, trigger.getMetadata().getNamespace()) //
+                        .usingJobData(RunJob.PIPELINE_NAME, trigger.getSpec().getTarget().getName()) //
+                        .usingJobData(RunJob.PIPELINE_NAMESPACE, trigger.getMetadata().getNamespace()) //
                         .build();
                 break;
             case "Component":

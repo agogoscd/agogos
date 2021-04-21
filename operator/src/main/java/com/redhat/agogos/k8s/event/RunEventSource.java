@@ -13,7 +13,7 @@ import lombok.ToString;
 
 @ApplicationScoped
 @ToString
-public class PipelineEventSource extends PipelineRunEventSource<Run> {
+public class RunEventSource extends AbstractTektonEventSource<Run> {
 
     @Inject
     RunClient pipelineRunClient;

@@ -19,7 +19,7 @@ public class PipelineRunEventHandler implements ResourceEventHandler<PipelineRun
     BuildEventSource buildEventSource;
 
     @Inject
-    PipelineEventSource pipelineEventSource;
+    RunEventSource runEventSource;
 
     void onStart(@Observes StartupEvent ev) {
     }
@@ -32,7 +32,7 @@ public class PipelineRunEventHandler implements ResourceEventHandler<PipelineRun
                 buildEventSource.handleEvent(Resource.COMPONENT, pipelineRun, isNew);
                 break;
             case PIPELINE:
-                pipelineEventSource.handleEvent(Resource.PIPELINE, pipelineRun, isNew);
+                runEventSource.handleEvent(Resource.PIPELINE, pipelineRun, isNew);
             default:
                 break;
         }

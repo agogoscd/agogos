@@ -14,7 +14,7 @@ import lombok.ToString;
 
 @ApplicationScoped
 @ToString
-public class BuildEventSource extends PipelineRunEventSource<Build> {
+public class BuildEventSource extends AbstractTektonEventSource<Build> {
     @Inject
     BuildClient componentBuildClient;
 
