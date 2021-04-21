@@ -19,7 +19,7 @@ import lombok.ToString;
 @Kind("Run")
 @Group("agogos.redhat.com")
 @Version("v1alpha1")
-public class Run extends AgogosResource<RunSpec, StatusResource> implements Namespaced {
+public class Run extends AgogosResource<RunSpec, Status> implements Namespaced {
     private static final long serialVersionUID = 6688424087008846788L;
 
     @ToString
@@ -50,5 +50,5 @@ public class Run extends AgogosResource<RunSpec, StatusResource> implements Name
 
     @Getter
     @Setter
-    private StatusResource status = new StatusResource();
+    private Status status = new Status();
 }

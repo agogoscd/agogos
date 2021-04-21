@@ -2,13 +2,13 @@ package com.redhat.agogos.k8s.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.redhat.agogos.Status;
+import com.redhat.agogos.ResourceStatus;
 import com.redhat.agogos.eventing.CloudEventPublisher;
 import com.redhat.agogos.k8s.Resource;
 import com.redhat.agogos.k8s.TektonPipelineHelper;
 import com.redhat.agogos.k8s.event.PipelineRunEvent;
 import com.redhat.agogos.v1alpha1.AgogosResource;
-import com.redhat.agogos.v1alpha1.StatusResource;
+import com.redhat.agogos.v1alpha1.Status;
 import io.fabric8.kubernetes.client.CustomResource;
 import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
@@ -27,7 +27,7 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractController<T extends AgogosResource<?, StatusResource>> implements ResourceController<T> {
+public abstract class AbstractController<T extends AgogosResource<?, Status>> implements ResourceController<T> {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractController.class);
 
     @Inject
@@ -61,7 +61,7 @@ public abstract class AbstractController<T extends AgogosResource<?, StatusResou
      */
     public UpdateControl<T> handlePipelineRunEvent(T resource, PipelineRunEvent event) {
         String type = resource.getKind().toLowerCase();
-        Status status = event.getStatus().toStatus();
+        ResourceStatus status = event.getStatus().toStatus();
         String message = null;
         Map<?, ?> result = null;
 
@@ -83,7 +83,7 @@ public abstract class AbstractController<T extends AgogosResource<?, StatusResou
                         result = objectMapper.readValue(resultJson, Map.class);
                     } catch (JsonProcessingException e) {
                         // ceType = CloudEventType.BUILD_FAILURE; TODO ?!?!?!?
-                        status = Status.Failed;
+                        status = ResourceStatus.Failed;
                         message = "Build finished successfully, but returned metadata is not a valid JSON content";
                     }
                 }
@@ -169,7 +169,7 @@ public abstract class AbstractController<T extends AgogosResource<?, StatusResou
         LOG.info("{} modified '{}'", resource.getKind(), resource.getFullName());
 
         try {
-            switch (Status.valueOf(resource.getStatus().getStatus())) {
+            switch (ResourceStatus.valueOf(resource.getStatus().getStatus())) {
                 case New:
                     return runNew(resource);
                 case Running:
@@ -185,7 +185,7 @@ public abstract class AbstractController<T extends AgogosResource<?, StatusResou
                     resource.getFullName(), ex);
 
             // Set status to "Failed" with reason being the failure
-            setStatus(resource.getStatus(), Status.Failed, ex.getMessage());
+            setStatus(resource.getStatus(), ResourceStatus.Failed, ex.getMessage());
 
             return UpdateControl.updateStatusSubResource(resource);
         }
@@ -196,32 +196,32 @@ public abstract class AbstractController<T extends AgogosResource<?, StatusResou
 
     /**
      * <p>
-     * Updates {@link StatusResource} of the particular {@link CustomResource}.
+     * Updates {@link Status} of the particular {@link CustomResource}.
      * <p/>
      * 
      * <p>
      * It sets result of the status to <code>null</code>.
      * </p>
      * 
-     * @param status {@link StatusResource} object
+     * @param status {@link Status} object
      * @param newStatus One of available statuses
      * @param newReason Description of the reason for last status change
      */
-    protected boolean setStatus(StatusResource status, Status newStatus, String newReason) {
+    protected boolean setStatus(Status status, ResourceStatus newStatus, String newReason) {
         return setStatus(status, newStatus, newReason, null);
     }
 
     /**
      * <p>
-     * Updates {@link StatusResource} of the particular {@link CustomResource}.
+     * Updates {@link Status} of the particular {@link CustomResource}.
      * <p/>
      * 
-     * @param status {@link StatusResource} object
+     * @param status {@link Status} object
      * @param newStatus One of available statuses
      * @param newReason Description of the reason for last status change
      * @param result Map of results, if any
      */
-    protected boolean setStatus(StatusResource status, Status newStatus, String newReason,
+    protected boolean setStatus(Status status, ResourceStatus newStatus, String newReason,
             Map<?, ?> newResult) {
 
         if (status.getStatus().equals(String.valueOf(newStatus)) //
@@ -271,7 +271,7 @@ public abstract class AbstractController<T extends AgogosResource<?, StatusResou
             LOG.warn("Parent resource {} '{}' of {} '{}' is not ready yet, failing", parent.getKind(),
                     parent.getFullName(), resource.getKind(), resource.getFullName());
 
-            setStatus(resource.getStatus(), Status.Failed,
+            setStatus(resource.getStatus(), ResourceStatus.Failed,
                     String.format("Parent resource '%s' is not ready", parent.getFullName()));
 
             return UpdateControl.updateStatusSubResource(resource);
@@ -297,7 +297,7 @@ public abstract class AbstractController<T extends AgogosResource<?, StatusResou
 
             LOG.error("{}: Could not create Tekton PipelineRun", error, e);
 
-            setStatus(resource.getStatus(), Status.Failed,
+            setStatus(resource.getStatus(), ResourceStatus.Failed,
                     String.format("Could not prepare resource, ERROR: %s", error));
 
             return UpdateControl.updateStatusSubResource(resource);

@@ -2,7 +2,7 @@ package com.redhat.agogos.v1alpha1;
 
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.redhat.agogos.Status;
+import com.redhat.agogos.ResourceStatus;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.util.Map;
@@ -13,7 +13,7 @@ import lombok.ToString;
 @ToString
 @JsonDeserialize(using = JsonDeserializer.None.class)
 @RegisterForReflection
-public class StatusResource implements KubernetesResource {
+public class Status implements KubernetesResource {
 
     private static final long serialVersionUID = -3677250631346179789L;
 
@@ -22,7 +22,7 @@ public class StatusResource implements KubernetesResource {
     private Map<?, ?> result;
     @Getter
     @Setter
-    private String status = String.valueOf(Status.New);
+    private String status = String.valueOf(ResourceStatus.New);
     @Getter
     @Setter
     private String reason;

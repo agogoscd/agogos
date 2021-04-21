@@ -13,9 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
-public class ComponentBuildValidator extends Validator<Build> {
+public class BuildValidator extends Validator<Build> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ComponentBuildValidator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BuildValidator.class);
 
     @Inject
     ComponentClient componentClient;

@@ -6,7 +6,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @JsonDeserialize
 @RegisterForReflection
-public class BuilderResourceList extends CustomResourceList<BuilderResource> {
+public class BuilderList extends CustomResourceList<Builder> {
 
     private static final long serialVersionUID = -4327366831588566317L;
 

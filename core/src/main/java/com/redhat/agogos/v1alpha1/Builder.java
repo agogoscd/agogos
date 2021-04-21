@@ -9,7 +9,7 @@ import lombok.ToString;
 @Kind("Builder")
 @Group("agogos.redhat.com")
 @Version("v1alpha1")
-public class BuilderResource extends AbstractStage {
+public class Builder extends AbstractStage {
     private static final long serialVersionUID = 1184222810180288956L;
 
 }

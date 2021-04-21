@@ -7,7 +7,7 @@ import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.k8s.Resource;
 import com.redhat.agogos.k8s.client.BuilderClient;
 import com.redhat.agogos.k8s.client.PipelineClient;
-import com.redhat.agogos.v1alpha1.BuilderResource;
+import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.Component.ComponentStatus;
 import com.redhat.agogos.v1alpha1.Component.Status;
@@ -180,7 +180,7 @@ public class ComponentController implements ResourceController<Component> {
                     component.getNamespacedName(), e);
         }
 
-        BuilderResource builder = builderClient.getByName(component.getSpec().getBuilderRef().get("name"));
+        Builder builder = builderClient.getByName(component.getSpec().getBuilderRef().get("name"));
 
         if (builder == null) {
             throw new MissingResourceException("Selected Builder '{}' is not available in the system",

@@ -15,9 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Controller(generationAwareEventProcessing = false)
-public class PipelineRunController extends AbstractController<Run> {
+public class RunController extends AbstractController<Run> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PipelineRunController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RunController.class);
 
     @Inject
     PipelineClient pipelineClient;

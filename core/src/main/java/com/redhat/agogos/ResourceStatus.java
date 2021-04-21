@@ -1,6 +1,6 @@
 package com.redhat.agogos;
 
-public enum Status {
+public enum ResourceStatus {
     New,
     Running,
     Finished,

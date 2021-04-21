@@ -3,7 +3,7 @@ package com.redhat.cpaas.test.k8s.webhooks.validator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.k8s.client.BuilderClient;
 import com.redhat.agogos.k8s.webhooks.WebhookHandler;
-import com.redhat.agogos.v1alpha1.BuilderResource;
+import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.cpaas.test.TestResources;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
@@ -39,7 +39,7 @@ public class ComponentValidatorTest {
     @DisplayName("Validate correct review request")
     public void validateCorrect() throws IOException {
         // Mock the stage validation to return a stage
-        Mockito.when(builderClient.getByName("maven")).thenReturn(new BuilderResource());
+        Mockito.when(builderClient.getByName("maven")).thenReturn(new Builder());
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
                 .then().statusCode(200).body("response.allowed", CoreMatchers.equalTo(true))
@@ -61,7 +61,7 @@ public class ComponentValidatorTest {
     @Test
     @DisplayName("Validate valid data passed to builder")
     public void validateCorrectBuilderData() throws IOException {
-        BuilderResource builder = new BuilderResource();
+        Builder builder = new Builder();
         builder.getSpec().getSchema().getOpenAPIV3Schema().putAll(TestResources.asMap("openapi-schema-valid.json"));
 
         Mockito.when(builderClient.getByName("maven")).thenReturn(builder);
@@ -74,7 +74,7 @@ public class ComponentValidatorTest {
     @Test
     @DisplayName("Validate invalid data passed to builder")
     public void validateIncorrectBuilderData() throws IOException {
-        BuilderResource builder = new BuilderResource();
+        Builder builder = new Builder();
         builder.getSpec().getSchema().getOpenAPIV3Schema().putAll(TestResources.asMap("openapi-schema-invalid.json"));
 
         Mockito.when(builderClient.getByName("maven")).thenReturn(builder);

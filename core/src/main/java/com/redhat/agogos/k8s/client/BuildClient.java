@@ -1,7 +1,7 @@
 package com.redhat.agogos.k8s.client;
 
 import com.redhat.agogos.v1alpha1.Build;
-import com.redhat.agogos.v1alpha1.BuildResourceList;
+import com.redhat.agogos.v1alpha1.BuildList;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
@@ -28,11 +28,11 @@ public class BuildClient {
     @Inject
     KubernetesClient kubernetesClient;
 
-    MixedOperation<Build, BuildResourceList, Resource<Build>> componentBuildClient;
+    MixedOperation<Build, BuildList, Resource<Build>> componentBuildClient;
 
     @PostConstruct
     void init() {
-        componentBuildClient = kubernetesClient.customResources(Build.class, BuildResourceList.class);
+        componentBuildClient = kubernetesClient.customResources(Build.class, BuildList.class);
     }
 
     public List<Build> findByLabel(String namespace, String label, String value) {

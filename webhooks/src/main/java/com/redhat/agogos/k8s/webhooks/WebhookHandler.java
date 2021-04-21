@@ -2,7 +2,7 @@ package com.redhat.agogos.k8s.webhooks;
 
 import com.redhat.agogos.k8s.webhooks.mutator.BuildMutator;
 import com.redhat.agogos.k8s.webhooks.mutator.RunMutator;
-import com.redhat.agogos.k8s.webhooks.validator.ComponentBuildValidator;
+import com.redhat.agogos.k8s.webhooks.validator.BuildValidator;
 import com.redhat.agogos.k8s.webhooks.validator.ComponentValidator;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Component;
@@ -31,7 +31,7 @@ public class WebhookHandler {
     ComponentValidator componentValidator;
 
     @Inject
-    ComponentBuildValidator buildValidator;
+    BuildValidator buildValidator;
 
     @Inject
     BuildMutator buildMutator;
