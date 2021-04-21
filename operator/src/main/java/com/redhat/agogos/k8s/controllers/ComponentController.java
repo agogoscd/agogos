@@ -147,7 +147,7 @@ public class ComponentController implements ResourceController<Component> {
 
     private UpdateControl<Component> onResourceUpdate(Component component,
             Context<Component> context) {
-        LOG.info("Component '{}' modified", component.getNamespacedName());
+        LOG.info("Component '{}' modified", component.getFullName());
 
         // Create or update pipeline in any case
         this.updateBuildPipeline(component);
@@ -234,20 +234,6 @@ public class ComponentController implements ResourceController<Component> {
                 .build();
 
         tasks.add(buildTask);
-
-        // // TODO: Remove, only for now
-        // PipelineTask s3Task = new PipelineTaskBuilder() //
-        // .withName("s3") //
-        // .withTaskRef(new TaskRef("tekton.dev/v1beta1", "Task", "s3")) //
-        // .addNewParam() //
-        // .withName("component") //
-        // .withNewValue(componentJson) //
-        // .endParam() //
-        // .withWorkspaces(resultsWsBinding, sharedWsBinding) //
-        // .withRunAfter(component.getMetadata().getName()) // TODO: hardcoded
-        // .build();
-
-        // tasks.add(s3Task);
 
         // Define main workspace
         PipelineWorkspaceDeclaration workspaceMain = new PipelineWorkspaceDeclarationBuilder() //
