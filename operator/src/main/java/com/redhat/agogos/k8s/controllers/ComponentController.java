@@ -219,8 +219,7 @@ public class ComponentController implements ResourceController<Component> {
         TaskRef buildTaskRef = new TaskRef(
                 "tekton.dev/v1beta1",
                 builder.getSpec().getTaskRef().get("kind"),
-                builder.getSpec().getTaskRef().get("name")
-        );
+                builder.getSpec().getTaskRef().get("name"));
         // Prepare main task
         PipelineTask buildTask = new PipelineTaskBuilder() //
                 .withName(component.getMetadata().getName()) //
