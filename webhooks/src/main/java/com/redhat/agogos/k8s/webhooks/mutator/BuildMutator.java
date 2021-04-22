@@ -9,11 +9,14 @@ import com.redhat.agogos.v1alpha1.Component;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionRequest;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
+import java.util.HashMap;
+import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 
 @ApplicationScoped
 public class BuildMutator extends Mutator<Build> {
@@ -44,11 +47,19 @@ public class BuildMutator extends Mutator<Build> {
      * @return Json object containing the label
      */
     private JsonObject generateLabels(Build componentBuild) {
-        JsonObject labels = Json.createObjectBuilder() //
-                .add(Resource.COMPONENT.getLabel(), componentBuild.getSpec().getComponent()) //
-                .build();
+        Map<String, String> labels = componentBuild.getMetadata().getLabels();
 
-        return labels;
+        if (labels == null) {
+            labels = new HashMap<>();
+        }
+
+        labels.put(Resource.COMPONENT.getLabel(), componentBuild.getSpec().getComponent());
+
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+
+        labels.forEach((k, v) -> builder.add(k, v));
+
+        return builder.build();
     }
 
     /**

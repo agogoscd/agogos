@@ -8,12 +8,15 @@ import com.redhat.agogos.v1alpha1.Run;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionRequest;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.MissingResourceException;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 
 @ApplicationScoped
 public class RunMutator extends Mutator<Run> {
@@ -44,11 +47,19 @@ public class RunMutator extends Mutator<Run> {
      * @return Json object containing the label
      */
     private JsonObject generateLabels(Run run) {
-        JsonObject labels = Json.createObjectBuilder() //
-                .add(Resource.PIPELINE.getLabel(), run.getSpec().getPipeline()) //
-                .build();
+        Map<String, String> labels = run.getMetadata().getLabels();
 
-        return labels;
+        if (labels == null) {
+            labels = new HashMap<>();
+        }
+
+        labels.put(Resource.PIPELINE.getLabel(), run.getSpec().getPipeline());
+
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+
+        labels.forEach((k, v) -> builder.add(k, v));
+
+        return builder.build();
     }
 
     /**
