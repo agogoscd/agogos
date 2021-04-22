@@ -38,7 +38,9 @@
         "namespace": "default"
       },
       "spec": {
-        "builder": "maven",
+        "builderRef": {
+            "name": "maven"
+        },
         "data": {
           "someKey": "someValue"
         }
@@ -52,7 +54,9 @@
         "namespace": "default"
       },
       "spec": {
-        "builder": "maven",
+        "builderRef": {
+            "name": "maven"
+        },
         "data": {
           "someKey": "someValue"
         }
