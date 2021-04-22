@@ -51,11 +51,11 @@ public class ComponentValidator extends Validator<ComponentResource> {
     private void validateComponent(ComponentResource component) throws ApplicationException {
         LOG.info("Validating component '{}'", component.getNamespacedName());
 
-        BuilderResource builder = builderClient.getByName(component.getSpec().getBuilder());
+        BuilderResource builder = builderClient.getByName(component.getSpec().getBuilderRef().get("name"));
 
         if (builder == null) {
             throw new MissingResourceException("Selected builder '{}' is not registered in the system",
-                    component.getSpec().getBuilder());
+                    component.getSpec().getBuilderRef().get("name"));
         }
 
         ValidationData<Void> validation = new ValidationData<>();

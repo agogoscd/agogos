@@ -61,7 +61,7 @@ public class ComponentResource extends AgogosResource<ComponentSpec, ComponentSt
 
         @Getter
         @Setter
-        private String builder;
+        private Map<String, String> builderRef = new HashMap<>();
 
         @Getter
         @Setter
@@ -102,7 +102,7 @@ public class ComponentResource extends AgogosResource<ComponentSpec, ComponentSt
      */
     @JsonIgnore
     public Map<String, Object> toEasyMap() {
-        return Map.of("builder", this.getSpec().getBuilder(), "data", this.getSpec().getData(), "name",
+        return Map.of("builder", this.getSpec().getBuilderRef().get("name"), "data", this.getSpec().getData(), "name",
                 this.getMetadata().getName(), "status", this.getStatus().getStatus());
     }
 
