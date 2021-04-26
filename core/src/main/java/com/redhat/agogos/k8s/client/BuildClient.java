@@ -1,9 +1,7 @@
 package com.redhat.agogos.k8s.client;
 
 import com.redhat.agogos.v1alpha1.Build;
-import com.redhat.agogos.v1alpha1.BuildResourceList;
-import io.fabric8.kubernetes.api.model.ListOptions;
-import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
+import com.redhat.agogos.v1alpha1.BuildList;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
@@ -30,12 +28,17 @@ public class BuildClient {
     @Inject
     KubernetesClient kubernetesClient;
 
-    MixedOperation<Build, BuildResourceList, Resource<Build>> componentBuildClient;
+    MixedOperation<Build, BuildList, Resource<Build>> componentBuildClient;
 
     @PostConstruct
     void init() {
-        componentBuildClient = kubernetesClient.customResources(Build.class, BuildResourceList.class);
+        componentBuildClient = kubernetesClient.customResources(Build.class, BuildList.class);
     }
+
+    // @Produces
+    // public MixedOperation<Build, BuildList, Resource<Build>> buildClient() {
+    //     return kubernetesClient.customResources(Build.class, BuildList.class);
+    // }
 
     public List<Build> findByLabel(String namespace, String label, String value) {
         return componentBuildClient.inNamespace(namespace).withLabel(label, value).list().getItems();
@@ -45,25 +48,12 @@ public class BuildClient {
         return componentBuildClient.inNamespace(namespace).withLabel(label).list().getItems();
     }
 
-    /**
-     * Find the {@link ComponentBuildResource} by name.
-     * 
-     * @param name Name of the ComponentBuild.
-     * @return The {@link ComponentBuildResource} or <code>null</code> in case it
-     *         cannot be found
-     */
-    public Build getByName(String name) {
-        ListOptions options = new ListOptionsBuilder().withFieldSelector(String.format("metadata.name=%s", name))
-                .build();
+    public List<Build> list(String namespace) {
+        return componentBuildClient.inNamespace(namespace).list().getItems();
+    }
 
-        BuildResourceList buildResources = componentBuildClient.list(options);
-
-        if (buildResources.getItems().isEmpty() || buildResources.getItems().size() > 1) {
-            LOG.debug("ComponentBuild '{}' cannot be found", name);
-            return null;
-        }
-
-        return buildResources.getItems().get(0);
+    public List<Build> list() {
+        return list(kubernetesClient.getNamespace());
     }
 
     public Build create(String name, String namespace) {

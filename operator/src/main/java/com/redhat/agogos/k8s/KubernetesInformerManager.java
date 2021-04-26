@@ -1,7 +1,7 @@
 package com.redhat.agogos.k8s;
 
 import com.redhat.agogos.k8s.event.PipelineRunEventHandler;
-import com.redhat.agogos.v1alpha1.ComponentResource;
+import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -34,7 +34,7 @@ public class KubernetesInformerManager {
 
         Map<String, String[]> labels = new HashMap<>(1);
         labels.put(Resource.RESOURCE.getLabel(),
-                new String[] { HasMetadata.getKind(ComponentResource.class).toLowerCase(),
+                new String[] { HasMetadata.getKind(Component.class).toLowerCase(),
                         HasMetadata.getKind(Pipeline.class).toLowerCase() });
 
         SharedIndexInformer<PipelineRun> informer = factory.sharedIndexInformerFor(PipelineRun.class,

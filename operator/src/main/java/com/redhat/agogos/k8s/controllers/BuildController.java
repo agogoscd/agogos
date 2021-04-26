@@ -5,7 +5,7 @@ import com.redhat.agogos.k8s.client.ComponentClient;
 import com.redhat.agogos.k8s.event.BuildEventSource;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.Build;
-import com.redhat.agogos.v1alpha1.ComponentResource;
+import com.redhat.agogos.v1alpha1.Component;
 import io.javaoperatorsdk.operator.api.Context;
 import io.javaoperatorsdk.operator.api.Controller;
 import io.javaoperatorsdk.operator.api.DeleteControl;
@@ -29,7 +29,7 @@ public class BuildController extends AbstractController<Build> {
      * <p>
      * Register the {@link io.fabric8.tekton.pipeline.v1alpha1.PipelineRun} event
      * source so that we can receive events from PipelineRun's that are related to
-     * {@link ComponentResource}'s.
+     * {@link Component}'s.
      * </p>
      */
     @Override
@@ -42,7 +42,7 @@ public class BuildController extends AbstractController<Build> {
      * Method triggered when a {@link Build} is removed from the cluster.
      * </p>
      * 
-     * @param component {@link Build}
+     * @param build {@link Build}
      * @param context {@link Context}
      * @return {@link DeleteControl}
      */
@@ -55,7 +55,7 @@ public class BuildController extends AbstractController<Build> {
     protected AgogosResource<?, ?> parentResource(Build build) {
         LOG.debug("Finding parent resource for Build '{}'", build.getFullName());
 
-        ComponentResource component = componentClient.getByName(build.getSpec().getComponent(),
+        Component component = componentClient.getByName(build.getSpec().getComponent(),
                 build.getMetadata().getNamespace());
 
         if (component == null) {

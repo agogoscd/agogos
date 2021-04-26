@@ -1,0 +1,12 @@
+quarkus:
+  banner:
+    enabled: false
+
+
+# "%dev":
+
+"%prod":
+  quarkus:
+    log:
+      level: SEVERE
+

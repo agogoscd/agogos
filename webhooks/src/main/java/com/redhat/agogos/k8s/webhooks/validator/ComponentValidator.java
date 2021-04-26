@@ -6,8 +6,8 @@ import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.errors.ValidationException;
 import com.redhat.agogos.k8s.client.BuilderClient;
-import com.redhat.agogos.v1alpha1.BuilderResource;
-import com.redhat.agogos.v1alpha1.ComponentResource;
+import com.redhat.agogos.v1alpha1.Builder;
+import com.redhat.agogos.v1alpha1.Component;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
 import java.util.List;
@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
-public class ComponentValidator extends Validator<ComponentResource> {
+public class ComponentValidator extends Validator<Component> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ComponentValidator.class);
 
@@ -32,7 +32,7 @@ public class ComponentValidator extends Validator<ComponentResource> {
     BuilderClient builderClient;
 
     @Override
-    protected void validateResource(ComponentResource resource, AdmissionResponseBuilder responseBuilder) {
+    protected void validateResource(Component resource, AdmissionResponseBuilder responseBuilder) {
         try {
             validateComponent(resource);
 
@@ -48,10 +48,10 @@ public class ComponentValidator extends Validator<ComponentResource> {
         }
     }
 
-    private void validateComponent(ComponentResource component) throws ApplicationException {
+    private void validateComponent(Component component) throws ApplicationException {
         LOG.info("Validating component '{}'", component.getNamespacedName());
 
-        BuilderResource builder = builderClient.getByName(component.getSpec().getBuilderRef().get("name"));
+        Builder builder = builderClient.getByName(component.getSpec().getBuilderRef().get("name"));
 
         if (builder == null) {
             throw new MissingResourceException("Selected builder '{}' is not registered in the system",

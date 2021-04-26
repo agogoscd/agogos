@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.AbstractStage.StageSpec;
 import com.redhat.agogos.v1alpha1.AbstractStage.StageStatus;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
-import io.fabric8.kubernetes.client.CustomResource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +14,7 @@ import lombok.ToString;
 
 @ToString
 @RegisterForReflection
-public abstract class AbstractStage extends CustomResource<StageSpec, StageStatus> {
+public abstract class AbstractStage extends AgogosResource<StageSpec, StageStatus> {
 
     public enum Phase {
         BUILD,

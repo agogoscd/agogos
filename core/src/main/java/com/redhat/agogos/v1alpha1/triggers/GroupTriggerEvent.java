@@ -6,7 +6,7 @@ import com.redhat.agogos.PipelineRunState;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.k8s.client.GroupClient;
 import com.redhat.agogos.v1alpha1.Build;
-import com.redhat.agogos.v1alpha1.GroupResource;
+import com.redhat.agogos.v1alpha1.Group;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -33,7 +33,7 @@ public class GroupTriggerEvent implements TriggerEvent {
         GroupClient groupClient = CDI.current().select(GroupClient.class).get();
 
         // Fetch the Group information
-        GroupResource componentGroup = groupClient.getByName(name);
+        Group componentGroup = groupClient.getByName(name);
 
         // TODO: This should be part of the validation webhook
         // But it doesn't hurt to have it here as well

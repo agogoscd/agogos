@@ -1,7 +1,7 @@
 package com.redhat.agogos.k8s.client;
 
-import com.redhat.agogos.v1alpha1.BuilderResource;
-import com.redhat.agogos.v1alpha1.BuilderResourceList;
+import com.redhat.agogos.v1alpha1.Builder;
+import com.redhat.agogos.v1alpha1.BuilderList;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
@@ -15,7 +15,7 @@ import javax.inject.Inject;
 /**
  * Builder CR client.
  * 
- * This bean is used to interact with the {@link BuilderResource} CR.
+ * This bean is used to interact with the {@link Builder} CR.
  * 
  * @author Marek Goldmann
  */
@@ -28,24 +28,24 @@ public class BuilderClient {
     @Inject
     TektonClient tektonClient;
 
-    MixedOperation<BuilderResource, BuilderResourceList, Resource<BuilderResource>> builderClient;
+    MixedOperation<Builder, BuilderList, Resource<Builder>> builderClient;
 
     @PostConstruct
     void init() {
-        builderClient = kubernetesClient.customResources(BuilderResource.class, BuilderResourceList.class);
+        builderClient = kubernetesClient.customResources(Builder.class, BuilderList.class);
     }
 
     /**
-     * Finds {@link BuilderResource} by name and returns it.
+     * Finds {@link Builder} by name and returns it.
      * 
      * @param name Name of the Builder
-     * @return {@link BuilderResource} object.
+     * @return {@link Builder} object.
      */
-    public BuilderResource getByName(String name) {
+    public Builder getByName(String name) {
         ListOptionsBuilder builder = new ListOptionsBuilder()
                 .withFieldSelector(String.format("metadata.name=%s", name));
 
-        BuilderResourceList builders = builderClient.list(builder.build());
+        BuilderList builders = builderClient.list(builder.build());
 
         if (builders.getItems().isEmpty() || builders.getItems().size() > 1) {
             return null;

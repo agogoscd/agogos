@@ -7,10 +7,10 @@ import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.k8s.Resource;
 import com.redhat.agogos.k8s.client.BuilderClient;
 import com.redhat.agogos.k8s.client.PipelineClient;
-import com.redhat.agogos.v1alpha1.BuilderResource;
-import com.redhat.agogos.v1alpha1.ComponentResource;
-import com.redhat.agogos.v1alpha1.ComponentResource.ComponentStatus;
-import com.redhat.agogos.v1alpha1.ComponentResource.Status;
+import com.redhat.agogos.v1alpha1.Builder;
+import com.redhat.agogos.v1alpha1.Component;
+import com.redhat.agogos.v1alpha1.Component.ComponentStatus;
+import com.redhat.agogos.v1alpha1.Component.Status;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.client.TektonClient;
@@ -43,7 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Controller
-public class ComponentController implements ResourceController<ComponentResource> {
+public class ComponentController implements ResourceController<Component> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ComponentController.class);
 
@@ -61,33 +61,33 @@ public class ComponentController implements ResourceController<ComponentResource
 
     /**
      * <p>
-     * Method triggered when a {@link ComponentResource} is removed from the
+     * Method triggered when a {@link Component} is removed from the
      * cluster.
      * </p>
      * 
-     * @param component {@link ComponentResource}
+     * @param component {@link Component}
      * @param context {@link Context}
      * @return {@link DeleteControl}
      */
     @Override
-    public DeleteControl deleteResource(ComponentResource component, Context<ComponentResource> context) {
+    public DeleteControl deleteResource(Component component, Context<Component> context) {
         LOG.info("Removing component '{}'", component.getNamespacedName());
         return DeleteControl.DEFAULT_DELETE;
     }
 
     /**
      * <p>
-     * Main method that is triggered when a change on the {@link ComponentResource}
+     * Main method that is triggered when a change on the {@link Component}
      * object is detected.
      * </p>
      * 
-     * @param component {@link ComponentResource}
+     * @param component {@link Component}
      * @param context {@link Context}
      * @return {@link UpdateControl}
      */
     @Override
-    public UpdateControl<ComponentResource> createOrUpdateResource(ComponentResource component,
-            Context<ComponentResource> context) {
+    public UpdateControl<Component> createOrUpdateResource(Component component,
+            Context<Component> context) {
 
         // Try to find the latest event
         final Optional<CustomResourceEvent> customResourceEvent = context.getEvents()
@@ -103,16 +103,16 @@ public class ComponentController implements ResourceController<ComponentResource
 
     /**
      * <p>
-     * Updates {@link ComponentResource.ComponentStatus} of the particular
-     * {@link ComponentResource}.
+     * Updates {@link Component.ComponentStatus} of the particular
+     * {@link Component}.
      * <p/>
      * 
      * 
-     * @param component {@link ComponentResource} object
+     * @param component {@link Component} object
      * @param status One of available statuses
      * @param reason Description of the reason for last status change
      */
-    private void setStatus(final ComponentResource component, final Status status, final String reason) {
+    private void setStatus(final Component component, final Status status, final String reason) {
         ComponentStatus componentStatus = component.getStatus();
 
         componentStatus.setStatus(String.valueOf(status));
@@ -122,14 +122,14 @@ public class ComponentController implements ResourceController<ComponentResource
 
     /**
      * <p>
-     * Creates or updates Tekton pipeline based on the {@link ComponentResource}
-     * data passed and sets the status subresource on {@link ComponentResource}
+     * Creates or updates Tekton pipeline based on the {@link Component}
+     * data passed and sets the status subresource on {@link Component}
      * depending on the outcome of the pipeline update.
      * </p>
      * 
      * @param component Component resource to create the pipeline for
      */
-    private void updateBuildPipeline(ComponentResource component) {
+    private void updateBuildPipeline(Component component) {
         try {
             LOG.debug("Preparing pipeline for component '{}'", component.getNamespacedName());
 
@@ -145,9 +145,9 @@ public class ComponentController implements ResourceController<ComponentResource
         }
     }
 
-    private UpdateControl<ComponentResource> onResourceUpdate(ComponentResource component,
-            Context<ComponentResource> context) {
-        LOG.info("Component '{}' modified", component.getNamespacedName());
+    private UpdateControl<Component> onResourceUpdate(Component component,
+            Context<Component> context) {
+        LOG.info("Component '{}' modified", component.getFullName());
 
         // Create or update pipeline in any case
         this.updateBuildPipeline(component);
@@ -160,15 +160,15 @@ public class ComponentController implements ResourceController<ComponentResource
 
     /**
      * <p>
-     * Creates or updates Tekton pipeline based on the {@link ComponentResource}
+     * Creates or updates Tekton pipeline based on the {@link Component}
      * data passed.
      * </p>
      * 
-     * @param component {@link ComponentResource} to create the pipeline for
+     * @param component {@link Component} to create the pipeline for
      * @return {@link Pipeline} object for the updated pipeline
      * @throws ApplicationException in case the pipeline cannot be updated
      */
-    private Pipeline updateTektonBuildPipeline(ComponentResource component) throws ApplicationException {
+    private Pipeline updateTektonBuildPipeline(Component component) throws ApplicationException {
         String componentJson;
 
         // Convert Component metadata to JSON
@@ -180,7 +180,7 @@ public class ComponentController implements ResourceController<ComponentResource
                     component.getNamespacedName(), e);
         }
 
-        BuilderResource builder = builderClient.getByName(component.getSpec().getBuilderRef().get("name"));
+        Builder builder = builderClient.getByName(component.getSpec().getBuilderRef().get("name"));
 
         if (builder == null) {
             throw new MissingResourceException("Selected Builder '{}' is not available in the system",
@@ -219,8 +219,7 @@ public class ComponentController implements ResourceController<ComponentResource
         TaskRef buildTaskRef = new TaskRef(
                 "tekton.dev/v1beta1",
                 builder.getSpec().getTaskRef().get("kind"),
-                builder.getSpec().getTaskRef().get("name")
-        );
+                builder.getSpec().getTaskRef().get("name"));
         // Prepare main task
         PipelineTask buildTask = new PipelineTaskBuilder() //
                 .withName(component.getMetadata().getName()) //
@@ -234,20 +233,6 @@ public class ComponentController implements ResourceController<ComponentResource
                 .build();
 
         tasks.add(buildTask);
-
-        // // TODO: Remove, only for now
-        // PipelineTask s3Task = new PipelineTaskBuilder() //
-        // .withName("s3") //
-        // .withTaskRef(new TaskRef("tekton.dev/v1beta1", "Task", "s3")) //
-        // .addNewParam() //
-        // .withName("component") //
-        // .withNewValue(componentJson) //
-        // .endParam() //
-        // .withWorkspaces(resultsWsBinding, sharedWsBinding) //
-        // .withRunAfter(component.getMetadata().getName()) // TODO: hardcoded
-        // .build();
-
-        // tasks.add(s3Task);
 
         // Define main workspace
         PipelineWorkspaceDeclaration workspaceMain = new PipelineWorkspaceDeclarationBuilder() //

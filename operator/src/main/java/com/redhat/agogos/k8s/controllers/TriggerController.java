@@ -12,7 +12,7 @@ import com.redhat.agogos.k8s.Resource;
 import com.redhat.agogos.k8s.TektonPipelineHelper;
 import com.redhat.agogos.k8s.client.ComponentClient;
 import com.redhat.agogos.k8s.client.PipelineClient;
-import com.redhat.agogos.v1alpha1.ComponentResource;
+import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.triggers.TimedTriggerEvent;
 import com.redhat.agogos.v1alpha1.triggers.Trigger;
@@ -98,7 +98,7 @@ public class TriggerController implements ResourceController<Trigger> {
 
         switch (target.getKind()) {
             case "Component":
-                ComponentResource component = componentClient.getByName(target.getName(), trigger.getMetadata().getNamespace());
+                Component component = componentClient.getByName(target.getName(), trigger.getMetadata().getNamespace());
 
                 // TODO: Move to validation admission webhook
                 if (component == null) {
