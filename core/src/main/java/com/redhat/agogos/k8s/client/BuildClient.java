@@ -35,12 +35,25 @@ public class BuildClient {
         componentBuildClient = kubernetesClient.customResources(Build.class, BuildList.class);
     }
 
+    // @Produces
+    // public MixedOperation<Build, BuildList, Resource<Build>> buildClient() {
+    //     return kubernetesClient.customResources(Build.class, BuildList.class);
+    // }
+
     public List<Build> findByLabel(String namespace, String label, String value) {
         return componentBuildClient.inNamespace(namespace).withLabel(label, value).list().getItems();
     }
 
     public List<Build> findByLabel(String namespace, String label) {
         return componentBuildClient.inNamespace(namespace).withLabel(label).list().getItems();
+    }
+
+    public List<Build> list(String namespace) {
+        return componentBuildClient.inNamespace(namespace).list().getItems();
+    }
+
+    public List<Build> list() {
+        return list(kubernetesClient.getNamespace());
     }
 
     public Build create(String name, String namespace) {

@@ -3,10 +3,10 @@ package com.redhat.agogos.v1alpha1.triggers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.triggers.Trigger.TriggerSpec;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
-import io.fabric8.kubernetes.client.CustomResource;
 import io.fabric8.kubernetes.model.annotation.Group;
 import io.fabric8.kubernetes.model.annotation.Kind;
 import io.fabric8.kubernetes.model.annotation.Version;
@@ -24,7 +24,7 @@ import lombok.ToString;
 @Kind("Trigger")
 @Group("agogos.redhat.com")
 @Version("v1alpha1")
-public class Trigger extends CustomResource<TriggerSpec, Void> implements Namespaced {
+public class Trigger extends AgogosResource<TriggerSpec, Void> implements Namespaced {
 
     @Getter
     @Setter
