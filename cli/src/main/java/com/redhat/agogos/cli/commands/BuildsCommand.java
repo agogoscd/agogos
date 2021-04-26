@@ -2,7 +2,6 @@ package com.redhat.agogos.cli.commands;
 
 import java.util.List;
 
-import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 
 import com.redhat.agogos.cli.commands.BuildsCommand.DescribeCommand;
