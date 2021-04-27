@@ -204,9 +204,16 @@ spec:
               type: object
               description: Defines the desired state of Stage
               properties:
-                task:
-                  type: string
-                  description: Name of the Tekton task being the implementation of the Stage.
+                taskRef:
+                  type: object
+                  description: Defines the task reference
+                  properties:
+                    name:
+                      type: string
+                      description: Name of the Tekton task being the implementation of the Stage.
+                    kind: 
+                      type: string
+                      description: The kind. Can be either Task or ClusterTask
                 schema:
                   type: object
                   description: Validation definition that should be applied on the Stage configuration defined.
@@ -219,7 +226,7 @@ spec:
                   required:
                     - "openAPIV3Schema"
               required:
-                - "task"
+                - "taskRef"
           type: object
       served: true
       storage: true
