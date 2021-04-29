@@ -47,7 +47,7 @@ cli:
   artifacts:
     paths:
       - cli/target/agogosctl
-  only: [merge_requests]
+  only: [main]
   tags: [docker]
 
 pages:
