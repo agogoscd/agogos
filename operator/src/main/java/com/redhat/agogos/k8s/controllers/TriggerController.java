@@ -211,7 +211,8 @@ public class TriggerController implements ResourceController<Trigger> {
                 .withSpec(triggerSpecBuilder.build());
 
         // Create the Tekton Trigger
-        tektonClient.v1alpha1().triggers().createOrReplace(triggerBuilder.build());
+        tektonClient.v1alpha1().triggers().inNamespace(trigger.getMetadata().getNamespace())
+                .createOrReplace(triggerBuilder.build());
     }
 
     private void scheduleTimedTrigger(Trigger trigger, TimedTriggerEvent timed) {

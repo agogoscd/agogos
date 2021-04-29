@@ -5,6 +5,9 @@ import javax.inject.Inject;
 import com.redhat.agogos.cli.commands.BuildCommand;
 import com.redhat.agogos.cli.commands.ComponentCommand;
 import com.redhat.agogos.cli.commands.InstallCommand;
+import com.redhat.agogos.cli.commands.PipelineCommand;
+import com.redhat.agogos.cli.commands.RunCommand;
+import com.redhat.agogos.cli.commands.TriggerCommand;
 
 import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
@@ -14,10 +17,13 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.ScopeType;
 
 @QuarkusMain
-@CommandLine.Command(mixinStandardHelpOptions = true, subcommands = { //
+@CommandLine.Command(name = "agogosctl", mixinStandardHelpOptions = true, subcommands = { //
         InstallCommand.class,
         BuildCommand.class,
-        ComponentCommand.class
+        ComponentCommand.class,
+        PipelineCommand.class,
+        RunCommand.class,
+        TriggerCommand.class,
 })
 public class CLI implements QuarkusApplication {
     @Inject
