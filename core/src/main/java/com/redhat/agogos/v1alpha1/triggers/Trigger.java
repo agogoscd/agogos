@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.AgogosResource;
+import com.redhat.agogos.v1alpha1.Status;
 import com.redhat.agogos.v1alpha1.triggers.Trigger.TriggerSpec;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
@@ -24,7 +25,7 @@ import lombok.ToString;
 @Kind("Trigger")
 @Group("agogos.redhat.com")
 @Version("v1alpha1")
-public class Trigger extends AgogosResource<TriggerSpec, Void> implements Namespaced {
+public class Trigger extends AgogosResource<TriggerSpec, Status> implements Namespaced {
 
     @Getter
     @Setter
@@ -42,7 +43,13 @@ public class Trigger extends AgogosResource<TriggerSpec, Void> implements Namesp
 
     private static final long serialVersionUID = 127976417696596732L;
 
+    @Getter
+    @Setter
     private TriggerSpec spec = new TriggerSpec();
+
+    @Getter
+    @Setter
+    private Status status = new Status();
 
     /**
      * <p>

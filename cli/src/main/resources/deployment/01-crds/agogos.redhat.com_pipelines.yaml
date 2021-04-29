@@ -74,9 +74,28 @@ spec:
                       - "stageRef"
               required:
                 - "stages"
+            status:
+              description: ComponentStatus defines the observed state of Component
+              properties:
+                lastUpdate:
+                  format: date-time
+                  type: string
+                reason:
+                  type: string
+                status:
+                  default: New
+                  enum:
+                    - New
+                    - Initializing
+                    - Ready
+                    - Failed
+                  type: string
+              type: object
           type: object
       served: true
       storage: true
+      subresources:
+        status: {}
       additionalPrinterColumns:
         - name: Component Group
           jsonPath: .spec.group
@@ -88,3 +107,9 @@ spec:
         - name: Age
           type: date
           jsonPath: .metadata.creationTimestamp
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

@@ -30,6 +30,26 @@ docs:
   only: [merge_requests]
   tags: [docker]
 
+cli:
+  image:
+    name: quay.io/quarkus/ubi-quarkus-native-image:21.0.0-java11
+    entrypoint: ["/bin/sh", "-c"]
+  variables:
+    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+    MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
+  cache:
+    paths:
+      - .m2/repository
+  stage: build
+  script:
+    - ./mvnw clean package -pl cli -am -Pnative -s ci_settings.xml -Dmaven.wagon.http.ssl.insecure=true -Dnative-image.xmx=4g
+    - mv ./cli/target/agogosctl-runner ./cli/target/agogosctl
+  artifacts:
+    paths:
+      - cli/target/agogosctl
+  only: [main]
+  tags: [docker]
+
 pages:
   image: antora/antora:2.3.4
   stage: deploy

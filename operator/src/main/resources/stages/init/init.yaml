@@ -3,7 +3,9 @@ kind: ClusterStage
 metadata:
   name: init
 spec:
-  task: init
+  taskRef:
+    kind: ClusterTask
+    name: init
 ---
 # The Tekton Task responsible for handling errata
 apiVersion: tekton.dev/v1beta1

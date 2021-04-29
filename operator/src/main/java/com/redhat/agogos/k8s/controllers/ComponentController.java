@@ -2,6 +2,7 @@ package com.redhat.agogos.k8s.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redhat.agogos.ResourceStatus;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.k8s.Resource;
@@ -9,8 +10,8 @@ import com.redhat.agogos.k8s.client.BuilderClient;
 import com.redhat.agogos.k8s.client.PipelineClient;
 import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
-import com.redhat.agogos.v1alpha1.Component.ComponentStatus;
-import com.redhat.agogos.v1alpha1.Component.Status;
+import com.redhat.agogos.v1alpha1.Status;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.client.TektonClient;
@@ -22,6 +23,7 @@ import io.fabric8.tekton.pipeline.v1beta1.PipelineTask;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineTaskBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineWorkspaceDeclaration;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineWorkspaceDeclarationBuilder;
+import io.fabric8.tekton.pipeline.v1beta1.Task;
 import io.fabric8.tekton.pipeline.v1beta1.TaskRef;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBinding;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBindingBuilder;
@@ -112,8 +114,8 @@ public class ComponentController implements ResourceController<Component> {
      * @param status One of available statuses
      * @param reason Description of the reason for last status change
      */
-    private void setStatus(final Component component, final Status status, final String reason) {
-        ComponentStatus componentStatus = component.getStatus();
+    private void setStatus(final Component component, final ResourceStatus status, final String reason) {
+        Status componentStatus = component.getStatus();
 
         componentStatus.setStatus(String.valueOf(status));
         componentStatus.setReason(reason);
@@ -135,13 +137,13 @@ public class ComponentController implements ResourceController<Component> {
 
             this.updateTektonBuildPipeline(component);
 
-            setStatus(component, Status.Initializing, "Preparing pipeline");
+            setStatus(component, ResourceStatus.Initializing, "Preparing pipeline");
 
             LOG.info("Pipeline for component '{}' updated", component.getNamespacedName());
         } catch (ApplicationException e) {
             LOG.error("Error occurred while creating pipeline for component '{}'", component.getNamespacedName(), e);
 
-            setStatus(component, Status.Failed, "Could not create component pipeline");
+            setStatus(component, ResourceStatus.Failed, "Could not create component pipeline");
         }
     }
 
@@ -153,7 +155,7 @@ public class ComponentController implements ResourceController<Component> {
         this.updateBuildPipeline(component);
 
         // Update Component status
-        setStatus(component, Status.Ready, "");
+        setStatus(component, ResourceStatus.Ready, "Component is ready");
 
         return UpdateControl.updateStatusSubResource(component);
     }
@@ -217,17 +219,13 @@ public class ComponentController implements ResourceController<Component> {
         tasks.add(initTask);
 
         TaskRef buildTaskRef = new TaskRef(
-                "tekton.dev/v1beta1",
-                builder.getSpec().getTaskRef().get("kind"),
-                builder.getSpec().getTaskRef().get("name"));
+                HasMetadata.getApiVersion(Task.class),
+                builder.getSpec().getTaskRef().getKind(),
+                builder.getSpec().getTaskRef().getName());
         // Prepare main task
         PipelineTask buildTask = new PipelineTaskBuilder() //
                 .withName(component.getMetadata().getName()) //
                 .withTaskRef(buildTaskRef)
-                .addNewParam() //
-                .withName("component") //
-                .withNewValue(componentJson) //
-                .endParam() //
                 .withWorkspaces(stageWsBinding, pipelineWsBinding) //
                 .withRunAfter("init") //
                 .build();

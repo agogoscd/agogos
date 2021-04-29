@@ -204,9 +204,16 @@ spec:
               type: object
               description: Defines the desired state of Stage
               properties:
-                task:
-                  type: string
-                  description: Name of the Tekton task being the implementation of the Stage.
+                taskRef:
+                  type: object
+                  description: Defines the task reference
+                  properties:
+                    name:
+                      type: string
+                      description: Name of the Tekton task being the implementation of the Stage.
+                    kind: 
+                      type: string
+                      description: The kind. Can be either Task or ClusterTask
                 schema:
                   type: object
                   description: Validation definition that should be applied on the Stage configuration defined.
@@ -219,7 +226,7 @@ spec:
                   required:
                     - "openAPIV3Schema"
               required:
-                - "task"
+                - "taskRef"
           type: object
       served: true
       storage: true
@@ -445,9 +452,28 @@ spec:
                       - "stageRef"
               required:
                 - "stages"
+            status:
+              description: ComponentStatus defines the observed state of Component
+              properties:
+                lastUpdate:
+                  format: date-time
+                  type: string
+                reason:
+                  type: string
+                status:
+                  default: New
+                  enum:
+                    - New
+                    - Initializing
+                    - Ready
+                    - Failed
+                  type: string
+              type: object
           type: object
       served: true
       storage: true
+      subresources:
+        status: {}
       additionalPrinterColumns:
         - name: Component Group
           jsonPath: .spec.group
@@ -459,6 +485,12 @@ spec:
         - name: Age
           type: date
           jsonPath: .metadata.creationTimestamp
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -740,12 +772,20 @@ spec:
                 - events
                 - target
             status:
-              description: Trigger status
+              description: Defines the observed state of the Trigger
               properties:
                 lastUpdate:
                   format: date-time
                   type: string
                 reason:
+                  type: string
+                status:
+                  default: New
+                  enum:
+                    - New
+                    - Initializing
+                    - Ready
+                    - Failed
                   type: string
               type: object
           type: object
@@ -835,6 +875,7 @@ apiVersion: triggers.tekton.dev/v1alpha1
 kind: EventListener
 metadata:
   name: default
+  namespace: default
 spec:
   serviceAccountName: agogos-el
   namespaceSelector:

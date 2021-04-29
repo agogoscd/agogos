@@ -24,7 +24,7 @@ import lombok.ToString;
 @Kind("Pipeline")
 @Group("agogos.redhat.com")
 @Version("v1alpha1")
-public class Pipeline extends AgogosResource<PipelineSpec, Void> implements Namespaced {
+public class Pipeline extends AgogosResource<PipelineSpec, Status> implements Namespaced {
 
     private static final long serialVersionUID = 4918853237265675286L;
 
@@ -99,4 +99,8 @@ public class Pipeline extends AgogosResource<PipelineSpec, Void> implements Name
     @Getter
     @Setter
     private PipelineSpec spec = new PipelineSpec();
+
+    @Setter
+    @Getter
+    private Status status = new Status();
 }
