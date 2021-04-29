@@ -772,12 +772,20 @@ spec:
                 - events
                 - target
             status:
-              description: Trigger status
+              description: Defines the observed state of the Trigger
               properties:
                 lastUpdate:
                   format: date-time
                   type: string
                 reason:
+                  type: string
+                status:
+                  default: New
+                  enum:
+                    - New
+                    - Initializing
+                    - Ready
+                    - Failed
                   type: string
               type: object
           type: object

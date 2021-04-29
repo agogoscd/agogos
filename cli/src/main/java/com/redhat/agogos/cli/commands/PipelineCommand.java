@@ -8,12 +8,15 @@ import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.cli.commands.ComponentCommand.ComponentListCommand;
 import com.redhat.agogos.cli.commands.PipelineCommand.PipelineListCommand;
 import com.redhat.agogos.cli.commands.PipelineCommand.PipelineRunCommand;
+import com.redhat.agogos.cli.commands.RunCommand.RunDescribeCommand;
 import com.redhat.agogos.cli.commands.base.BaseCommand;
+import com.redhat.agogos.cli.commands.base.BaseListCommand;
 import com.redhat.agogos.cli.commands.base.ListMixin;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.Run;
 
+import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Parameters;
@@ -29,7 +32,7 @@ public class PipelineCommand implements Runnable {
 
     @Override
     public void run() {
-        cli.run(ComponentListCommand.class);
+        cli.usage(this.getClass());
     }
 
     @Command(mixinStandardHelpOptions = true, name = "run", description = "run a pipeline")
@@ -52,25 +55,11 @@ public class PipelineCommand implements Runnable {
 
             run = agogosClient.v1alpha1().runs().inNamespace(agogosClient.namespace()).create(run);
 
-            cli.run(PipelineListCommand.class);
+            cli.run(RunDescribeCommand.class, run.getMetadata().getName());
         }
     }
 
-    @Command(mixinStandardHelpOptions = true, name = "list", description = "list pipelines")
-    static class PipelineListCommand extends BaseCommand<Pipeline> {
-
-        @Mixin
-        ListMixin list;
-
-        @Inject
-        AgogosClient agogosClient;
-
-        @Override
-        public void run() {
-            List<Pipeline> pipelines = agogosClient.v1alpha1().pipelines().list()
-                    .getItems();
-
-            print(pipelines);
-        }
+    @Command(mixinStandardHelpOptions = true, name = "list", aliases = { "l" }, description = "list pipelines")
+    static class PipelineListCommand extends BaseListCommand<Pipeline> {
     }
 }

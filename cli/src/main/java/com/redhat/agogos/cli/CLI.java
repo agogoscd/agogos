@@ -40,6 +40,10 @@ public class CLI implements QuarkusApplication {
     @Getter
     Output output;
 
+    public void usage(Class<? extends Runnable> command) {
+        new CommandLine(command, factory).usage(System.out);
+    }
+
     public void run(Class<? extends Runnable> command, String... args) {
         new CommandLine(command, factory).setCaseInsensitiveEnumValuesAllowed(true).execute(args);
     }

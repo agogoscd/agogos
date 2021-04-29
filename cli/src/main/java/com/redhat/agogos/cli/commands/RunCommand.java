@@ -1,22 +1,21 @@
 package com.redhat.agogos.cli.commands;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import com.redhat.agogos.cli.CLI;
-import com.redhat.agogos.cli.commands.ComponentCommand.ComponentListCommand;
+import com.redhat.agogos.cli.commands.RunCommand.RunDescribeCommand;
 import com.redhat.agogos.cli.commands.RunCommand.RunListCommand;
 import com.redhat.agogos.cli.commands.base.BaseCommand;
-import com.redhat.agogos.cli.commands.base.ListMixin;
+import com.redhat.agogos.cli.commands.base.BaseListCommand;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Run;
 
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
+import picocli.CommandLine.Parameters;
 
 @Command(mixinStandardHelpOptions = true, name = "runs", aliases = {
         "run", "r" }, description = "Interact with runs", subcommands = { // 
+                RunDescribeCommand.class,
                 RunListCommand.class
         })
 public class RunCommand implements Runnable {
@@ -25,24 +24,25 @@ public class RunCommand implements Runnable {
 
     @Override
     public void run() {
-        cli.run(ComponentListCommand.class);
+        cli.usage(this.getClass());
     }
 
-    @Command(mixinStandardHelpOptions = true, name = "list", description = "list runs")
-    static class RunListCommand extends BaseCommand<Run> {
-
-        @Mixin
-        ListMixin list;
+    @Command(mixinStandardHelpOptions = true, name = "describe", description = "describe run")
+    public static class RunDescribeCommand extends BaseCommand<Run> {
+        @Parameters(index = "0", description = "Name of the run")
+        String name;
 
         @Inject
         AgogosClient agogosClient;
 
         @Override
         public void run() {
-            List<Run> runs = agogosClient.v1alpha1().runs().list()
-                    .getItems();
-
-            print(runs);
+            Run run = agogosClient.v1alpha1().runs().inNamespace(agogosClient.namespace()).withName(name).get();
+            showResource(run);
         }
+    }
+
+    @Command(mixinStandardHelpOptions = true, name = "list", aliases = { "l" }, description = "list runs")
+    static class RunListCommand extends BaseListCommand<Run> {
     }
 }

@@ -9,6 +9,7 @@ import com.redhat.agogos.cli.commands.BuildCommand.BuildDescribeCommand;
 import com.redhat.agogos.cli.commands.BuildCommand.BuildListCommand;
 import com.redhat.agogos.cli.commands.base.ListMixin;
 import com.redhat.agogos.cli.commands.base.BaseCommand;
+import com.redhat.agogos.cli.commands.base.BaseListCommand;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Build;
 
@@ -29,7 +30,7 @@ public class BuildCommand implements Runnable {
 
     @Override
     public void run() {
-        cli.run(BuildListCommand.class);
+        cli.usage(this.getClass());
     }
 
     @Command(mixinStandardHelpOptions = true, name = "describe", description = "describe build")
@@ -42,46 +43,13 @@ public class BuildCommand implements Runnable {
 
         @Override
         public void run() {
-            Build build = agogosClient.v1alpha1().builds().withName(name).get();
-            print(build);
+            Build build = agogosClient.v1alpha1().builds().inNamespace(agogosClient.namespace()).withName(name).get();
+            showResource(build);
         }
     }
 
-    @Command(mixinStandardHelpOptions = true, name = "list", description = "list builds")
-    static class BuildListCommand extends BaseCommand<Build> {
+    @Command(mixinStandardHelpOptions = true, name = "list", aliases = { "l" }, description = "list builds")
+    static class BuildListCommand extends BaseListCommand<Build> {
 
-        @Mixin
-        ListMixin list;
-
-        @Inject
-        AgogosClient agogosClient;
-
-        @Override
-        public void run() {
-            List<Build> builds = agogosClient.v1alpha1().builds()
-                    .list(new ListOptionsBuilder().withNewLimit(list.getLimit())
-                            .build())
-                    .getItems();
-
-            print(builds);
-        }
-
-        // public void paginate() {
-        //     String cont = null;
-
-        //     BuildList buildList;
-
-        //     do {
-        //         buildList = agogosClient.v1alpha1().builds()
-        //                 .list(new ListOptionsBuilder().withNewLimit(limit).withContinue(cont)
-        //                         .build());
-
-        //         buildList.getItems().forEach(build -> {
-        //             System.out.printf("%-20s %s\n", build.getMetadata().getNamespace(), build.getMetadata().getName());
-        //         });
-
-        //         cont = buildList.getMetadata().getContinue();
-        //     } while (buildList.getMetadata().getRemainingItemCount() != null);
-        // }
     }
 }

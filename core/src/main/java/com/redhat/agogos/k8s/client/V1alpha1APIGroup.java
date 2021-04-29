@@ -23,5 +23,4 @@ public interface V1alpha1APIGroup {
     MixedOperation<Run, RunList, Resource<Run>> runs();
 
     MixedOperation<Trigger, TriggerList, Resource<Trigger>> triggers();
-
 }

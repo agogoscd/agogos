@@ -9,6 +9,7 @@ import com.redhat.agogos.cli.commands.BuildCommand.BuildDescribeCommand;
 import com.redhat.agogos.cli.commands.ComponentCommand.ComponentBuildCommand;
 import com.redhat.agogos.cli.commands.ComponentCommand.ComponentListCommand;
 import com.redhat.agogos.cli.commands.base.BaseCommand;
+import com.redhat.agogos.cli.commands.base.BaseListCommand;
 import com.redhat.agogos.cli.commands.base.ListMixin;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Build;
@@ -30,7 +31,7 @@ public class ComponentCommand implements Runnable {
 
     @Override
     public void run() {
-        cli.run(ComponentListCommand.class);
+        cli.usage(this.getClass());
     }
 
     @Command(mixinStandardHelpOptions = true, name = "describe", description = "describe component")
@@ -44,13 +45,13 @@ public class ComponentCommand implements Runnable {
         @Override
         public void run() {
             Component component = agogosClient.v1alpha1().components().withName(name).get();
-            print(component);
+            showResource(component);
         }
     }
 
     @Command(mixinStandardHelpOptions = true, name = "build", description = "build a component")
     static class ComponentBuildCommand extends BaseCommand<Component> {
-        @Parameters(index = "0", description = "Name of the component to build")
+        @Parameters(index = "0", description = "Name of the component to build.")
         String name;
 
         @Inject
@@ -72,23 +73,7 @@ public class ComponentCommand implements Runnable {
         }
     }
 
-    @Command(mixinStandardHelpOptions = true, name = "list", description = "list components")
-    static class ComponentListCommand extends BaseCommand<Component> {
-
-        @Mixin
-        ListMixin list;
-
-        @Inject
-        AgogosClient agogosClient;
-
-        @Override
-        public void run() {
-            List<Component> components = agogosClient.v1alpha1().components()
-                    .list(new ListOptionsBuilder().withNewLimit(list.getLimit())
-                            .build())
-                    .getItems();
-
-            print(components);
-        }
+    @Command(mixinStandardHelpOptions = true, name = "list", aliases = { "l" }, description = "list components")
+    static class ComponentListCommand extends BaseListCommand<Component> {
     }
 }

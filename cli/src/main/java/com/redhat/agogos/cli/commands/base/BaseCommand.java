@@ -1,6 +1,6 @@
 package com.redhat.agogos.cli.commands.base;
 
-import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -12,11 +12,14 @@ import com.redhat.agogos.RunnableResourceStatus;
 import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.cli.CLI.Output;
 import com.redhat.agogos.errors.ApplicationException;
+import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.RunnableStatus;
 import com.redhat.agogos.v1alpha1.Status;
 
-import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.client.CustomResourceList;
+import io.fabric8.kubernetes.client.dsl.MixedOperation;
+import io.fabric8.kubernetes.client.dsl.Resource;
 import picocli.CommandLine.Help.Ansi;
 
 public abstract class BaseCommand<T extends AgogosResource<?, ? extends Status>> implements Runnable {
@@ -24,25 +27,76 @@ public abstract class BaseCommand<T extends AgogosResource<?, ? extends Status>>
     @Inject
     CLI cli;
 
-    protected void print(T resource) {
+    @Inject
+    protected AgogosClient agogosClient;
+
+    protected void show(MixedOperation<T, ? extends CustomResourceList<T>, Resource<T>> resourceClient) {
+    }
+
+    protected void showResource(T resource) {
+        if (resource == null) {
+            throw new ApplicationException("No resource found");
+        }
+
         if (cli.getOutput() != null && cli.getOutput() != Output.plain) {
             printResource(resource, cli.getOutput());
             return;
         }
 
-        describe(resource);
+        print(resource);
     }
 
-    protected void print(List<T> resources) {
-        if (cli.getOutput() != null && cli.getOutput() != Output.plain) {
-            printResource(resources, cli.getOutput());
-            return;
+    protected void print(T resource) {
+        String nl = System.getProperty("line.separator");
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(Ansi.AUTO.string("💖 @|bold About|@")).append(nl).append(nl);
+
+        sb.append(Ansi.AUTO.string(String.format("@|bold Name|@:\t\t%s", resource.getMetadata().getName()))).append(nl);
+
+        if (resource.getStatus() != null) {
+            if (resource.getStatus() instanceof RunnableStatus) {
+                RunnableStatus status = (RunnableStatus) resource.getStatus();
+
+                sb.append(nl).append(Ansi.AUTO.string("🎉 @|bold Status|@")).append(nl).append(nl);
+
+                String buildColor = "green";
+
+                if (String.valueOf(RunnableResourceStatus.Failed).equals(resource.getStatus().getStatus())) {
+                    buildColor = "red";
+                }
+
+                sb.append(Ansi.AUTO
+                        .string(String.format("@|bold Status|@:\t\t@|%s %s |@", buildColor,
+                                resource.getStatus().getStatus())))
+                        .append(nl);
+                sb.append(Ansi.AUTO.string(String.format("@|bold Reason|@:\t\t%s",
+                        Optional.ofNullable(resource.getStatus().getReason()).orElse("N/A")))).append(nl);
+                sb.append(Ansi.AUTO
+                        .string(String.format("@|bold Created|@:\t%s", resource.getMetadata().getCreationTimestamp())))
+                        .append(nl);
+                sb.append(Ansi.AUTO.string(String.format("@|bold Started|@:\tTBD"))).append(nl);
+                sb.append(Ansi.AUTO.string(String.format("@|bold Finished|@:\tTBD"))).append(nl);
+                sb.append(Ansi.AUTO.string(String.format("@|bold Duration|@:\tTBD"))).append(nl);
+
+                if (status.getResult() != null) {
+                    sb.append(nl).append(Ansi.AUTO.string("📦 @|bold Result|@")).append(nl).append(nl);
+
+                    sb.append(Ansi.AUTO
+                            .string(String.format("%s", toJson(status.getResult()))));
+                }
+
+            } else {
+                sb.append(Ansi.AUTO.string(String.format("Status:\t\t @|bold %s |@", resource.getStatus().getStatus())));
+            }
+
         }
 
-        list(resources);
+        System.out.println(sb.toString());
+
     }
 
-    private void printResource(Object resource, Output output) {
+    void printResource(Object resource, Output output) {
 
         switch (output) {
             case json:
@@ -56,59 +110,16 @@ public abstract class BaseCommand<T extends AgogosResource<?, ? extends Status>>
         }
     }
 
-    private void list(List<T> resources) {
-
-        //System.out.println(Ansi.AUTO.string("@|bold RESOURCE\t\t\t\t STATUS |@"));
-
-        resources.forEach(resource -> {
-            if (resource.getStatus() instanceof RunnableStatus) {
-                String buildColor = "green";
-
-                if (resource.getStatus().getStatus().equals(String.valueOf(RunnableResourceStatus.Failed))) {
-                    buildColor = "red";
-                }
-
-                System.out.println(Ansi.AUTO.string(String.format("@|bold %s |@\t\t @|bold,%s %s |@",
-                        resource.getMetadata().getName(), buildColor, resource.getStatus().getStatus())));
-            } else {
-                System.out.println(Ansi.AUTO.string(String.format("@|bold %s |@\t\t @|bold %s |@",
-                        resource.getMetadata().getName(), resource.getStatus().getStatus())));
-            }
-
-        });
-    }
-
-    private void describe(T resource) {
-        System.out.println(Ansi.AUTO.string(String.format("%s:\t\t @|bold %s |@",
-                HasMetadata.getKind(resource.getClass()), resource.getMetadata().getName())));
-
-        if (resource.getStatus() != null) {
-            if (resource.getStatus() instanceof RunnableStatus) {
-                String buildColor = "green";
-
-                if (String.valueOf(RunnableResourceStatus.Failed).equals(resource.getStatus().getStatus())) {
-                    buildColor = "red";
-                }
-
-                System.out.println(Ansi.AUTO
-                        .string(String.format("Status:\t\t @|bold,%s %s |@", buildColor, resource.getStatus().getStatus())));
-
-            } else {
-                System.out
-                        .println(Ansi.AUTO.string(String.format("Status:\t\t @|bold %s |@", resource.getStatus().getStatus())));
-            }
-
-            System.out.println(Ansi.AUTO.string(String.format("Reason:\t\t @|bold %s |@", resource.getStatus().getReason())));
-        }
-
-    }
-
-    private void printJson(Object resource) {
+    private String toJson(Object resource) {
         try {
-            System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(resource));
+            return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(resource);
         } catch (JsonProcessingException e) {
             throw new ApplicationException("Cannot convert resource to JSON", e);
         }
+    }
+
+    private void printJson(Object resource) {
+        System.out.println(toJson(resource));
     }
 
     private void printYaml(Object resource) {
