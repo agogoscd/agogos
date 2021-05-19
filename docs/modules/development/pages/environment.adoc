@@ -3,9 +3,6 @@
 Agogos can be developed in environments that provide following basic requirements:
 
 * Kubernetes 1.19+
-* Tekton Pipelines
-* Tekton Triggers
-* Knative Eventing
 * JDK 11
 
 [#minikube]
@@ -22,10 +19,28 @@ driver you could use this command:
 ❯ minikube start --driver=kvm2 --cpus=4 --memory=6g --disk-size=30GB
 ----
 
-== Dependencies
+== Installation
 
-Please follow the xref:getting-started:installation/manual.adoc[manual installation instructions]
-which provide instruction on how to install these.
+Please follow the xref:getting-started:installation/manual.adoc[manual installation instructions].
+It is important to use the `dev` profile which allows to run Agogos resources in development mode,
+outside of the cluster.
+
+[source,bash]
+----
+❯ agogosctl adm install --profile dev
+----
+
+[NOTE]
+====
+Please note that installing Agogos using the `agogosctl` CLI will ensure proper dependencies
+are installed automatically.
+
+This includes:
+
+* Tekton Pipelines
+* Tekton Triggers
+* Knative Eventing
+====
 
 == Running Agogos
 
@@ -33,7 +48,7 @@ Please consult the xref:development:running.adoc[running Agogos in development m
 
 == Gotchas
 
-[#managing-contexts]
+[#managing-kubernetes-contexts]
 === Managing contexts
 
 Kubernetes contexts are managed globally. This means that any time you will have

@@ -1,38 +1,37 @@
 = Manual Installation
 
-Agogos provides a CLI to install it on the cluster together with any other
-required dependencies such as Tekton or Tekton Triggers.
+The `agogosctl` binary provides an `install` command to install Agogos.
+This process ensures that all Agogos dependencies and resources are
+installed in the correct way.
 
-[WARNING]
+[TIP]
 ====
-We do not provide any CLI binaries to download at this moment. In order to obtain the CLI
-you need to clone the Agogos repository and build it yourself:
-
-[source,bash]
-----
-❯ ./mvnw package -pl cli -am
-----
-
-Afterwards it can be run like this:
-
-[source,bash]
-----
-❯ java -jar cli/target/quarkus-app/quarkus-run.jar install --help
-Usage: <main class> install [-hV] [-p=<profile>]
-Install Agogos
-  -h, --help                Show this help message and exit.
-  -p, --profile=<profile>   Selected installation profile, valid values: DEV
-  -V, --version             Print version information and exit.
-----
+If you don't have the CLI installed, you can follow xref:getting-started:first-steps.adoc#cli[these instructions].
 ====
 
-== Development installation
+== Installation profiles
 
-To install latest development version of Agogos run this command:
+Agogos can be installed using different profiles.
+
+* `local`
+* `dev`
+
+[NOTE]
+====
+In both profiles it is assumed that the user has access to the cluster and is
+already logged in. You may need to have cluster admin privileges in order
+to install Agogos using these profiles.
+====
+
+The difference between these profiles is *what* Agogos resources are deployed in the
+cluster. For the local profile everything will be installed in-cluster, whereas
+the development profile will create only required resources in-cluster leaving
+to the user to start Agogos resources manually, potentially outside of the cluster.
+This is useful in case of Agogos development.
 
 [source,bash]
 ----
-❯ java -jar cli/target/quarkus-app/quarkus-run.jar install
+❯ agogosctl adm install --profile local
 ----
 
 [WARNING]
@@ -43,7 +42,7 @@ No confirmation is required, make sure you are using the correct cluster!
 This command will install all required dependencies and Agogos resources on
 the cluster you are authenticated with.
 
-Agogos resources will be installed in the `agogos` namespace.
+NOTE: Agogos resources will be installed in the `agogos` namespace.
 
 At this point the operator should be starting, you can follow logs by running
 this command:
@@ -53,6 +52,6 @@ this command:
 ❯ kubectl logs -n agogos -lapp.kubernetes.io/component=operator,app.kubernetes.io/part-of=agogos -f
 ----
 
-Congrats, Agogos is running!
+Congrats, Agogos is running! 🎉
 
 // TODO: Next steps

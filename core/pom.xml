@@ -51,6 +51,11 @@
             <artifactId>quarkus-config-yaml</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>knative-client</artifactId>
+            <version>${kubernetes-client.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.quarkiverse.tektonclient</groupId>
             <artifactId>quarkus-tekton-client</artifactId>
             <version>${quarkus-tekton-client.version}</version>

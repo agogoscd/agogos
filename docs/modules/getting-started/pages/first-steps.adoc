@@ -4,9 +4,46 @@ include::common:partial$draft.adoc[]
 
 It's great to see your interest in Agogos!
 
+[#cli]
+== CLI
+
+We suggest to install `agogosctl` -- the Agogos CLI in the first place. You
+will need it for example to install and run Agogos or to interact with it later.
+
+We provide the `agogosctl` binary to download from our CI:
+
+[source,bash]
+----
+❯ curl -L "https://gitlab.cee.redhat.com/agogos/agogos/-/jobs/artifacts/main/raw/cli/target/agogosctl?job=cli" -o agogosctl
+❯ chmod +x agogosctl
+----
+
+TIP: We suggest to place the `agogosctl` binary on your `PATH`.
+
+NOTE: Currently the binary size may be quite big. We will try to optimize it.
+
+[source,bash]
+----
+❯ agogosctl --help
+Usage: agogosctl [-hV] [-o=<output>] [COMMAND]
+  -h, --help              Show this help message and exit.
+  -o, --output=<output>   Output format, valid values: plain, yaml, json,
+                            default: plain.
+  -V, --version           Print version information and exit.
+Commands:
+  install                   Install Agogos
+  build, builds, b          Interact with builds
+  components, component, c  Interact with components
+  pipelines, pipeline, p    Interact with pipelines
+  runs, run, r              Interact with runs
+  triggers, trigger, t      Interact with triggers
+----
+
+
+
+
 #TODO#
 
-* Install
 * Register a builder
 * Register a component
 * Run a build

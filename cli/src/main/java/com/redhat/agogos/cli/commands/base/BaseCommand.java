@@ -1,9 +1,5 @@
 package com.redhat.agogos.cli.commands.base;
 
-import java.util.Optional;
-
-import javax.inject.Inject;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -16,10 +12,11 @@ import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.RunnableStatus;
 import com.redhat.agogos.v1alpha1.Status;
-
 import io.fabric8.kubernetes.client.CustomResourceList;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import java.util.Optional;
+import javax.inject.Inject;
 import picocli.CommandLine.Help.Ansi;
 
 public abstract class BaseCommand<T extends AgogosResource<?, ? extends Status>> implements Runnable {

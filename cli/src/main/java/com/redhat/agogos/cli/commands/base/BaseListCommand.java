@@ -1,19 +1,16 @@
 package com.redhat.agogos.cli.commands.base;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.redhat.agogos.RunnableResourceStatus;
 import com.redhat.agogos.cli.CLI.Output;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.RunnableStatus;
 import com.redhat.agogos.v1alpha1.Status;
-
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.CustomResourceList;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import java.util.List;
+import javax.inject.Inject;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.Option;
 

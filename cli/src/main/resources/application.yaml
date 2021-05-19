@@ -2,11 +2,28 @@ quarkus:
   banner:
     enabled: false
 
+resources:
+  wait: true
 
-# "%dev":
+"%dev":
+  quarkus:
+    log:
+      level: INFO
+      console:
+        format: "%m%n"
+      category:
+        "com.redhat.agogos":
+          level: DEBUG
+        "io.fabric8.kubernetes.client":
+          level: ERROR
+        "io.quarkus":
+          level: "OFF"
 
 "%prod":
   quarkus:
     log:
       level: SEVERE
 
+"%test":
+  resources:
+    wait: false

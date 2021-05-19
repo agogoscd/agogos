@@ -1,0 +1,805 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: builders.agogos.redhat.com
+spec:
+  group: agogos.redhat.com
+  names:
+    kind: Builder
+    listKind: BuilderList
+    plural: builders
+    singular: builder
+  scope: Cluster
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: Builder is the Schema for the builders API
+          properties:
+            apiVersion:
+              description:
+                "APIVersion defines the versioned schema of this representation
+                of an object. Servers should convert recognized schemas to the latest
+                internal value, and may reject unrecognized values.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
+              type: string
+            kind:
+              description:
+                "Kind is a string value representing the REST resource this
+                object represents. Servers may infer this from the endpoint the client
+                submits requests to. Cannot be updated. In CamelCase.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              description: Defines the desired state of Builder
+              properties:
+                taskRef:
+                  type: object
+                  description: Defines the task reference
+                  properties:
+                    name:
+                      type: string
+                      description: Name of the Tekton task being the implementation of the Stage.
+                    kind: 
+                      type: string
+                      description: The kind. Can be either Task or ClusterTask
+                schema:
+                  type: object
+                  description: Validation definition that should be applied on the Builder configuration passed.
+                  properties:
+                    openAPIV3Schema:
+                      x-kubernetes-preserve-unknown-fields: true
+                      type: object
+                      description: "OpenAPI v3 formatted validation.
+                        More info: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md"
+                  required:
+                    - "openAPIV3Schema"
+              required:
+                - "taskRef"
+            status:
+              description: BuilderStatus defines the observed state of Builder
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: builds.agogos.redhat.com
+spec:
+  group: agogos.redhat.com
+  names:
+    kind: Build
+    listKind: BuildList
+    plural: builds
+    singular: build
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: Build is the Schema for the builds API
+          properties:
+            apiVersion:
+              description:
+                "APIVersion defines the versioned schema of this representation
+                of an object. Servers should convert recognized schemas to the latest
+                internal value, and may reject unrecognized values.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
+              type: string
+            kind:
+              description:
+                "Kind is a string value representing the REST resource this
+                object represents. Servers may infer this from the endpoint the client
+                submits requests to. Cannot be updated. In CamelCase.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              description: Defines the desired state of Build
+              properties:
+                component:
+                  description: "The Component name the Build refers to"
+                  type: string
+              required:
+                - "component"
+            status:
+              description: Status defines the observed state of Build
+              properties:
+                lastUpdate:
+                  format: date-time
+                  type: string
+                result:
+                  description: "Build result metadata"
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+                reason:
+                  type: string
+                status:
+                  default: New
+                  enum:
+                    - New
+                    - Running
+                    - Finished
+                    - Failed
+                    - Aborted
+                  type: string
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Component
+          jsonPath: .spec.component
+          type: string
+        - name: Status
+          jsonPath: .status.status
+          type: string
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: clusterstages.agogos.redhat.com
+spec:
+  group: agogos.redhat.com
+  names:
+    kind: ClusterStage
+    listKind: ClusterStageList
+    plural: clusterstages
+    singular: clusterstage
+  scope: Cluster
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: Stage is the Schema for the stages API
+          properties:
+            apiVersion:
+              description:
+                "APIVersion defines the versioned schema of this representation
+                of an object. Servers should convert recognized schemas to the latest
+                internal value, and may reject unrecognized values.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
+              type: string
+            kind:
+              description:
+                "Kind is a string value representing the REST resource this
+                object represents. Servers may infer this from the endpoint the client
+                submits requests to. Cannot be updated. In CamelCase.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              description: Defines the desired state of Stage
+              properties:
+                taskRef:
+                  type: object
+                  description: Defines the task reference
+                  properties:
+                    name:
+                      type: string
+                      description: Name of the Tekton task being the implementation of the Stage.
+                    kind: 
+                      type: string
+                      description: The kind. Can be either Task or ClusterTask
+                schema:
+                  type: object
+                  description: Validation definition that should be applied on the Stage configuration defined.
+                  properties:
+                    openAPIV3Schema:
+                      x-kubernetes-preserve-unknown-fields: true
+                      type: object
+                      description: "OpenAPI v3 formatted validation.
+                        More info: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md"
+                  required:
+                    - "openAPIV3Schema"
+              required:
+                - "taskRef"
+          type: object
+      served: true
+      storage: true
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: components.agogos.redhat.com
+spec:
+  group: agogos.redhat.com
+  names:
+    kind: Component
+    listKind: ComponentList
+    plural: components
+    singular: component
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: Component is the Schema for the components API
+          properties:
+            apiVersion:
+              description:
+                "APIVersion defines the versioned schema of this representation
+                of an object. Servers should convert recognized schemas to the latest
+                internal value, and may reject unrecognized values.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
+              type: string
+            kind:
+              description:
+                "Kind is a string value representing the REST resource this
+                object represents. Servers may infer this from the endpoint the client
+                submits requests to. Cannot be updated. In CamelCase.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              description: ComponentSpec defines the desired state of Component
+              properties:
+                data:
+                  type: object
+                  x-kubernetes-preserve-unknown-fields: true
+                  description:
+                    "Additional data containing the information about the Component.
+                    It can be metadata as well as source coordinates.
+                    This content needs to be supported by the particular builder
+                    used to build this component. Builder defines schema that this
+                    content is checked against."
+                builderRef:
+                  type: object
+                  description: Defines the builder reference
+                  properties:
+                    name:
+                      type: string
+                      description: Name of the builder being referenced.
+                    kind:
+                      type: string
+                      description: The kind. Can be either builder or ClusterBuilder
+              required:
+                - "data"
+                - "builderRef"
+            status:
+              description: ComponentStatus defines the observed state of Component
+              properties:
+                lastUpdate:
+                  format: date-time
+                  type: string
+                reason:
+                  type: string
+                status:
+                  default: New
+                  enum:
+                    - New
+                    - Initializing
+                    - Ready
+                    - Failed
+                  type: string
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Status
+          jsonPath: .status.status
+          type: string
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: groups.agogos.redhat.com
+spec:
+  group: agogos.redhat.com
+  names:
+    kind: Group
+    listKind: GroupList
+    plural: groups
+    singular: group
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: Group is the Schema for the groups API
+          properties:
+            apiVersion:
+              description:
+                "APIVersion defines the versioned schema of this representation
+                of an object. Servers should convert recognized schemas to the latest
+                internal value, and may reject unrecognized values.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
+              type: string
+            kind:
+              description:
+                "Kind is a string value representing the REST resource this
+                object represents. Servers may infer this from the endpoint the client
+                submits requests to. Cannot be updated. In CamelCase.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              description: Defines the desired state of Group
+              properties:
+                components:
+                  type: array
+                  description: List of the Components
+                  items:
+                    type: string
+                    description: Name of the Component
+              required:
+                - "components"
+          type: object
+      served: true
+      storage: true
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: pipelines.agogos.redhat.com
+spec:
+  group: agogos.redhat.com
+  names:
+    kind: Pipeline
+    listKind: PipelineList
+    plural: pipelines
+    singular: pipeline
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: Pipeline is the Schema for the pipeline API
+          properties:
+            apiVersion:
+              description:
+                "APIVersion defines the versioned schema of this representation
+                of an object. Servers should convert recognized schemas to the latest
+                internal value, and may reject unrecognized values.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
+              type: string
+            kind:
+              description:
+                "Kind is a string value representing the REST resource this
+                object represents. Servers may infer this from the endpoint the client
+                submits requests to. Cannot be updated. In CamelCase.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              description: Defines the desired state of the Pipeline
+              properties:
+                group:
+                  type: string
+                  description: Name of the Group the Pipeline should run with
+                stages:
+                  type: array
+                  description: List of stages to run in order
+                  items:
+                    type: object
+                    description: Stage reference with required configuration
+                    properties:
+                      stageRef:
+                        type: object
+                        description: Stage reference
+                        properties:                         
+                          name:
+                            type: string
+                            description: Name of the stage to run
+                          kind:
+                            type: string
+                            description: "The type of the stage, one of: Stage or ClusterStage"
+                            enum: ["Stage", "ClusterStage"]
+                        required:
+                          - name
+                          - kind
+                      runAfter:
+                        type: array
+                        items:
+                          type: string
+                        description: A list of stages that must finish BEFORE this stage runs
+                      config:
+                        type: object
+                        description: "Additional configuration properties passed to the stage implementation"
+                        x-kubernetes-preserve-unknown-fields: true
+                    required:
+                      - "stageRef"
+              required:
+                - "stages"
+            status:
+              description: ComponentStatus defines the observed state of Component
+              properties:
+                lastUpdate:
+                  format: date-time
+                  type: string
+                reason:
+                  type: string
+                status:
+                  default: New
+                  enum:
+                    - New
+                    - Initializing
+                    - Ready
+                    - Failed
+                  type: string
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Component Group
+          jsonPath: .spec.group
+          type: string
+        ## https://github.com/kubernetes/kubectl/issues/517
+        # - name: Stages
+        #   type: string
+        #   jsonPath: .spec.stages[*].name
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: runs.agogos.redhat.com
+spec:
+  group: agogos.redhat.com
+  names:
+    kind: Run
+    listKind: RunList
+    plural: runs
+    singular: run
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: PipelineRun is the Schema for the builds API
+          properties:
+            apiVersion:
+              description:
+                "APIVersion defines the versioned schema of this representation
+                of an object. Servers should convert recognized schemas to the latest
+                internal value, and may reject unrecognized values.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
+              type: string
+            kind:
+              description:
+                "Kind is a string value representing the REST resource this
+                object represents. Servers may infer this from the endpoint the client
+                submits requests to. Cannot be updated. In CamelCase.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              description: Defines the desired state of Build
+              properties:
+                pipeline:
+                  description: "Name of the Pipeline to run"
+                  type: string
+              required:
+                - "pipeline"
+            status:
+              description: PipelineRunStatus defines the observed state of PipelineRun
+              properties:
+                lastUpdate:
+                  format: date-time
+                  type: string
+                reason:
+                  type: string
+                status:
+                  default: New
+                  enum:
+                    - New
+                    - Running
+                    - Finished
+                    - Failed
+                    - Aborted
+                  type: string
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Pipeline
+          jsonPath: .spec.pipeline
+          type: string
+        - name: Status
+          jsonPath: .status.status
+          type: string
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: stages.agogos.redhat.com
+spec:
+  group: agogos.redhat.com
+  names:
+    kind: Stage
+    listKind: StageList
+    plural: stages
+    singular: stage
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: Stage is the Schema for the stages API
+          properties:
+            apiVersion:
+              description:
+                "APIVersion defines the versioned schema of this representation
+                of an object. Servers should convert recognized schemas to the latest
+                internal value, and may reject unrecognized values.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
+              type: string
+            kind:
+              description:
+                "Kind is a string value representing the REST resource this
+                object represents. Servers may infer this from the endpoint the client
+                submits requests to. Cannot be updated. In CamelCase.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              description: Defines the desired state of Stage
+              properties:
+                taskRef:
+                  type: object
+                  description: Defines the task reference
+                  properties:
+                    name:
+                      type: string
+                      description: Name of the Tekton task being the implementation of the Stage.
+                    kind: 
+                      type: string
+                      description: The kind. Can be either Task or ClusterTask
+                schema:
+                  type: object
+                  description: Validation definition that should be applied on the Stage configuration passed.
+                  properties:
+                    openAPIV3Schema:
+                      x-kubernetes-preserve-unknown-fields: true
+                      type: object
+                      description: "OpenAPI v3 formatted validation.
+                        More info: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md"
+                  required:
+                    - "openAPIV3Schema"
+              required:
+                - "taskRef"
+            status:
+              description: StageStatus defines the observed state of Stage
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Phase
+          type: string
+          jsonPath: .metadata.labels.cpaas\.redhat\.com/phase
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: triggers.agogos.redhat.com
+spec:
+  group: agogos.redhat.com
+  names:
+    kind: Trigger
+    listKind: TriggerList
+    plural: triggers
+    singular: trigger
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: Trigger schema
+          properties:
+            apiVersion:
+              description:
+                "APIVersion defines the versioned schema of this representation
+                of an object. Servers should convert recognized schemas to the latest
+                internal value, and may reject unrecognized values.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
+              type: string
+            kind:
+              description:
+                "Kind is a string value representing the REST resource this
+                object represents. Servers may infer this from the endpoint the client
+                submits requests to. Cannot be updated. In CamelCase.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              description: State of Trigger
+              properties:
+                events:
+                  type: array
+                  description: List of events that fires the Trigger
+                  items:
+                    type: object
+                    description: Event definition that fires the Triggers
+
+                    properties:
+                      cel:
+                        type: object
+                        properties:
+                          filter:
+                            type: string
+                            description: "Event filter using the CEL language: https://tekton.dev/docs/triggers/cel_expressions/"
+                        required: ["filter"]
+                      component:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: The name of the Component which builds should be watched
+                        required: ["name"]
+                      group:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: The name of the ComponentGroup which builds should be watched
+                        required: ["name"]
+                      pipeline:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: "The name of the Pipeline which successful finish should be watched"
+                        required: ["name"]
+                      build:
+                        type: object
+                        properties:
+                          filter:
+                            type: string
+                            description: "Event filter using the CEL language: https://tekton.dev/docs/triggers/cel_expressions/"
+                        required: ["filter"]
+                      timed:
+                        type: object
+                        properties:
+                          cron:
+                            type: string
+                            description: "Event filter using the CEL language: https://tekton.dev/docs/triggers/cel_expressions/"
+                            example: "0 15 2 * *"
+                        required: ["cron"]
+                    oneOf:
+                      - required: ["component"]
+                      - required: ["group"]
+                      - required: ["cel"]
+                      - required: ["pipeline"]
+                      - required: ["build"]
+                      - required: ["timed"]
+                target:
+                  type: object
+                  description: "The target resource that should be created"
+                  properties:
+                    kind:
+                      type: string
+                      enum: ["Component", "Pipeline"]
+                    name:
+                      type: string
+                    apiVersion:
+                      type: string
+                  required:
+                    - kind
+                    - name
+              required:
+                - events
+                - target
+            status:
+              description: Defines the observed state of the Trigger
+              properties:
+                lastUpdate:
+                  format: date-time
+                  type: string
+                reason:
+                  type: string
+                status:
+                  default: New
+                  enum:
+                    - New
+                    - Initializing
+                    - Ready
+                    - Failed
+                  type: string
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

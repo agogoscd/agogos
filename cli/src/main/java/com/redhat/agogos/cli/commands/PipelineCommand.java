@@ -1,24 +1,16 @@
 package com.redhat.agogos.cli.commands;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.redhat.agogos.cli.CLI;
-import com.redhat.agogos.cli.commands.ComponentCommand.ComponentListCommand;
 import com.redhat.agogos.cli.commands.PipelineCommand.PipelineListCommand;
 import com.redhat.agogos.cli.commands.PipelineCommand.PipelineRunCommand;
 import com.redhat.agogos.cli.commands.RunCommand.RunDescribeCommand;
 import com.redhat.agogos.cli.commands.base.BaseCommand;
 import com.redhat.agogos.cli.commands.base.BaseListCommand;
-import com.redhat.agogos.cli.commands.base.ListMixin;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.Run;
-
-import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
+import javax.inject.Inject;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Parameters;
 
 @Command(mixinStandardHelpOptions = true, name = "pipelines", aliases = {

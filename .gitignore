@@ -40,3 +40,6 @@ release.properties
 tmp
 node_modules
 /build
+
+*.crt
+*.pem
