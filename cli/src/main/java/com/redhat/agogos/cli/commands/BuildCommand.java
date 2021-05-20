@@ -1,21 +1,14 @@
 package com.redhat.agogos.cli.commands;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
 import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.cli.commands.BuildCommand.BuildDescribeCommand;
 import com.redhat.agogos.cli.commands.BuildCommand.BuildListCommand;
-import com.redhat.agogos.cli.commands.base.ListMixin;
 import com.redhat.agogos.cli.commands.base.BaseCommand;
 import com.redhat.agogos.cli.commands.base.BaseListCommand;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Build;
-
-import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
+import javax.inject.Inject;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Parameters;
 
 @Command(mixinStandardHelpOptions = true, name = "build", aliases = {

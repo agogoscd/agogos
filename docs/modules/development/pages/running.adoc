@@ -2,13 +2,13 @@
 
 include::common:partial$draft.adoc[]
 
-NOTE: Make sure you have xref:environment/index.adoc[prepared your environment] first.
+NOTE: Make sure you have xref:environment.adoc[prepared your environment] first.
 
 == Cluster Connection
 
 Before running Agogos, please make sure you are logged in into correct cluster.
 
-TIP: If you use Minikube, see the xref:environment/local.adoc#managing-contexts[note about managing contexts].
+TIP: If you use Minikube, see the xref:environment.adoc#managing-kubernetes-contexts[note about managing contexts].
 
 == Running Agogos Operator
 
@@ -20,6 +20,30 @@ The `kubectl port-forward` command could be used to achieve this goal.
 [source,bash]
 ----
 ❯ kubectl port-forward service/broker-ingress 8111:80 -n knative-eventing
+----
+
+== Running Webhooks
+
+To run Webhooks application you need to run this command:
+
+[NOTE]
+====
+We assume here that you have checked out the code at the `~/agogos` path. If this
+is not the case, replace it with the proper one.
+====
+
+[source,bash]
+.Running Webhooks
+----
+❯ QUARKUS_HTTP_SSL_CERTIFICATE_FILE=~/agogos/cli/target/webhooks.crt QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE=~/agogos/cli/target/key.pem ./mvnw clean quarkus:dev -pl webhooks -am -Dquarkus.http.host=0.0.0.0
+----
+
+After running this command you should see the Agogos Webhooks running.
+
+----
+2021-05-19 12:26:27,451 INFO  [io.quarkus] (Quarkus Main Thread) agogos-webhooks 1.0-SNAPSHOT on JVM (powered by Quarkus 1.13.1.Final) started in 5.781s. Listening on: http://0.0.0.0:7080 and https://0.0.0.0:8443
+2021-05-19 12:26:27,453 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+2021-05-19 12:26:27,453 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, config-yaml, hibernate-validator, kubernetes, kubernetes-client, quarkiverse-tekton-client, resteasy, resteasy-jackson]
 ----
 
 === Running the Operator
@@ -48,14 +72,3 @@ To enable hot reload, visit http://localhost:7070/ and refresh the page.
 
 This page provides a useful development UI available at http://localhost:7070/q/dev/ as well!
 ====
-
-== Running Webhooks
-
-Similarly, you can run Webhooks application:
-
-[source,bash]
-.Running Webhooks
-----
-❯ ./mvnw quarkus:dev -pl webhooks -am
-----
-

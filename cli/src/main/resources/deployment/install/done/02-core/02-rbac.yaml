@@ -23,16 +23,3 @@ rules:
   - apiGroups: [""]
     resources: ["serviceaccounts"]
     verbs: ["impersonate"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: agogos-el
-subjects:
-  - kind: ServiceAccount
-    name: agogos-el
-    namespace: default # TODO: change this
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: agogos-el
