@@ -2,6 +2,10 @@ package com.redhat.agogos.v1alpha1;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.fabric8.kubernetes.client.CustomResource;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,5 +36,11 @@ public class AgogosResource<S, T> extends CustomResource<S, T> {
     // TODO: add logic based on status
     public boolean isReady() {
         return true;
+    }
+
+    @JsonIgnore
+    public ZonedDateTime creationTime() {
+        return LocalDateTime.parse(this.getMetadata().getCreationTimestamp(),
+                DateTimeFormatter.ISO_ZONED_DATE_TIME).atZone(ZoneId.of("UTC"));
     }
 }

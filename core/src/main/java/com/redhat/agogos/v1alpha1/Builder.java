@@ -64,6 +64,11 @@ public class Builder extends AgogosResource<BuilderSpec, Status> {
 
     }
 
+    @Override
+    protected Status initStatus() {
+        return new Status();
+    }
+
     @Getter
     @Setter
     private BuilderSpec spec = new BuilderSpec();

@@ -82,7 +82,8 @@ public class Component extends AgogosResource<ComponentSpec, Status> implements 
     @Setter
     private ComponentSpec spec = new ComponentSpec();
 
-    @Setter
-    @Getter
-    private Status status = new Status();
+    @Override
+    protected Status initStatus() {
+        return new Status();
+    }
 }

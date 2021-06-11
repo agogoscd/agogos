@@ -14,6 +14,7 @@
     </parent>
 
     <modules>
+        <!-- <module>quarkus-deployment</module> -->
         <module>core</module>
         <module>cli</module>
         <module>operator</module>
@@ -29,17 +30,16 @@
 
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-        <quarkus.platform.version>1.13.1.Final</quarkus.platform.version>
+        <quarkus.platform.version>1.13.6.Final</quarkus.platform.version>
         <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
         <failsafe-plugin.version>3.0.0-M5</failsafe-plugin.version>
-        <operator-framework.version>1.8.4</operator-framework.version>
+        <operator-framework.version>1.9.0</operator-framework.version>
         <cloudevents.version>2.0.0</cloudevents.version>
         <openapi-schema-validator.version>1.0.5</openapi-schema-validator.version>
         <lombok.version>1.18.16</lombok.version>
         <quarkus-tekton-client.version>0.4.0</quarkus-tekton-client.version>
-        <!-- Do not upgrade Quakus extension, it started generating CRD's, we need to prepare for that. -->
-        <quarkus-operatorsdk.version>1.8.3</quarkus-operatorsdk.version>
-        <kubernetes-client.version>5.3.1</kubernetes-client.version>
+        <quarkus-operatorsdk.version>1.9.2</quarkus-operatorsdk.version>
+        <kubernetes-client.version>5.4.1</kubernetes-client.version>
     </properties>
 
     <dependencyManagement>

@@ -224,7 +224,7 @@ public class ComponentController implements ResourceController<Component> {
                 builder.getSpec().getTaskRef().getName());
         // Prepare main task
         PipelineTask buildTask = new PipelineTaskBuilder() //
-                .withName(component.getMetadata().getName()) //
+                .withName("builder") //
                 .withTaskRef(buildTaskRef)
                 .withWorkspaces(stageWsBinding, pipelineWsBinding) //
                 .withRunAfter("init") //
@@ -241,7 +241,7 @@ public class ComponentController implements ResourceController<Component> {
         // Pipeline result is the result of the main task executed
         PipelineResult pipelineResult = new PipelineResultBuilder() //
                 .withName("data") //
-                .withValue("$(tasks.".concat(component.getMetadata().getName()).concat(".results.data)")) //
+                .withValue("$(tasks.builder.results.data)") //
                 .build();
 
         // Add any useful/required labels

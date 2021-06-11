@@ -49,11 +49,11 @@ public abstract class Installer {
         }
     }
 
-    private List<HasMetadata> loadKubernetesResources(InputStream stream) {
+    private List<HasMetadata> loadKubernetesResources(InputStream stream, String namespace) {
         List<HasMetadata> resources = null;
 
         try {
-            resources = kubernetesClient.load(stream).get();
+            resources = kubernetesClient.load(stream).inNamespace(namespace).get();
         } catch (KubernetesClientException e) {
             throw new ApplicationException("Could not read resources", e);
         }
@@ -70,12 +70,12 @@ public abstract class Installer {
     }
 
     protected List<HasMetadata> installKubernetesResources(InputStream stream, String namespace) {
-        return installKubernetesResources(loadKubernetesResources(stream), namespace);
+        return installKubernetesResources(loadKubernetesResources(stream, namespace), namespace);
     }
 
     protected List<HasMetadata> installKubernetesResources(InputStream stream, String namespace,
             Consumer<List<HasMetadata>> consumer) {
-        return installKubernetesResources(loadKubernetesResources(stream), namespace, consumer);
+        return installKubernetesResources(loadKubernetesResources(stream, namespace), namespace, consumer);
     }
 
     protected List<HasMetadata> installKubernetesResources(List<HasMetadata> resources, String namespace) {

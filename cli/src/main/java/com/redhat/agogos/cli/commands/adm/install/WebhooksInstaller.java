@@ -108,6 +108,8 @@ public class WebhooksInstaller extends Installer {
 
         resources = installKubernetesResources(resources, namespace);
 
+        // TODO: Make sure the service was restarted in case it already existed and certificates were regenerated
+
         status(resources);
 
         if (profile == InstallProfile.dev) {
@@ -211,9 +213,9 @@ public class WebhooksInstaller extends Installer {
                 .build();
 
         ValidatingWebhookBuilder validatingWebhookBuilder = new ValidatingWebhookBuilder() //
-                .withNewName("validate.webhook.agogos.redhat.com") //
-                .withNewSideEffects("None") //
-                .withNewFailurePolicy("Fail") //
+                .withName("validate.webhook.agogos.redhat.com") //
+                .withSideEffects("None") //
+                .withFailurePolicy("Fail") //
                 .withAdmissionReviewVersions("v1")//
                 .withRules(validationRules); //
 
@@ -233,7 +235,7 @@ public class WebhooksInstaller extends Installer {
             case dev:
                 validatingWebhookBuilder
                         .withNewClientConfig() //
-                        .withNewUrl("https://192.168.39.1:8443/webhooks/validate")
+                        .withUrl("https://192.168.39.1:8443/webhooks/validate")
                         .withCaBundle(certProvider.caBundle())//
                         .endClientConfig(); //
             default:
@@ -256,11 +258,22 @@ public class WebhooksInstaller extends Installer {
                 .withApiGroups("agogos.redhat.com").withApiVersions("v1alpha1").withResources("builds", "runs")
                 .withScope("*").build();
 
-        MutatingWebhook mutatingWebhook = new MutatingWebhookBuilder().withNewName("mutate.webhook.agogos.redhat.com")
-                .withNewSideEffects("None").withNewFailurePolicy("Fail").withAdmissionReviewVersions("v1")
-                .withNewClientConfig().withNewService().withNamespace(namespace).withName(NAME)
-                .withPath("/webhooks/mutate").withPort(443).endService().withCaBundle(certProvider.caBundle()).endClientConfig()
-                .withRules(mutationRules).build();
+        MutatingWebhook mutatingWebhook = new MutatingWebhookBuilder() //
+                .withName("mutate.webhook.agogos.redhat.com") //
+                .withSideEffects("None") //
+                .withFailurePolicy("Fail") //
+                .withAdmissionReviewVersions("v1") //
+                .withNewClientConfig()//
+                .withNewService() //
+                .withNamespace(namespace) //
+                .withName(NAME) //
+                .withPath("/webhooks/mutate") //
+                .withPort(443) //
+                .endService() //
+                .withCaBundle(certProvider.caBundle()) //
+                .endClientConfig() //
+                .withRules(mutationRules) //
+                .build();
 
         MutatingWebhookConfiguration mutatingWebhookConfiguration = new MutatingWebhookConfigurationBuilder()
                 .withNewMetadata().withName("webhook.agogos.redhat.com").withLabels(LABELS).endMetadata()

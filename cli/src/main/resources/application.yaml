@@ -12,17 +12,30 @@ resources:
       console:
         format: "%m%n"
       category:
+        "io.quarkus.kubernetes":
+          level: DEBUG
         "com.redhat.agogos":
           level: DEBUG
         "io.fabric8.kubernetes.client":
           level: ERROR
-        "io.quarkus":
-          level: "OFF"
+        # "io.quarkus":
+        #   level: "OFF"
 
 "%prod":
   quarkus:
+    # http:
+    #   insecure-requests: DISABLED
     log:
-      level: SEVERE
+      level: INFO
+      console:
+        format: "%m%n"
+      category:
+        "io.quarkus.kubernetes":
+          level: ERROR
+        "io.fabric8.kubernetes.client":
+          level: ERROR
+        "io.quarkus":
+          level: "OFF"
 
 "%test":
   resources:

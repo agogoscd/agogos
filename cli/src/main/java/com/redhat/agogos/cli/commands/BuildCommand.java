@@ -26,7 +26,7 @@ public class BuildCommand implements Runnable {
         cli.usage(this.getClass());
     }
 
-    @Command(mixinStandardHelpOptions = true, name = "describe", description = "describe build")
+    @Command(mixinStandardHelpOptions = true, name = "describe", aliases = { "d", "desc" }, description = "describe build")
     public static class BuildDescribeCommand extends BaseCommand<Build> {
         @Parameters(index = "0", description = "Name of the build")
         String name;
