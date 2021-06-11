@@ -2,13 +2,14 @@ package com.redhat.agogos.cli;
 
 import com.redhat.agogos.cli.commands.AdmCommand;
 import com.redhat.agogos.cli.commands.BuildCommand;
+import com.redhat.agogos.cli.commands.BuilderCommand;
 import com.redhat.agogos.cli.commands.ComponentCommand;
 import com.redhat.agogos.cli.commands.PipelineCommand;
 import com.redhat.agogos.cli.commands.RunCommand;
+import com.redhat.agogos.cli.commands.StageCommand;
 import com.redhat.agogos.cli.commands.TriggerCommand;
 import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
-import java.io.PrintWriter;
 import javax.inject.Inject;
 import lombok.Getter;
 import picocli.CommandLine;
@@ -23,6 +24,9 @@ import picocli.CommandLine.ScopeType;
         PipelineCommand.class,
         RunCommand.class,
         TriggerCommand.class,
+        StageCommand.class,
+        BuilderCommand.class,
+// LoadCommand.class,
 })
 public class CLI implements QuarkusApplication {
     @Inject
@@ -45,31 +49,10 @@ public class CLI implements QuarkusApplication {
 
     @Override
     public int run(String... args) throws Exception {
-        return run(new CommandLine(this, factory), new PrintWriter(System.out, true), new PrintWriter(System.err, true), args);
+        return new CommandLine(this, factory).execute(args);
     }
 
     public int run(Class<? extends Runnable> command, String... args) {
-        return run(new CommandLine(command, factory), new PrintWriter(System.out, true), new PrintWriter(System.err, true),
-                args);
-    }
-
-    /**
-     * Mostly useful in testing.
-     * 
-     * @param out
-     * @param err
-     * @param args
-     * @return
-     */
-    public int run(PrintWriter out, PrintWriter err, String... args) {
-        return run(new CommandLine(this, factory), out, err, args);
-    }
-
-    private int run(CommandLine cli, PrintWriter out, PrintWriter err, String... args) {
-        cli.setCaseInsensitiveEnumValuesAllowed(true);
-        cli.setOut(out);
-        cli.setErr(err);
-
-        return cli.execute(args);
+        return new CommandLine(command, factory).execute(args);
     }
 }

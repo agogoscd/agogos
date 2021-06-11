@@ -43,7 +43,7 @@ public class CloudEventPublisher {
 
     public void publish(PipelineRunState state, AgogosResource<?, ?> resource, AgogosResource<?, ?> parent) {
         if (state == null || resource == null || parent == null) {
-            LOG.warn("Missing onw of required resources");
+            LOG.warn("Missing one of required resources");
             return;
         }
 

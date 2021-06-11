@@ -1,4 +1,10 @@
+
+
 quarkus:
+  operator-sdk:
+    crd:
+      generate: false
+
   http:
     port: 7070
   log:

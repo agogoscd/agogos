@@ -1,10 +1,12 @@
 package com.redhat.agogos.k8s.client;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 @ApplicationScoped
+@RegisterForReflection
 public class DefaultAgogosClient implements AgogosClient {
 
     @Inject

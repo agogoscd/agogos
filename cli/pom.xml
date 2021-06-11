@@ -37,6 +37,11 @@
             <artifactId>agogos-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- <dependency>
+            <groupId>com.redhat.cpaas</groupId>
+            <artifactId>agogos-quarkus-deployment</artifactId>
+            <version>${project.version}</version>
+        </dependency> -->
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-kubernetes-client</artifactId>
@@ -48,10 +53,6 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-picocli</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>info.picocli</groupId>
-            <artifactId>picocli-codegen</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -113,7 +114,8 @@
             </build>
             <properties>
                 <quarkus.package.type>native</quarkus.package.type>
-                <quarkus.native.additional-build-args>--rerun-class-initialization-at-runtime=org.bouncycastle.jcajce.provider.drbg.DRBG\$Default\,org.bouncycastle.jcajce.provider.drbg.DRBG\$NonceAndIV\,org.bouncycastle.crypto.prng.SP800SecureRandom -H:ResourceConfigurationFiles=resources-config.json -H:+PrintClassInitialization --trace-class-instantiation=org.bouncycastle.jcajce.provider.drbg.DRBG</quarkus.native.additional-build-args>
+                <quarkus.native.additional-build-args>--rerun-class-initialization-at-runtime=org.bouncycastle.jcajce.provider.drbg.DRBG\$Default\,org.bouncycastle.jcajce.provider.drbg.DRBG\$NonceAndIV\,org.bouncycastle.crypto.prng.SP800SecureRandom -H:ResourceConfigurationFiles=resources-config.json -H:+PrintClassInitialization</quarkus.native.additional-build-args>
+                <!-- -H:ReflectionConfigurationFiles=reflection-config.json -->
             </properties>
         </profile>
     </profiles>

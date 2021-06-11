@@ -54,21 +54,21 @@ public enum PipelineRunStatus {
         return PipelineRunState.FAILED;
     }
 
-    public RunnableResourceStatus toStatus() {
+    public ResultableResourceStatus toStatus() {
         switch (this) {
             case STARTED:
             case RUNNING:
-                return RunnableResourceStatus.Running;
+                return ResultableResourceStatus.Running;
             case COMPLETED:
             case SUCCEEDED:
-                return RunnableResourceStatus.Finished;
+                return ResultableResourceStatus.Finished;
             case CANCELLING:
             case CANCELLED:
-                return RunnableResourceStatus.Aborted;
+                return ResultableResourceStatus.Aborted;
             default:
                 break;
         }
 
-        return RunnableResourceStatus.Failed;
+        return ResultableResourceStatus.Failed;
     }
 }

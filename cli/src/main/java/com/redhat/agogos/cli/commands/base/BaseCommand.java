@@ -4,22 +4,26 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
-import com.redhat.agogos.RunnableResourceStatus;
+import com.redhat.agogos.ResultableResourceStatus;
 import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.cli.CLI.Output;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.AgogosResource;
-import com.redhat.agogos.v1alpha1.RunnableStatus;
-import com.redhat.agogos.v1alpha1.Status;
+import com.redhat.agogos.v1alpha1.AgogosResourceStatus;
+import com.redhat.agogos.v1alpha1.ResultableStatus;
 import io.fabric8.kubernetes.client.CustomResourceList;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import javax.inject.Inject;
 import picocli.CommandLine.Help.Ansi;
 
-public abstract class BaseCommand<T extends AgogosResource<?, ? extends Status>> implements Runnable {
+public abstract class BaseCommand<T extends AgogosResource<?, ? extends AgogosResourceStatus>> implements Runnable {
 
     @Inject
     CLI cli;
@@ -52,29 +56,57 @@ public abstract class BaseCommand<T extends AgogosResource<?, ? extends Status>>
         sb.append(Ansi.AUTO.string(String.format("@|bold Name|@:\t\t%s", resource.getMetadata().getName()))).append(nl);
 
         if (resource.getStatus() != null) {
-            if (resource.getStatus() instanceof RunnableStatus) {
-                RunnableStatus status = (RunnableStatus) resource.getStatus();
+            if (resource.getStatus() instanceof ResultableStatus) {
+                ResultableStatus status = (ResultableStatus) resource.getStatus();
 
                 sb.append(nl).append(Ansi.AUTO.string("🎉 @|bold Status|@")).append(nl).append(nl);
 
                 String buildColor = "green";
 
-                if (String.valueOf(RunnableResourceStatus.Failed).equals(resource.getStatus().getStatus())) {
+                if (String.valueOf(ResultableResourceStatus.Failed).equals(resource.getStatus().getStatus())) {
                     buildColor = "red";
                 }
 
+                ZonedDateTime startTime = status.startTime();
+                ZonedDateTime completionTime = status.completionTime();
+
+                Long duration = null;
+
+                if (startTime != null) {
+                    if (completionTime != null) {
+
+                        duration = Duration.between(startTime, completionTime).toMinutes();
+                    } else {
+                        duration = Duration
+                                .between(startTime, ZonedDateTime.now(ZoneId.of("UTC")))
+                                .toMinutes();
+                    }
+                }
+
                 sb.append(Ansi.AUTO
-                        .string(String.format("@|bold Status|@:\t\t@|%s %s |@", buildColor,
+                        .string(String.format("@|bold Status|@:\t\t@|bold,%s %s |@", buildColor,
                                 resource.getStatus().getStatus())))
                         .append(nl);
                 sb.append(Ansi.AUTO.string(String.format("@|bold Reason|@:\t\t%s",
                         Optional.ofNullable(resource.getStatus().getReason()).orElse("N/A")))).append(nl);
                 sb.append(Ansi.AUTO
-                        .string(String.format("@|bold Created|@:\t%s", resource.getMetadata().getCreationTimestamp())))
+                        .string(String.format("@|bold Created|@:\t%s",
+                                formatDate(resource.creationTime()))))
                         .append(nl);
-                sb.append(Ansi.AUTO.string(String.format("@|bold Started|@:\tTBD"))).append(nl);
-                sb.append(Ansi.AUTO.string(String.format("@|bold Finished|@:\tTBD"))).append(nl);
-                sb.append(Ansi.AUTO.string(String.format("@|bold Duration|@:\tTBD"))).append(nl);
+                sb.append(Ansi.AUTO.string(
+                        String.format("@|bold Started|@:\t%s",
+                                Optional.ofNullable(formatDate(status.startTime())).orElse("N/A"))))
+                        .append(nl);
+                sb.append(Ansi.AUTO.string(
+                        String.format("@|bold Finished|@:\t%s",
+                                Optional.ofNullable(formatDate(status.completionTime())).orElse("N/A"))))
+                        .append(nl);
+
+                if (duration != null) {
+                    sb.append(Ansi.AUTO
+                            .string(String.format("@|bold Duration|@:\t%s minute(s)", duration)))
+                            .append(nl);
+                }
 
                 if (status.getResult() != null) {
                     sb.append(nl).append(Ansi.AUTO.string("📦 @|bold Result|@")).append(nl).append(nl);
@@ -91,6 +123,16 @@ public abstract class BaseCommand<T extends AgogosResource<?, ? extends Status>>
 
         System.out.println(sb.toString());
 
+    }
+
+    private String formatDate(ZonedDateTime time) {
+        if (time == null) {
+            return null;
+        }
+
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        return dateTimeFormatter.format(time);
     }
 
     void printResource(Object resource, Output output) {

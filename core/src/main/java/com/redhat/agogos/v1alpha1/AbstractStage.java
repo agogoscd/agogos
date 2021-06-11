@@ -3,7 +3,6 @@ package com.redhat.agogos.v1alpha1;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.AbstractStage.StageSpec;
-import com.redhat.agogos.v1alpha1.AbstractStage.StageStatus;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.util.HashMap;
@@ -14,7 +13,7 @@ import lombok.ToString;
 
 @ToString
 @RegisterForReflection
-public abstract class AbstractStage extends AgogosResource<StageSpec, StageStatus> {
+public abstract class AbstractStage extends AgogosResource<StageSpec, Status> {
 
     public enum Phase {
         BUILD,
@@ -35,23 +34,6 @@ public abstract class AbstractStage extends AgogosResource<StageSpec, StageStatu
         private Map<Object, Object> openAPIV3Schema = new HashMap<>();
     }
 
-    @JsonDeserialize(using = JsonDeserializer.None.class)
-    @ToString
-    @RegisterForReflection
-    public static class StageStatus implements KubernetesResource {
-        private static final long serialVersionUID = 8090667061734131108L;
-
-        @Getter
-        @Setter
-        private String status;
-        @Getter
-        @Setter
-        private String reason;
-        @Getter
-        @Setter
-        private String lastUpdate;
-    }
-
     @ToString
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
@@ -67,6 +49,11 @@ public abstract class AbstractStage extends AgogosResource<StageSpec, StageStatu
         @Setter
         private StageSchema schema = new StageSchema();
 
+    }
+
+    @Override
+    protected Status initStatus() {
+        return new Status();
     }
 
     @Getter
