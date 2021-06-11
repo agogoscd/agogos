@@ -2,9 +2,13 @@ quarkus:
   banner:
     enabled: false
 
-resources:
-  wait: true
+  security:
+    security-providers: BC
 
+  native:
+    resources:
+      includes: deployment/crds.yaml
+  
 "%dev":
   quarkus:
     log:
@@ -36,7 +40,3 @@ resources:
           level: ERROR
         "io.quarkus":
           level: "OFF"
-
-"%test":
-  resources:
-    wait: false

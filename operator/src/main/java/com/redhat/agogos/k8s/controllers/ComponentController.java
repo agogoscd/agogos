@@ -25,6 +25,7 @@ import io.fabric8.tekton.pipeline.v1beta1.PipelineWorkspaceDeclaration;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineWorkspaceDeclarationBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.Task;
 import io.fabric8.tekton.pipeline.v1beta1.TaskRef;
+import io.fabric8.tekton.pipeline.v1beta1.TaskRefBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBinding;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBindingBuilder;
 import io.javaoperatorsdk.operator.api.Context;
@@ -207,7 +208,8 @@ public class ComponentController implements ResourceController<Component> {
 
         PipelineTask initTask = new PipelineTaskBuilder() //
                 .withName("init") //
-                .withTaskRef(new TaskRef("tekton.dev/v1beta1", "ClusterTask", "init")) //
+                .withTaskRef(new TaskRefBuilder().withName("init").withApiVersion("tekton.dev/v1beta1").withKind("ClusterTask")
+                        .build()) //
                 .addNewParam() //
                 .withName("data") //
                 // TODO: Do not pass the JSON, but instead we should pass just coordinates
@@ -218,10 +220,9 @@ public class ComponentController implements ResourceController<Component> {
 
         tasks.add(initTask);
 
-        TaskRef buildTaskRef = new TaskRef(
-                HasMetadata.getApiVersion(Task.class),
-                builder.getSpec().getTaskRef().getKind(),
-                builder.getSpec().getTaskRef().getName());
+        TaskRef buildTaskRef = new TaskRefBuilder().withApiVersion(HasMetadata.getApiVersion(Task.class))
+                .withKind(builder.getSpec().getTaskRef().getKind()).withName(builder.getSpec().getTaskRef().getName()).build();
+
         // Prepare main task
         PipelineTask buildTask = new PipelineTaskBuilder() //
                 .withName("builder") //

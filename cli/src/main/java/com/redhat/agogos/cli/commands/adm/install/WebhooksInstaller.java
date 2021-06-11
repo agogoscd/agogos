@@ -1,5 +1,6 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
+import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import com.redhat.agogos.cli.commands.adm.certs.CertProvider;
 import com.redhat.agogos.errors.ApplicationException;
@@ -106,11 +107,17 @@ public class WebhooksInstaller extends Installer {
                     ));
         }
 
-        resources = installKubernetesResources(resources, namespace);
+        Service webhooksService = kubernetesClient.services().inNamespace(namespace).withName(NAME).get();
 
-        // TODO: Make sure the service was restarted in case it already existed and certificates were regenerated
+        resources = resourceLoader.installKubernetesResources(resources, namespace);
 
-        status(resources);
+        if (webhooksService != null) {
+            LOG.info("🕞 Restarting Webhooks service after updating certificates...");
+
+            kubernetesClient.apps().deployments().inNamespace(namespace).withName(NAME).rolling().restart();
+        }
+
+        Helper.status(resources);
 
         if (profile == InstallProfile.dev) {
             writeCerts();
@@ -175,7 +182,7 @@ public class WebhooksInstaller extends Installer {
                 .endResources() //
                 .build();
 
-        Deployment webhookDeployment = new DeploymentBuilder().withNewMetadata().withName("agogos-webhooks")
+        Deployment webhookDeployment = new DeploymentBuilder().withNewMetadata().withName(NAME)
                 .withLabels(LABELS)
                 .endMetadata().withNewSpec().withReplicas(1).withNewSelector().withMatchLabels(LABELS).endSelector()
                 .withNewTemplate().withNewMetadata().withLabels(LABELS).endMetadata().withNewSpec()
@@ -195,7 +202,7 @@ public class WebhooksInstaller extends Installer {
         ServicePort httpsPort = new ServicePortBuilder().withName("https").withPort(443).withProtocol("TCP")
                 .withTargetPort(new IntOrString(8443)).build();
 
-        Service webhookService = new ServiceBuilder().withNewMetadata().withName("agogos-webhooks").withLabels(LABELS)
+        Service webhookService = new ServiceBuilder().withNewMetadata().withName(NAME).withLabels(LABELS)
                 .endMetadata().withNewSpec().withPorts(httpPort, httpsPort).withType("ClusterIP").withSelector(LABELS)
                 .endSpec()
                 .build();
@@ -290,7 +297,7 @@ public class WebhooksInstaller extends Installer {
 
         Secret secret = new SecretBuilder().withNewMetadata().withName(NAME).withLabels(LABELS)
                 .endMetadata()
-                .withNewType("kubernetes.io/tls").withData(certData).build();
+                .withType("kubernetes.io/tls").withData(certData).build();
 
         return secret;
     }

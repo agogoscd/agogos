@@ -1,5 +1,6 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
+import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
@@ -53,7 +54,7 @@ public class OperatorInstaller extends Installer {
     public void install(InstallProfile profile, String namespace) {
         LOG.info("🕞 Installing Agogos Operator component...");
 
-        List<HasMetadata> resources = installKubernetesResources( //
+        List<HasMetadata> resources = resourceLoader.installKubernetesResources( //
                 List.of( //
                         serviceAccount(),
                         clusterRole(),
@@ -63,7 +64,7 @@ public class OperatorInstaller extends Installer {
                 ),
                 namespace);
 
-        status(resources);
+        Helper.status(resources);
 
         LOG.info("✅ Agogos Operator installed");
     }

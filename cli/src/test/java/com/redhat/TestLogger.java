@@ -26,7 +26,6 @@ public class TestLogger implements BeforeEachCallback, AfterEachCallback {
 
         @Override
         public void publish(LogRecord record) {
-            System.out.println("PUBLISH");
             records.add(record);
             System.out.println(records.size());
         }
@@ -47,7 +46,6 @@ public class TestLogger implements BeforeEachCallback, AfterEachCallback {
     static InMemoryHandler handler;
 
     static {
-        System.out.println("STATIC IMNIT");
         handler = new InMemoryHandler();
     }
 

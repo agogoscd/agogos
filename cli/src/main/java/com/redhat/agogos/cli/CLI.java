@@ -4,6 +4,7 @@ import com.redhat.agogos.cli.commands.AdmCommand;
 import com.redhat.agogos.cli.commands.BuildCommand;
 import com.redhat.agogos.cli.commands.BuilderCommand;
 import com.redhat.agogos.cli.commands.ComponentCommand;
+import com.redhat.agogos.cli.commands.LoadCommand;
 import com.redhat.agogos.cli.commands.PipelineCommand;
 import com.redhat.agogos.cli.commands.RunCommand;
 import com.redhat.agogos.cli.commands.StageCommand;
@@ -26,7 +27,7 @@ import picocli.CommandLine.ScopeType;
         TriggerCommand.class,
         StageCommand.class,
         BuilderCommand.class,
-// LoadCommand.class,
+        LoadCommand.class,
 })
 public class CLI implements QuarkusApplication {
     @Inject

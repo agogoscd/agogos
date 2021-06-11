@@ -11,11 +11,13 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 @RegisterForReflection
+@ToString
 public class RunClient {
     private static final Logger LOG = LoggerFactory.getLogger(RunClient.class);
 

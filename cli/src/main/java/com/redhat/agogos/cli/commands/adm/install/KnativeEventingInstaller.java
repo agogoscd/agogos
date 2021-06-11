@@ -1,5 +1,6 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
+import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
@@ -28,7 +29,7 @@ public class KnativeEventingInstaller extends Installer {
         LOG.info("🕞 Installing Knative Eventing {}...", VERSION);
 
         cleanup();
-        status(install());
+        Helper.status(install());
 
         LOG.info("✅ Knative Eventing {} installed", VERSION);
     }
@@ -65,8 +66,10 @@ public class KnativeEventingInstaller extends Installer {
 
         for (String file : files) {
             resources.addAll(
-                    installKubernetesResources(String.format("https://github.com/knative/eventing/releases/download/%s/%s.yaml",
-                            VERSION, file), NAMESPACE,
+                    resourceLoader.installKubernetesResources(
+                            String.format("https://github.com/knative/eventing/releases/download/%s/%s.yaml",
+                                    VERSION, file),
+                            NAMESPACE,
                             loaded -> {
                                 loaded.removeIf(
                                         resource -> resource instanceof Deployment

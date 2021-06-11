@@ -1,5 +1,6 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
+import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import javax.enterprise.context.ApplicationScoped;
@@ -26,7 +27,7 @@ public class TektonInstaller extends Installer {
         String url = String.format("https://storage.googleapis.com/tekton-releases/pipeline/previous/%s/release.yaml",
                 VERSION);
 
-        status(installKubernetesResources(url, NAMESPACE));
+        Helper.status(resourceLoader.installKubernetesResources(url, NAMESPACE));
 
         LOG.info("✅ Tekton {} installed", VERSION);
     }

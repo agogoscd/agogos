@@ -23,7 +23,7 @@ public class BuildController extends AbstractController<Build> {
     ComponentClient componentClient;
 
     @Inject
-    BuildEventSource pipelineRunEventSource;
+    BuildEventSource buildEventSource;
 
     /**
      * <p>
@@ -34,7 +34,7 @@ public class BuildController extends AbstractController<Build> {
      */
     @Override
     public void init(EventSourceManager eventSourceManager) {
-        eventSourceManager.registerEventSource("component", pipelineRunEventSource);
+        eventSourceManager.registerEventSource("component", buildEventSource);
     }
 
     /**
