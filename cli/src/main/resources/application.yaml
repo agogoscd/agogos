@@ -7,7 +7,7 @@ quarkus:
 
   native:
     resources:
-      includes: deployment/crds.yaml
+      includes: deployment/crds.yaml,dependencies/*.yaml
   
 "%dev":
   quarkus:

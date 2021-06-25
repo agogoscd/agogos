@@ -39,6 +39,9 @@ public class CLI implements QuarkusApplication {
         json
     }
 
+    @Option(names = { "-v", "--verbose" }, scope = ScopeType.INHERIT)
+    boolean verbose = false;
+
     @Option(names = { "--output",
             "-o" }, description = "Output format, valid values: ${COMPLETION-CANDIDATES}, default: ${DEFAULT-VALUE}.", defaultValue = "plain", scope = ScopeType.INHERIT)
     @Getter
@@ -50,7 +53,8 @@ public class CLI implements QuarkusApplication {
 
     @Override
     public int run(String... args) throws Exception {
-        return new CommandLine(this, factory).execute(args);
+        return new CommandLine(this, factory).setExecutionExceptionHandler(new ExceptionHandler()).execute(args);
+
     }
 
     public int run(Class<? extends Runnable> command, String... args) {

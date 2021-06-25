@@ -39,6 +39,7 @@ import org.openapi4j.parser.model.v3.OpenApi3;
 import org.openapi4j.parser.model.v3.Path;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.error.YAMLException;
 
 @RegisterForReflection
 @ApplicationScoped
@@ -215,27 +216,19 @@ public class ResourceLoader {
         }
     }
 
-    private InputStream urlToStream(String url) {
-        URL resource = null;
-
+    private InputStream urlToStream(URL url) {
         try {
-            resource = new URL(url);
-        } catch (MalformedURLException e) {
-            throw new ApplicationException("Could not parse resource url: {}", url, e);
-        }
-
-        try {
-            return resource.openStream();
+            return url.openStream();
         } catch (IOException e) {
             throw new ApplicationException("Could not load resource from url: {}", url, e);
         }
     }
 
-    public List<HasMetadata> installKubernetesResources(String url, String namespace) {
+    public List<HasMetadata> installKubernetesResources(URL url, String namespace) {
         return installKubernetesResources(urlToStream(url), namespace);
     }
 
-    public List<HasMetadata> installKubernetesResources(String url, String namespace, Consumer<List<HasMetadata>> consumer) {
+    public List<HasMetadata> installKubernetesResources(URL url, String namespace, Consumer<List<HasMetadata>> consumer) {
         return installKubernetesResources(urlToStream(url), namespace, consumer);
     }
 
@@ -261,13 +254,24 @@ public class ResourceLoader {
         Yaml yaml = new Yaml(opts);
         Iterable<Object> elements = yaml.loadAll(stream);
 
-        elements.forEach(element -> {
-            if (element != null) {
-                resources.add(objectMapper.convertValue(element, GenericKubernetesResource.class));
-            }
-        });
+        try {
+            elements.forEach(element -> {
+                if (element != null) {
+                    if (element instanceof List) {
+                        ((List<?>) element).forEach(entry -> {
+                            resources.add(objectMapper.convertValue(entry, GenericKubernetesResource.class));
+                        });
+                    } else {
+                        resources.add(objectMapper.convertValue(element, GenericKubernetesResource.class));
+                    }
+                }
+            });
+        } catch (YAMLException e) {
+            throw new ApplicationException("Could not load resources", e);
+        }
 
         return resources;
+
     }
 
     private List<HasMetadata> installKubernetesResources(List<HasMetadata> resources, String namespace,

@@ -1,0 +1,27 @@
+# This first marker is optional
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Component
+metadata:
+  name: dummy-rpm
+  labels:
+    type: demo
+spec:
+  builderRef:
+    kind: Builder
+    name: dummy-v1
+  data:
+    type: rpm
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Component
+metadata:
+  name: dummy-container
+  labels:
+    type: demo
+spec:
+  builderRef:
+    kind: Builder
+    name: dummy-v1
+  data:
+    type: container

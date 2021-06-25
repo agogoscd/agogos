@@ -2,7 +2,6 @@ package com.redhat.agogos.cli.test;
 
 import io.fabric8.kubernetes.client.server.mock.KubernetesCrudDispatcher;
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
-import java.io.IOException;
 import java.util.function.Consumer;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -28,17 +27,7 @@ public class KubernetesTestServerSetup implements Consumer<KubernetesServer> {
         /**
          * Complete JSON OpenAPI schema.
          */
-        static String OPENAPI_DATA = null;
-
-        static {
-            try {
-                OPENAPI_DATA = new String(
-                        Thread.currentThread().getContextClassLoader().getResourceAsStream(MOCKED_RESOURCE_NAME)
-                                .readAllBytes());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        static final String OPENAPI_DATA = ResourceUtils.testResourceAsString(MOCKED_RESOURCE_NAME);
 
         @Override
         public synchronized MockResponse dispatch(RecordedRequest request) {
