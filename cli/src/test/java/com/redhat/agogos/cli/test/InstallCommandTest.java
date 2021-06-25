@@ -3,6 +3,7 @@ package com.redhat.agogos.cli.test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.InMemoryLogHandler;
 import com.redhat.agogos.cli.CLI;
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@WithKubernetesTestServer
+@WithKubernetesTestServer(setup = KubernetesTestServerSetup.class)
 @QuarkusTest
 public class InstallCommandTest {
 
@@ -25,6 +26,9 @@ public class InstallCommandTest {
 
     @Inject
     CLI cli;
+
+    @Inject
+    ObjectMapper objectMapper;
 
     InMemoryLogHandler handler;
 

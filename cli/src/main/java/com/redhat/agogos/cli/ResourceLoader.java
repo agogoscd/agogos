@@ -96,6 +96,7 @@ public class ResourceLoader {
                 throw new ApplicationException(
                         "Could not parse OpenAPI information received from Kubernetes.", e);
             }
+
             openApi.getPaths().entrySet().forEach(entry -> {
                 Path path = entry.getValue();
 
