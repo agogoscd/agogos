@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.cli.CLI;
-import com.redhat.agogos.cli.test.InMemoryLogHandler;
-import com.redhat.agogos.cli.test.KubernetesTestServerSetup;
+import com.redhat.agogos.test.InMemoryLogHandler;
+import com.redhat.agogos.test.KubernetesTestServerSetup;
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.kubernetes.client.KubernetesTestServer;

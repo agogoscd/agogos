@@ -1,9 +1,8 @@
-package com.redhat.cpaas.errors;
+package com.redhat.agogos.errors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-import com.redhat.agogos.errors.ValidationException;
 import org.junit.jupiter.api.Test;
 
 class ValidationExceptionTest {

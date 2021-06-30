@@ -1,4 +1,4 @@
-package com.redhat.agogos.cli.test;
+package com.redhat.agogos.test;
 
 import java.util.ArrayList;
 import java.util.List;

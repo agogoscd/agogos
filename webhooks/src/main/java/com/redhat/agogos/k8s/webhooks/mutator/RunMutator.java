@@ -1,8 +1,9 @@
 
 package com.redhat.agogos.k8s.webhooks.mutator;
 
+import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.k8s.Resource;
-import com.redhat.agogos.k8s.client.PipelineClient;
+import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.Run;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -10,7 +11,6 @@ import io.fabric8.kubernetes.api.model.admission.v1.AdmissionRequest;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.MissingResourceException;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.Json;
@@ -21,7 +21,7 @@ import javax.json.JsonObjectBuilder;
 @ApplicationScoped
 public class RunMutator extends Mutator<Run> {
     @Inject
-    PipelineClient pipelineClient;
+    AgogosClient agogosClient;
 
     @Override
     protected void mutateResource(Run run, AdmissionRequest request,
@@ -71,8 +71,8 @@ public class RunMutator extends Mutator<Run> {
      * @return Json array with one entry with Pipeline
      */
     private JsonArray generateOwner(Run run, String namespace) {
-        Pipeline pipeline = pipelineClient.getByName(run.getSpec().getPipeline(),
-                namespace);
+        Pipeline pipeline = agogosClient.v1alpha1().pipelines().inNamespace(namespace).withName(run.getSpec().getPipeline())
+                .get();
 
         if (pipeline == null) {
             throw new MissingResourceException("Selected Pipeline '{}' does not exist in '{}' namespace",

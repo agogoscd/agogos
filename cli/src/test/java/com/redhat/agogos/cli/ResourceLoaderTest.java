@@ -3,9 +3,9 @@ package com.redhat.agogos.cli;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.redhat.agogos.cli.test.KubernetesTestServerSetup;
-import com.redhat.agogos.cli.test.ResourceUtils;
 import com.redhat.agogos.errors.ApplicationException;
+import com.redhat.agogos.test.KubernetesTestServerSetup;
+import com.redhat.agogos.test.ResourceUtils;
 import com.redhat.agogos.v1alpha1.Component;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
