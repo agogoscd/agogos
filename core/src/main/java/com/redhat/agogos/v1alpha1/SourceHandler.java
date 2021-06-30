@@ -2,30 +2,35 @@ package com.redhat.agogos.v1alpha1;
 
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.redhat.agogos.v1alpha1.Builder.BuilderSpec;
+import com.redhat.agogos.v1alpha1.SourceHandler.SourceHandlerSpec;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.model.annotation.Group;
 import io.fabric8.kubernetes.model.annotation.Kind;
 import io.fabric8.kubernetes.model.annotation.Version;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.HashMap;
-import java.util.Map;
-
-@ToString(callSuper = true)
-@Kind("Builder")
+/**
+ * <p>
+ * Cluster scoped resource to register handlers for fetching source code for different SCM.
+ * </p>
+ */
+@ToString
+@RegisterForReflection
+@Kind("SourceHandler")
 @Group("agogos.redhat.com")
 @Version("v1alpha1")
-public class Builder extends AgogosResource<BuilderSpec, Status> {
-    private static final long serialVersionUID = 1184222810180288956L;
+public class SourceHandler extends AgogosResource<SourceHandlerSpec, Void> {
+    private static final long serialVersionUID = 9122121231081986174L;
 
     @ToString
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
-    public static class BuilderSchema implements KubernetesResource {
+    public static class SourceHandlerSchema implements KubernetesResource {
         private static final long serialVersionUID = 5507683698215774978L;
 
         @Getter
@@ -36,35 +41,36 @@ public class Builder extends AgogosResource<BuilderSpec, Status> {
     @ToString
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
-    public static class BuilderSpec implements KubernetesResource {
+    public static class SourceHandlerSpec implements KubernetesResource {
+        private static final long serialVersionUID = -2068477162805635444L;
 
-        private static final long serialVersionUID = 3644066384389447653L;
-
+        /**
+         * <p>
+         * {@link TaskRef} providing the implementation for the {@link SourceHandler}.
+         * </p>
+         */
         @Getter
         @Setter
         private TaskRef taskRef = new TaskRef();
 
         @Getter
         @Setter
-        private BuilderSchema schema = new BuilderSchema();
+        private SourceHandlerSchema schema = new SourceHandlerSchema();
 
     }
 
-    public Builder() {
-
+    public SourceHandler() {
+        super();
     }
 
-    public Builder(String name) {
+    public SourceHandler(String name) {
+        super();
+
         this.getMetadata().setName(name);
-    }
-
-    @Override
-    protected Status initStatus() {
-        return new Status();
     }
 
     @Getter
     @Setter
-    private BuilderSpec spec = new BuilderSpec();
+    private SourceHandlerSpec spec = new SourceHandlerSpec();
 
 }

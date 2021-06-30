@@ -28,9 +28,6 @@ import java.util.Map;
 @QuarkusTest
 public class ComponentControllerTest {
 
-    // @KubernetesTestServer
-    // KubernetesServer mockServer;
-
     @Inject
     ComponentController componentController;
 

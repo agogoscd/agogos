@@ -56,6 +56,23 @@ spec:
                     kind:
                       type: string
                       description: The kind. Can be either builder or ClusterBuilder
+                source:
+                  description: Information about the source code
+                  type: object
+                  properties:
+                    handlerRef:
+                      type: object
+                      description: Selected SourceHandler
+                      properties:
+                        name:
+                          type: string
+                          description: Name of the SourceHandler
+                    data:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                      description: "Additional data that should be passed to the SourceHandler"
+                  required: ["handlerRef"]
+
               required:
                 - "data"
                 - "builderRef"

@@ -7,6 +7,7 @@ import com.redhat.agogos.k8s.Resource;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
+import com.redhat.agogos.v1alpha1.SourceHandler;
 import com.redhat.agogos.v1alpha1.Status;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.OwnerReference;
@@ -164,6 +165,19 @@ public class ComponentController implements ResourceController<Component> {
                     component.getSpec().getBuilderRef().get("name"));
         }
 
+        SourceHandler sourceHandler = null;
+
+        // In case the source handler is specified in the Component, validate if it exists in the system
+        if (component.getSpec().getSource().getHandlerRef().getName() != null) {
+            sourceHandler = agogosClient.v1alpha1().sourcehandlers()
+                    .withName(component.getSpec().getSource().getHandlerRef().getName()).get();
+
+            if (sourceHandler == null) {
+                throw new MissingResourceException("Selected SourceHandler '{}' is not available in the system",
+                        component.getSpec().getSource().getHandlerRef().getName());
+            }
+        }
+
         List<PipelineTask> tasks = new ArrayList<>();
 
         // Prepare workspace for main task to store results
@@ -197,6 +211,48 @@ public class ComponentController implements ResourceController<Component> {
 
         tasks.add(initTask);
 
+        String runBuildAfter = "init";
+
+        if (sourceHandler != null) {
+            Task sourceTask = tektonClient.v1beta1().tasks().inNamespace(component.getMetadata().getNamespace())
+                    .withName(sourceHandler.getSpec().getTaskRef().getName()).get();
+
+            // Prepare workspace for main task to share content between steps
+            WorkspacePipelineTaskBinding sourceWsBinding = new WorkspacePipelineTaskBindingBuilder() //
+                    .withName("output") // TODO: This is specific for the git-clone task: https://hub.tekton.dev/tekton/task/git-clone
+                    .withWorkspace("ws") //
+                    .withSubPath("pipeline/source") //
+                    .build();
+
+            PipelineTaskBuilder sourceTaskBuilder = new PipelineTaskBuilder() //
+                    .withName("source") //
+                    .withRunAfter("init") //
+                    .withTaskRef(
+                            // TODO: unhardcode apiversion
+                            new TaskRefBuilder().withName(sourceHandler.getSpec().getTaskRef().getName())
+                                    .withApiVersion("tekton.dev/v1beta1")
+                                    .withKind(sourceHandler.getSpec().getTaskRef().getKind())
+                                    .build()) //
+                    .withWorkspaces(sourceWsBinding);
+
+            System.out.println(component.getSpec().getSource().getData());
+
+            sourceTask.getSpec().getParams().forEach(p -> {
+                //System.out.println(p);
+                Object value = component.getSpec().getSource().getData().get(p.getName());
+
+                System.out.println(value);
+
+                if (value != null) {
+                    sourceTaskBuilder.addNewParam().withName(p.getName()).withNewValue(value.toString()).endParam();
+                }
+            });
+
+            tasks.add(sourceTaskBuilder.build());
+
+            runBuildAfter = "source";
+        }
+
         TaskRef buildTaskRef = new TaskRefBuilder().withApiVersion(HasMetadata.getApiVersion(Task.class))
                 .withKind(builder.getSpec().getTaskRef().getKind()).withName(builder.getSpec().getTaskRef().getName()).build();
 
@@ -205,7 +261,7 @@ public class ComponentController implements ResourceController<Component> {
                 .withName("builder") //
                 .withTaskRef(buildTaskRef)
                 .withWorkspaces(stageWsBinding, pipelineWsBinding) //
-                .withRunAfter("init") //
+                .withRunAfter(runBuildAfter)
                 .build();
 
         tasks.add(buildTask);

@@ -29,8 +29,41 @@ public class Component extends AgogosResource<ComponentSpec, Status> implements 
     @ToString
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
+    public static class SourceHandlerRef implements KubernetesResource {
+        /**
+         * Name of the {@link SourceHandler}.
+         */
+        @Getter
+        @Setter
+        private String name;
+    }
+
+    @ToString
+    @JsonDeserialize(using = JsonDeserializer.None.class)
+    @RegisterForReflection
+    public static class SourceSpec implements KubernetesResource {
+        /**
+         * A reference to select {@link SourceHandler}.
+         */
+        @Getter
+        @Setter
+        SourceHandlerRef handlerRef = new SourceHandlerRef();
+
+        /**
+         * Configuration passed to the {@link SourceHandler}.
+         */
+        @Getter
+        @Setter
+        private Map<Object, Object> data = new HashMap<>();
+    }
+
+    @JsonDeserialize(using = JsonDeserializer.None.class)
+    @RegisterForReflection
     public static class ComponentSpec implements KubernetesResource {
         private static final long serialVersionUID = -2068477162805635444L;
+        @Getter
+        @Setter
+        private SourceSpec source = new SourceSpec();
 
         @Getter
         @Setter
