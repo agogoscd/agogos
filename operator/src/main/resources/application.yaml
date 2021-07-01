@@ -77,3 +77,6 @@ kubernetes:
     # TODO: change this
     kubernetes-client:
       trust-certs: true
+
+"%test":
+  broker/mp-rest/url: http://localhost:8111

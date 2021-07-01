@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.errors.ValidationException;
-import com.redhat.agogos.k8s.client.BuilderClient;
+import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
@@ -29,7 +29,7 @@ public class ComponentValidator extends Validator<Component> {
     ObjectMapper objectMapper;
 
     @Inject
-    BuilderClient builderClient;
+    AgogosClient agogosClient;
 
     @Override
     protected void validateResource(Component resource, AdmissionResponseBuilder responseBuilder) {
@@ -51,7 +51,7 @@ public class ComponentValidator extends Validator<Component> {
     private void validateComponent(Component component) throws ApplicationException {
         LOG.info("Validating component '{}'", component.getNamespacedName());
 
-        Builder builder = builderClient.getByName(component.getSpec().getBuilderRef().get("name"));
+        Builder builder = agogosClient.v1alpha1().builders().withName(component.getSpec().getBuilderRef().get("name")).get();
 
         if (builder == null) {
             throw new MissingResourceException("Selected builder '{}' is not registered in the system",

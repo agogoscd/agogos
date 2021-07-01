@@ -1,10 +1,11 @@
-package com.redhat.agogos.cli.test;
+package com.redhat.agogos.test;
 
 import io.fabric8.kubernetes.client.server.mock.KubernetesCrudDispatcher;
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
-import java.util.function.Consumer;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.RecordedRequest;
+
+import java.util.function.Consumer;
 
 /**
  * <p>

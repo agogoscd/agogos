@@ -1,4 +1,4 @@
-package com.redhat.agogos.cli.test;
+package com.redhat.agogos.test;
 
 import java.io.IOException;
 import java.io.InputStream;

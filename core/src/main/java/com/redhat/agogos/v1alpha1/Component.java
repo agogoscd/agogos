@@ -45,6 +45,12 @@ public class Component extends AgogosResource<ComponentSpec, Status> implements 
         super();
     }
 
+    public Component(String name) {
+        super();
+
+        this.getMetadata().setName(name);
+    }
+
     @JsonIgnore
     public boolean isReady() {
         if (ResourceStatus.valueOf(getStatus().getStatus()) == ResourceStatus.Ready) {

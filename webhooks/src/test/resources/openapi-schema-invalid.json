@@ -1,9 +1,0 @@
-{
-  "type": "object",
-  "properties": {
-    "someNonExistingKey": {
-      "type": "string"
-    }
-  },
-  "required": ["someNonExistingKey"]
-}

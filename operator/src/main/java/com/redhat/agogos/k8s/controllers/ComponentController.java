@@ -6,7 +6,7 @@ import com.redhat.agogos.ResourceStatus;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.k8s.Resource;
-import com.redhat.agogos.k8s.client.BuilderClient;
+import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.k8s.client.PipelineClient;
 import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
@@ -54,7 +54,7 @@ public class ComponentController implements ResourceController<Component> {
     PipelineClient componentResourceClient;
 
     @Inject
-    BuilderClient builderClient;
+    AgogosClient agogosClient;
 
     @Inject
     ObjectMapper objectMapper;
@@ -129,34 +129,24 @@ public class ComponentController implements ResourceController<Component> {
      * data passed and sets the status subresource on {@link Component}
      * depending on the outcome of the pipeline update.
      * </p>
-     * 
-     * @param component Component resource to create the pipeline for
      */
-    private void updateBuildPipeline(Component component) {
-        try {
-            LOG.debug("Preparing pipeline for component '{}'", component.getNamespacedName());
-
-            this.updateTektonBuildPipeline(component);
-
-            setStatus(component, ResourceStatus.Initializing, "Preparing pipeline");
-
-            LOG.info("Pipeline for component '{}' updated", component.getNamespacedName());
-        } catch (ApplicationException e) {
-            LOG.error("Error occurred while creating pipeline for component '{}'", component.getNamespacedName(), e);
-
-            setStatus(component, ResourceStatus.Failed, "Could not create component pipeline");
-        }
-    }
-
     private UpdateControl<Component> onResourceUpdate(Component component,
             Context<Component> context) {
         LOG.info("Component '{}' modified", component.getFullName());
 
-        // Create or update pipeline in any case
-        this.updateBuildPipeline(component);
+        try {
+            LOG.debug("Preparing pipeline for Component '{}'", component.getNamespacedName());
 
-        // Update Component status
-        setStatus(component, ResourceStatus.Ready, "Component is ready");
+            this.updateTektonBuildPipeline(component);
+
+            setStatus(component, ResourceStatus.Ready, "Component is ready");
+
+            LOG.info("Pipeline for Component '{}' updated", component.getNamespacedName());
+        } catch (ApplicationException e) {
+            LOG.error("Error occurred while creating pipeline for component '{}'", component.getNamespacedName(), e);
+
+            setStatus(component, ResourceStatus.Failed, "Could not create Component: " + e.getMessage());
+        }
 
         return UpdateControl.updateStatusSubResource(component);
     }
@@ -183,7 +173,7 @@ public class ComponentController implements ResourceController<Component> {
                     component.getNamespacedName(), e);
         }
 
-        Builder builder = builderClient.getByName(component.getSpec().getBuilderRef().get("name"));
+        Builder builder = agogosClient.v1alpha1().builders().withName(component.getSpec().getBuilderRef().get("name")).get();
 
         if (builder == null) {
             throw new MissingResourceException("Selected Builder '{}' is not available in the system",
@@ -214,6 +204,18 @@ public class ComponentController implements ResourceController<Component> {
                 .withName("data") //
                 // TODO: Do not pass the JSON, but instead we should pass just coordinates
                 .withNewValue(componentJson) //
+                .endParam() //
+                .addNewParam() //
+                .withName("name") //
+                .withNewValue(component.getMetadata().getName()) //
+                .endParam() //
+                .addNewParam() //
+                .withName("kind") //
+                .withNewValue(component.getKind()) //
+                .endParam() //
+                .addNewParam() //
+                .withName("apiversion") //
+                .withNewValue(component.getVersion()) //
                 .endParam() //
                 .withWorkspaces(pipelineWsBinding) //
                 .build();

@@ -34,6 +34,12 @@
         </dependency>
         <dependency>
             <groupId>com.redhat.cpaas</groupId>
+            <artifactId>agogos-test</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.redhat.cpaas</groupId>
             <artifactId>agogos-core</artifactId>
             <version>${project.version}</version>
         </dependency>
