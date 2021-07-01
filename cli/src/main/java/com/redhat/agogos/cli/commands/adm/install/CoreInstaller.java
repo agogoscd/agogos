@@ -1,5 +1,6 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
+import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.ClusterStage;
@@ -63,7 +64,7 @@ public class CoreInstaller extends Installer {
     public void install(InstallProfile profile, String namespace) {
         LOG.info("🕞 Installing Agogos core resources...");
 
-        List<HasMetadata> resources = installKubernetesResources( //
+        List<HasMetadata> resources = resourceLoader.installKubernetesResources( //
                 List.of( //
                         namespace(namespace),
                         serviceAccount(),
@@ -75,7 +76,7 @@ public class CoreInstaller extends Installer {
         resources.add(installInitClusterStage());
         resources.add(installKnativeBroker(namespace));
 
-        status(resources);
+        Helper.status(resources);
 
         LOG.info("✅ Agogos core resources installed");
     }

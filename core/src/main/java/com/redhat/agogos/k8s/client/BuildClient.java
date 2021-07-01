@@ -10,6 +10,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 @ApplicationScoped
 @RegisterForReflection
+@ToString
 public class BuildClient {
     private static final Logger LOG = LoggerFactory.getLogger(BuildClient.class);
 
@@ -34,11 +36,6 @@ public class BuildClient {
     void init() {
         componentBuildClient = kubernetesClient.customResources(Build.class, BuildList.class);
     }
-
-    // @Produces
-    // public MixedOperation<Build, BuildList, Resource<Build>> buildClient() {
-    //     return kubernetesClient.customResources(Build.class, BuildList.class);
-    // }
 
     public List<Build> findByLabel(String namespace, String label, String value) {
         return componentBuildClient.inNamespace(namespace).withLabel(label, value).list().getItems();

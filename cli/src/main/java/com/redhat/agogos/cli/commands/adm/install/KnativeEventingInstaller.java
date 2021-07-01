@@ -1,9 +1,11 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
+import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
@@ -28,7 +30,8 @@ public class KnativeEventingInstaller extends Installer {
         LOG.info("🕞 Installing Knative Eventing {}...", VERSION);
 
         cleanup();
-        status(install());
+
+        Helper.status(install());
 
         LOG.info("✅ Knative Eventing {} installed", VERSION);
     }
@@ -61,12 +64,16 @@ public class KnativeEventingInstaller extends Installer {
     private List<HasMetadata> install() {
         List<HasMetadata> resources = new ArrayList<>();
 
-        String[] files = new String[] { "eventing-core", "in-memory-channel", "mt-channel-broker" };
+        String[] files = new String[] { "core", "in-memory-channel", "mt-channel-broker" };
 
         for (String file : files) {
+            String path = String.format("dependencies/knative-eventing-%s-%s.yaml", file, VERSION);
+            InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+
             resources.addAll(
-                    installKubernetesResources(String.format("https://github.com/knative/eventing/releases/download/%s/%s.yaml",
-                            VERSION, file), NAMESPACE,
+                    resourceLoader.installKubernetesResources(
+                            is,
+                            NAMESPACE,
                             loaded -> {
                                 loaded.removeIf(
                                         resource -> resource instanceof Deployment

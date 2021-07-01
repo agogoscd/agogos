@@ -1,6 +1,6 @@
 package com.redhat.agogos.cli.commands.adm;
 
-import com.cronutils.utils.StringUtils;
+import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller;
 import com.redhat.agogos.errors.ApplicationException;
 import io.fabric8.knative.client.KnativeClient;
@@ -11,7 +11,6 @@ import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
-import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.api.model.ServiceAccount;
 import io.fabric8.kubernetes.api.model.ServiceAccountBuilder;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRole;
@@ -87,7 +86,7 @@ public class InitCommand implements Runnable {
         EventListener el = installTektonEl();
         installKnativeTrigger(el);
 
-        status(installedResources);
+        Helper.status(installedResources);
 
         LOG.info("Done, '{}' namespace initialized and ready to use!", namespace);
     }
@@ -321,25 +320,4 @@ public class InitCommand implements Runnable {
         installedResources.add(sa);
     }
 
-    private void status(List<HasMetadata> k8sResources) {
-        StringBuilder sb = new StringBuilder(System.getProperty("line.separator"));
-
-        for (HasMetadata o : k8sResources) {
-            String prefix = HasMetadata.getGroup(o.getClass());
-
-            if (StringUtils.isEmpty(prefix)) {
-                prefix = o.getKind().toLowerCase();
-            }
-
-            sb.append("  -> ").append(prefix).append("/").append(o.getMetadata().getName());
-
-            if (o instanceof Namespaced) {
-                sb.append(" (").append(o.getMetadata().getNamespace()).append(")");
-            }
-
-            sb.append(System.getProperty("line.separator"));
-        }
-
-        System.out.println(sb.toString());
-    }
 }

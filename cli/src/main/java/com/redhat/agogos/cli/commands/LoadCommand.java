@@ -1,18 +1,17 @@
 package com.redhat.agogos.cli.commands;
 
+import com.redhat.agogos.cli.Helper;
+import com.redhat.agogos.cli.ResourceLoader;
 import com.redhat.agogos.errors.ApplicationException;
-import com.redhat.agogos.k8s.client.AgogosClient;
-import com.redhat.agogos.v1alpha1.Component;
 import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientException;
-import io.fabric8.kubernetes.internal.KubernetesDeserializer;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import javax.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -20,43 +19,41 @@ import picocli.CommandLine.Option;
         "l" }, description = "Load agogos descriptors from files")
 public class LoadCommand implements Runnable {
 
-    @Option(names = { "-f", "--file" }, paramLabel = "FILE", description = "Paths to descriptors to load")
-    List<Path> files;
+    private static final Logger LOG = LoggerFactory.getLogger(LoadCommand.class);
+
+    @Option(names = { "-f", "--file" }, required = true, paramLabel = "FILE", description = "Paths to descriptors to load")
+    List<Path> paths;
+
+    @Option(names = { "--namespace",
+            "-n" }, defaultValue = "default", required = true, description = "Namespace where Agogos resources should be installed, by default: ${DEFAULT-VALUE}.")
+    String namespace;
 
     @Inject
-    AgogosClient agogosClient;
-
-    @Inject
-    KubernetesClient kubernetesClient;
-
-    LoadCommand() {
-        KubernetesDeserializer.registerCustomKind(HasMetadata.getApiVersion(Component.class),
-                HasMetadata.getKind(Component.class),
-                Component.class);
-    }
+    ResourceLoader resourceLoader;
 
     @Override
     public void run() {
+        paths.forEach(path -> {
+            LOG.info("🕞 Installing resources from '{}' file...", path);
 
-        files.forEach(file -> {
-            byte[] content = null;
+            byte[] content = readFile(path);
 
-            try {
-                content = Files.readAllBytes(file);
-            } catch (IOException e) {
-                throw new ApplicationException("Could not read resources", e);
-            }
+            List<HasMetadata> resources = resourceLoader.installKubernetesResources(new ByteArrayInputStream(content),
+                    namespace);
 
-            List<HasMetadata> resources = null;
+            Helper.status(resources);
 
-            try {
-                resources = kubernetesClient.load(new ByteArrayInputStream(content)).inNamespace("default").get();
-            } catch (KubernetesClientException e) {
-                throw new ApplicationException("Could not read resources", e);
-            }
-
-            System.out.println(resources);
+            LOG.info("✅ {} resources installed", resources.size());
         });
+
+    }
+
+    private byte[] readFile(Path path) {
+        try {
+            return Files.readAllBytes(path);
+        } catch (IOException e) {
+            throw new ApplicationException("Could not read resources at {}", path, e);
+        }
     }
 
 }

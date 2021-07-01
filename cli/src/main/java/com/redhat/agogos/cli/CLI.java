@@ -4,6 +4,7 @@ import com.redhat.agogos.cli.commands.AdmCommand;
 import com.redhat.agogos.cli.commands.BuildCommand;
 import com.redhat.agogos.cli.commands.BuilderCommand;
 import com.redhat.agogos.cli.commands.ComponentCommand;
+import com.redhat.agogos.cli.commands.LoadCommand;
 import com.redhat.agogos.cli.commands.PipelineCommand;
 import com.redhat.agogos.cli.commands.RunCommand;
 import com.redhat.agogos.cli.commands.StageCommand;
@@ -26,7 +27,7 @@ import picocli.CommandLine.ScopeType;
         TriggerCommand.class,
         StageCommand.class,
         BuilderCommand.class,
-// LoadCommand.class,
+        LoadCommand.class,
 })
 public class CLI implements QuarkusApplication {
     @Inject
@@ -37,6 +38,9 @@ public class CLI implements QuarkusApplication {
         yaml,
         json
     }
+
+    @Option(names = { "-v", "--verbose" }, scope = ScopeType.INHERIT)
+    boolean verbose = false;
 
     @Option(names = { "--output",
             "-o" }, description = "Output format, valid values: ${COMPLETION-CANDIDATES}, default: ${DEFAULT-VALUE}.", defaultValue = "plain", scope = ScopeType.INHERIT)
@@ -49,7 +53,8 @@ public class CLI implements QuarkusApplication {
 
     @Override
     public int run(String... args) throws Exception {
-        return new CommandLine(this, factory).execute(args);
+        return new CommandLine(this, factory).setExecutionExceptionHandler(new ExceptionHandler()).execute(args);
+
     }
 
     public int run(Class<? extends Runnable> command, String... args) {

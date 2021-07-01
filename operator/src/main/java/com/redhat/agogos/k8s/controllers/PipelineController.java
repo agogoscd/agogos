@@ -19,7 +19,7 @@ import io.fabric8.tekton.pipeline.v1beta1.PipelineTask;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineTaskBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineWorkspaceDeclaration;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineWorkspaceDeclarationBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.TaskRef;
+import io.fabric8.tekton.pipeline.v1beta1.TaskRefBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBinding;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBindingBuilder;
 import io.javaoperatorsdk.operator.api.Context;
@@ -130,7 +130,8 @@ public class PipelineController implements ResourceController<Pipeline> {
             // Prepare task
             PipelineTask task = new PipelineTaskBuilder() //
                     .withName(stageRef.getName()) //
-                    .withTaskRef(new TaskRef("tekton.dev/v1beta1", taskType, stage.getSpec().getTaskRef().get("name"))) //
+                    .withTaskRef(new TaskRefBuilder().withApiVersion("tekton.dev/v1beta1").withKind(taskType)
+                            .withName(stage.getSpec().getTaskRef().get("name")).build()) //
                     .addNewParam() //
                     .withName("config") //
                     .withNewValue(stageConfig) //

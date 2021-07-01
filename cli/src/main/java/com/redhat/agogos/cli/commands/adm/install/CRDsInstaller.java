@@ -1,5 +1,6 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
+import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import java.io.InputStream;
@@ -21,9 +22,9 @@ public class CRDsInstaller extends Installer {
         LOG.info("🕞 Installing Agogos CRDs...");
 
         InputStream stream = Thread.currentThread().getContextClassLoader()
-                .getResourceAsStream("/deployment/crds.yaml");
+                .getResourceAsStream("deployment/crds.yaml");
 
-        status(installKubernetesResources(stream, namespace));
+        Helper.status(resourceLoader.installKubernetesResources(stream, namespace));
 
         LOG.info("✅ Agogos CRDs installed");
     }

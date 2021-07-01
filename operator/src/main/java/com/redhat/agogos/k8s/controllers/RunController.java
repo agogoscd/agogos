@@ -23,7 +23,7 @@ public class RunController extends AbstractController<Run> {
     PipelineClient pipelineClient;
 
     @Inject
-    RunEventSource pipelineRunEventSource;
+    RunEventSource runEventSource;
 
     @Override
     public DeleteControl deleteResource(Run run, Context<Run> context) {
@@ -32,7 +32,7 @@ public class RunController extends AbstractController<Run> {
 
     @Override
     public void init(EventSourceManager eventSourceManager) {
-        eventSourceManager.registerEventSource("pipeline", pipelineRunEventSource);
+        eventSourceManager.registerEventSource("pipeline", runEventSource);
     }
 
     @Override

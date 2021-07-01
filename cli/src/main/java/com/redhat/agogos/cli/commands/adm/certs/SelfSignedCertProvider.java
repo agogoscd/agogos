@@ -7,7 +7,6 @@ import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.cert.CertificateException;
@@ -38,7 +37,6 @@ import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 
 @ApplicationScoped
 public class SelfSignedCertProvider implements CertProvider {
-    private static final String BC_PROVIDER = "BC";
     private static final String KEY_ALGORITHM = "RSA";
     private static final String CERT_SIGNATURE_ALGORITHM = "SHA256withRSA";
 
@@ -85,12 +83,10 @@ public class SelfSignedCertProvider implements CertProvider {
         KeyPairGenerator keyPairGenerator = null;
 
         try {
-            keyPairGenerator = KeyPairGenerator.getInstance(KEY_ALGORITHM, BC_PROVIDER);
+            keyPairGenerator = KeyPairGenerator.getInstance(KEY_ALGORITHM);
         } catch (NoSuchAlgorithmException e) {
             throw new ApplicationException("Error while generating key pair; cannot find {} algorithm",
-                    KEY_ALGORITHM);
-        } catch (NoSuchProviderException e) {
-            throw new ApplicationException("Error while generating key pair; cannot find BouncyCastle provider", e);
+                    KEY_ALGORITHM, e);
         }
 
         keyPairGenerator.initialize(keySize);
@@ -112,7 +108,7 @@ public class SelfSignedCertProvider implements CertProvider {
         ContentSigner caCertContentSigner = null;
 
         try {
-            caCertContentSigner = new JcaContentSignerBuilder(CERT_SIGNATURE_ALGORITHM).setProvider(BC_PROVIDER)
+            caCertContentSigner = new JcaContentSignerBuilder(CERT_SIGNATURE_ALGORITHM)
                     .build(caKeyPair.getPrivate());
         } catch (OperatorCreationException e) {
             throw new ApplicationException("Error while signing CA certificate", e);
@@ -130,7 +126,7 @@ public class SelfSignedCertProvider implements CertProvider {
         X509Certificate rootCert = null;
 
         try {
-            rootCert = new JcaX509CertificateConverter().setProvider(BC_PROVIDER).getCertificate(rootCertHolder);
+            rootCert = new JcaX509CertificateConverter().getCertificate(rootCertHolder);
         } catch (CertificateException e) {
             throw new ApplicationException("Error while generating the CA certificate", e);
         }
@@ -151,8 +147,7 @@ public class SelfSignedCertProvider implements CertProvider {
 
         PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(cn,
                 keyPair.getPublic());
-        JcaContentSignerBuilder csrBuilder = new JcaContentSignerBuilder(CERT_SIGNATURE_ALGORITHM)
-                .setProvider(BC_PROVIDER);
+        JcaContentSignerBuilder csrBuilder = new JcaContentSignerBuilder(CERT_SIGNATURE_ALGORITHM);
 
         ContentSigner csrContentSigner = null;
 
@@ -181,7 +176,7 @@ public class SelfSignedCertProvider implements CertProvider {
         X509Certificate issuedCert = null;
 
         try {
-            issuedCert = new JcaX509CertificateConverter().setProvider(BC_PROVIDER)
+            issuedCert = new JcaX509CertificateConverter()
                     .getCertificate(issuedCertHolder);
         } catch (CertificateException e) {
             throw new ApplicationException("Error while generating the certificate", e);
