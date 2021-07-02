@@ -27,12 +27,14 @@ import io.fabric8.tekton.triggers.v1alpha1.Trigger;
 import io.fabric8.tekton.triggers.v1alpha1.TriggerBinding;
 import io.fabric8.tekton.triggers.v1alpha1.TriggerTemplate;
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import java.util.List;
-import java.util.Map;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import java.util.List;
+import java.util.Map;
 
 @Profile(InstallProfile.local)
 @Profile(InstallProfile.dev)

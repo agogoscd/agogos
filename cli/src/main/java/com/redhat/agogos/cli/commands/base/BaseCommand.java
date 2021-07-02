@@ -15,13 +15,15 @@ import com.redhat.agogos.v1alpha1.ResultableStatus;
 import io.fabric8.kubernetes.client.CustomResourceList;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import picocli.CommandLine.Help.Ansi;
+
+import javax.inject.Inject;
+
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
-import javax.inject.Inject;
-import picocli.CommandLine.Help.Ansi;
 
 public abstract class BaseCommand<T extends AgogosResource<?, ? extends AgogosResourceStatus>> implements Runnable {
 

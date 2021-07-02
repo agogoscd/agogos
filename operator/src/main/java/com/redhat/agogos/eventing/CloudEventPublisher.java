@@ -9,20 +9,22 @@ import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import io.cloudevents.CloudEvent;
 import io.cloudevents.core.builder.CloudEventBuilder;
-import java.io.StringReader;
-import java.net.URI;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonObjectBuilder;
 import javax.ws.rs.core.MediaType;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.io.StringReader;
+import java.net.URI;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @ApplicationScoped
 public class CloudEventPublisher {

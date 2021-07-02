@@ -9,14 +9,16 @@ import com.redhat.agogos.v1alpha1.Run;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionRequest;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
-import java.util.HashMap;
-import java.util.Map;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @ApplicationScoped
 public class RunMutator extends Mutator<Run> {

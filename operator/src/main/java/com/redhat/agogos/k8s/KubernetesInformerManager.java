@@ -11,11 +11,13 @@ import io.fabric8.kubernetes.client.informers.SharedInformerFactory;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
-import java.util.HashMap;
-import java.util.Map;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @ApplicationScoped
 public class KubernetesInformerManager {

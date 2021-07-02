@@ -11,12 +11,14 @@ import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.CustomResourceList;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import picocli.CommandLine.Help.Ansi;
+import picocli.CommandLine.Option;
+
+import javax.inject.Inject;
+
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
-import javax.inject.Inject;
-import picocli.CommandLine.Help.Ansi;
-import picocli.CommandLine.Option;
 
 public abstract class BaseListCommand<T extends AgogosResource<?, ? extends AgogosResourceStatus>> extends BaseCommand<T> {
     @Option(names = "--limit", defaultValue = "0", description = "Number of items to display, if not provided all resources will be returned.", hidden = true)

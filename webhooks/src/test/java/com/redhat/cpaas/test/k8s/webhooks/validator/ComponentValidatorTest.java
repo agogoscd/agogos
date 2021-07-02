@@ -17,14 +17,16 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import javax.inject.Inject;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @WithKubernetesTestServer(setup = ComponentValidatorTestServerSetup.class)
 @QuarkusTest

@@ -2,11 +2,12 @@ package com.redhat.agogos.v1alpha1.triggers;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import java.util.Arrays;
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Getter
 @Setter

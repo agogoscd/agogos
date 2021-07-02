@@ -11,14 +11,16 @@ import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReview;
 import io.fabric8.kubernetes.client.CustomResource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import java.util.Base64;
-import java.util.function.Consumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.json.Json;
 import javax.json.JsonPatch;
 import javax.json.JsonPatchBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.Base64;
+import java.util.function.Consumer;
 
 @ApplicationScoped
 @RegisterForReflection

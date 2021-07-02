@@ -3,11 +3,12 @@ package com.redhat.agogos.k8s.event;
 import com.redhat.agogos.k8s.Resource;
 import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 @ApplicationScoped
 @ToString

@@ -5,11 +5,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.AbstractStage.StageSpec;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @ToString
 @RegisterForReflection

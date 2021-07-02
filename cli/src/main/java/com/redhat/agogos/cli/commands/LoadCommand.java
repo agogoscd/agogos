@@ -4,16 +4,18 @@ import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.ResourceLoader;
 import com.redhat.agogos.errors.ApplicationException;
 import io.fabric8.kubernetes.api.model.HasMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+
+import javax.inject.Inject;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import javax.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
 
 @Command(mixinStandardHelpOptions = true, name = "load", aliases = {
         "l" }, description = "Load agogos descriptors from files")

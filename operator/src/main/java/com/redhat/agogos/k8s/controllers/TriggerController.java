@@ -28,12 +28,14 @@ import io.javaoperatorsdk.operator.api.Controller;
 import io.javaoperatorsdk.operator.api.DeleteControl;
 import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
-import java.util.HashMap;
-import java.util.Map;
-import javax.inject.Inject;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class TriggerController implements ResourceController<Trigger> {

@@ -6,10 +6,11 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRunResult;
 import io.javaoperatorsdk.operator.processing.event.AbstractEvent;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @ToString
 public class PipelineRunEvent extends AbstractEvent {

@@ -7,9 +7,10 @@ import com.redhat.agogos.cli.commands.base.BaseCommand;
 import com.redhat.agogos.cli.commands.base.BaseListCommand;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Run;
-import javax.inject.Inject;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
+
+import javax.inject.Inject;
 
 @Command(mixinStandardHelpOptions = true, name = "runs", aliases = {
         "run", "r" }, description = "Interact with runs", subcommands = { // 

@@ -7,9 +7,10 @@ import com.redhat.agogos.cli.commands.base.BaseCommand;
 import com.redhat.agogos.cli.commands.base.BaseListCommand;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Build;
-import javax.inject.Inject;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
+
+import javax.inject.Inject;
 
 @Command(mixinStandardHelpOptions = true, name = "build", aliases = {
         "builds", "b" }, description = "Interact with builds", subcommands = { // 

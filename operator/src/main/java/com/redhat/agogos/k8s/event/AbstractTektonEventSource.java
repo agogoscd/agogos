@@ -10,11 +10,13 @@ import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.javaoperatorsdk.operator.processing.event.AbstractEventSource;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+
+import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractTektonEventSource<T extends HasMetadata> extends AbstractEventSource {
     protected static final Logger LOG = LoggerFactory.getLogger(AbstractTektonEventSource.class);

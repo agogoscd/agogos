@@ -6,11 +6,13 @@ import com.redhat.agogos.v1alpha1.Build;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
-import java.util.HashMap;
-import java.util.Map;
+import lombok.ToString;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import lombok.ToString;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @ApplicationScoped
 @ToString

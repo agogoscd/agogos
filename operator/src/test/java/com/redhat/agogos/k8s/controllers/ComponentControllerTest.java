@@ -15,12 +15,14 @@ import io.javaoperatorsdk.operator.processing.event.EventList;
 import io.javaoperatorsdk.operator.processing.event.internal.CustomResourceEvent;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
-import java.util.List;
-import java.util.Map;
-import javax.inject.Inject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import javax.inject.Inject;
+
+import java.util.List;
+import java.util.Map;
 
 @WithKubernetesTestServer(setup = CRDTestServerSetup.class)
 @QuarkusTest
