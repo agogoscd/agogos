@@ -1,0 +1,45 @@
+quarkus:
+  http:
+    port: 7001
+  log:
+    min-level: TRACE
+    syslog:
+      truncate: false
+
+  banner:
+    enabled: true
+    path: "banner.txt"
+
+  container-image:
+    group: cpaas
+    name: agogos-poc-relay-github
+    registry: quay.io
+
+"%test":
+  quarkus:
+    log:
+      category:
+        "com.redhat.agogos":
+          level: TRACE
+
+"%dev":
+  quarkus:
+    http:
+      access-log:
+        enabled: true
+        pattern: combined
+    log:
+      category:
+        "com.redhat.agogos":
+          level: TRACE
+
+"%prod":
+  quarkus:
+    http:
+      access-log:
+        enabled: true
+        pattern: combined
+    log:
+      category:
+        "com.redhat.agogos":
+          level: DEBUG
