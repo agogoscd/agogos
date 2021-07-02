@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.redhat.cpaas</groupId>
+        <groupId>com.redhat.agogos</groupId>
         <artifactId>agogos-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
@@ -33,13 +33,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.redhat.cpaas</groupId>
+            <groupId>com.redhat.agogos</groupId>
             <artifactId>agogos-test</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.redhat.cpaas</groupId>
+            <groupId>com.redhat.agogos</groupId>
             <artifactId>agogos-core</artifactId>
             <version>${project.version}</version>
         </dependency>
