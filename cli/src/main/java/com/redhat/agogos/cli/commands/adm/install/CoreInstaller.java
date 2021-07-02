@@ -4,6 +4,7 @@ import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.ClusterStage;
+import io.fabric8.knative.client.KnativeClient;
 import io.fabric8.knative.eventing.v1.Broker;
 import io.fabric8.knative.eventing.v1.BrokerBuilder;
 import io.fabric8.kubernetes.api.model.ConfigMap;
@@ -66,6 +67,9 @@ public class CoreInstaller extends Installer {
     @Inject
     AgogosClient agogosClient;
 
+    @Inject
+    KnativeClient knativeClient;
+
     @Override
     public void install(InstallProfile profile, String namespace) {
         LOG.info("🕞 Installing Agogos core resources...");
@@ -122,7 +126,7 @@ public class CoreInstaller extends Installer {
                 .endSpec() //
                 .build();
 
-        broker = kubernetesClient.resource(broker).inNamespace(namespace).deletingExisting().createOrReplace();
+        broker = knativeClient.brokers().inNamespace(namespace).createOrReplace(broker);
 
         return broker;
     }
