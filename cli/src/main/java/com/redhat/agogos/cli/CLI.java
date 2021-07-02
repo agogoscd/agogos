@@ -11,11 +11,12 @@ import com.redhat.agogos.cli.commands.StageCommand;
 import com.redhat.agogos.cli.commands.TriggerCommand;
 import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
-import javax.inject.Inject;
 import lombok.Getter;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ScopeType;
+
+import javax.inject.Inject;
 
 @QuarkusMain
 @CommandLine.Command(name = "agogosctl", mixinStandardHelpOptions = true, subcommands = { //

@@ -4,8 +4,9 @@ import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.cli.commands.StageCommand.StageListCommand;
 import com.redhat.agogos.cli.commands.base.BaseListCommand;
 import com.redhat.agogos.v1alpha1.Stage;
-import javax.inject.Inject;
 import picocli.CommandLine.Command;
+
+import javax.inject.Inject;
 
 @Command(mixinStandardHelpOptions = true, name = "stage", aliases = {
         "stages", "stg" }, description = "Interact with stages", subcommands = { // 

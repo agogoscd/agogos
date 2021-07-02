@@ -4,8 +4,9 @@ import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.cli.commands.TriggerCommand.TriggerListCommand;
 import com.redhat.agogos.cli.commands.base.BaseListCommand;
 import com.redhat.agogos.v1alpha1.triggers.Trigger;
-import javax.inject.Inject;
 import picocli.CommandLine.Command;
+
+import javax.inject.Inject;
 
 @Command(mixinStandardHelpOptions = true, name = "triggers", aliases = {
         "trigger", "t" }, description = "Interact with triggers", subcommands = { // 

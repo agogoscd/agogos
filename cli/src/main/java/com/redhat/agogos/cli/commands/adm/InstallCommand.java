@@ -4,14 +4,16 @@ import com.redhat.agogos.cli.commands.adm.install.Installer;
 import com.redhat.agogos.cli.commands.adm.install.Priority;
 import com.redhat.agogos.cli.commands.adm.install.Profile;
 import com.redhat.agogos.cli.commands.adm.install.Profiles;
-import java.util.Comparator;
-import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Instance;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+
+import javax.enterprise.inject.Any;
+import javax.enterprise.inject.Instance;
+import javax.inject.Inject;
+
+import java.util.Comparator;
 
 @Command(mixinStandardHelpOptions = true, name = "install", description = "Install Agogos")
 public class InstallCommand implements Runnable {

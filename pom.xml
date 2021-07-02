@@ -114,7 +114,9 @@
                                 <include>cli/src/test/java/**/*.java</include>
                             </includes>
                             <removeUnusedImports />
-                            <importOrder />
+                            <importOrder>
+                                <file>spotless-importorder.properties</file>
+                            </importOrder>
                             <eclipse>
                                 <file>eclipse-format.xml</file>
                             </eclipse>

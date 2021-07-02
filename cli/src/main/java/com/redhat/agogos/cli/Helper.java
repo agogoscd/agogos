@@ -1,9 +1,10 @@
 package com.redhat.agogos.cli;
 
 import io.fabric8.kubernetes.api.model.HasMetadata;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class Helper {
     private static final Logger LOG = LoggerFactory.getLogger(Helper.class);

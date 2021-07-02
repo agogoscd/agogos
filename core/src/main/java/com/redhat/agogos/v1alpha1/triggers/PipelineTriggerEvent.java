@@ -5,11 +5,12 @@ import com.redhat.agogos.CloudEventHelper;
 import com.redhat.agogos.PipelineRunState;
 import com.redhat.agogos.v1alpha1.Run;
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import java.util.Arrays;
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Getter
 @Setter

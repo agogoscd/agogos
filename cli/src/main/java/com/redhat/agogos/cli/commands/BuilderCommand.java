@@ -4,8 +4,9 @@ import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.cli.commands.BuilderCommand.BuilderListCommand;
 import com.redhat.agogos.cli.commands.base.BaseListCommand;
 import com.redhat.agogos.v1alpha1.Builder;
-import javax.inject.Inject;
 import picocli.CommandLine.Command;
+
+import javax.inject.Inject;
 
 @Command(mixinStandardHelpOptions = true, name = "builder", aliases = {
         "builders", "bldr" }, description = "Interact with builders", subcommands = { // 

@@ -2,10 +2,6 @@ package com.redhat.agogos.cron;
 
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.v1alpha1.triggers.Trigger;
-import java.util.Date;
-import java.util.Set;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
 import org.quartz.JobBuilder;
@@ -16,6 +12,12 @@ import org.quartz.SchedulerException;
 import org.quartz.TriggerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import java.util.Date;
+import java.util.Set;
 
 /**
  * Responsible for scheduling sending a {@link io.cloudevents.CloudEvent} used

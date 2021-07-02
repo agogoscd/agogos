@@ -19,14 +19,16 @@ import io.quarkus.test.kubernetes.client.KubernetesTestServer;
 import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.util.Base64;
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+
+import java.util.Base64;
 
 @WithKubernetesTestServer(setup = RunMutatorTestServerSetup.class)
 @QuarkusTest
