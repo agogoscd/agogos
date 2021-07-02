@@ -4,9 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
-import com.redhat.agogos.k8s.client.ClusterStageClient;
-import com.redhat.agogos.k8s.client.GroupClient;
-import com.redhat.agogos.k8s.client.StageClient;
+import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.AbstractStage;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.Pipeline.PipelineSpec.StageEntry;
@@ -44,13 +42,7 @@ public class PipelineController implements ResourceController<Pipeline> {
     TektonClient tektonClient;
 
     @Inject
-    GroupClient groupClient;
-
-    @Inject
-    StageClient stageClient;
-
-    @Inject
-    ClusterStageClient clusterStageClient;
+    AgogosClient agogosClient;
 
     @Inject
     ObjectMapper objectMapper;
@@ -95,11 +87,11 @@ public class PipelineController implements ResourceController<Pipeline> {
 
             switch (stageRef.getKind()) {
                 case "Stage":
-                    stage = stageClient.getByName(stageRef.getName(), pipeline.getMetadata().getNamespace());
-
+                    stage = agogosClient.v1alpha1().stages().inNamespace(pipeline.getMetadata().getNamespace())
+                            .withName(stageRef.getName()).get();
                     break;
                 case "ClusterStage":
-                    stage = clusterStageClient.getByName(stageRef.getName());
+                    stage = agogosClient.v1alpha1().clusterstages().withName(stageRef.getName()).get();
                     taskType = "ClusterTask";
                     break;
                 default:

@@ -1,7 +1,7 @@
 package com.redhat.agogos.k8s.controllers;
 
 import com.redhat.agogos.errors.ApplicationException;
-import com.redhat.agogos.k8s.client.PipelineClient;
+import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.k8s.event.RunEventSource;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.Pipeline;
@@ -21,7 +21,7 @@ public class RunController extends AbstractController<Run> {
     private static final Logger LOG = LoggerFactory.getLogger(RunController.class);
 
     @Inject
-    PipelineClient pipelineClient;
+    AgogosClient agogosClient;
 
     @Inject
     RunEventSource runEventSource;
@@ -38,8 +38,8 @@ public class RunController extends AbstractController<Run> {
 
     @Override
     protected AgogosResource<?, ?> parentResource(Run pipelineRun) {
-        Pipeline pipeline = pipelineClient.getByName(pipelineRun.getSpec().getPipeline(),
-                pipelineRun.getMetadata().getNamespace());
+        Pipeline pipeline = agogosClient.v1alpha1().pipelines().inNamespace(pipelineRun.getMetadata().getNamespace())
+                .withName(pipelineRun.getSpec().getPipeline()).get();
 
         if (pipeline == null) {
             throw new ApplicationException("Could not find Pipeline with name '{}' in namespace '{}'",

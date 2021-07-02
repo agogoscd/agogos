@@ -8,6 +8,8 @@ import com.redhat.agogos.v1alpha1.ClusterStage;
 import com.redhat.agogos.v1alpha1.ClusterStageList;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.ComponentList;
+import com.redhat.agogos.v1alpha1.Group;
+import com.redhat.agogos.v1alpha1.GroupList;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.PipelineList;
 import com.redhat.agogos.v1alpha1.Run;
@@ -78,6 +80,11 @@ public class V1alpha1APIGroupClient implements V1alpha1APIGroup {
     @Produces
     public MixedOperation<Builder, BuilderList, Resource<Builder>> builders() {
         return kubernetesClient.customResources(Builder.class, BuilderList.class);
+    }
+
+    @Override
+    public MixedOperation<Group, GroupList, Resource<Group>> groups() {
+        return kubernetesClient.customResources(Group.class, GroupList.class);
     }
 
 }

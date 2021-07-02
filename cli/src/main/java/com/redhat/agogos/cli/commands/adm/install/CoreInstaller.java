@@ -7,6 +7,7 @@ import com.redhat.agogos.v1alpha1.ClusterStage;
 import io.fabric8.knative.eventing.v1.Broker;
 import io.fabric8.knative.eventing.v1.BrokerBuilder;
 import io.fabric8.kubernetes.api.model.ConfigMap;
+import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
@@ -45,13 +46,16 @@ public class CoreInstaller extends Installer {
 
     private static final Logger LOG = LoggerFactory.getLogger(CoreInstaller.class);
     private static final String KNATIVE_BROKER_NAME = "default";
+    private static final String KNATIVE_BROKER_CONFIG_NAME = "eventing-broker-config";
+
+    public static final String CLUSTER_ROLE_VIEW_NAME = "agogos-view";
     public static final String CLUSTER_ROLE_NAME_EVENTING = "agogos-el";
 
     private static final String INIT_TEKTON_TASK_NAME = "init";
     private static final String INIT_TEKTON_TASK_DEFAULT_IMAGE = "quay.io/cpaas/agogos-poc-stage-init:latest";
     private static final String INIT_STAGE_NAME = "init";
 
-    private static final String SA = "agogos";
+    private static final String SERVICE_ACCOUNT_NAME = "agogos";
 
     private static final Map<String, String> LABELS = Map.of(//
             "app.kubernetes.io/instance", "default", //
@@ -71,21 +75,52 @@ public class CoreInstaller extends Installer {
                         namespace(namespace),
                         serviceAccount(),
 
+                        clusterRole(),
                         clusterRoleEventing(),
                         initClusterTask()),
                 namespace);
 
         resources.add(installInitClusterStage());
-        resources.add(installKnativeBroker(namespace));
+
+        ConfigMap knativeBrokerConfiguration = installKnativeBrokerConfiguration(namespace);
+
+        resources.add(knativeBrokerConfiguration);
+        resources.add(installKnativeBroker(namespace, knativeBrokerConfiguration));
 
         Helper.status(resources);
 
         LOG.info("✅ Agogos core resources installed");
     }
 
-    private Broker installKnativeBroker(String namespace) {
-        Broker broker = new BrokerBuilder().withNewMetadata().withName(KNATIVE_BROKER_NAME)
-                .withLabels(LABELS).endMetadata().build();
+    private ConfigMap installKnativeBrokerConfiguration(String namespace) {
+        ConfigMap configMap = new ConfigMapBuilder() //
+                .withNewMetadata() //
+                .withName(KNATIVE_BROKER_CONFIG_NAME) //
+                .endMetadata() //
+                .withData(Map.of("channelTemplateSpec", "apiVersion: messaging.knative.dev/v1\nkind: InMemoryChannel"))
+                .build();
+
+        configMap = kubernetesClient.configMaps().inNamespace(namespace).createOrReplace(configMap);
+
+        return configMap;
+    }
+
+    private Broker installKnativeBroker(String namespace, ConfigMap configuration) {
+        Broker broker = new BrokerBuilder() //
+                .withNewMetadata() //
+                .withName(KNATIVE_BROKER_NAME) //
+                .withLabels(LABELS) //
+                .withAnnotations(Map.of("eventing.knative.dev/broker.class", "MTChannelBasedBroker")) // TODO: Not good for production deployment, fine for now
+                .endMetadata() //
+                .withNewSpec() //
+                .withNewConfig() //
+                .withApiVersion(configuration.getApiVersion()) //
+                .withKind(configuration.getKind()) //
+                .withName(configuration.getMetadata().getName()) //
+                .withNamespace(configuration.getMetadata().getNamespace()) //
+                .endConfig() //
+                .endSpec() //
+                .build();
 
         broker = kubernetesClient.resource(broker).inNamespace(namespace).deletingExisting().createOrReplace();
 
@@ -93,7 +128,7 @@ public class CoreInstaller extends Installer {
     }
 
     private ServiceAccount serviceAccount() {
-        ServiceAccount sa = new ServiceAccountBuilder().withNewMetadata().withName(SA)
+        ServiceAccount sa = new ServiceAccountBuilder().withNewMetadata().withName(SERVICE_ACCOUNT_NAME)
                 .withLabels(LABELS).endMetadata()
                 .build();
 
@@ -122,6 +157,19 @@ public class CoreInstaller extends Installer {
                                 .withResources(HasMetadata.getPlural(PipelineRun.class)).withVerbs("create").build() //
                 ).build();
 
+    }
+
+    private ClusterRole clusterRole() {
+        ClusterRole cr = new ClusterRoleBuilder().withNewMetadata().withName(CLUSTER_ROLE_VIEW_NAME).withLabels(LABELS)
+                .withLabels(Map.of("rbac.authorization.k8s.io/aggregate-to-view", "true"))
+                .endMetadata().withRules( //
+                        new PolicyRuleBuilder().withApiGroups("agogos.redhat.com")
+                                .withResources("*")
+                                .withVerbs("get", "list", "watch")
+                                .build())
+                .build();
+
+        return cr;
     }
 
     private Namespace namespace(String namespace) {

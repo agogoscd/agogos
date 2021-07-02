@@ -3,7 +3,7 @@ package com.redhat.agogos.k8s.webhooks.mutator;
 
 import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.k8s.Resource;
-import com.redhat.agogos.k8s.client.ComponentClient;
+import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Component;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -23,7 +23,7 @@ import java.util.Map;
 @ApplicationScoped
 public class BuildMutator extends Mutator<Build> {
     @Inject
-    ComponentClient componentClient;
+    AgogosClient agogosClient;
 
     @Override
     protected void mutateResource(Build build, AdmissionRequest request,
@@ -73,8 +73,8 @@ public class BuildMutator extends Mutator<Build> {
      * @return Json array with one entry pointing to the Component
      */
     private JsonArray generateOwner(Build build, String namespace) {
-        Component component = componentClient.getByName(build.getSpec().getComponent(),
-                namespace);
+        Component component = agogosClient.v1alpha1().components().inNamespace(namespace)
+                .withName(build.getSpec().getComponent()).get();
 
         if (component == null) {
             throw new MissingResourceException("Selected Component '{}' does not exist in '{}' namespace",

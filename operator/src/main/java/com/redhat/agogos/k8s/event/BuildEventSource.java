@@ -1,7 +1,7 @@
 package com.redhat.agogos.k8s.event;
 
 import com.redhat.agogos.k8s.Resource;
-import com.redhat.agogos.k8s.client.BuildClient;
+import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Build;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.OwnerReference;
@@ -17,8 +17,9 @@ import java.util.Map;
 @ApplicationScoped
 @ToString
 public class BuildEventSource extends AbstractTektonEventSource<Build> {
+
     @Inject
-    BuildClient componentBuildClient;
+    AgogosClient agogosClient;
 
     @Override
     protected Build createResource(PipelineRun pipelineRun) {
@@ -46,7 +47,7 @@ public class BuildEventSource extends AbstractTektonEventSource<Build> {
         build.getMetadata().setLabels(buildLabels);
         build.getSpec().setComponent(component);
 
-        build = componentBuildClient.create(build, pipelineRun.getMetadata().getNamespace());
+        build = agogosClient.v1alpha1().builds().inNamespace(pipelineRun.getMetadata().getNamespace()).createOrReplace(build);
 
         LOG.info("Build '{}' created out of an existing Tekton PipelineRun '{}'", build.getFullName(),
                 pipelineRunName);

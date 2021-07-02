@@ -1,6 +1,5 @@
 package com.redhat.cpaas.test.k8s.webhooks.mutator;
 
-import com.redhat.agogos.k8s.client.PipelineClient;
 import com.redhat.agogos.k8s.webhooks.WebhookHandler;
 import com.redhat.agogos.test.CRDTestServerSetup;
 import com.redhat.agogos.v1alpha1.Pipeline;
@@ -14,7 +13,6 @@ import io.fabric8.kubernetes.api.model.authentication.UserInfoBuilder;
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
 import io.quarkus.test.kubernetes.client.KubernetesTestServer;
 import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import io.restassured.RestAssured;
@@ -49,9 +47,6 @@ public class RunMutatorTest {
 
     @KubernetesTestServer
     KubernetesServer mockServer;
-
-    @InjectMock
-    PipelineClient pipelineClient;
 
     Pipeline pipeline;
 

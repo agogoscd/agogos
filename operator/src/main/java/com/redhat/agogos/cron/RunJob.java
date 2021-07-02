@@ -1,7 +1,6 @@
 package com.redhat.agogos.cron;
 
-import com.redhat.agogos.k8s.client.PipelineClient;
-import com.redhat.agogos.k8s.client.RunClient;
+import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.Run;
 import io.cloudevents.CloudEvent;
@@ -25,10 +24,7 @@ public class RunJob implements Job {
     public static final String PIPELINE_NAMESPACE = "namespace";
 
     @Inject
-    PipelineClient pipelineClient;
-
-    @Inject
-    RunClient runClient;
+    AgogosClient agogosClient;
 
     /**
      * Function to send a {@link CloudEvent} with as specified by the data available
@@ -44,7 +40,7 @@ public class RunJob implements Job {
 
         LOG.info("Scheduling a new Run for '{}' Pipeline from '{}' namespace", name, namespace);
 
-        Pipeline pipeline = pipelineClient.getByName(name, namespace);
+        Pipeline pipeline = agogosClient.v1alpha1().pipelines().inNamespace(namespace).withName(name).get();
 
         OwnerReference ownerReference = new OwnerReferenceBuilder() //
                 .withApiVersion(pipeline.getApiVersion()) //
@@ -60,7 +56,7 @@ public class RunJob implements Job {
         run.getSpec().setPipeline(name);
         run.getMetadata().getOwnerReferences().add(ownerReference);
 
-        run = runClient.create(run, namespace);
+        run = agogosClient.v1alpha1().runs().inNamespace(namespace).createOrReplace(run);
 
         LOG.info("Run '{}' scheduled, next run at {}", run.getFullName(),
                 context.getNextFireTime());

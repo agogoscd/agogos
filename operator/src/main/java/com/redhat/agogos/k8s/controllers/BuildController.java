@@ -1,7 +1,7 @@
 package com.redhat.agogos.k8s.controllers;
 
 import com.redhat.agogos.errors.ApplicationException;
-import com.redhat.agogos.k8s.client.ComponentClient;
+import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.k8s.event.BuildEventSource;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.Build;
@@ -21,7 +21,7 @@ public class BuildController extends AbstractController<Build> {
     private static final Logger LOG = LoggerFactory.getLogger(BuildController.class);
 
     @Inject
-    ComponentClient componentClient;
+    AgogosClient agogosClient;
 
     @Inject
     BuildEventSource buildEventSource;
@@ -56,8 +56,8 @@ public class BuildController extends AbstractController<Build> {
     protected AgogosResource<?, ?> parentResource(Build build) {
         LOG.debug("Finding parent resource for Build '{}'", build.getFullName());
 
-        Component component = componentClient.getByName(build.getSpec().getComponent(),
-                build.getMetadata().getNamespace());
+        Component component = agogosClient.v1alpha1().components().inNamespace(build.getMetadata().getNamespace())
+                .withName(build.getSpec().getComponent()).get();
 
         if (component == null) {
             throw new ApplicationException("Could not find Component with name '{}' in namespace '{}'",

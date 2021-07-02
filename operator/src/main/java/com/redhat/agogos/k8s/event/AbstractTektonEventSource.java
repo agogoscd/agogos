@@ -108,9 +108,6 @@ public abstract class AbstractTektonEventSource<T extends HasMetadata> extends A
 
         // Update the Tekton PipelineRun with new owner
         updateOwnerReference(owner, pipelineRun);
-
-        // Handle the event
-        //handleEvent(pipelineRun, owner.getMetadata().getUid());
     }
 
     private void handleEvent(PipelineRun pipelineRun, String uid) {

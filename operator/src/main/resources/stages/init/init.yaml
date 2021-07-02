@@ -7,7 +7,6 @@ spec:
     kind: ClusterTask
     name: init
 ---
-# The Tekton Task responsible for handling errata
 apiVersion: tekton.dev/v1beta1
 kind: ClusterTask
 metadata:
@@ -18,11 +17,13 @@ spec:
   params:
     - name: "image"
       type: "string"
-      default: "quay.io/cpaas/agogos-poc-stage-init:latest"
-    - name: "data"
+      default: "quay.io/cpaas/agogos-poc-stage-init:devel"
+    - name: "resource"
       type: "string"
+      description: "Coordinates of the resource that should be fetched"
   steps:
     - name: "execute"
+      imagePullPolicy: "Always"
       image: "$(params.image)"
-      command: ["/bin/python3"]
-      args: ["/run.py", "$(params.data)", "$(workspaces.pipeline.path)"]
+      command: ["/usr/local/bin/entrypoint"]
+      args: ["$(params.resource)", "$(workspaces.pipeline.path)"]
