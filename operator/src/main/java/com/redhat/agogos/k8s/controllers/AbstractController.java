@@ -69,14 +69,12 @@ public abstract class AbstractController<T extends AgogosResource<?, ResultableS
 
         String message = null;
         Map<?, ?> result = null;
-        boolean sendCe = true;
 
         switch (event.getStatus()) {
             case STARTED:
                 message = String.format("%s started", resource.getKind());
                 break;
             case RUNNING:
-                sendCe = false;
                 message = String.format("%s is running", resource.getKind());
                 break;
             case COMPLETED:
@@ -114,14 +112,12 @@ public abstract class AbstractController<T extends AgogosResource<?, ResultableS
 
                 break;
             case FAILED:
-                sendCe = true;
                 message = String.format("%s failed", resource.getKind());
                 break;
             case TIMEOUT:
                 message = String.format("%s timed out", resource.getKind());
                 break;
             case CANCELLING:
-                sendCe = false;
                 message = String.format("%s is being cancelled", resource.getKind());
                 break;
             case CANCELLED:
@@ -141,14 +137,11 @@ public abstract class AbstractController<T extends AgogosResource<?, ResultableS
             return UpdateControl.noUpdate();
         }
 
-        // Send CloudEvent if necessary
-        if (sendCe) {
-            try {
-                cloudEventPublisher.publish(event.getStatus().toEvent(), resource, parentResource(resource));
-            } catch (Exception e) {
-                LOG.warn("Could not publish {} CloudEvent for {} '{}', reason: {}", type, resource.getKind(),
-                        resource.getFullName(), e.getMessage(), e);
-            }
+        try {
+            cloudEventPublisher.publish(event.getStatus().toEvent(), resource, parentResource(resource));
+        } catch (Exception e) {
+            LOG.warn("Could not publish {} CloudEvent for {} '{}', reason: {}", type, resource.getKind(),
+                    resource.getFullName(), e.getMessage(), e);
         }
 
         // Update the last update field
@@ -247,7 +240,7 @@ public abstract class AbstractController<T extends AgogosResource<?, ResultableS
         // already has a Tekton PipelineRun associated with it, so skip creating new
         // one.
         if (labels.containsKey(Resource.PIPELINERUN.getLabel())) {
-            LOG.warn(
+            LOG.debug(
                     "Tried to create a new Tekton PipelineRun for a resource with already bound PipelineRun, ignoring");
             return UpdateControl.noUpdate();
         }
