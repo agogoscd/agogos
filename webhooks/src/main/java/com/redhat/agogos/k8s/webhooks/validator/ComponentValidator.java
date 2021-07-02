@@ -51,7 +51,7 @@ public class ComponentValidator extends Validator<Component> {
     }
 
     private void validateComponent(Component component) throws ApplicationException {
-        LOG.info("Validating component '{}'", component.getNamespacedName());
+        LOG.info("Validating component '{}'", component.getFullName());
 
         Builder builder = agogosClient.v1alpha1().builders().withName(component.getSpec().getBuilderRef().get("name")).get();
 
@@ -65,7 +65,7 @@ public class ComponentValidator extends Validator<Component> {
         JsonNode schemaNode = objectMapper.valueToTree(builder.getSpec().getSchema().getOpenAPIV3Schema());
         JsonNode contentNode = objectMapper.valueToTree(component.getSpec().getData());
 
-        LOG.debug("Validating component '{}' content: '{}' with schema: '{}'", component.getNamespacedName(),
+        LOG.debug("Validating component '{}' content: '{}' with schema: '{}'", component.getFullName(),
                 contentNode, schemaNode);
 
         SchemaValidator schemaValidator;
@@ -84,13 +84,13 @@ public class ComponentValidator extends Validator<Component> {
                     .map(item -> item.message().replaceAll("\\.+$", "")).collect(Collectors.toList());
 
             errorMessages.forEach(message -> {
-                LOG.error("Validation error for '{}' component: '{}'", component.getNamespacedName(), message);
+                LOG.error("Validation error for '{}' component: '{}'", component.getFullName(), message);
             });
 
-            throw new ValidationException("Component definition '{}' is not valid: {}", component.getNamespacedName(),
+            throw new ValidationException("Component definition '{}' is not valid: {}", component.getFullName(),
                     errorMessages);
         }
 
-        LOG.info("Component '{}' is valid!", component.getNamespacedName());
+        LOG.info("Component '{}' is valid!", component.getFullName());
     }
 }

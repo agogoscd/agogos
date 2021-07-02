@@ -2,7 +2,7 @@ package com.redhat.agogos.k8s.webhooks.validator;
 
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
-import com.redhat.agogos.k8s.client.ComponentClient;
+import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Component;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
@@ -19,7 +19,7 @@ public class BuildValidator extends Validator<Build> {
     private static final Logger LOG = LoggerFactory.getLogger(BuildValidator.class);
 
     @Inject
-    ComponentClient componentClient;
+    AgogosClient agogosClient;
 
     @Override
     protected void validateResource(Build componentBuild, AdmissionResponseBuilder responseBuilder) {
@@ -40,8 +40,8 @@ public class BuildValidator extends Validator<Build> {
     private void validateComponentBuild(Build componentBuild) throws ApplicationException {
         LOG.info("Validating component build '{}'", componentBuild.getFullName());
 
-        Component component = componentClient.getByName(componentBuild.getSpec().getComponent(),
-                componentBuild.getMetadata().getNamespace());
+        Component component = agogosClient.v1alpha1().components().inNamespace(componentBuild.getMetadata().getNamespace())
+                .withName(componentBuild.getSpec().getComponent()).get();
 
         if (component == null) {
             throw new MissingResourceException("Selected Component '{}' does not exist in '{}' namespace",

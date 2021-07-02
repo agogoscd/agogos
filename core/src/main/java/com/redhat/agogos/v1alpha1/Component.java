@@ -61,30 +61,6 @@ public class Component extends AgogosResource<ComponentSpec, Status> implements 
         return false;
     }
 
-    /**
-     * <p>
-     * Returns object name together with namespace. Useful for logging.
-     * </p>
-     * 
-     * @return String in format: <code>[NAMESPACE]/[NAME]</code>
-     */
-    @JsonIgnore
-    public String getNamespacedName() {
-        return this.getMetadata().getNamespace() + "/" + this.getMetadata().getName();
-    }
-
-    /**
-     * Returns a {@link Map} with the most relevant fields from the
-     * {@link Component}.
-     *
-     * @return An Immutable {@link Map}
-     */
-    @JsonIgnore
-    public Map<String, Object> toEasyMap() {
-        return Map.of("builder", this.getSpec().getBuilderRef().get("name"), "data", this.getSpec().getData(), "name",
-                this.getMetadata().getName(), "status", this.getStatus().getStatus());
-    }
-
     @Getter
     @Setter
     private ComponentSpec spec = new ComponentSpec();

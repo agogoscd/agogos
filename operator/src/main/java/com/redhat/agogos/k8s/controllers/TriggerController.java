@@ -10,8 +10,7 @@ import com.redhat.agogos.cron.TriggerEventScheduler;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.k8s.Resource;
 import com.redhat.agogos.k8s.TektonPipelineHelper;
-import com.redhat.agogos.k8s.client.ComponentClient;
-import com.redhat.agogos.k8s.client.PipelineClient;
+import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.triggers.TimedTriggerEvent;
@@ -49,13 +48,10 @@ public class TriggerController implements ResourceController<Trigger> {
     TektonPipelineHelper pipelineHelper;
 
     @Inject
-    ComponentClient componentClient;
+    AgogosClient agogosClient;
 
     @Inject
     TriggerEventScheduler scheduler;
-
-    @Inject
-    PipelineClient pipelineClient;
 
     @Override
     public DeleteControl deleteResource(Trigger trigger, Context<Trigger> context) {
@@ -100,7 +96,8 @@ public class TriggerController implements ResourceController<Trigger> {
 
         switch (target.getKind()) {
             case "Component":
-                Component component = componentClient.getByName(target.getName(), trigger.getMetadata().getNamespace());
+                Component component = agogosClient.v1alpha1().components().inNamespace(trigger.getMetadata().getNamespace())
+                        .withName(target.getName()).get();
 
                 // TODO: Move to validation admission webhook
                 if (component == null) {
@@ -120,8 +117,9 @@ public class TriggerController implements ResourceController<Trigger> {
                 break;
             case "Pipeline":
                 // TODO: Make it possible to specify namespace on the Trigger target?
-                Pipeline pipeline = pipelineClient.getByName(target.getName(),
-                        trigger.getMetadata().getNamespace());
+                Pipeline pipeline = agogosClient.v1alpha1().pipelines().inNamespace(trigger.getMetadata().getNamespace())
+                        .withName(target.getName()).get();
+                ;
 
                 // TODO: Add to validation admission webhook
                 if (pipeline == null) {

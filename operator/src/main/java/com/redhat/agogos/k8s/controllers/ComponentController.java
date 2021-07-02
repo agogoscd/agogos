@@ -1,13 +1,10 @@
 package com.redhat.agogos.k8s.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.ResourceStatus;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.k8s.Resource;
 import com.redhat.agogos.k8s.client.AgogosClient;
-import com.redhat.agogos.k8s.client.PipelineClient;
 import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.Status;
@@ -53,13 +50,7 @@ public class ComponentController implements ResourceController<Component> {
     private static final Logger LOG = LoggerFactory.getLogger(ComponentController.class);
 
     @Inject
-    PipelineClient componentResourceClient;
-
-    @Inject
     AgogosClient agogosClient;
-
-    @Inject
-    ObjectMapper objectMapper;
 
     @Inject
     TektonClient tektonClient;
@@ -76,7 +67,7 @@ public class ComponentController implements ResourceController<Component> {
      */
     @Override
     public DeleteControl deleteResource(Component component, Context<Component> context) {
-        LOG.info("Removing component '{}'", component.getNamespacedName());
+        LOG.info("Removing component '{}'", component.getFullName());
         return DeleteControl.DEFAULT_DELETE;
     }
 
@@ -137,15 +128,15 @@ public class ComponentController implements ResourceController<Component> {
         LOG.info("Component '{}' modified", component.getFullName());
 
         try {
-            LOG.debug("Preparing pipeline for Component '{}'", component.getNamespacedName());
+            LOG.debug("Preparing pipeline for Component '{}'", component.getFullName());
 
             this.updateTektonBuildPipeline(component);
 
             setStatus(component, ResourceStatus.Ready, "Component is ready");
 
-            LOG.info("Pipeline for Component '{}' updated", component.getNamespacedName());
+            LOG.info("Pipeline for Component '{}' updated", component.getFullName());
         } catch (ApplicationException e) {
-            LOG.error("Error occurred while creating pipeline for component '{}'", component.getNamespacedName(), e);
+            LOG.error("Error occurred while creating pipeline for component '{}'", component.getFullName(), e);
 
             setStatus(component, ResourceStatus.Failed, "Could not create Component: " + e.getMessage());
         }
@@ -164,17 +155,6 @@ public class ComponentController implements ResourceController<Component> {
      * @throws ApplicationException in case the pipeline cannot be updated
      */
     private Pipeline updateTektonBuildPipeline(Component component) throws ApplicationException {
-        String componentJson;
-
-        // Convert Component metadata to JSON
-        // TODO: Remove this
-        try {
-            componentJson = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(component.toEasyMap());
-        } catch (JsonProcessingException e) {
-            throw new ApplicationException("Internal error; could not serialize component '{}'",
-                    component.getNamespacedName(), e);
-        }
-
         Builder builder = agogosClient.v1alpha1().builders().withName(component.getSpec().getBuilderRef().get("name")).get();
 
         if (builder == null) {
@@ -198,26 +178,17 @@ public class ComponentController implements ResourceController<Component> {
                 .withSubPath("pipeline") //
                 .build();
 
+        String resource = new StringBuilder().append(component.getPlural()).append(".").append(component.getVersion())
+                .append(".")
+                .append(component.getGroup()).append("/").append(component.getMetadata().getName()).toString();
+
         PipelineTask initTask = new PipelineTaskBuilder() //
                 .withName("init") //
                 .withTaskRef(new TaskRefBuilder().withName("init").withApiVersion("tekton.dev/v1beta1").withKind("ClusterTask")
                         .build()) //
                 .addNewParam() //
-                .withName("data") //
-                // TODO: Do not pass the JSON, but instead we should pass just coordinates
-                .withNewValue(componentJson) //
-                .endParam() //
-                .addNewParam() //
-                .withName("name") //
-                .withNewValue(component.getMetadata().getName()) //
-                .endParam() //
-                .addNewParam() //
-                .withName("kind") //
-                .withNewValue(component.getKind()) //
-                .endParam() //
-                .addNewParam() //
-                .withName("apiversion") //
-                .withNewValue(component.getVersion()) //
+                .withName("resource") //
+                .withNewValue(resource) //
                 .endParam() //
                 .withWorkspaces(pipelineWsBinding) //
                 .build();

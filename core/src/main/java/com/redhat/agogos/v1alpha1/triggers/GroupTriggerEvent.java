@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.redhat.agogos.CloudEventHelper;
 import com.redhat.agogos.PipelineRunState;
 import com.redhat.agogos.errors.ApplicationException;
-import com.redhat.agogos.k8s.client.GroupClient;
+import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Group;
 import io.quarkus.runtime.annotations.RegisterForReflection;
@@ -32,10 +32,11 @@ public class GroupTriggerEvent implements TriggerEvent {
     public List<String> toCel(Trigger trigger) {
         // Obtain component group client so we can get information about
         // the referenced Group
-        GroupClient groupClient = CDI.current().select(GroupClient.class).get();
+        AgogosClient agogosClient = CDI.current().select(AgogosClient.class).get();
 
         // Fetch the Group information
-        Group componentGroup = groupClient.getByName(name);
+        Group componentGroup = agogosClient.v1alpha1().groups().inNamespace(trigger.getMetadata().getNamespace()).withName(name)
+                .get();
 
         // TODO: This should be part of the validation webhook
         // But it doesn't hurt to have it here as well

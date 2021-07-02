@@ -16,6 +16,8 @@ import io.fabric8.kubernetes.api.model.ServiceAccountBuilder;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRole;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBinding;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBindingBuilder;
+import io.fabric8.kubernetes.api.model.rbac.RoleBinding;
+import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.tekton.client.TektonClient;
@@ -47,6 +49,9 @@ public class InitCommand implements Runnable {
     // ServiceAccount
     private static final String SERVICE_ACCOUNT_TEKTON_EL_NAME = "agogos-el";
     private static final String SERVICE_ACCOUNT_NAME = "agogos";
+
+    // RoleBinding
+    private static final String ROLE_BINDING_NAME = "agogos";
 
     // Tekton EventListener
     private static final String TEKTON_EVENT_LISTENER_NAME = "agogos";
@@ -81,8 +86,9 @@ public class InitCommand implements Runnable {
         LOG.info("Initializing '{}' namespace with Agogos resources...", namespace);
 
         installNamespace();
-        installClusterRoleBinding();
+        installElClusterRoleBinding();
         installSa();
+        installAgogosRoleBinding();
         installCm();
         installTektonElSa();
         EventListener el = installTektonEl();
@@ -255,8 +261,10 @@ public class InitCommand implements Runnable {
 
     /**
      * Ensure the ClusterRoleBinding for the ServiceAccount used by the Tekton EventListener exists and is configured properly.
+     * 
+     * TODO: This should be RoleBinding instead
      */
-    private void installClusterRoleBinding() {
+    private void installElClusterRoleBinding() {
         String name = new StringBuilder() //
                 .append(SERVICE_ACCOUNT_TEKTON_EL_NAME) //
                 .append("-") //
@@ -283,6 +291,19 @@ public class InitCommand implements Runnable {
         crb = kubernetesClient.rbac().clusterRoleBindings().createOrReplace(crb);
 
         installedResources.add(crb);
+    }
+
+    private void installAgogosRoleBinding() {
+        RoleBinding roleBinding = new RoleBindingBuilder().withNewMetadata().withName(ROLE_BINDING_NAME).endMetadata()
+                .addNewSubject()
+                .withKind(HasMetadata.getKind(ServiceAccount.class)).withName(SERVICE_ACCOUNT_NAME).endSubject()
+                .withNewRoleRef().withKind(HasMetadata.getKind(ClusterRole.class))
+                .withName(CoreInstaller.CLUSTER_ROLE_VIEW_NAME).withApiGroup(HasMetadata.getGroup(ClusterRole.class))
+                .endRoleRef().build();
+
+        roleBinding = kubernetesClient.rbac().roleBindings().inNamespace(namespace).createOrReplace(roleBinding);
+
+        installedResources.add(roleBinding);
     }
 
     /**

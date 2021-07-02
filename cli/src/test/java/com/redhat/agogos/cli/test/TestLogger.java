@@ -24,7 +24,6 @@ public class TestLogger implements BeforeEachCallback, AfterEachCallback {
         @Override
         public void publish(LogRecord record) {
             records.add(record);
-            System.out.println(records.size());
         }
 
         @Override

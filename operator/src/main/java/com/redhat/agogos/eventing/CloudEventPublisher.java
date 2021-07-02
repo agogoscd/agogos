@@ -91,5 +91,6 @@ public class CloudEventPublisher {
         LOG.debug("CloudEvent payload: '{}'", data);
 
         broker.sendEvent(cloudEvent);
+
     }
 }
