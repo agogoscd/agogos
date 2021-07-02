@@ -34,6 +34,7 @@ import io.javaoperatorsdk.operator.processing.event.internal.CustomResourceEvent
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import java.text.SimpleDateFormat;
@@ -44,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@ApplicationScoped
 @Controller
 public class ComponentController implements ResourceController<Component> {
 

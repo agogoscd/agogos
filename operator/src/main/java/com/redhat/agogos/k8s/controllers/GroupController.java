@@ -7,6 +7,9 @@ import io.javaoperatorsdk.operator.api.DeleteControl;
 import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
 
+import javax.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
 @Controller
 public class GroupController implements ResourceController<Group> {
 

@@ -135,8 +135,11 @@ public abstract class AbstractController<T extends AgogosResource<?, ResultableS
         resourceStatus.setStartTime(event.getPipelineRun().getStatus().getStartTime());
         resourceStatus.setCompletionTime(event.getPipelineRun().getStatus().getCompletionTime());
 
-        // Check whether the update is necessary
-        boolean update = !resourceStatus.equals(originalResourceStatus);
+        // Check whether the resource status was modified
+        // If this is not the case, we are done here
+        if (resourceStatus.equals(originalResourceStatus)) {
+            return UpdateControl.noUpdate();
+        }
 
         // Send CloudEvent if necessary
         if (sendCe) {
@@ -148,16 +151,13 @@ public abstract class AbstractController<T extends AgogosResource<?, ResultableS
             }
         }
 
-        // If status update is required, perform it
-        if (update) {
-            resourceStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
+        // Update the last update field
+        resourceStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
 
-            LOG.debug("Updating {} '{}' with Tekton PipelineRun state '{}'", resource.getKind(), resource.getFullName(),
-                    event.getStatus());
-            return UpdateControl.updateStatusSubResource(resource);
-        }
+        LOG.debug("Updating {} '{}' with Tekton PipelineRun state '{}'", resource.getKind(), resource.getFullName(),
+                event.getStatus());
 
-        return UpdateControl.noUpdate();
+        return UpdateControl.updateStatusSubResource(resource);
     }
 
     private ResultableStatus deepCopy(ResultableStatus status) {
