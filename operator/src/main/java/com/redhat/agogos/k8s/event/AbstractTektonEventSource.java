@@ -120,6 +120,8 @@ public abstract class AbstractTektonEventSource<T extends HasMetadata> extends A
                 pipelineRun.getStatus().getConditions().get(0).getReason(), pipelineRun.getMetadata().getName(), uid);
 
         eventHandler.handleEvent(new PipelineRunEvent(pipelineRun, this, uid));
+
+        LOG.trace("Event for PipelineRun '{}' handled", pipelineRun.getMetadata().getName());
     }
 
     protected void updateOwnerReference(T owner, PipelineRun pipelineRun) {
