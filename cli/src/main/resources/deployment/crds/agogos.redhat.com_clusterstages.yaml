@@ -43,10 +43,20 @@ spec:
                   properties:
                     name:
                       type: string
-                      description: Name of the Tekton task being the implementation of the Stage.
-                    kind: 
+                      description: Name of the Tekton task being the implementation of the SourceHandler.
+                    kind:
                       type: string
-                      description: The kind. Can be either Task or ClusterTask
+                      description: The SourceHandler Tekton task implementation type. Can be either Task or ClusterTask. By default it is Task.
+                      default: Task
+                      enum:
+                        - Task
+                        - ClusterTask
+                    url:
+                      type: string
+                      description: A URL to a Task definition
+                  oneOf:
+                    - required: ["name", "kind"]
+                    - required: ["url"]
                 schema:
                   type: object
                   description: Validation definition that should be applied on the Stage configuration defined.

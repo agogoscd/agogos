@@ -219,9 +219,8 @@ public class CoreInstaller extends Installer {
         ClusterStage cs = new ClusterStage();
 
         cs.getMetadata().setName(INIT_STAGE_NAME);
-        // TODO: Change this to be a proper object
-        cs.getSpec().getTaskRef().put("kind", "ClusterTask");
-        cs.getSpec().getTaskRef().put("name", INIT_TEKTON_TASK_NAME);
+        cs.getSpec().getTaskRef().setKind(HasMetadata.getKind(ClusterTask.class));
+        cs.getSpec().getTaskRef().setName(INIT_TEKTON_TASK_NAME);
 
         cs = agogosClient.v1alpha1().clusterstages().createOrReplace(cs);
 

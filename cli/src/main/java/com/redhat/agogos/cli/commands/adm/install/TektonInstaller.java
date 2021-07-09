@@ -20,15 +20,14 @@ public class TektonInstaller extends Installer {
     private static final Logger LOG = LoggerFactory.getLogger(TektonInstaller.class);
 
     // In sync with https://docs.openshift.com/container-platform/4.7/cicd/pipelines/op-release-notes.html#getting-support
-    private static final String VERSION = "v0.22.0";
+    private static final String VERSION = "v0.24.0";
     private static final String NAMESPACE = "tekton-pipelines";
 
     @Override
     public void install(InstallProfile profile, String namespace) {
         LOG.info("🕞 Installing Tekton {}...", VERSION);
 
-        String path = String.format("dependencies/tekton-%s.yaml", VERSION);
-        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
+        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("dependencies/tekton.yaml");
         Helper.status(resourceLoader.installKubernetesResources(is, NAMESPACE));
 
         LOG.info("✅ Tekton {} installed", VERSION);
