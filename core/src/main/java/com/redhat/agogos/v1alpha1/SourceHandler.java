@@ -8,11 +8,14 @@ import io.fabric8.kubernetes.model.annotation.Group;
 import io.fabric8.kubernetes.model.annotation.Kind;
 import io.fabric8.kubernetes.model.annotation.Version;
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -57,6 +60,9 @@ public class SourceHandler extends AgogosResource<SourceHandlerSpec, Void> {
         @Setter
         private SourceHandlerSchema schema = new SourceHandlerSchema();
 
+        @Getter
+        @Setter
+        private List<WorkspaceMapping> workspaces = new ArrayList<>();
     }
 
     public SourceHandler() {

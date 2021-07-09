@@ -21,4 +21,8 @@ public class TaskRef implements KubernetesResource {
     @Getter
     @Setter
     private String name;
+
+    @Getter
+    @Setter
+    private String url;
 }

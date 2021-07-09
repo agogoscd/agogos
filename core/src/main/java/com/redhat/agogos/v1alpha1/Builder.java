@@ -12,7 +12,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @ToString(callSuper = true)
@@ -47,6 +49,10 @@ public class Builder extends AgogosResource<BuilderSpec, Status> {
         @Getter
         @Setter
         private BuilderSchema schema = new BuilderSchema();
+
+        @Getter
+        @Setter
+        private List<WorkspaceMapping> workspaces = new ArrayList<>();
 
     }
 

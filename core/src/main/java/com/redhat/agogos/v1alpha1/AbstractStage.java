@@ -16,12 +16,6 @@ import java.util.Map;
 @RegisterForReflection
 public abstract class AbstractStage extends AgogosResource<StageSpec, Status> {
 
-    public enum Phase {
-        BUILD,
-        TEST,
-        DELIVERY;
-    }
-
     private static final long serialVersionUID = 7447807439691538160L;
 
     @ToString
@@ -44,7 +38,7 @@ public abstract class AbstractStage extends AgogosResource<StageSpec, Status> {
 
         @Getter
         @Setter
-        private Map<String, String> taskRef = new HashMap<>();
+        private TaskRef taskRef = new TaskRef();
 
         @Getter
         @Setter

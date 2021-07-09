@@ -1,13 +1,10 @@
 package com.redhat.agogos.k8s.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.test.CRDTestServerSetup;
 import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
+import com.redhat.agogos.v1alpha1.Component.BuilderRef;
 import io.fabric8.kubernetes.client.Watcher;
 import io.javaoperatorsdk.operator.api.Context;
 import io.javaoperatorsdk.operator.api.UpdateControl;
@@ -23,6 +20,10 @@ import javax.inject.Inject;
 
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @WithKubernetesTestServer(setup = CRDTestServerSetup.class)
 @QuarkusTest
@@ -49,7 +50,7 @@ public class ComponentControllerTest {
         Component component = new Component();
         component.getMetadata().setNamespace("default");
         component.getMetadata().setName("test-fail");
-        component.getSpec().setBuilderRef(Map.of("name", "some-builder-name"));
+        component.getSpec().setBuilderRef(new BuilderRef("some-builder-name"));
 
         Context<Component> context = withCustomResourceModifiedEvent(component);
 
@@ -70,7 +71,7 @@ public class ComponentControllerTest {
         Component component = new Component();
         component.getMetadata().setNamespace("default");
         component.getMetadata().setName("test-create");
-        component.getSpec().setBuilderRef(Map.of("name", "builder-name"));
+        component.getSpec().setBuilderRef(new BuilderRef("builder-name"));
 
         Context<Component> context = withCustomResourceModifiedEvent(component);
 

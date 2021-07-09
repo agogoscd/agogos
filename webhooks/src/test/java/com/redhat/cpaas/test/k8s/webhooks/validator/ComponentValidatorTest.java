@@ -60,7 +60,7 @@ public class ComponentValidatorTest {
     void beforeEach() {
         component = new Component("component-name");
         component.getMetadata().setNamespace("default");
-        component.getSpec().getBuilderRef().put("name", "maven");
+        component.getSpec().getBuilderRef().setName("maven");
 
         UserInfo userInfo = new UserInfoBuilder().withUsername("minikube-user").withGroups("system:authenticated").build();
 
@@ -75,7 +75,7 @@ public class ComponentValidatorTest {
     @Test
     @DisplayName("Validate review request for a component with non-existing builder")
     public void validateInvalidBuilder() throws IOException {
-        component.getSpec().getBuilderRef().put("name", "doesntexist");
+        component.getSpec().getBuilderRef().setName("doesntexist");
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
                 .then().statusCode(200).body("response.allowed", CoreMatchers.equalTo(false))

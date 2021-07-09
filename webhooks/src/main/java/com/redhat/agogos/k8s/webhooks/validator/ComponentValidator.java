@@ -53,11 +53,11 @@ public class ComponentValidator extends Validator<Component> {
     private void validateComponent(Component component) throws ApplicationException {
         LOG.info("Validating component '{}'", component.getFullName());
 
-        Builder builder = agogosClient.v1alpha1().builders().withName(component.getSpec().getBuilderRef().get("name")).get();
+        Builder builder = agogosClient.v1alpha1().builders().withName(component.getSpec().getBuilderRef().getName()).get();
 
         if (builder == null) {
             throw new MissingResourceException("Selected builder '{}' is not registered in the system",
-                    component.getSpec().getBuilderRef().get("name"));
+                    component.getSpec().getBuilderRef().getName());
         }
 
         ValidationData<Void> validation = new ValidationData<>();
