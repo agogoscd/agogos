@@ -198,7 +198,7 @@ public class CoreInstaller extends Installer {
                                 .endDefault()//
                                 .build(), //
                         new ParamSpecBuilder()//
-                                .withName("data")//
+                                .withName("resource")//
                                 .withType("string")//
                                 .build() //
                 ) //
