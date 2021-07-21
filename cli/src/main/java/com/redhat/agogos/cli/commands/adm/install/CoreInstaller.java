@@ -207,7 +207,7 @@ public class CoreInstaller extends Installer {
                                 .withName("execute") //
                                 .withImage("$(params.image)")//
                                 .withCommand("/bin/python3")//
-                                .withArgs("/run.py", "$(params.data)", "$(workspaces.pipeline.path)")//
+                                .withArgs("/run.py", "$(params.resource)", "$(workspaces.pipeline.path)")//
                                 .build()) //
                 .endSpec()//
                 .build();
