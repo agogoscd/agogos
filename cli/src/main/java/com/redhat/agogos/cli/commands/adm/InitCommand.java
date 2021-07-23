@@ -4,6 +4,8 @@ import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller;
 import com.redhat.agogos.errors.ApplicationException;
 import io.fabric8.knative.client.KnativeClient;
+import io.fabric8.knative.eventing.v1.Broker;
+import io.fabric8.knative.eventing.v1.BrokerBuilder;
 import io.fabric8.knative.eventing.v1.Trigger;
 import io.fabric8.knative.eventing.v1.TriggerBuilder;
 import io.fabric8.kubernetes.api.model.ConfigMap;
@@ -31,7 +33,6 @@ import picocli.CommandLine.Option;
 import javax.inject.Inject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -44,29 +45,18 @@ import java.util.concurrent.TimeoutException;
 public class InitCommand implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(InitCommand.class);
 
-    private static final String CONFIG_MAP_NAME = "agogos-config";
+    private static final String RESOURCE_NAME = "agogos";
+    private static final String RESOURCE_NAME_EVENTING = "agogos-eventing";
+    private static final String RESOURCE_NAME_CONFIG = "agogos-config";
 
-    // ServiceAccount
-    private static final String SERVICE_ACCOUNT_TEKTON_EL_NAME = "agogos-el";
-    private static final String SERVICE_ACCOUNT_NAME = "agogos";
-
-    // RoleBinding
-    private static final String ROLE_BINDING_NAME = "agogos";
-
-    // Tekton EventListener
-    private static final String TEKTON_EVENT_LISTENER_NAME = "agogos";
-
-    // Knative Trigger
-    private static final String KNATIVE_TRIGGER_NAME = "default";
-
-    // Knative Broker
-    private static final String KNATIVE_BROKER_NAME = "default";
+    private static final Map<String, String> LABELS = Map.of(//
+            "app.kubernetes.io/instance", "default", //
+            "app.kubernetes.io/part-of", "agogos", //
+            "app.kubernetes.io/component", "core"//
+    );
 
     @Option(names = { "--namespace", "-n" }, required = true, description = "Name of the namespace to be initialized")
     String namespace;
-
-    @Option(names = { "--instance" }, required = true, defaultValue = "agogos", description = "The Agogos instance")
-    String agogosNamespace;
 
     @Inject
     KubernetesClient kubernetesClient;
@@ -81,38 +71,77 @@ public class InitCommand implements Runnable {
 
     @Override
     public void run() {
-        validate();
-
         LOG.info("Initializing '{}' namespace with Agogos resources...", namespace);
 
         installNamespace();
-        installElClusterRoleBinding();
-        installSa();
-        installAgogosRoleBinding();
-        installCm();
-        installTektonElSa();
-        EventListener el = installTektonEl();
-        installKnativeTrigger(el);
+
+        ServiceAccount sa = installMainSa();
+        ServiceAccount eventingSa = installEventingSa();
+
+        installMainRoleBinding(sa);
+        installEventingRoleBinding(eventingSa);
+
+        installConfig();
+        ConfigMap brokerConfig = installBrokerConfig();
+
+        EventListener el = installTektonEl(eventingSa);
+        Broker broker = installKnativeBroker(brokerConfig);
+
+        installKnativeTrigger(broker, el);
 
         Helper.status(installedResources);
 
         LOG.info("Done, '{}' namespace initialized and ready to use!", namespace);
     }
 
-    /**
-     * Checks whether Agogos is installed.
-     */
-    private void validate() {
-        Namespace ns = kubernetesClient.namespaces().withName(agogosNamespace).get();
+    private ConfigMap installBrokerConfig() {
+        ConfigMap configMap = new ConfigMapBuilder() //
+                .withNewMetadata() //
+                .withName("agogos-broker-config") //
+                .endMetadata() //
+                .withData(Map.of("channelTemplateSpec", "apiVersion: messaging.knative.dev/v1\nkind: InMemoryChannel"))
+                .build();
 
-        if (ns == null) {
-            throw new ApplicationException(
-                    "The '{}' namespace could not be found. Make sure you install Agogos in this namespace before continuing.",
-                    agogosNamespace);
-        }
+        configMap = kubernetesClient.configMaps().inNamespace(namespace).createOrReplace(configMap);
+
+        installedResources.add(configMap);
+
+        return configMap;
     }
 
-    private void installCm() {
+    private Broker installKnativeBroker(ConfigMap configuration) {
+        Broker broker = new BrokerBuilder() //
+                .withNewMetadata() //
+                .withName(RESOURCE_NAME) //
+                .withLabels(LABELS) //
+                .withAnnotations(Map.of("eventing.knative.dev/broker.class", "MTChannelBasedBroker")) // TODO: Not good for production deployment, fine for now
+                .endMetadata() //
+                .withNewSpec() //
+                .withNewConfig() //
+                .withApiVersion(configuration.getApiVersion()) //
+                .withKind(configuration.getKind()) //
+                .withName(configuration.getMetadata().getName()) //
+                .withNamespace(configuration.getMetadata().getNamespace()) //
+                .endConfig() //
+                .endSpec() //
+                .build();
+
+        broker = knativeClient.brokers().inNamespace(namespace).createOrReplace(broker);
+
+        installedResources.add(broker);
+
+        return broker;
+    }
+
+    /**
+     * <p>
+     * A way to provide custom configuration for {@link com.redhat.agogos.v1alpha1.Builder} and
+     * {@link com.redhat.agogos.v1alpha1.Stage}.
+     * </p>
+     * 
+     * TODO: Rethink this! This should be done differently, maybe.
+     */
+    private void installConfig() {
         String exampleData = new StringBuilder() //
                 .append("# This content is not used and is provided as an example.") //
                 .append(System.getProperty("line.separator")) //
@@ -123,7 +152,7 @@ public class InitCommand implements Runnable {
 
         ConfigMap cm = new ConfigMapBuilder() //
                 .withNewMetadata() //
-                .withName(CONFIG_MAP_NAME) //
+                .withName(RESOURCE_NAME_CONFIG) //
                 .endMetadata() //
                 .withData(data) //
                 .build();
@@ -159,32 +188,28 @@ public class InitCommand implements Runnable {
 
     }
 
-    private String readElUrl() {
-        EventListener el = tektonClient.v1alpha1().eventListeners().inNamespace(namespace)
-                .withName(TEKTON_EVENT_LISTENER_NAME).get();
-
-        String url = el.getStatus().getAddress().getUrl();
-
-        if (url != null) {
-            return url;
-        }
-
-        throw new ApplicationException("Could not find URL for EventListener");
-    }
-
-    private String obtainElUrl() {
+    private String obtainElUri(final EventListener el) {
         Callable<String> callable = () -> {
             while (true) {
                 try {
-                    return readElUrl();
+                    EventListener elInfo = tektonClient.v1alpha1().eventListeners().inNamespace(el.getMetadata().getNamespace())
+                            .withName(el.getMetadata().getName()).get();
+
+                    String url = elInfo.getStatus().getAddress().getUrl();
+
+                    if (url != null) {
+                        return url;
+                    }
+
+                    throw new ApplicationException("Could not find URL for EventListener");
                 } catch (NullPointerException | ApplicationException e) {
                     // Ignored
                 }
 
                 Thread.sleep(2000);
 
-                throw new ApplicationException("Could not read EventListener's '{}/{}' url", namespace,
-                        TEKTON_EVENT_LISTENER_NAME);
+                throw new ApplicationException("Could not read EventListener's '{}/{}' url", el.getMetadata().getNamespace(),
+                        el.getMetadata().getName());
             }
         };
 
@@ -203,31 +228,36 @@ public class InitCommand implements Runnable {
     /**
      * Install Knative Trigger responsible for routing events from the Broker into Tekton EventListener.
      */
-    private void installKnativeTrigger(EventListener el) {
+    private void installKnativeTrigger(Broker broker, EventListener el) {
+        String uri = obtainElUri(el);
+
         Trigger trigger = new TriggerBuilder() //
                 .withNewMetadata() //
-                .withName(KNATIVE_TRIGGER_NAME) //
+                .withName(RESOURCE_NAME) //
                 .endMetadata() //
                 .withNewSpec() //
-                .withBroker(KNATIVE_BROKER_NAME) //
+                .withBroker(broker.getMetadata().getName()) //
                 .withNewSubscriber() //
-                .withUri(obtainElUrl()) //
+                .withUri(uri) //
                 .endSubscriber() //
                 .endSpec() //
                 .build();
 
-        trigger = knativeClient.triggers().inNamespace(agogosNamespace).createOrReplace(trigger);
+        trigger = knativeClient.triggers().inNamespace(namespace).createOrReplace(trigger);
 
         installedResources.add(trigger);
     }
 
     /**
-     * Prepares the namespace for new product.
+     * <p>
+     * Prepares the namespace for the new project.
+     * </p>
      */
     private void installNamespace() {
         Namespace ns = new NamespaceBuilder() //
                 .withNewMetadata() //
                 .withName(namespace) //
+                .withLabels(LABELS) //
                 .endMetadata() //
                 .build();
 
@@ -237,18 +267,20 @@ public class InitCommand implements Runnable {
     }
 
     /**
-     * Prepares Tekton EventListener responsible for handling CloudEvents coming from the broker.
+     * <p>
+     * Prepares Tekton {@link EventListener} responsible for handling CloudEvents coming from the broker.
+     * </p>
      */
-    private EventListener installTektonEl() {
+    private EventListener installTektonEl(ServiceAccount sa) {
         EventListener el = new EventListenerBuilder() //
-                .withNewMetadata()//
-                .withName(TEKTON_EVENT_LISTENER_NAME) //
+                .withNewMetadata() //
+                .withName(RESOURCE_NAME) //
                 .endMetadata() //
                 .withNewSpec() //
-                .withServiceAccountName(SERVICE_ACCOUNT_TEKTON_EL_NAME) //
+                .withServiceAccountName(sa.getMetadata().getName()) //
                 .withNewNamespaceSelector() //
                 .withMatchNames(namespace) //
-                .endNamespaceSelector()//
+                .endNamespaceSelector() //
                 .endSpec() //
                 .build();
 
@@ -260,46 +292,52 @@ public class InitCommand implements Runnable {
     }
 
     /**
-     * Ensure the ClusterRoleBinding for the ServiceAccount used by the Tekton EventListener exists and is configured properly.
+     * Ensure the {@link ClusterRoleBinding} for the {@link ServiceAccount} used by the Tekton {@link EventListener} exists and
+     * is configured properly.
      * 
-     * TODO: This should be RoleBinding instead
      */
-    private void installElClusterRoleBinding() {
-        String name = new StringBuilder() //
-                .append(SERVICE_ACCOUNT_TEKTON_EL_NAME) //
-                .append("-") //
-                .append(namespace) //
-                .toString();
-
-        ClusterRoleBinding crb = new ClusterRoleBindingBuilder() //
+    private ClusterRoleBinding installEventingRoleBinding(ServiceAccount sa) {
+        ClusterRoleBinding roleBinding = new ClusterRoleBindingBuilder() //
                 .withNewMetadata() //
-                .withName(name) //
+                .withName(RESOURCE_NAME_EVENTING) //
                 .endMetadata()
                 .withSubjects(
                         new SubjectBuilder() //
-                                .withKind(HasMetadata.getKind(ServiceAccount.class)) //
-                                .withName(SERVICE_ACCOUNT_TEKTON_EL_NAME) //
+                                .withApiGroup(HasMetadata.getGroup(sa.getClass())) //
+                                .withKind(sa.getKind()) //
+                                .withName(sa.getMetadata().getName()) //
                                 .withNamespace(namespace) //
                                 .build())
                 .withNewRoleRef() //
                 .withApiGroup(HasMetadata.getGroup(ClusterRole.class)) //
                 .withKind(HasMetadata.getKind(ClusterRole.class)) //
-                .withName(CoreInstaller.CLUSTER_ROLE_NAME_EVENTING) //
+                .withName(RESOURCE_NAME_EVENTING) //
                 .endRoleRef() //
                 .build();
 
-        crb = kubernetesClient.rbac().clusterRoleBindings().createOrReplace(crb);
+        roleBinding = kubernetesClient.rbac().clusterRoleBindings().createOrReplace(roleBinding);
 
-        installedResources.add(crb);
+        installedResources.add(roleBinding);
+
+        return roleBinding;
     }
 
-    private void installAgogosRoleBinding() {
-        RoleBinding roleBinding = new RoleBindingBuilder().withNewMetadata().withName(ROLE_BINDING_NAME).endMetadata()
-                .addNewSubject()
-                .withKind(HasMetadata.getKind(ServiceAccount.class)).withName(SERVICE_ACCOUNT_NAME).endSubject()
-                .withNewRoleRef().withKind(HasMetadata.getKind(ClusterRole.class))
-                .withName(CoreInstaller.CLUSTER_ROLE_VIEW_NAME).withApiGroup(HasMetadata.getGroup(ClusterRole.class))
-                .endRoleRef().build();
+    private void installMainRoleBinding(ServiceAccount sa) {
+        RoleBinding roleBinding = new RoleBindingBuilder() //
+                .withNewMetadata() //
+                .withName(RESOURCE_NAME) //
+                .endMetadata() //
+                .addNewSubject() //
+                .withApiGroup(HasMetadata.getGroup(sa.getClass())) //
+                .withKind(sa.getKind()) //
+                .withName(sa.getMetadata().getName()) //
+                .endSubject() //
+                .withNewRoleRef() //
+                .withKind(HasMetadata.getKind(ClusterRole.class)) //
+                .withName(CoreInstaller.CLUSTER_ROLE_VIEW_NAME) //
+                .withApiGroup(HasMetadata.getGroup(ClusterRole.class)) //
+                .endRoleRef() //
+                .build();
 
         roleBinding = kubernetesClient.rbac().roleBindings().inNamespace(namespace).createOrReplace(roleBinding);
 
@@ -309,38 +347,34 @@ public class InitCommand implements Runnable {
     /**
      * Installs ServiceAccount used by Pipelines.
      */
-    private void installSa() {
-        Map<String, String> labels = new HashMap<>();
-        labels.put("app.kubernetes.io/instance", namespace);
-        labels.put("app.kubernetes.io/part-of", "agogos");
-
+    private ServiceAccount installMainSa() {
         ServiceAccount sa = new ServiceAccountBuilder() //
                 .withNewMetadata() //
-                .withName(SERVICE_ACCOUNT_NAME) //
-                .withLabels(labels) //
+                .withName(RESOURCE_NAME) //
+                .withLabels(LABELS) //
                 .endMetadata() //
                 .build();
 
         sa = kubernetesClient.serviceAccounts().inNamespace(namespace).createOrReplace(sa);
 
         installedResources.add(sa);
+
+        return sa;
     }
 
-    private void installTektonElSa() {
-        Map<String, String> labels = new HashMap<>();
-        labels.put("app.kubernetes.io/instance", namespace);
-        labels.put("app.kubernetes.io/part-of", "agogos");
-
+    private ServiceAccount installEventingSa() {
         ServiceAccount sa = new ServiceAccountBuilder() //
                 .withNewMetadata() //
-                .withName(SERVICE_ACCOUNT_TEKTON_EL_NAME) //
-                .withLabels(labels) //
+                .withName(RESOURCE_NAME_EVENTING) //
+                .withLabels(LABELS) //
                 .endMetadata() //
                 .build();
 
         sa = kubernetesClient.serviceAccounts().inNamespace(namespace).createOrReplace(sa);
 
         installedResources.add(sa);
+
+        return sa;
     }
 
 }

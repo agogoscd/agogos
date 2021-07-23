@@ -1,5 +1,3 @@
-
-
 quarkus:
   operator-sdk:
     crd:
@@ -38,6 +36,21 @@ agogos:
   service-account: agogos
   cloud-events:
     publish: true
+    base-url: "http://broker-ingress.knative-eventing.svc.cluster.local"
+
+  security:
+    # Here we are controlling the Pod security Policy for all containers
+    # run as part of Build or Pipeline in Agogos.
+    # https://kubernetes.io/docs/concepts/policy/pod-security-policy
+    pod-security-policy:
+      # By default every we require that every container run in the Pod
+      # has a regular user specified.
+      # https://kubernetes.io/docs/concepts/policy/pod-security-policy/#users-and-groups
+      runAsNonRoot: true
+      # To unify permissions of files created as part of Builds and Pipeline execution
+      # we set the used ID.
+      # https://kubernetes.io/docs/concepts/policy/pod-security-policy/#users-and-groups
+      runAsUser: 65532
 
 kubernetes:
   # Default storage class name in minikube
@@ -47,6 +60,12 @@ kubernetes:
   broker/mp-rest/url: http://localhost:8111
   
   #hostnameVerifier: io.quarkus.restclient.NoopHostnameVerifier
+
+  agogos:
+    service-account: agogos
+    cloud-events:
+      publish: true
+      base-url: "http://localhost:8111"
 
   quarkus:
     log:

@@ -8,12 +8,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-@Path("/agogos")
+@Path("/")
 @RegisterRestClient(configKey = "broker")
 public interface BrokerRestClient {
 
     @POST
-    @Path("/default")
+    @Path("/agogos")
     @Produces(MediaType.APPLICATION_JSON)
     void sendEvent(final CloudEvent cloudEvent);
 }

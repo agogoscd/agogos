@@ -1,5 +1,9 @@
 package com.redhat.agogos.k8s.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.test.CRDTestServerSetup;
 import com.redhat.agogos.v1alpha1.Builder;
@@ -19,11 +23,6 @@ import org.mockito.Mockito;
 import javax.inject.Inject;
 
 import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @WithKubernetesTestServer(setup = CRDTestServerSetup.class)
 @QuarkusTest

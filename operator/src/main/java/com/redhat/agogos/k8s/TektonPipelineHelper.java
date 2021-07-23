@@ -41,6 +41,12 @@ public class TektonPipelineHelper {
     @ConfigProperty(name = "kubernetes.storage-class")
     Optional<String> storageClass;
 
+    @ConfigProperty(name = "agogos.security.pod-security-policy.runAsNonRoot")
+    Optional<Boolean> runAsNonRoot;
+
+    @ConfigProperty(name = "agogos.security.pod-security-policy.runAsUser")
+    Optional<Long> runAsUser;
+
     @Inject
     TektonClient tektonClient;
 
@@ -113,8 +119,8 @@ public class TektonPipelineHelper {
         labels.put(Resource.RESOURCE.getLabel(), kind.toLowerCase());
 
         PodSecurityContext podSecurityContext = new PodSecurityContextBuilder() //
-                .withRunAsNonRoot(true) //
-                .withRunAsUser(65532l) // TODO: user ID is currently hardcoded, we should refrain from doing it, but at the same time we need to ensure best practices in security are in place
+                .withRunAsNonRoot(runAsNonRoot.orElse(true)) //
+                .withRunAsUser(runAsUser.orElse(65532l)) // 
                 .build();
 
         PipelineRun pipelineRun = new PipelineRunBuilder() //

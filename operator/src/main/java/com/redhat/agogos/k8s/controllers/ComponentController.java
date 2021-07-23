@@ -35,7 +35,6 @@ import io.javaoperatorsdk.operator.api.DeleteControl;
 import io.javaoperatorsdk.operator.api.ResourceController;
 import io.javaoperatorsdk.operator.api.UpdateControl;
 import io.javaoperatorsdk.operator.processing.event.internal.CustomResourceEvent;
-import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -325,6 +324,7 @@ public class ComponentController implements ResourceController<Component> {
                     component.getSpec().getBuilderRef().getName());
         }
 
+        // TODO: ClusterTask support?
         Task builderTask = tektonClient.v1beta1().tasks().inNamespace(component.getMetadata().getNamespace())
                 .withName(builder.getSpec().getTaskRef().getName()).get();
 

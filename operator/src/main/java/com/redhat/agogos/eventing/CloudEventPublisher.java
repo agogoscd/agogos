@@ -10,7 +10,7 @@ import com.redhat.agogos.v1alpha1.AgogosResource;
 import io.cloudevents.CloudEvent;
 import io.cloudevents.core.builder.CloudEventBuilder;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +21,10 @@ import javax.json.JsonObjectBuilder;
 import javax.ws.rs.core.MediaType;
 
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,22 +33,54 @@ import java.util.UUID;
 public class CloudEventPublisher {
     private static final Logger LOG = LoggerFactory.getLogger(CloudEventPublisher.class);
 
-    /**
-     * Broker RestClient.
-     */
-    @Inject
-    @RestClient
-    BrokerRestClient broker;
+    // /**
+    //  * Broker RestClient.
+    //  */
+    // @Inject
+    // @RestClient
+    // BrokerRestClient broker;
 
     @Inject
     ObjectMapper objectMapper;
 
+    @ConfigProperty(name = "agogos.cloud-events.base-url", defaultValue = "http://broker-ingress.knative-eventing.svc.cluster.local")
+    String baseurl;
+
     @ConfigProperty(name = "agogos.cloud-events.publish")
     Optional<Boolean> publish;
 
+    Map<String, BrokerRestClient> brokers = new HashMap<>();
+
+    private BrokerRestClient restClient(String namespace) {
+        BrokerRestClient client = brokers.get(namespace);
+
+        if (client == null) {
+            URL url;
+
+            try {
+                url = new URL( //
+                        new StringBuilder(baseurl) //
+                                .append("/") //
+                                .append(namespace) //
+                                // .append("/") //
+                                // .append("agogos") //
+                                .toString());
+            } catch (MalformedURLException e) {
+                throw new ApplicationException("Could not create URL for Knative Broker in namespace {}", namespace);
+            }
+
+            LOG.debug("Preparing new CloudEvent Broker client with URL '{}'", url);
+
+            client = RestClientBuilder.newBuilder().baseUrl(url).build(BrokerRestClient.class);
+            brokers.put(namespace, client);
+        }
+
+        return client;
+    }
+
     public void publish(PipelineRunState state, AgogosResource<?, ?> resource, AgogosResource<?, ?> parent) {
         if (state == null || resource == null || parent == null) {
-            LOG.warn("Missing one of required resources");
+            LOG.warn("Missing one of required resources, CloudEvent won't be published!");
             return;
         }
 
@@ -66,11 +101,12 @@ public class CloudEventPublisher {
 
         String type = CloudEventHelper.type(resource.getClass(), state);
         String data = dataBuilder.build().toString();
+        BrokerRestClient client = restClient(resource.getMetadata().getNamespace());
 
-        publish(type, data);
+        send(client, type, data);
     }
 
-    public void publish(String type, String data) {
+    private void send(BrokerRestClient broker, String type, String data) {
         if (!publish.orElse(true)) {
             LOG.debug(
                     "Publishing CloudEvent '{}' skipped because it is disabled in configuration; see 'agogos.cloud-events.publish' property",
@@ -91,6 +127,5 @@ public class CloudEventPublisher {
         LOG.debug("CloudEvent payload: '{}'", data);
 
         broker.sendEvent(cloudEvent);
-
     }
 }
