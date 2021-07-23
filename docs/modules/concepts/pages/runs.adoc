@@ -1,0 +1,5 @@
+= Runs
+
+include::common:partial$draft.adoc[]
+
+Run represents the execution of a xref:pipelines.adoc[Pipeline].
