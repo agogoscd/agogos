@@ -34,7 +34,7 @@ class ResourceMapping {
      */
     @JsonIgnore
     public String getPlural() {
-        String url = endpoints.stream().filter(e -> !e.contains("{")).findAny().orElse(null);
+        String url = endpoints.stream().filter(e -> !e.contains("{")).findFirst().orElse(null);
 
         if (url == null) {
             return null;

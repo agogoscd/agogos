@@ -58,7 +58,7 @@ kubernetes:
 
 "%dev":
   broker/mp-rest/url: http://localhost:8111
-  
+
   #hostnameVerifier: io.quarkus.restclient.NoopHostnameVerifier
 
   agogos:

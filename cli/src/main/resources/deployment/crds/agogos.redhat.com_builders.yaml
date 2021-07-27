@@ -82,13 +82,27 @@ spec:
                         description: "Name of the target pipeline in the Task implementation"
                       subPath:
                         type: string
-                        descripton: "Subpath on the source workspace that should be exposed as the target workspace"
+                        description: "Subpath on the source workspace that should be exposed as the target workspace"
                     required:
                       - "target"
               required:
                 - "taskRef"
             status:
-              description: BuilderStatus defines the observed state of Builder
+              description: Status defines the observed state of Builder
+              properties:
+                lastUpdate:
+                  format: date-time
+                  type: string
+                reason:
+                  type: string
+                status:
+                  default: New
+                  enum:
+                    - New
+                    - Initializing
+                    - Ready
+                    - Failed
+                  type: string
               type: object
           type: object
       served: true

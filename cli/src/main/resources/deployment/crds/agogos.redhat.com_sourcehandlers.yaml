@@ -83,7 +83,7 @@ spec:
                         description: "Name of the target pipeline in the Task implementation"
                       subPath:
                         type: string
-                        descripton: "Subpath on the source workspace that should be exposed as the target workspace"
+                        description: "Subpath on the source workspace that should be exposed as the target workspace"
                     required:
                       - "target"
               required:
