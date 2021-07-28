@@ -23,8 +23,8 @@ public class KnativeEventingInstaller extends Installer {
 
     private static final Logger LOG = LoggerFactory.getLogger(KnativeEventingInstaller.class);
 
-    // In sync with https://docs.openshift.com/container-platform/4.7/serverless/serverless-release-notes.html#new-features-1-14-0_serverless-release-notes
-    private static final String VERSION = "v0.20.4";
+    // In sync with https://docs.openshift.com/container-platform/4.7/serverless/serverless-release-notes.html#serverless-rn-1-15-0_serverless-release-notes
+    private static final String VERSION = "v0.21.4";
     private static final String NAMESPACE = "knative-eventing";
 
     @Override
@@ -69,7 +69,7 @@ public class KnativeEventingInstaller extends Installer {
         String[] files = new String[] { "core", "in-memory-channel", "mt-channel-broker" };
 
         for (String file : files) {
-            String path = String.format("dependencies/knative-eventing-%s-%s.yaml", file, VERSION);
+            String path = String.format("dependencies/knative-eventing-%s.yaml", file);
             InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
 
             resources.addAll(

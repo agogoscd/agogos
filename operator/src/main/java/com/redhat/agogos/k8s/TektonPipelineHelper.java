@@ -2,6 +2,7 @@ package com.redhat.agogos.k8s;
 
 import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.v1alpha1.Component;
+import com.redhat.agogos.v1alpha1.WorkspaceMapping;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
@@ -9,6 +10,8 @@ import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaimBuilder;
+import io.fabric8.kubernetes.api.model.PodSecurityContext;
+import io.fabric8.kubernetes.api.model.PodSecurityContextBuilder;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
@@ -37,6 +40,12 @@ public class TektonPipelineHelper {
 
     @ConfigProperty(name = "kubernetes.storage-class")
     Optional<String> storageClass;
+
+    @ConfigProperty(name = "agogos.security.pod-security-policy.runAsNonRoot")
+    Optional<Boolean> runAsNonRoot;
+
+    @ConfigProperty(name = "agogos.security.pod-security-policy.runAsUser")
+    Optional<Long> runAsUser;
 
     @Inject
     TektonClient tektonClient;
@@ -102,12 +111,17 @@ public class TektonPipelineHelper {
                 .build();
 
         WorkspaceBinding workspace = new WorkspaceBindingBuilder() //
-                .withName("ws") //
+                .withName(WorkspaceMapping.MAIN_WORKSPACE_NAME) //
                 .withVolumeClaimTemplate(pvc) //
                 .build();
 
         Map<String, String> labels = new HashMap<>();
         labels.put(Resource.RESOURCE.getLabel(), kind.toLowerCase());
+
+        PodSecurityContext podSecurityContext = new PodSecurityContextBuilder() //
+                .withRunAsNonRoot(runAsNonRoot.orElse(true)) //
+                .withRunAsUser(runAsUser.orElse(65532l)) // 
+                .build();
 
         PipelineRun pipelineRun = new PipelineRunBuilder() //
                 .withNewMetadata() //
@@ -118,6 +132,9 @@ public class TektonPipelineHelper {
                 .withNewSpec() //
                 .withNewPipelineRef().withName(name).endPipelineRef() //
                 .withWorkspaces(workspace) //
+                .withNewPodTemplate() //
+                .withSecurityContext(podSecurityContext) //
+                .endPodTemplate() //
                 .endSpec() //
                 .build();
 

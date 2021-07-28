@@ -5,10 +5,7 @@ import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.ClusterStage;
 import io.fabric8.knative.client.KnativeClient;
-import io.fabric8.knative.eventing.v1.Broker;
-import io.fabric8.knative.eventing.v1.BrokerBuilder;
 import io.fabric8.kubernetes.api.model.ConfigMap;
-import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
@@ -23,12 +20,14 @@ import io.fabric8.tekton.pipeline.v1beta1.ParamSpecBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.fabric8.tekton.pipeline.v1beta1.StepBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspaceDeclarationBuilder;
+import io.fabric8.tekton.triggers.v1alpha1.ClusterInterceptor;
 import io.fabric8.tekton.triggers.v1alpha1.ClusterTriggerBinding;
 import io.fabric8.tekton.triggers.v1alpha1.EventListener;
 import io.fabric8.tekton.triggers.v1alpha1.Trigger;
 import io.fabric8.tekton.triggers.v1alpha1.TriggerBinding;
 import io.fabric8.tekton.triggers.v1alpha1.TriggerTemplate;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,16 +43,14 @@ import java.util.Map;
 @ApplicationScoped
 @RegisterForReflection
 public class CoreInstaller extends Installer {
-
     private static final Logger LOG = LoggerFactory.getLogger(CoreInstaller.class);
-    private static final String KNATIVE_BROKER_NAME = "default";
-    private static final String KNATIVE_BROKER_CONFIG_NAME = "eventing-broker-config";
+
+    private static final String RESOURCE_NAME_EVENTING = "agogos-eventing";
 
     public static final String CLUSTER_ROLE_VIEW_NAME = "agogos-view";
     public static final String CLUSTER_ROLE_NAME_EVENTING = "agogos-el";
 
     private static final String INIT_TEKTON_TASK_NAME = "init";
-    private static final String INIT_TEKTON_TASK_DEFAULT_IMAGE = "quay.io/cpaas/agogos-poc-stage-init:latest";
     private static final String INIT_STAGE_NAME = "init";
 
     private static final String SERVICE_ACCOUNT_NAME = "agogos";
@@ -63,6 +60,9 @@ public class CoreInstaller extends Installer {
             "app.kubernetes.io/part-of", "agogos", //
             "app.kubernetes.io/component", "core"//
     );
+
+    @ConfigProperty(name = "agogos.container-image.init", defaultValue = "quay.io/cpaas/agogos-poc-stage-init:latest")
+    String containerImageInit;
 
     @Inject
     AgogosClient agogosClient;
@@ -78,57 +78,16 @@ public class CoreInstaller extends Installer {
                 List.of( //
                         namespace(namespace),
                         serviceAccount(),
-
-                        clusterRole(),
+                        clusterRoleView(),
                         clusterRoleEventing(),
                         initClusterTask()),
                 namespace);
 
         resources.add(installInitClusterStage());
 
-        ConfigMap knativeBrokerConfiguration = installKnativeBrokerConfiguration(namespace);
-
-        resources.add(knativeBrokerConfiguration);
-        resources.add(installKnativeBroker(namespace, knativeBrokerConfiguration));
-
         Helper.status(resources);
 
         LOG.info("✅ Agogos core resources installed");
-    }
-
-    private ConfigMap installKnativeBrokerConfiguration(String namespace) {
-        ConfigMap configMap = new ConfigMapBuilder() //
-                .withNewMetadata() //
-                .withName(KNATIVE_BROKER_CONFIG_NAME) //
-                .endMetadata() //
-                .withData(Map.of("channelTemplateSpec", "apiVersion: messaging.knative.dev/v1\nkind: InMemoryChannel"))
-                .build();
-
-        configMap = kubernetesClient.configMaps().inNamespace(namespace).createOrReplace(configMap);
-
-        return configMap;
-    }
-
-    private Broker installKnativeBroker(String namespace, ConfigMap configuration) {
-        Broker broker = new BrokerBuilder() //
-                .withNewMetadata() //
-                .withName(KNATIVE_BROKER_NAME) //
-                .withLabels(LABELS) //
-                .withAnnotations(Map.of("eventing.knative.dev/broker.class", "MTChannelBasedBroker")) // TODO: Not good for production deployment, fine for now
-                .endMetadata() //
-                .withNewSpec() //
-                .withNewConfig() //
-                .withApiVersion(configuration.getApiVersion()) //
-                .withKind(configuration.getKind()) //
-                .withName(configuration.getMetadata().getName()) //
-                .withNamespace(configuration.getMetadata().getNamespace()) //
-                .endConfig() //
-                .endSpec() //
-                .build();
-
-        broker = knativeClient.brokers().inNamespace(namespace).createOrReplace(broker);
-
-        return broker;
     }
 
     private ServiceAccount serviceAccount() {
@@ -139,8 +98,15 @@ public class CoreInstaller extends Installer {
         return sa;
     }
 
+    /**
+     * <p>
+     * Prepares {@link ClusterRole} that is used
+     * </p>
+     * 
+     * @return
+     */
     private ClusterRole clusterRoleEventing() {
-        return new ClusterRoleBuilder().withNewMetadata().withName(CLUSTER_ROLE_NAME_EVENTING).withLabels(LABELS)
+        return new ClusterRoleBuilder().withNewMetadata().withName(RESOURCE_NAME_EVENTING).withLabels(LABELS)
                 .endMetadata().withRules( //
                         // Tekton Triggers
                         new PolicyRuleBuilder()
@@ -150,7 +116,8 @@ public class CoreInstaller extends Installer {
                                         HasMetadata.getPlural(TriggerBinding.class),
                                         HasMetadata.getPlural(TriggerTemplate.class),
                                         HasMetadata.getPlural(Trigger.class),
-                                        HasMetadata.getPlural(ClusterTriggerBinding.class))
+                                        HasMetadata.getPlural(ClusterTriggerBinding.class),
+                                        HasMetadata.getPlural(ClusterInterceptor.class))
                                 .withVerbs("get", "list", "watch").build(), //
                         new PolicyRuleBuilder().withApiGroups("").withResources(HasMetadata.getPlural(ConfigMap.class))
                                 .withVerbs("get", "list", "watch").build(), //
@@ -163,7 +130,7 @@ public class CoreInstaller extends Installer {
 
     }
 
-    private ClusterRole clusterRole() {
+    private ClusterRole clusterRoleView() {
         ClusterRole cr = new ClusterRoleBuilder().withNewMetadata().withName(CLUSTER_ROLE_VIEW_NAME).withLabels(LABELS)
                 .withLabels(Map.of("rbac.authorization.k8s.io/aggregate-to-view", "true"))
                 .endMetadata().withRules( //
@@ -188,26 +155,26 @@ public class CoreInstaller extends Installer {
                 .withName(INIT_TEKTON_TASK_NAME) //
                 .endMetadata() //
                 .withNewSpec() //
-                .withWorkspaces(new WorkspaceDeclarationBuilder().withName("pipeline").build())//
+                .withWorkspaces(new WorkspaceDeclarationBuilder().withName("output").build()) //
                 .withParams( //
-                        new ParamSpecBuilder()//
-                                .withName("image")//
-                                .withType("string")//
-                                .withNewDefault()
-                                .withStringVal(INIT_TEKTON_TASK_DEFAULT_IMAGE)//
-                                .endDefault()//
-                                .build(), //
-                        new ParamSpecBuilder()//
-                                .withName("resource")//
-                                .withType("string")//
+                        new ParamSpecBuilder() //
+                                .withName("image") //
+                                .withType("string") //
+                                .withNewDefault() //
+                                .withStringVal(containerImageInit) //
+                                .endDefault() //
+                                .build(),
+                        new ParamSpecBuilder() //
+                                .withName("resource") //
+                                .withType("string") //
                                 .build() //
                 ) //
                 .withSteps(
                         new StepBuilder()//
                                 .withName("execute") //
-                                .withImage("$(params.image)")//
-                                .withCommand("/bin/python3")//
-                                .withArgs("/run.py", "$(params.resource)", "$(workspaces.pipeline.path)")//
+                                .withImage("$(params.image)") //
+                                .withCommand("/usr/local/bin/entrypoint") //
+                                .withArgs("$(params.resource)", "$(workspaces.output.path)") //
                                 .build()) //
                 .endSpec()//
                 .build();
@@ -219,9 +186,9 @@ public class CoreInstaller extends Installer {
         ClusterStage cs = new ClusterStage();
 
         cs.getMetadata().setName(INIT_STAGE_NAME);
-        // TODO: Change this to be a proper object
-        cs.getSpec().getTaskRef().put("kind", "ClusterTask");
-        cs.getSpec().getTaskRef().put("name", INIT_TEKTON_TASK_NAME);
+        cs.getMetadata().setLabels(LABELS);
+        cs.getSpec().getTaskRef().setKind(HasMetadata.getKind(ClusterTask.class));
+        cs.getSpec().getTaskRef().setName(INIT_TEKTON_TASK_NAME);
 
         cs = agogosClient.v1alpha1().clusterstages().createOrReplace(cs);
 

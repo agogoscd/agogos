@@ -9,6 +9,7 @@ import com.redhat.agogos.v1alpha1.AbstractStage;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.Pipeline.PipelineSpec.StageEntry;
 import com.redhat.agogos.v1alpha1.Pipeline.PipelineSpec.StageReference;
+import com.redhat.agogos.v1alpha1.WorkspaceMapping;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.client.TektonClient;
@@ -61,7 +62,7 @@ public class PipelineController implements ResourceController<Pipeline> {
 
         // Prepare workspace for main task to share content between steps
         WorkspacePipelineTaskBinding pipelineWsBinding = new WorkspacePipelineTaskBindingBuilder() //
-                .withName("pipeline") //
+                .withName(WorkspaceMapping.MAIN_WORKSPACE_NAME) //
                 .withWorkspace("ws") //
                 .withSubPath("pipeline") //
                 .build();
@@ -127,7 +128,7 @@ public class PipelineController implements ResourceController<Pipeline> {
             PipelineTask task = new PipelineTaskBuilder() //
                     .withName(stageRef.getName()) //
                     .withTaskRef(new TaskRefBuilder().withApiVersion("tekton.dev/v1beta1").withKind(taskType)
-                            .withName(stage.getSpec().getTaskRef().get("name")).build()) //
+                            .withName(stage.getSpec().getTaskRef().getName()).build()) //
                     .addNewParam() //
                     .withName("config") //
                     .withNewValue(stageConfig) //

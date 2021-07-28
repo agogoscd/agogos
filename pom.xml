@@ -19,7 +19,7 @@
         <module>cli</module>
         <module>operator</module>
         <module>webhooks</module>
-        <module>relays</module>
+        <!-- <module>relays</module> -->
     </modules>
 
     <properties>
@@ -39,8 +39,8 @@
         <openapi-schema-validator.version>1.0.5</openapi-schema-validator.version>
         <lombok.version>1.18.16</lombok.version>
         <quarkus-tekton-client.version>0.4.0</quarkus-tekton-client.version>
-        <quarkus-operatorsdk.version>1.9.1</quarkus-operatorsdk.version>
-        <kubernetes-client.version>5.5.0</kubernetes-client.version>
+        <quarkus-operatorsdk.version>1.9.4</quarkus-operatorsdk.version>
+        <kubernetes-client.version>5.6.0</kubernetes-client.version>
     </properties>
 
     <dependencyManagement>

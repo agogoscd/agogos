@@ -20,7 +20,7 @@ import javax.inject.Inject;
 public class RunJob implements Job {
     private static final Logger LOG = LoggerFactory.getLogger(RunJob.class);
 
-    public static final String PIPELINE_NAME = "pipeline";
+    public static final String PIPELINE_NAME = "shared";
     public static final String PIPELINE_NAMESPACE = "namespace";
 
     @Inject

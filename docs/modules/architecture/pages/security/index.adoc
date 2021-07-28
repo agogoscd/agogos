@@ -1,3 +1,31 @@
 = Security
 
 include::common:partial$draft.adoc[]
+
+== Pod Security Policies
+
+NOTE: Pod Security Policy settings are covered under the `agogos.security.pod-security-policy` hierarchy.
+
+By default every xref:concepts:builds.adoc[Build] and xref:concepts:runs.adoc[Run] is executed
+with following Pod Security settings:
+
+`runAsNonRoot`::
+Default: `true`
++
+This setting ensures that process run in the container uses a user ID other than `0` being the `root` user uid.
++
+This setting requires that the container image used to deliver the functionality
+must use a regular user ID for the process it runs.
++
+In case a Dockerfile is used to build the container image -- it must have a `USER [uid]`
+instruction where the `uid` is a regular user uid.
+If this is not the case and a `root` user is used, the pod will fail with
+`CreateContainerConfigError` status.
+
+`runAsUser`::
+Default: `65532`
++
+This settings defines the uid of the user running the main process in the container.
+This setting overrides any setting in the container image.
++
+You need to make sure the container image is able to be run with this specific uid.

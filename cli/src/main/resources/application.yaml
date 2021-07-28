@@ -8,7 +8,7 @@ quarkus:
   native:
     resources:
       includes: deployment/crds.yaml,dependencies/*.yaml
-  
+
 "%dev":
   quarkus:
     log:
@@ -24,6 +24,10 @@ quarkus:
           level: ERROR
         # "io.quarkus":
         #   level: "OFF"
+
+  agogos:
+    container-image:
+      init: quay.io/cpaas/agogos-poc-stage-init:latest
 
 "%prod":
   quarkus:

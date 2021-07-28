@@ -12,7 +12,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @ToString(callSuper = true)
@@ -36,21 +38,6 @@ public class Builder extends AgogosResource<BuilderSpec, Status> {
     @ToString
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
-    public static class TaskRef implements KubernetesResource {
-        private static final long serialVersionUID = 5507683698215774978L;
-
-        @Getter
-        @Setter
-        private String kind;
-
-        @Getter
-        @Setter
-        private String name;
-    }
-
-    @ToString
-    @JsonDeserialize(using = JsonDeserializer.None.class)
-    @RegisterForReflection
     public static class BuilderSpec implements KubernetesResource {
 
         private static final long serialVersionUID = 3644066384389447653L;
@@ -62,6 +49,10 @@ public class Builder extends AgogosResource<BuilderSpec, Status> {
         @Getter
         @Setter
         private BuilderSchema schema = new BuilderSchema();
+
+        @Getter
+        @Setter
+        private List<WorkspaceMapping> workspaces = new ArrayList<>();
 
     }
 

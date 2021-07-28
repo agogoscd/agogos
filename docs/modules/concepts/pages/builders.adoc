@@ -10,3 +10,9 @@ can be added to the system.
 Builders define schema for a Component so that it can be accepted by the Builder.
 This means that if a Component uses a particular Builder
 it's definition needs to pass the schema validation defined by the Builder.
+
+== Workspaces
+
+Each Builder has a single `build` workspace assigned. This is the place
+where all of the work related to building the resource is happening.
+

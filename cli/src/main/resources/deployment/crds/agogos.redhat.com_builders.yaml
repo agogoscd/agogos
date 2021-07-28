@@ -43,10 +43,20 @@ spec:
                   properties:
                     name:
                       type: string
-                      description: Name of the Tekton task being the implementation of the Stage.
-                    kind: 
+                      description: Name of the Tekton task being the implementation of the SourceHandler.
+                    kind:
                       type: string
-                      description: The kind. Can be either Task or ClusterTask
+                      description: The SourceHandler Tekton task implementation type. Can be either Task or ClusterTask. By default it is Task.
+                      default: Task
+                      enum:
+                        - Task
+                        - ClusterTask
+                    url:
+                      type: string
+                      description: A URL to a Task definition
+                  oneOf:
+                    - required: ["name", "kind"]
+                    - required: ["url"]
                 schema:
                   type: object
                   description: Validation definition that should be applied on the Builder configuration passed.
@@ -58,10 +68,41 @@ spec:
                         More info: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md"
                   required:
                     - "openAPIV3Schema"
+                workspaces:
+                  type: array
+                  description: "List of workspace mappings between Agogos exposed workspaces and Task being the implementation of Builder"
+                  items:
+                    type: object
+                    properties:
+                      source:
+                        type: string
+                        description: "Name of the Agogos exposed workspace"
+                      target:
+                        type: string
+                        description: "Name of the target pipeline in the Task implementation"
+                      subPath:
+                        type: string
+                        description: "Subpath on the source workspace that should be exposed as the target workspace"
+                    required:
+                      - "target"
               required:
                 - "taskRef"
             status:
-              description: BuilderStatus defines the observed state of Builder
+              description: Status defines the observed state of Builder
+              properties:
+                lastUpdate:
+                  format: date-time
+                  type: string
+                reason:
+                  type: string
+                status:
+                  default: New
+                  enum:
+                    - New
+                    - Initializing
+                    - Ready
+                    - Failed
+                  type: string
               type: object
           type: object
       served: true

@@ -7,9 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.test.InMemoryLogHandler;
 import com.redhat.agogos.test.KubernetesTestServerSetup;
-import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.kubernetes.client.KubernetesTestServer;
 import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import org.jboss.logmanager.LogContext;
 import org.junit.jupiter.api.AfterEach;
@@ -22,9 +20,6 @@ import javax.inject.Inject;
 @WithKubernetesTestServer(setup = KubernetesTestServerSetup.class)
 @QuarkusTest
 public class InstallCommandTest {
-
-    @KubernetesTestServer
-    KubernetesServer mockServer;
 
     @Inject
     CLI cli;
@@ -51,14 +46,14 @@ public class InstallCommandTest {
     void shouldInstallLocalProfile() throws Exception {
         assertEquals(0, handler.getRecords().size());
 
-        int exitCode = cli.run("adm", "install", "-p", "local");
+        int exitCode = cli.run("-v", "adm", "install", "-p", "local");
 
         assertEquals(0, exitCode);
 
         assertTrue(handler.contains("💻 Selected profile: local"));
-        assertTrue(handler.contains("✅ Tekton v0.22.0 installed"));
-        assertTrue(handler.contains("✅ Tekton Triggers v0.12.1 installed"));
-        assertTrue(handler.contains("✅ Knative Eventing v0.20.4 installed"));
+        assertTrue(handler.contains("✅ Tekton v0.24.0 installed"));
+        assertTrue(handler.contains("✅ Tekton Triggers v0.14.2 installed"));
+        assertTrue(handler.contains("✅ Knative Eventing v0.21.4 installed"));
         assertTrue(handler.contains("✅ Agogos CRDs installed"));
         assertTrue(handler.contains("✅ Agogos core resources installed"));
         assertTrue(handler.contains("✅ Agogos Webhook installed"));
@@ -70,14 +65,14 @@ public class InstallCommandTest {
     void shouldInstallDevProfile() throws Exception {
         assertEquals(0, handler.getRecords().size());
 
-        int exitCode = cli.run("adm", "install", "-p", "dev");
+        int exitCode = cli.run("-v", "adm", "install", "-p", "dev");
 
         assertEquals(0, exitCode);
 
         assertTrue(handler.contains("💻 Selected profile: dev"));
-        assertTrue(handler.contains("✅ Tekton v0.22.0 installed"));
-        assertTrue(handler.contains("✅ Tekton Triggers v0.12.1 installed"));
-        assertTrue(handler.contains("✅ Knative Eventing v0.20.4 installed"));
+        assertTrue(handler.contains("✅ Tekton v0.24.0 installed"));
+        assertTrue(handler.contains("✅ Tekton Triggers v0.14.2 installed"));
+        assertTrue(handler.contains("✅ Knative Eventing v0.21.4 installed"));
         assertTrue(handler.contains("✅ Agogos CRDs installed"));
         assertTrue(handler.contains("✅ Agogos core resources installed"));
     }

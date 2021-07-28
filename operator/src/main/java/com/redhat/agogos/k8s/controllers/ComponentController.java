@@ -7,11 +7,15 @@ import com.redhat.agogos.k8s.Resource;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
+import com.redhat.agogos.v1alpha1.SourceHandler;
 import com.redhat.agogos.v1alpha1.Status;
+import com.redhat.agogos.v1alpha1.WorkspaceMapping;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.client.TektonClient;
+import io.fabric8.tekton.pipeline.v1beta1.ArrayOrString;
+import io.fabric8.tekton.pipeline.v1beta1.ClusterTask;
 import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineResult;
@@ -51,6 +55,16 @@ public class ComponentController implements ResourceController<Component> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ComponentController.class);
 
+    private static final String BUILD_PIPELINE_INIT_TASK_NAME = "init";
+    private static final String BUILD_PIPELINE_SOURCE_TASK_NAME = "fetch-source";
+    private static final String BUILD_PIPELINE_BUILDER_TASK_NAME = "build";
+
+    private static final String BUILD_PIPELINE_DEFAULT_TASK_WORKSPACE_NAME = "output";
+
+    private static final String BUILD_PIPELINE_INIT_TASK_WORKSPACE_NAME = "output";
+    private static final String BUILD_PIPELINE_SOURCE_TASK_WORKSPACE_NAME = "output";
+    private static final String BUILD_PIPELINE_BUILDER_TASK_WORKSPACE_NAME = "output";
+
     @Inject
     AgogosClient agogosClient;
 
@@ -86,6 +100,8 @@ public class ComponentController implements ResourceController<Component> {
     @Override
     public UpdateControl<Component> createOrUpdateResource(Component component,
             Context<Component> context) {
+
+        // TODO: Trigger this method when used source handler was updated, implement event sources for source handlers
 
         // Try to find the latest event
         final Optional<CustomResourceEvent> customResourceEvent = context.getEvents()
@@ -148,6 +164,218 @@ public class ComponentController implements ResourceController<Component> {
 
     /**
      * <p>
+     * Prepares the 'init' task which is responsible for fetching information about the resource that should be built.
+     * </p>
+     */
+    private PipelineTask prepareInitTask(List<PipelineTask> tasks, Component component) {
+        ClusterTask initTask = tektonClient.v1beta1().clusterTasks().withName(BUILD_PIPELINE_INIT_TASK_NAME).get();
+
+        if (initTask == null) {
+            throw new MissingResourceException("Could not find 'init' ClusterTask in the system");
+        }
+
+        // Construct the resource in format: [PLURAL].[VERSION].[GROUP]/[NAME]
+        // For example: 'components.v1alpha1.agogos.redhat.com/test'
+        String resource = new StringBuilder() //
+                .append(component.getPlural()) //
+                .append(".") //
+                .append(component.getVersion()) //
+                .append(".") //
+                .append(component.getGroup()) //
+                .append("/") //
+                .append(component.getMetadata().getName()) //
+                .toString();
+
+        WorkspacePipelineTaskBinding workspaceBinding = new WorkspacePipelineTaskBindingBuilder() //
+                .withName(BUILD_PIPELINE_INIT_TASK_WORKSPACE_NAME) //
+                .withWorkspace(WorkspaceMapping.MAIN_WORKSPACE_NAME) //
+                .build();
+
+        // Build the init task
+        PipelineTask pipelineTask = new PipelineTaskBuilder() //
+                .withName(BUILD_PIPELINE_INIT_TASK_NAME) //
+                .withTaskRef(new TaskRefBuilder() //
+                        .withName(initTask.getMetadata().getName())
+                        .withApiVersion(initTask.getApiVersion()) //
+                        .withKind(initTask.getKind()) //
+                        .build()) //
+                .addNewParam() //
+                .withName("resource") //
+                .withNewValue(resource) //
+                .endParam() //
+                .withWorkspaces(workspaceBinding) //
+                .build();
+
+        tasks.add(pipelineTask);
+
+        return pipelineTask;
+    }
+
+    /**
+     * <p>
+     * Handle declared workspace binding on the resource. If there are any provided - these will be iterated over and required
+     * workspaces will be bound.
+     * </p>
+     * 
+     * <p>
+     * In case no bindings are provided, default binding will be applied.
+     * </p>
+     * 
+     * @param mappings
+     * @param defaultWorkspace
+     * @return
+     */
+    private List<WorkspacePipelineTaskBinding> workspaceBindings(List<WorkspaceMapping> mappings, String defaultWorkspace) {
+        List<WorkspacePipelineTaskBinding> workspaceBindings = new ArrayList<>();
+
+        if (mappings == null || mappings.isEmpty()) {
+            WorkspacePipelineTaskBinding defaultTaskBinding = new WorkspacePipelineTaskBindingBuilder() //
+                    .withName(BUILD_PIPELINE_DEFAULT_TASK_WORKSPACE_NAME)
+                    .withWorkspace(WorkspaceMapping.MAIN_WORKSPACE_NAME) //
+                    .build();
+
+            workspaceBindings.add(defaultTaskBinding);
+        } else {
+            mappings.forEach(workspaceMapping -> {
+                String targetWorkspaceName = BUILD_PIPELINE_SOURCE_TASK_WORKSPACE_NAME;
+
+                // Handle workspace mappings, if provided
+                if (workspaceMapping.getTarget() != null) {
+                    targetWorkspaceName = workspaceMapping.getTarget();
+                }
+
+                WorkspacePipelineTaskBinding pipelineTaskBinding = new WorkspacePipelineTaskBindingBuilder() //
+                        .withName(targetWorkspaceName)
+                        .withWorkspace(WorkspaceMapping.MAIN_WORKSPACE_NAME) //
+                        .withSubPath(workspaceMapping.getSubPath()) //
+                        .build();
+
+                workspaceBindings.add(pipelineTaskBinding);
+            });
+        }
+
+        return workspaceBindings;
+    }
+
+    private PipelineTask prepareSourceHandlerTask(List<PipelineTask> tasks, Component component) {
+        SourceHandler sourceHandler = null;
+
+        // In case the source handler is specified in the Component, validate if it exists in the system
+        // TODO: Add this to validation webhook as well
+
+        String sourceHandlerName = component.getSpec().getSource().getHandlerRef().getName();
+
+        if (sourceHandlerName == null) {
+            return null;
+        }
+
+        sourceHandler = agogosClient.v1alpha1().sourcehandlers().inNamespace(component.getMetadata().getNamespace())
+                .withName(sourceHandlerName).get();
+
+        if (sourceHandler == null) {
+            throw new MissingResourceException(
+                    "Selected SourceHandler '{}' requested by '{}' Component is not found",
+                    component.getSpec().getSource().getHandlerRef().getName(), component.getFullName());
+        }
+
+        Task sourceHandlerTask = tektonClient.v1beta1().tasks().inNamespace(component.getMetadata().getNamespace())
+                .withName(sourceHandler.getSpec().getTaskRef().getName()).get();
+
+        if (sourceHandlerTask == null) {
+            throw new MissingResourceException(
+                    "Task '{}' being implementation of SourceHandler '{}' requested by '{}' Component is not found",
+                    sourceHandler.getSpec().getTaskRef().getName(),
+                    component.getSpec().getSource().getHandlerRef().getName(), component.getFullName());
+        }
+
+        PipelineTask lastTask = tasks.get(tasks.size() - 1);
+
+        PipelineTaskBuilder pipelineTaskBuilder = new PipelineTaskBuilder() //
+                .withName(BUILD_PIPELINE_SOURCE_TASK_NAME) //
+                .withRunAfter(lastTask.getName()) //
+                .withTaskRef(
+                        new TaskRefBuilder().withName(sourceHandlerTask.getMetadata().getName())
+                                .withApiVersion(sourceHandlerTask.getApiVersion())
+                                .withKind(sourceHandlerTask.getKind())
+                                .build()) //
+                .withWorkspaces(
+                        workspaceBindings(sourceHandler.getSpec().getWorkspaces(), BUILD_PIPELINE_SOURCE_TASK_WORKSPACE_NAME));
+
+        sourceHandlerTask.getSpec().getParams().forEach(p -> {
+            Object value = component.getSpec().getSource().getData().get(p.getName());
+
+            if (value != null) {
+                pipelineTaskBuilder.addNewParam().withName(p.getName()).withNewValue(value.toString()).endParam();
+            }
+        });
+
+        PipelineTask pipelineTask = pipelineTaskBuilder.build();
+
+        tasks.add(pipelineTask);
+
+        return pipelineTask;
+    }
+
+    private PipelineTask prepareBuilderTask(List<PipelineTask> tasks, Component component) {
+        Builder builder = agogosClient.v1alpha1().builders().withName(component.getSpec().getBuilderRef().getName()).get();
+
+        if (builder == null) {
+            throw new MissingResourceException("Selected Builder '{}' is not available in the system",
+                    component.getSpec().getBuilderRef().getName());
+        }
+
+        // TODO: ClusterTask support?
+        Task builderTask = tektonClient.v1beta1().tasks().inNamespace(component.getMetadata().getNamespace())
+                .withName(builder.getSpec().getTaskRef().getName()).get();
+
+        if (builderTask == null) {
+            throw new MissingResourceException(
+                    "Task '{}' being implementation of Builder '{}' requested by '{}' Component is not found",
+                    builder.getSpec().getTaskRef().getName(),
+                    component.getSpec().getBuilderRef().getName(), component.getFullName());
+        }
+
+        PipelineTask lastTask = tasks.get(tasks.size() - 1);
+
+        TaskRef buildTaskRef = new TaskRefBuilder() //
+                .withApiVersion(HasMetadata.getApiVersion(Task.class)) //
+                .withKind(builder.getSpec().getTaskRef().getKind()) //
+                .withName(builder.getSpec().getTaskRef().getName()) //
+                .build();
+
+        // Prepare main task
+        PipelineTaskBuilder pipelineTaskBuilder = new PipelineTaskBuilder() //
+                .withName(BUILD_PIPELINE_BUILDER_TASK_NAME) //
+                .withTaskRef(buildTaskRef)
+                .withWorkspaces(
+                        workspaceBindings(builder.getSpec().getWorkspaces(), BUILD_PIPELINE_BUILDER_TASK_WORKSPACE_NAME)) //
+                .withRunAfter(lastTask.getName());
+
+        builderTask.getSpec().getParams().forEach(p -> {
+            Object value = component.getSpec().getData().get(p.getName());
+
+            if (value != null) {
+                ArrayOrString converted;
+
+                if (value instanceof List) {
+                    converted = new ArrayOrString((List) value);
+                } else {
+                    converted = new ArrayOrString(value.toString());
+                }
+
+                pipelineTaskBuilder.addNewParam().withName(p.getName()).withValue(converted).endParam();
+            }
+        });
+
+        PipelineTask pipelineTask = pipelineTaskBuilder.build();
+
+        tasks.add(pipelineTask);
+
+        return pipelineTask;
+    }
+
+    /**
+     * <p>
      * Creates or updates Tekton pipeline based on the {@link Component}
      * data passed.
      * </p>
@@ -157,69 +385,29 @@ public class ComponentController implements ResourceController<Component> {
      * @throws ApplicationException in case the pipeline cannot be updated
      */
     private Pipeline updateTektonBuildPipeline(Component component) throws ApplicationException {
-        Builder builder = agogosClient.v1alpha1().builders().withName(component.getSpec().getBuilderRef().get("name")).get();
-
-        if (builder == null) {
-            throw new MissingResourceException("Selected Builder '{}' is not available in the system",
-                    component.getSpec().getBuilderRef().get("name"));
-        }
 
         List<PipelineTask> tasks = new ArrayList<>();
 
-        // Prepare workspace for main task to store results
-        WorkspacePipelineTaskBinding stageWsBinding = new WorkspacePipelineTaskBindingBuilder() //
-                .withName("stage") //
-                .withWorkspace("ws") //
-                .withSubPath("stage") //
-                .build();
+        // Add the init task
+        prepareInitTask(tasks, component);
 
-        // Prepare workspace for main task to share content between steps
-        WorkspacePipelineTaskBinding pipelineWsBinding = new WorkspacePipelineTaskBindingBuilder() //
-                .withName("pipeline") //
-                .withWorkspace("ws") //
-                .withSubPath("pipeline") //
-                .build();
+        // Add SourceHandler task reference if SourceHandler was specified
+        prepareSourceHandlerTask(tasks, component);
 
-        String resource = new StringBuilder().append(component.getPlural()).append(".").append(component.getVersion())
-                .append(".")
-                .append(component.getGroup()).append("/").append(component.getMetadata().getName()).toString();
-
-        PipelineTask initTask = new PipelineTaskBuilder() //
-                .withName("init") //
-                .withTaskRef(new TaskRefBuilder().withName("init").withApiVersion("tekton.dev/v1beta1").withKind("ClusterTask")
-                        .build()) //
-                .addNewParam() //
-                .withName("resource") //
-                .withNewValue(resource) //
-                .endParam() //
-                .withWorkspaces(pipelineWsBinding) //
-                .build();
-
-        tasks.add(initTask);
-
-        TaskRef buildTaskRef = new TaskRefBuilder().withApiVersion(HasMetadata.getApiVersion(Task.class))
-                .withKind(builder.getSpec().getTaskRef().getKind()).withName(builder.getSpec().getTaskRef().getName()).build();
-
-        // Prepare main task
-        PipelineTask buildTask = new PipelineTaskBuilder() //
-                .withName("builder") //
-                .withTaskRef(buildTaskRef)
-                .withWorkspaces(stageWsBinding, pipelineWsBinding) //
-                .withRunAfter("init") //
-                .build();
-
-        tasks.add(buildTask);
+        // Finally add the Builder task
+        PipelineTask buildTask = prepareBuilderTask(tasks, component);
 
         // Define main workspace
         PipelineWorkspaceDeclaration workspaceMain = new PipelineWorkspaceDeclarationBuilder() //
-                .withName("ws") //
-                .withDescription("Main workspace") //
+                .withName(WorkspaceMapping.MAIN_WORKSPACE_NAME) //
+                .withDescription("Main workspace that is shared across each task in the build pipeline") //
                 .build();
 
         // Pipeline result is the result of the main task executed
         PipelineResult pipelineResult = new PipelineResultBuilder() //
                 .withName("data") //
-                .withValue("$(tasks.builder.results.data)") //
+                .withValue(new StringBuilder().append("$(tasks.").append(buildTask.getName())
+                        .append(".results.data)").toString()) //
                 .build();
 
         // Add any useful/required labels
@@ -246,7 +434,7 @@ public class ComponentController implements ResourceController<Component> {
                 .withNewSpec() //
                 .withWorkspaces(workspaceMain) //
                 .addAllToTasks(tasks) //
-                .withResults(pipelineResult) //
+                //.withResults(pipelineResult) //
                 .endSpec() //
                 .build();
 
