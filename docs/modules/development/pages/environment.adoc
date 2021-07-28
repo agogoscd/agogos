@@ -46,6 +46,13 @@ This includes:
 
 Please consult the xref:development:running.adoc[running Agogos in development mode] page.
 
+== IDE
+
+We provide instructions on how to set up the IDE so that it works the best with our
+codebase.
+
+* xref:ide/vscode.adoc[Visual Studio code (vscode)]
+
 == Gotchas
 
 [#managing-kubernetes-contexts]
