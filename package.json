@@ -12,5 +12,8 @@
     "gulp": "^4.0.2",
     "gulp-connect": "^5.7.0",
     "js-yaml": "^4.0.0"
+  },
+  "devDependencies": {
+    "gulp-livereload": "^4.0.2"
   }
 }

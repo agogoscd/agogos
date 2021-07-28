@@ -108,3 +108,17 @@ If you see error similar to what can be found below, just start Minikube again. 
 💡  Suggestion: Follow your Linux distribution instructions for configuring KVM
 📘  Documentation: https://minikube.sigs.k8s.io/docs/reference/drivers/kvm2
 ----
+
+=== Failure to call webhooks due to a refused connection
+
+An internal error appears because your firewall blocks the connection between Agogos
+Webhooks application and Kubernetes. 
+Running the following command will fix the issue.
+
+NOTE: The `--permanent` option activates after restarting your system. 
+If you wish immediate but temporary effects, then consider removing it. 
+
+[source,bash]
+----
+❯ sudo firewall-cmd --permanent --zone=libvirt --add-port=8443/tcp
+----

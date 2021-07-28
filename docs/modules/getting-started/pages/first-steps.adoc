@@ -29,18 +29,43 @@ Usage: agogosctl [-hV] [-o=<output>] [COMMAND]
   -h, --help              Show this help message and exit.
   -o, --output=<output>   Output format, valid values: plain, yaml, json,
                             default: plain.
+  -v, --verbose           
   -V, --version           Print version information and exit.
 Commands:
-  install                   Install Agogos
+  adm                       Agogos administration commands
   build, builds, b          Interact with builds
   components, component, c  Interact with components
   pipelines, pipeline, p    Interact with pipelines
   runs, run, r              Interact with runs
   triggers, trigger, t      Interact with triggers
+  stage, stages, stage      Interact with stages
+  builder, builders, bldr   Interact with builders
+  load, l                   Load agogos descriptors from files
+----
+
+== Interact with Agogos
+
+Register a builder:
+[source,bash]
+----
+❯ agogosctl load -f BUILDER_FILENAME
 ----
 
 
+Register a component:
+[source,bash]
+----
+❯ agogosctl load -f COMPONENT_FILENAME
+----
 
+
+Build a component:
+[source,bash]
+----
+❯ agogosctl component build COMPONENT_NAME
+----
+
+TIP: Use `list` after any of the basic commands to verify the successful load of the resources.
 
 #TODO#
 
