@@ -120,11 +120,11 @@ public class WebhooksInstaller extends Installer {
 
         Helper.status(resources);
 
+        LOG.info("✅ Agogos Webhook installed");
+
         if (profile == InstallProfile.dev) {
             writeCerts();
         }
-
-        LOG.info("✅ Agogos Webhook installed");
     }
 
     private void writeCerts() {
@@ -133,24 +133,20 @@ public class WebhooksInstaller extends Installer {
 
         try {
             Files.writeString(keyPath, certProvider.privateKey());
-            LOG.info("👉  Private key available at '{}'", keyPath.toAbsolutePath());
-
         } catch (IOException e) {
             throw new ApplicationException("Could not write private key to file '{}'", keyPath.toAbsolutePath());
         }
 
         try {
             Files.writeString(certPath, certProvider.certificate());
-            LOG.info("👉  Certificate available at '{}'", certPath.toAbsolutePath());
-
         } catch (IOException e) {
             throw new ApplicationException("Could not write certificate to file '{}'", certPath.toAbsolutePath());
         }
 
         LOG.info(
-                "💡 You can use now following environment variables to point the Webhook application to generated certificate");
-        LOG.info("💡 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE={}", keyPath.toAbsolutePath());
-        LOG.info("💡 QUARKUS_HTTP_SSL_CERTIFICATE_FILE={}", certPath.toAbsolutePath());
+                "\n👋 Webhook configuration in development mode. You can use following environment variables to point the Webhook application to generated certificate:\n");
+        LOG.info("👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE={}", keyPath.toAbsolutePath());
+        LOG.info("👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILE={}", certPath.toAbsolutePath());
     }
 
     private Deployment deployment() {
