@@ -1,0 +1,164 @@
+= Visual Studio Code
+
+include::common:partial$draft.adoc[]
+
+== Installation
+
+You can obtain vscode from the link:https://code.visualstudio.com/[official page].
+
+== Task Configuration
+
+Selecting task to run (Ctrl+Shift+P):
+
+image::vscode-run-task.png[vscode run tasks]
+
+Choosing the task to run:
+
+image::vscode-select-task.png[vscode select tasks]
+
+You can configure vscode to be able to automatically launch special tasks. Place
+the following configuration into `.vscode/tasks.json` file.
+
+[source,json]
+..vscode/tasks.json
+----
+// See https://go.microsoft.com/fwlink/?LinkId=733558
+// for the documentation about the tasks.json format
+{
+  "version": "2.0.0",
+  "inputs": [
+    {
+      "id": "agogos.cli.command",
+      "type": "promptString",
+      "default": "c list",
+      "description": "CLI command to debug"
+    }
+  ],
+  "tasks": [
+    {
+      "label": "cli",
+      "type": "shell",
+      "command": "./mvnw quarkus:dev -Ddebug=5010 -pl cli -am -Dquarkus.args='${input:agogos.cli.command}'",
+      "isBackground": true,
+      "problemMatcher": [
+        {
+          "pattern": [
+            {
+              "regexp": "\\b\\B",
+              "file": 1,
+              "location": 2,
+              "message": 3
+            }
+          ],
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": "^.*Scanning for projects...*",
+            "endsPattern": "^Installed features:*"
+          }
+        }
+      ]
+    },
+    {
+      "label": "operator",
+      "type": "shell",
+      "command": "./mvnw quarkus:dev -Ddebug=5015 -pl operator -am",
+      "isBackground": true,
+      "problemMatcher": [
+        {
+          "pattern": [
+            {
+              "regexp": "\\b\\B",
+              "file": 1,
+              "location": 2,
+              "message": 3
+            }
+          ],
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": "^.*Scanning for projects...*",
+            "endsPattern": "^.*Quarkus .* started in .*\\. Listening on:*"
+          }
+        }
+      ]
+    },
+    {
+      "label": "webhooks",
+      "type": "shell",
+      "command": "./mvnw quarkus:dev -Ddebug=5020 -pl webhooks -am",
+      "isBackground": true,
+      "problemMatcher": [
+        {
+          "pattern": [
+            {
+              "regexp": "\\b\\B",
+              "file": 1,
+              "location": 2,
+              "message": 3
+            }
+          ],
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": "^.*Scanning for projects...*",
+            "endsPattern": "^.*Quarkus .* started in .*\\. Listening on:*"
+          }
+        }
+      ]
+    },
+    {
+      "type": "gulp",
+      "task": "default",
+      "problemMatcher": [],
+      "label": "docs",
+      "options": {
+        "env": {
+          "LIVERELOAD": "true"
+        }
+      }
+    }
+  ]
+}
+----
+
+== Debug Launch Configuration
+
+image::vscode-launch-selection.png[vscode launch selection]
+
+To be able to launch debug tasks in the IDE you can add following content to the
+`.vscode/launch.json` file.
+
+[source,json]
+..vscode/launch.json
+----
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "preLaunchTask": "operator",
+      "type": "java",
+      "request": "attach",
+      "hostName": "localhost",
+      "name": "Debug Operator",
+      "port": 5015
+    },
+    {
+      "preLaunchTask": "cli",
+      "type": "java",
+      "request": "attach",
+      "hostName": "localhost",
+      "name": "Debug CLI",
+      "port": 5010
+    },
+    {
+      "preLaunchTask": "webhooks",
+      "type": "java",
+      "request": "attach",
+      "hostName": "localhost",
+      "name": "Debug Webhooks",
+      "port": 5020
+    }
+  ]
+}
+----
