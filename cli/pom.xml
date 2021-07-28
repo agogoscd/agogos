@@ -12,10 +12,6 @@
     <version>1.0-SNAPSHOT</version>
     <name>Agogos CLI</name>
 
-    <properties>
-        <bouncycastle.version>1.68</bouncycastle.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
