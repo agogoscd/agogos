@@ -1,4 +1,5 @@
 = Visual Studio Code
+:experimental: true
 
 include::common:partial$draft.adoc[]
 
@@ -8,7 +9,9 @@ You can obtain vscode from the link:https://code.visualstudio.com/[official page
 
 == Task Configuration
 
-Selecting task to run (Ctrl+Shift+P):
+TIP: Use the kbd:[Ctrl+Shift+P] keyboard shortcut and type: "run tasks".
+
+Selecting task to run:
 
 image::vscode-run-task.png[vscode run tasks]
 
@@ -18,6 +21,8 @@ image::vscode-select-task.png[vscode select tasks]
 
 You can configure vscode to be able to automatically launch special tasks. Place
 the following configuration into `.vscode/tasks.json` file.
+
+NOTE: Read more about vscode task configuration from the link:https://code.visualstudio.com/docs/editor/tasks[official documentation].
 
 [source,json]
 ..vscode/tasks.json
