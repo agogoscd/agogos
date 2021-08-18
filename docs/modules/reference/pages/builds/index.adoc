@@ -1,6 +1,5 @@
-= Contributing to Agogos
+= Builds
 
 include::common:partial$draft.adoc[]
 
 #TODO#
-

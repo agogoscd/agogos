@@ -1,6 +1,0 @@
-= Architecture
-
-include::common:partial$draft.adoc[]
-
-// TODO: Service account usage - single or multiple, what with pull secrets?
-// Secrets - make it possible to redefine

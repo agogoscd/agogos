@@ -1,0 +1,6 @@
+= Stages
+
+include::common:partial$draft.adoc[]
+
+// * link:stage-api{outfilesuffix}[Stage API]
+// * link:builder-tutorial{outfilesuffix}[Builder tutorial]

@@ -1,29 +1,6 @@
-= Triggers
+= Internals
 
 include::common:partial$draft.adoc[]
-
-TIP: To understand better Triggers you may want to read about xref:events/index.adoc[Events] first.
-
-Let's consider following Trigger definition:
-
-[source,yaml]
-----
-apiVersion: agogos.redhat.com/v1alpha1
-kind: Trigger
-metadata:
-  name: container-main
-spec:
-  events:
-    - build:
-        component: container-dep
-  target:
-    kind: Component
-    name: container-main
-----
-
-It creates a binding between a Component build event and another component
-so that when a Component with name `container-dep` builds successfully, the
-Trigger will kick the `container-main` Component build.
 
 == Internal Representation of Triggers
 
@@ -97,7 +74,7 @@ NOTE: See the xref:events/index.adoc#eventing-overview[overview diagram].
 
 #TODO#
 
-== Example
+== Resource Workflow
 
 Let's see now what's happening underneath.
 

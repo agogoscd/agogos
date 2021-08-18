@@ -1,6 +1,4 @@
-* xref:index.adoc[]
+* Getting Started
 
-** xref:first-steps.adoc[]
-
-** xref:installation/index.adoc[]
-*** xref:installation/manual.adoc[]
+** xref:overview.adoc[]
+** xref:cli.adoc[]
