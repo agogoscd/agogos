@@ -1,3 +1,0 @@
-= Apache Kafka
-
-include::common:partial$draft.adoc[]

@@ -1,10 +1,23 @@
-* xref:index.adoc[]
+* Reference
+
+** xref:overview.adoc[]
+
+** xref:builds/index.adoc[]
+*** xref:builds/results.adoc[]
+*** xref:builds/artifacts.adoc[]
 
 
-** xref:events/index.adoc[]
+** Events
+
+*** xref:events/overview.adoc[]
 *** xref:events/agogos.adoc[]
 
-** xref:triggers/index.adoc[]
+** Triggers
+
+*** xref:triggers/overview.adoc[]
+*** xref:triggers/internals.adoc[]
+*** xref:triggers/examples.adoc[]
+
 *** xref:triggers/build/index.adoc[]
 **** xref:triggers/build/component.adoc[]
 **** xref:triggers/build/group.adoc[]
@@ -13,4 +26,4 @@
 *** xref:triggers/timed.adoc[]
 *** xref:triggers/pipeline.adoc[]
 *** xref:triggers/event.adoc[]
-*** xref:triggers/examples.adoc[]
+

@@ -1,0 +1,89 @@
+= Build Results
+
+include::common:partial$draft.adoc[]
+
+[TIP]
+====
+Looking for xref:builds/artifacts.adoc[Build artifacts]?
+====
+
+A Build result is a short JSON-formatted content that describes the build output.
+Build results are created *automatically*.
+
+Structure and content depends on the xref:concepts:builders.adoc[Builder] implementation
+that created it. Please refer to the particular Builder documentation for more information
+about the Build result schema.
+
+[WARNING]
+====
+Build *result* is not the same as build *status*. Status describes the current state of the build
+(in progress, failed, etc) whereas results describes the output of the build, in most cases it contains
+pointers to xref:builds/artifacts.adoc[Build artifacts].
+====
+
+// TODO Implement this.
+
+Build results are stored in the `status` subresource of the Build resource in the `result` field:
+
+[source,yaml]
+----
+status:
+  completionTime: "2021-07-22T12:48:28Z"
+  lastUpdate: "2021-07-22T14:48:29+02:00"
+  reason: Build finished
+  startTime: "2021-07-22T12:47:58Z"
+  status: Finished
+  result:
+    build-id: 1235
+----
+
+You can use the `jq` command to retrieve the status after the build is finished:
+
+[source,bash]
+----
+❯ agogosctl b describe agogos-cli-4c9sp -o json | jq '.status.result'
+{
+  "build-id": 1235
+}
+----
+
+[WARNING]
+====
+Maximum size of a Build result is less than 4kB! You can find more information about this in the
+link:https://tekton.dev/docs/pipelines/tasks/#emitting-results[Tekton documentation for results].
+====
+
+== Using Build Results
+
+Build results are automatically *generated* (by Builders that support it) and automatically
+*exposed* for future consumption as well. It is Agogos responsibility to provide correct
+data at the Build or Pipeline execution.
+
+Build results are provided:
+
+1. For subsequent builds which have dependency on the current build, and
+2. Pipelines that work on the requested build
+
+Build results are exposed as files located in the workspace.
+
+[WARNING]
+====
+Mount point of the
+workspace is determined by the xref:concepts:builders.adoc[Builder] or
+xref:concepts:stages.adoc[Stage] implementations and may vary.
+Please consult the particular implementation documentation.
+====
+
+Below you can find an example file hierarchy with Build results.
+
+[source,bash]
+----
+[WORKSPACE ROOT]
+└── results
+    ├── component1 # Component name
+    │   └── build-653gfds # Build name
+    │       └── result.json # Build result file
+    └── component2
+        └── build-1gdf3y
+            └── result.json
+----

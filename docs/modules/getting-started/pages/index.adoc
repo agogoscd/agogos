@@ -1,5 +1,0 @@
-= Getting Started
-
-include::common:partial$draft.adoc[]
-
-#TODO#

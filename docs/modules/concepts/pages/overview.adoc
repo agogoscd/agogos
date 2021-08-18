@@ -1,5 +1,3 @@
-= Events
+= Overview
 
 include::common:partial$draft.adoc[]
-
-#TODO#

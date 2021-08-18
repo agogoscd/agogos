@@ -1,13 +1,21 @@
-= Visual Studio Code
+= IDE support
 :experimental: true
 
 include::common:partial$draft.adoc[]
 
-== Installation
+We provide instructions on how to set up the IDE so that it works the best with our
+codebase.
+
+* xref:ide.adoc#vscode[Visual Studio Code (vscode)]
+
+[#vscode]
+== Visual Studio Code
+
+=== Installation
 
 You can obtain vscode from the link:https://code.visualstudio.com/[official page].
 
-== Task Configuration
+=== Task Configuration
 
 TIP: Use the kbd:[Ctrl+Shift+P] keyboard shortcut and type: "run tasks".
 
@@ -124,7 +132,7 @@ NOTE: Read more about vscode task configuration from the link:https://code.visua
 }
 ----
 
-== Debug Launch Configuration
+=== Debug Launch Configuration
 
 image::vscode-launch-selection.png[vscode launch selection]
 

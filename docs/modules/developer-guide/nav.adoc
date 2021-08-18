@@ -1,11 +1,20 @@
-* Development
-// ** xref:contributing.adoc[]
+*// ** xref:contributing.adoc[]*
 
-** xref:environment.adoc[]
-** xref:running.adoc[]
+* Developer Guide
+
+** xref:overview.adoc[]
+
+** xref:contributing.adoc[]
+** xref:ide.adoc[]
+
+** xref:development-mode.adoc[]
+
 ** xref:testing/index.adoc[]
 
-// ** xref:stage/index.adoc[]
+** xref:stages/index.adoc[]
+
+** xref:builders/index.adoc[]
+
 // *** xref:stage/builder_tutorial.adoc[]
 // *** xref:stage/stage_api.adoc[]
 

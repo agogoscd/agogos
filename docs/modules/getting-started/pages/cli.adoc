@@ -1,0 +1,110 @@
+= Hello CLI!
+
+include::common:partial$draft.adoc[]
+
+The Agogos CLI -- `agogosctl` -- is a very important piece of the Agogos system. It is very powerful and
+in many cases required to properly use Agogos. For example you can use the CLI to install Agogos itself,
+create Components, run Builds or Pipelines.
+
+== Installation
+
+You can download the `agogosctl` binary from our CI:
+
+[source,bash]
+----
+❯ curl -L "https://gitlab.cee.redhat.com/agogos/agogos/-/jobs/artifacts/main/raw/cli/target/agogosctl?job=cli" -o agogosctl
+❯ chmod +x agogosctl
+----
+
+TIP: We suggest to place the `agogosctl` binary on your `PATH`.
+
+NOTE: Currently the binary size may be quite big. We will try to optimize it.
+
+[source,bash]
+----
+❯ agogosctl --help
+Usage: agogosctl [-hV] [-o=<output>] [COMMAND]
+  -h, --help              Show this help message and exit.
+  -o, --output=<output>   Output format, valid values: plain, yaml, json,
+                            default: plain.
+  -v, --verbose           
+  -V, --version           Print version information and exit.
+Commands:
+  adm                       Agogos administration commands
+  build, builds, b          Interact with builds
+  components, component, c  Interact with components
+  pipelines, pipeline, p    Interact with pipelines
+  runs, run, r              Interact with runs
+  triggers, trigger, t      Interact with triggers
+  stage, stages, stage      Interact with stages
+  builder, builders, bldr   Interact with builders
+  load, l                   Load agogos descriptors from files
+----
+
+== Basic commands
+
+Load a resource:
+
+[source,bash]
+----
+❯ agogosctl load -f resource.yaml
+----
+
+List components:
+
+[source,bash]
+----
+❯ agogosctl component list
+----
+
+Build a Component:
+
+[source,bash]
+----
+❯ agogosctl component build COMPONENT_NAME
+----
+
+Run a Pipeline:
+
+[source,bash]
+----
+❯ agogosctl pipeline run PIPELINE_NAME
+----
+
+== Gotchas
+
+[#managing-kubernetes-contexts]
+=== Managing contexts
+
+Kubernetes contexts are managed globally. This means that any time you will have
+one active context.
+
+[NOTE]
+====
+Kubernetes documentation references:
+
+* link:https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/[Organizing Cluster Access Using kubeconfig Files]
+* link:https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/[Configure Access to Multiple Clusters]
+====
+
+After starting Minikube, the current context is switched to `minikube`. This means
+that any commands executed using `kubectl` or `oc` will be run against your local
+Minikube cluster.
+
+There are many ways how multiple contexts can be managed, two of them:
+
+1. Manage contexts with `kubectl config` commands
++
+To switch to a different use the `kubectl config use-context` command.
+To list all available contexts run `kubectl config get-contexts`.
+2. Use separate kubeconfig files for different use cases and control it via `KUBECONFIG` environment variable.
+
+#TODO#
+
+* Register a builder (dev / admin)
+* Register a component (user)
+* Run a build (user)
+* Register a stage (dev / admin)
+* Create a pipeline (user)
+* Run pipeline (user)
+* Create a trigger (user)

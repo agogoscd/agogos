@@ -1,4 +1,4 @@
-= Triggers
+= Overview
 
 This guide will help you understand how Triggers work and what are the best
 practices related to Triggers.
@@ -6,14 +6,12 @@ practices related to Triggers.
 == Introduction
 
 Every xref:concepts:builds.adoc[Build] or xref:concepts:pipelines.adoc[Pipeline] can be run manually but this is not sufficient for automated systems.
-
-This is where Triggers come into play.
+This is where xref:concepts:triggers.adoc[Triggers] come into play.
 
 Triggers are a way to define *when* a particular Pipeline (or Build) should be run.
 
 A Trigger is a binding between some event in the system and some action. Defined action
-is performed only when an event meets the required criteria defined by the Trigger
-making Triggers event filters.
+is performed only when an event meets the required criteria defined by the Trigger.
 
 Most common actions are:
 
@@ -58,7 +56,28 @@ trigger2 -> pipeline [color="#a83232",penwidth="2",label="Run"];
 There are multiple event types within the system and there are multiple Trigger types
 as well to cover these cases.
 
-Triggers are defined using the xref:concepts:triggers.adoc[Trigger resource].
+TIP: To understand better Triggers you may want to read about xref:events/overview.adoc[Events] first.
+
+Let's consider following Trigger definition:
+
+[source,yaml]
+----
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Trigger
+metadata:
+  name: container-main
+spec:
+  events:
+    - build:
+        component: container-dep
+  target:
+    kind: Component
+    name: container-main
+----
+
+It creates a binding between a Component build event and another component
+so that when a Component with name `container-dep` builds successfully, the
+Trigger will kick the `container-main` Component build.
 
 [#multiple-triggers]
 
@@ -66,7 +85,7 @@ Triggers are defined using the xref:concepts:triggers.adoc[Trigger resource].
 
 Every resource that supports triggers can have multiple triggers defined. Multiple
 triggers specified on the same resource are *evaluated separately*. This means that
-every time a _Trigger_ defined on the resource will be satisfied -- the resource
+every time a Trigger defined on the resource will be satisfied -- the resource
 wil be triggered.
 
 WARNING: In case of misconfiguration -- resource can be triggered *multiple times* because of the same event.
@@ -75,9 +94,13 @@ WARNING: In case of misconfiguration -- resource can be triggered *multiple time
 
 Resource that can be defined as Trigger targets:
 
-* xref:concepts:components.adoc[Component] -- a new build will be started
-* xref:concepts:pipelines.adoc[Pipeline] -- a new run will be executed
+* xref:concepts:components.adoc[Component] -- a new build will of specified Component be started
+* xref:concepts:pipelines.adoc[Pipeline] -- specified Pipeline will be run
 
 == Examples
 
-The xref:reference:triggers/examples.adoc[examples page] contains examples usage of _Triggers_.
+The xref:reference:triggers/examples.adoc[examples page] contains examples usage of Triggers.
+
+== More Information
+
+If you want to know more on how Triggers are implemented, we have a xref:triggers/internals.adoc[document describing this].
