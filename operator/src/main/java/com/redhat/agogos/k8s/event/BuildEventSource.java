@@ -3,6 +3,7 @@ package com.redhat.agogos.k8s.event;
 import com.redhat.agogos.k8s.Resource;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Build;
+import com.redhat.agogos.v1alpha1.Component;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
@@ -20,6 +21,11 @@ public class BuildEventSource extends AbstractTektonEventSource<Build> {
 
     @Inject
     AgogosClient agogosClient;
+
+    @Override
+    protected String getResourceName() {
+        return HasMetadata.getKind(Component.class).toLowerCase();
+    }
 
     @Override
     protected Build createResource(PipelineRun pipelineRun) {

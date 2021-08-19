@@ -54,9 +54,9 @@ public class KnativeEventingInstaller extends Installer {
 
         String releaseLabel = "eventing.knative.dev/release";
 
-        kubernetesClient.admissionRegistration().v1().validatingWebhookConfigurations().inNamespace(NAMESPACE)
+        kubernetesClient.admissionRegistration().v1().validatingWebhookConfigurations()
                 .withLabel(releaseLabel).delete();
-        kubernetesClient.admissionRegistration().v1().mutatingWebhookConfigurations().inNamespace(NAMESPACE)
+        kubernetesClient.admissionRegistration().v1().mutatingWebhookConfigurations()
                 .withLabel(releaseLabel)
                 .delete();
 

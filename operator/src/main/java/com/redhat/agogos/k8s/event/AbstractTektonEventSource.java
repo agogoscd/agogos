@@ -7,12 +7,15 @@ import io.fabric8.kubernetes.api.model.ObjectMetaBuilder;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
 import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.javaoperatorsdk.operator.processing.event.AbstractEventSource;
+import io.quarkus.runtime.StartupEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import java.util.List;
@@ -27,6 +30,57 @@ public abstract class AbstractTektonEventSource<T extends HasMetadata> extends A
     protected abstract T createResource(PipelineRun pipelineRun);
 
     protected abstract boolean isOwner(OwnerReference ownerReference);
+
+    /**
+     * <p>
+     * Returns name of the type of the resource in lower case. For example:
+     * "component", "pipeline".
+     * </p>
+     * 
+     * @return String type of the resource
+     */
+    protected abstract String getResourceName();
+
+    /**
+     * <p>
+     * Method responsible for creating an informer for the Tekton {@link PipelineRun} with
+     * the <code>agogos.redhat.com/resource</code> label set to a value that is supported by the
+     * final implementation of the {@link AbstractTektonEventSource} class.
+     * </p>
+     * 
+     * <p>
+     * This method is run immediately after the bean is initialized.
+     * </p>
+     * 
+     */
+    void watch(@Observes StartupEvent ev) {
+        tektonClient.v1beta1().pipelineRuns().inAnyNamespace()
+                // We are interested only in resources which have exact value set in the particular label
+                .withLabelIn(Resource.RESOURCE.getLabel(), getResourceName())
+                .inform(new ResourceEventHandler<PipelineRun>() {
+
+                    @Override
+                    public void onAdd(PipelineRun pipelineRun) {
+                        handleEvent(pipelineRun, true);
+
+                    }
+
+                    @Override
+                    public void onUpdate(PipelineRun oldPipelineRun, PipelineRun pipelineRun) {
+                        handleEvent(pipelineRun, false);
+
+                    }
+
+                    @Override
+                    public void onDelete(PipelineRun pipelineRun, boolean deletedFinalStateUnknown) {
+                        LOG.debug("PipelineRun '{}' (related to {} resource) deleted from '{}' namespace, ignoring",
+                                pipelineRun.getMetadata().getName(),
+                                getResourceName(),
+                                pipelineRun.getMetadata().getNamespace());
+
+                    }
+                });
+    }
 
     /**
      * <p>
@@ -80,7 +134,7 @@ public abstract class AbstractTektonEventSource<T extends HasMetadata> extends A
         return true;
     }
 
-    public void handleEvent(Resource type, PipelineRun pipelineRun, boolean isNew) {
+    public void handleEvent(PipelineRun pipelineRun, boolean isNew) {
         if (!isEventValid(pipelineRun)) {
             return;
         }

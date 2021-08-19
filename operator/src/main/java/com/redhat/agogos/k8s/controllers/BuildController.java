@@ -68,5 +68,4 @@ public class BuildController extends AbstractController<Build> {
 
         return component;
     }
-
 }
