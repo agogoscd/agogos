@@ -5,7 +5,7 @@ import io.fabric8.knative.internal.pkg.apis.Condition;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRunResult;
-import io.javaoperatorsdk.operator.processing.event.AbstractEvent;
+import io.javaoperatorsdk.operator.processing.event.DefaultEvent;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @ToString
-public class PipelineRunEvent extends AbstractEvent {
+public class PipelineRunEvent extends DefaultEvent {
     @Getter
     PipelineRun pipelineRun;
 
