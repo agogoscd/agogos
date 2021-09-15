@@ -10,12 +10,12 @@ import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.ComponentList;
 import com.redhat.agogos.v1alpha1.Group;
 import com.redhat.agogos.v1alpha1.GroupList;
+import com.redhat.agogos.v1alpha1.Handler;
+import com.redhat.agogos.v1alpha1.HandlerList;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.PipelineList;
 import com.redhat.agogos.v1alpha1.Run;
 import com.redhat.agogos.v1alpha1.RunList;
-import com.redhat.agogos.v1alpha1.SourceHandler;
-import com.redhat.agogos.v1alpha1.SourceHandlerList;
 import com.redhat.agogos.v1alpha1.Stage;
 import com.redhat.agogos.v1alpha1.StageList;
 import com.redhat.agogos.v1alpha1.TriggerList;
@@ -39,59 +39,59 @@ public class V1alpha1APIGroupClient implements V1alpha1APIGroup {
     @Override
     @Produces
     public MixedOperation<Build, BuildList, Resource<Build>> builds() {
-        return kubernetesClient.customResources(Build.class, BuildList.class);
+        return kubernetesClient.resources(Build.class, BuildList.class);
     }
 
     @Override
     @Produces
     public MixedOperation<Component, ComponentList, Resource<Component>> components() {
-        return kubernetesClient.customResources(Component.class, ComponentList.class);
+        return kubernetesClient.resources(Component.class, ComponentList.class);
     }
 
     @Override
     @Produces
     public MixedOperation<Pipeline, PipelineList, Resource<Pipeline>> pipelines() {
-        return kubernetesClient.customResources(Pipeline.class, PipelineList.class);
+        return kubernetesClient.resources(Pipeline.class, PipelineList.class);
     }
 
     @Override
     @Produces
     public MixedOperation<Run, RunList, Resource<Run>> runs() {
-        return kubernetesClient.customResources(Run.class, RunList.class);
+        return kubernetesClient.resources(Run.class, RunList.class);
     }
 
     @Override
     @Produces
     public MixedOperation<Trigger, TriggerList, Resource<Trigger>> triggers() {
-        return kubernetesClient.customResources(Trigger.class, TriggerList.class);
+        return kubernetesClient.resources(Trigger.class, TriggerList.class);
     }
 
     @Override
     @Produces
     public MixedOperation<ClusterStage, ClusterStageList, Resource<ClusterStage>> clusterstages() {
-        return kubernetesClient.customResources(ClusterStage.class, ClusterStageList.class);
+        return kubernetesClient.resources(ClusterStage.class, ClusterStageList.class);
     }
 
     @Override
     @Produces
     public MixedOperation<Stage, StageList, Resource<Stage>> stages() {
-        return kubernetesClient.customResources(Stage.class, StageList.class);
+        return kubernetesClient.resources(Stage.class, StageList.class);
     }
 
     @Override
     @Produces
     public MixedOperation<Builder, BuilderList, Resource<Builder>> builders() {
-        return kubernetesClient.customResources(Builder.class, BuilderList.class);
+        return kubernetesClient.resources(Builder.class, BuilderList.class);
     }
 
     @Override
     public MixedOperation<Group, GroupList, Resource<Group>> groups() {
-        return kubernetesClient.customResources(Group.class, GroupList.class);
+        return kubernetesClient.resources(Group.class, GroupList.class);
     }
 
     @Override
-    public MixedOperation<SourceHandler, SourceHandlerList, Resource<SourceHandler>> sourcehandlers() {
-        return kubernetesClient.customResources(SourceHandler.class, SourceHandlerList.class);
+    public MixedOperation<Handler, HandlerList, Resource<Handler>> handlers() {
+        return kubernetesClient.resources(Handler.class, HandlerList.class);
     }
 
 }

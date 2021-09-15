@@ -10,12 +10,12 @@ import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.ComponentList;
 import com.redhat.agogos.v1alpha1.Group;
 import com.redhat.agogos.v1alpha1.GroupList;
+import com.redhat.agogos.v1alpha1.Handler;
+import com.redhat.agogos.v1alpha1.HandlerList;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.PipelineList;
 import com.redhat.agogos.v1alpha1.Run;
 import com.redhat.agogos.v1alpha1.RunList;
-import com.redhat.agogos.v1alpha1.SourceHandler;
-import com.redhat.agogos.v1alpha1.SourceHandlerList;
 import com.redhat.agogos.v1alpha1.Stage;
 import com.redhat.agogos.v1alpha1.StageList;
 import com.redhat.agogos.v1alpha1.TriggerList;
@@ -42,5 +42,5 @@ public interface V1alpha1APIGroup {
 
     MixedOperation<Group, GroupList, Resource<Group>> groups();
 
-    MixedOperation<SourceHandler, SourceHandlerList, Resource<SourceHandler>> sourcehandlers();
+    MixedOperation<Handler, HandlerList, Resource<Handler>> handlers();
 }

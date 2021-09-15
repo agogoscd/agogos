@@ -37,45 +37,76 @@ spec:
               type: object
               description: ComponentSpec defines the desired state of Component
               properties:
-                data:
+                pre:
+                  type: array
+                  description: "List of Handlers that should be executed before the build"
+                  items:
+                    type: object
+                    properties:
+                      handlerRef:
+                        type: object
+                        description: Handler reference
+                        properties:
+                          name:
+                            type: string
+                            description: Name of the Handler
+                        required: ["name"]
+                      params:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                        description: "Parameters that should be passed to the Handler implementation"
+                      config:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                        description: "Additional configuration that should be passed to the Handler implementation"
+                    required: ["handlerRef"]
+
+                post:
+                  type: array
+                  description: "List of Handlers that should be executed after the build"
+                  items:
+                    type: object
+                    properties:
+                      handlerRef:
+                        type: object
+                        description: Handler reference
+                        properties:
+                          name:
+                            type: string
+                            description: Name of the Handler
+                        required: ["name"]
+                      params:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                        description: "Parameters that should be passed to the Handler implementation"
+                      config:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                        description: "Additional configuration that should be passed to the Handler implementation"
+                    required: ["handlerRef"]
+
+                build:
                   type: object
-                  x-kubernetes-preserve-unknown-fields: true
-                  description:
-                    "Additional data containing the information about the Component.
-                    It can be metadata as well as source coordinates.
-                    This content needs to be supported by the particular builder
-                    used to build this component. Builder defines schema that this
-                    content is checked against."
-                builderRef:
-                  type: object
-                  description: Defines the builder reference
                   properties:
-                    name:
-                      type: string
-                      description: Name of the builder being referenced.
-                    kind:
-                      type: string
-                      description: The kind. Can be either builder or ClusterBuilder
-                source:
-                  description: Information about the source code
-                  type: object
-                  properties:
-                    handlerRef:
+                    builderRef:
                       type: object
-                      description: Selected SourceHandler
+                      description: Builder reference
                       properties:
                         name:
                           type: string
-                          description: Name of the SourceHandler
-                    data:
+                          description: Name of the Builder
+                        kind:
+                          type: string
+                          description: Type of the Builder
+                          default:
+                      required: ["name", "kind"]
+                    params:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
-                      description: "Additional data that should be passed to the SourceHandler"
-                  required: ["handlerRef"]
-
+                      description: "Parameters that should be passed to the Builder implementation"
+                  required: ["builderRef"]
               required:
-                - "data"
-                - "builderRef"
+                - "build"
             status:
               description: ComponentStatus defines the observed state of Component
               properties:

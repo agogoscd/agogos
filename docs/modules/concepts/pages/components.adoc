@@ -6,9 +6,8 @@ Component is a concept that describes a single buildable element.
 
 We can identify following Component's tasks:
 
-. Define where the source is located
 . Define what xref:builders.adoc[Builder] should be used to build it
-. Optionally define data influencing xref:builders.adoc[Builder's] behavior
+. Optionally provide a list of pre and post xref:handlers.adoc[Handlers]
 
 Component is an abstract concept which is not directly tied to any build tool
 that should be used to build the source code. This is where xref:builders.adoc[Builders]
@@ -41,3 +40,13 @@ builder -> artifact1;
 builder -> artifact2;
 }
 ....
+
+A xref:builds.adoc[Build] object is created every time a new build of a Component
+is executed. Builds contain 
+
+== Example Component Definition
+
+[source,yaml]
+----
+include::example$component.yaml[]
+----

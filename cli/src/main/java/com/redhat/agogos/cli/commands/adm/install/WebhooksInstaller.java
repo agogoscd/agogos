@@ -6,6 +6,7 @@ import com.redhat.agogos.cli.commands.adm.certs.CertProvider;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Component;
+import com.redhat.agogos.v1alpha1.Handler;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.ContainerPortBuilder;
@@ -212,7 +213,8 @@ public class WebhooksInstaller extends Installer {
                 .withOperations("CREATE", "UPDATE")
                 .withApiGroups("agogos.redhat.com") //
                 .withApiVersions("v1alpha1")//
-                .withResources(HasMetadata.getPlural(Build.class), HasMetadata.getPlural(Component.class)) //
+                .withResources(HasMetadata.getPlural(Build.class), HasMetadata.getPlural(Component.class),
+                        HasMetadata.getPlural(Handler.class)) //
                 .withScope("*") //
                 .build();
 

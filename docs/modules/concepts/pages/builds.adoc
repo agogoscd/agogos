@@ -1,3 +1,7 @@
 = Builds
 
 include::common:partial$draft.adoc[]
+
+Build object is created each time a xref:component.adoc[Component] is built.
+
+Build objects contain references to artifacts produced by the build process.

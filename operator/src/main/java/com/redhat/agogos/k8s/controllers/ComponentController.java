@@ -1,5 +1,7 @@
 package com.redhat.agogos.k8s.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.ResourceStatus;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
@@ -7,7 +9,8 @@ import com.redhat.agogos.k8s.Resource;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
-import com.redhat.agogos.v1alpha1.SourceHandler;
+import com.redhat.agogos.v1alpha1.ComponentHandlerSpec;
+import com.redhat.agogos.v1alpha1.Handler;
 import com.redhat.agogos.v1alpha1.Status;
 import com.redhat.agogos.v1alpha1.WorkspaceMapping;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -16,6 +19,7 @@ import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.ArrayOrString;
 import io.fabric8.tekton.pipeline.v1beta1.ClusterTask;
+import io.fabric8.tekton.pipeline.v1beta1.ParamSpec;
 import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineResult;
@@ -56,6 +60,7 @@ public class ComponentController implements ResourceController<Component> {
     private static final Logger LOG = LoggerFactory.getLogger(ComponentController.class);
 
     private static final String BUILD_PIPELINE_INIT_TASK_NAME = "init";
+    private static final String BUILD_PIPELINE_ARTIFACT_TASK_NAME_PREFIX = "artifact-";
     private static final String BUILD_PIPELINE_SOURCE_TASK_NAME = "fetch-source";
     private static final String BUILD_PIPELINE_BUILDER_TASK_NAME = "build";
 
@@ -70,6 +75,9 @@ public class ComponentController implements ResourceController<Component> {
 
     @Inject
     TektonClient tektonClient;
+
+    @Inject
+    ObjectMapper objectMapper;
 
     /**
      * <p>
@@ -225,7 +233,7 @@ public class ComponentController implements ResourceController<Component> {
      * @param defaultWorkspace
      * @return
      */
-    private List<WorkspacePipelineTaskBinding> workspaceBindings(List<WorkspaceMapping> mappings, String defaultWorkspace) {
+    private List<WorkspacePipelineTaskBinding> workspaceBindings(List<WorkspaceMapping> mappings) {
         List<WorkspacePipelineTaskBinding> workspaceBindings = new ArrayList<>();
 
         if (mappings == null || mappings.isEmpty()) {
@@ -240,8 +248,8 @@ public class ComponentController implements ResourceController<Component> {
                 String targetWorkspaceName = BUILD_PIPELINE_SOURCE_TASK_WORKSPACE_NAME;
 
                 // Handle workspace mappings, if provided
-                if (workspaceMapping.getTarget() != null) {
-                    targetWorkspaceName = workspaceMapping.getTarget();
+                if (workspaceMapping.getName() != null) {
+                    targetWorkspaceName = workspaceMapping.getName();
                 }
 
                 WorkspacePipelineTaskBinding pipelineTaskBinding = new WorkspacePipelineTaskBindingBuilder() //
@@ -257,71 +265,59 @@ public class ComponentController implements ResourceController<Component> {
         return workspaceBindings;
     }
 
-    private PipelineTask prepareSourceHandlerTask(List<PipelineTask> tasks, Component component) {
-        SourceHandler sourceHandler = null;
+    private void prepareHandlerTasks(Component component, List<ComponentHandlerSpec> handlers, List<PipelineTask> tasks) {
+        handlers.stream().forEach(handlerSpec -> {
+            String handlerName = handlerSpec.getHandlerRef().getName();
 
-        // In case the source handler is specified in the Component, validate if it exists in the system
-        // TODO: Add this to validation webhook as well
+            Handler handler = agogosClient.v1alpha1().handlers().inNamespace(component.getMetadata().getNamespace())
+                    .withName(handlerName).get();
 
-        String sourceHandlerName = component.getSpec().getSource().getHandlerRef().getName();
+            Task handlerTask = tektonClient.v1beta1().tasks().inNamespace(component.getMetadata().getNamespace())
+                    .withName(handler.getSpec().getTaskRef().getName()).get();
 
-        if (sourceHandlerName == null) {
-            return null;
-        }
+            PipelineTask lastTask = tasks.get(tasks.size() - 1);
 
-        sourceHandler = agogosClient.v1alpha1().sourcehandlers().inNamespace(component.getMetadata().getNamespace())
-                .withName(sourceHandlerName).get();
+            PipelineTaskBuilder pipelineTaskBuilder = new PipelineTaskBuilder() //
+                    .withName(handlerName) //
+                    .withRunAfter(lastTask.getName()) //
+                    .withTaskRef(
+                            new TaskRefBuilder().withName(handlerTask.getMetadata().getName())
+                                    .withApiVersion(handlerTask.getApiVersion())
+                                    .withKind(handlerTask.getKind())
+                                    .build()) //
+                    .withWorkspaces(
+                            workspaceBindings(handler.getSpec().getWorkspaces()));
 
-        if (sourceHandler == null) {
-            throw new MissingResourceException(
-                    "Selected SourceHandler '{}' requested by '{}' Component is not found",
-                    component.getSpec().getSource().getHandlerRef().getName(), component.getFullName());
-        }
+            addParams(pipelineTaskBuilder, handlerTask.getSpec().getParams(), handlerSpec.getParams());
 
-        Task sourceHandlerTask = tektonClient.v1beta1().tasks().inNamespace(component.getMetadata().getNamespace())
-                .withName(sourceHandler.getSpec().getTaskRef().getName()).get();
+            PipelineTask pipelineTask = pipelineTaskBuilder.build();
 
-        if (sourceHandlerTask == null) {
-            throw new MissingResourceException(
-                    "Task '{}' being implementation of SourceHandler '{}' requested by '{}' Component is not found",
-                    sourceHandler.getSpec().getTaskRef().getName(),
-                    component.getSpec().getSource().getHandlerRef().getName(), component.getFullName());
-        }
-
-        PipelineTask lastTask = tasks.get(tasks.size() - 1);
-
-        PipelineTaskBuilder pipelineTaskBuilder = new PipelineTaskBuilder() //
-                .withName(BUILD_PIPELINE_SOURCE_TASK_NAME) //
-                .withRunAfter(lastTask.getName()) //
-                .withTaskRef(
-                        new TaskRefBuilder().withName(sourceHandlerTask.getMetadata().getName())
-                                .withApiVersion(sourceHandlerTask.getApiVersion())
-                                .withKind(sourceHandlerTask.getKind())
-                                .build()) //
-                .withWorkspaces(
-                        workspaceBindings(sourceHandler.getSpec().getWorkspaces(), BUILD_PIPELINE_SOURCE_TASK_WORKSPACE_NAME));
-
-        sourceHandlerTask.getSpec().getParams().forEach(p -> {
-            Object value = component.getSpec().getSource().getData().get(p.getName());
-
-            if (value != null) {
-                pipelineTaskBuilder.addNewParam().withName(p.getName()).withNewValue(value.toString()).endParam();
-            }
+            tasks.add(pipelineTask);
         });
-
-        PipelineTask pipelineTask = pipelineTaskBuilder.build();
-
-        tasks.add(pipelineTask);
-
-        return pipelineTask;
     }
 
-    private PipelineTask prepareBuilderTask(List<PipelineTask> tasks, Component component) {
-        Builder builder = agogosClient.v1alpha1().builders().withName(component.getSpec().getBuilderRef().getName()).get();
+    private boolean isListOfStrings(List<Object> array) {
+        boolean strings = true;
+
+        for (Object e : array) {
+            if (!(e instanceof String)) {
+                strings = false;
+                break;
+            }
+        }
+
+        return strings;
+    }
+
+    private PipelineTask prepareBuilderTask(Component component, List<PipelineTask> tasks) {
+        String builderName = component.getSpec().getBuild().getBuilderRef().getName();
+
+        Builder builder = agogosClient.v1alpha1().builders().withName(builderName)
+                .get();
 
         if (builder == null) {
             throw new MissingResourceException("Selected Builder '{}' is not available in the system",
-                    component.getSpec().getBuilderRef().getName());
+                    builderName);
         }
 
         // TODO: ClusterTask support?
@@ -332,7 +328,7 @@ public class ComponentController implements ResourceController<Component> {
             throw new MissingResourceException(
                     "Task '{}' being implementation of Builder '{}' requested by '{}' Component is not found",
                     builder.getSpec().getTaskRef().getName(),
-                    component.getSpec().getBuilderRef().getName(), component.getFullName());
+                    builderName, component.getFullName());
         }
 
         PipelineTask lastTask = tasks.get(tasks.size() - 1);
@@ -348,30 +344,44 @@ public class ComponentController implements ResourceController<Component> {
                 .withName(BUILD_PIPELINE_BUILDER_TASK_NAME) //
                 .withTaskRef(buildTaskRef)
                 .withWorkspaces(
-                        workspaceBindings(builder.getSpec().getWorkspaces(), BUILD_PIPELINE_BUILDER_TASK_WORKSPACE_NAME)) //
+                        workspaceBindings(builder.getSpec().getWorkspaces())) //
                 .withRunAfter(lastTask.getName());
 
-        builderTask.getSpec().getParams().forEach(p -> {
-            Object value = component.getSpec().getData().get(p.getName());
-
-            if (value != null) {
-                ArrayOrString converted;
-
-                if (value instanceof List) {
-                    converted = new ArrayOrString((List) value);
-                } else {
-                    converted = new ArrayOrString(value.toString());
-                }
-
-                pipelineTaskBuilder.addNewParam().withName(p.getName()).withValue(converted).endParam();
-            }
-        });
+        addParams(pipelineTaskBuilder, builderTask.getSpec().getParams(), component.getSpec().getBuild().getParams());
 
         PipelineTask pipelineTask = pipelineTaskBuilder.build();
 
         tasks.add(pipelineTask);
 
         return pipelineTask;
+    }
+
+    private void addParams(PipelineTaskBuilder pipelineTaskBuilder, List<ParamSpec> taskParams, Map<String, Object> params) {
+        taskParams.forEach(p -> {
+            Object value = params.get(p.getName());
+
+            if (value == null) {
+                return;
+            }
+
+            ArrayOrString converted = null;
+
+            if (value instanceof List && isListOfStrings((List<Object>) value)) {
+                converted = new ArrayOrString((List) value);
+            } else if (value instanceof String) {
+                converted = new ArrayOrString(value.toString());
+            } else {
+                try {
+                    converted = new ArrayOrString(
+                            objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(value));
+                } catch (JsonProcessingException e) {
+                    throw new ApplicationException("Could not convert '{}' parameter to JSON", p.getName(), e);
+                }
+            }
+
+            pipelineTaskBuilder.addNewParam().withName(p.getName()).withValue(converted).endParam();
+
+        });
     }
 
     /**
@@ -385,17 +395,19 @@ public class ComponentController implements ResourceController<Component> {
      * @throws ApplicationException in case the pipeline cannot be updated
      */
     private Pipeline updateTektonBuildPipeline(Component component) throws ApplicationException {
-
         List<PipelineTask> tasks = new ArrayList<>();
 
         // Add the init task
         prepareInitTask(tasks, component);
 
-        // Add SourceHandler task reference if SourceHandler was specified
-        prepareSourceHandlerTask(tasks, component);
+        // Add any pre Handlers
+        prepareHandlerTasks(component, component.getSpec().getPre(), tasks);
 
         // Finally add the Builder task
-        PipelineTask buildTask = prepareBuilderTask(tasks, component);
+        PipelineTask buildTask = prepareBuilderTask(component, tasks);
+
+        // Add any post Handlers
+        prepareHandlerTasks(component, component.getSpec().getPost(), tasks);
 
         // Define main workspace
         PipelineWorkspaceDeclaration workspaceMain = new PipelineWorkspaceDeclarationBuilder() //

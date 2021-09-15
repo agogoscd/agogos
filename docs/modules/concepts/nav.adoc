@@ -3,7 +3,7 @@
 ** xref:components.adoc[]
 ** xref:builds.adoc[]
 ** xref:groups.adoc[]
-** xref:source-handlers.adoc[]
+** xref:handlers.adoc[]
 ** xref:builders.adoc[]
 ** xref:stages.adoc[]
 ** xref:pipelines.adoc[]

@@ -8,7 +8,7 @@ import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.test.CRDTestServerSetup;
 import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
-import com.redhat.agogos.v1alpha1.Component.BuilderRef;
+import com.redhat.agogos.v1alpha1.ComponentBuilderSpec.BuilderRef;
 import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.ClusterTask;
@@ -67,7 +67,7 @@ public class ComponentControllerTest {
         Component component = new Component();
         component.getMetadata().setNamespace("default");
         component.getMetadata().setName("test-fail");
-        component.getSpec().setBuilderRef(new BuilderRef("some-builder-name"));
+        component.getSpec().getBuild().setBuilderRef(new BuilderRef("some-builder-name"));
 
         Context<Component> context = withCustomResourceModifiedEvent(component);
 
@@ -88,7 +88,7 @@ public class ComponentControllerTest {
         Component component = new Component();
         component.getMetadata().setNamespace("default");
         component.getMetadata().setName("test-create");
-        component.getSpec().setBuilderRef(new BuilderRef("should-handle-component-builder-name"));
+        component.getSpec().getBuild().setBuilderRef(new BuilderRef("should-handle-component-builder-name"));
 
         Context<Component> context = withCustomResourceModifiedEvent(component);
 
