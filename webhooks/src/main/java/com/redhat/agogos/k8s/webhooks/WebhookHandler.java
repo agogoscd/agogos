@@ -4,8 +4,10 @@ import com.redhat.agogos.k8s.webhooks.mutator.BuildMutator;
 import com.redhat.agogos.k8s.webhooks.mutator.RunMutator;
 import com.redhat.agogos.k8s.webhooks.validator.BuildValidator;
 import com.redhat.agogos.k8s.webhooks.validator.ComponentValidator;
+import com.redhat.agogos.k8s.webhooks.validator.HandlerValidator;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Component;
+import com.redhat.agogos.v1alpha1.Handler;
 import com.redhat.agogos.v1alpha1.Run;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReview;
@@ -32,6 +34,9 @@ public class WebhookHandler {
     ComponentValidator componentValidator;
 
     @Inject
+    HandlerValidator handlerValidator;
+
+    @Inject
     BuildValidator buildValidator;
 
     @Inject
@@ -50,6 +55,10 @@ public class WebhookHandler {
 
         if (resource instanceof Component) {
             return componentValidator.validate(admissionReview);
+        }
+
+        if (resource instanceof Handler) {
+            return handlerValidator.validate(admissionReview);
         }
 
         // If there is no specific handling needed, allow the request

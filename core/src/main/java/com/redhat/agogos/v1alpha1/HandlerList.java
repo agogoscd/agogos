@@ -6,7 +6,7 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @JsonDeserialize
 @RegisterForReflection
-public class SourceHandlerList extends CustomResourceList<SourceHandler> {
+public class HandlerList extends CustomResourceList<Handler> {
 
     private static final long serialVersionUID = -4327366831588566317L;
 

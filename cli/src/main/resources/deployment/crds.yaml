@@ -74,17 +74,14 @@ spec:
                   items:
                     type: object
                     properties:
-                      source:
-                        type: string
-                        description: "Name of the Agogos exposed workspace"
-                      target:
+                      name:
                         type: string
                         description: "Name of the target pipeline in the Task implementation"
                       subPath:
                         type: string
                         description: "Subpath on the source workspace that should be exposed as the target workspace"
                     required:
-                      - "target"
+                      - "name"
               required:
                 - "taskRef"
             status:
@@ -326,45 +323,76 @@ spec:
               type: object
               description: ComponentSpec defines the desired state of Component
               properties:
-                data:
+                pre:
+                  type: array
+                  description: "List of Handlers that should be executed before the build"
+                  items:
+                    type: object
+                    properties:
+                      handlerRef:
+                        type: object
+                        description: Handler reference
+                        properties:
+                          name:
+                            type: string
+                            description: Name of the Handler
+                        required: ["name"]
+                      params:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                        description: "Parameters that should be passed to the Handler implementation"
+                      config:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                        description: "Additional configuration that should be passed to the Handler implementation"
+                    required: ["handlerRef"]
+
+                post:
+                  type: array
+                  description: "List of Handlers that should be executed after the build"
+                  items:
+                    type: object
+                    properties:
+                      handlerRef:
+                        type: object
+                        description: Handler reference
+                        properties:
+                          name:
+                            type: string
+                            description: Name of the Handler
+                        required: ["name"]
+                      params:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                        description: "Parameters that should be passed to the Handler implementation"
+                      config:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                        description: "Additional configuration that should be passed to the Handler implementation"
+                    required: ["handlerRef"]
+
+                build:
                   type: object
-                  x-kubernetes-preserve-unknown-fields: true
-                  description:
-                    "Additional data containing the information about the Component.
-                    It can be metadata as well as source coordinates.
-                    This content needs to be supported by the particular builder
-                    used to build this component. Builder defines schema that this
-                    content is checked against."
-                builderRef:
-                  type: object
-                  description: Defines the builder reference
                   properties:
-                    name:
-                      type: string
-                      description: Name of the builder being referenced.
-                    kind:
-                      type: string
-                      description: The kind. Can be either builder or ClusterBuilder
-                source:
-                  description: Information about the source code
-                  type: object
-                  properties:
-                    handlerRef:
+                    builderRef:
                       type: object
-                      description: Selected SourceHandler
+                      description: Builder reference
                       properties:
                         name:
                           type: string
-                          description: Name of the SourceHandler
-                    data:
+                          description: Name of the Builder
+                        kind:
+                          type: string
+                          description: Type of the Builder
+                          default:
+                      required: ["name", "kind"]
+                    params:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
-                      description: "Additional data that should be passed to the SourceHandler"
-                  required: ["handlerRef"]
-
+                      description: "Parameters that should be passed to the Builder implementation"
+                  required: ["builderRef"]
               required:
-                - "data"
-                - "builderRef"
+                - "build"
             status:
               description: ComponentStatus defines the observed state of Component
               properties:
@@ -450,6 +478,114 @@ spec:
           type: object
       served: true
       storage: true
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: handlers.agogos.redhat.com
+spec:
+  group: agogos.redhat.com
+  names:
+    kind: Handler
+    listKind: HandlerList
+    plural: handlers
+    singular: handler
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: Handler is the schema to define a custom handler that can be executed as part of the build process
+          properties:
+            apiVersion:
+              description:
+                "APIVersion defines the versioned schema of this representation
+                of an object. Servers should convert recognized schemas to the latest
+                internal value, and may reject unrecognized values.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
+              type: string
+            kind:
+              description:
+                "Kind is a string value representing the REST resource this
+                object represents. Servers may infer this from the endpoint the client
+                submits requests to. Cannot be updated. In CamelCase.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              description: Defines the desired state of Handler
+              properties:
+                taskRef:
+                  type: object
+                  description: Defines the task reference
+                  properties:
+                    name:
+                      type: string
+                      description: Name of the Tekton task being the implementation of the Handler.
+                    kind:
+                      type: string
+                      description: The Handler Tekton task implementation type. Can be either Task or ClusterTask. By default it is Task.
+                      default: Task
+                      enum:
+                        - Task
+                        - ClusterTask
+                    url:
+                      type: string
+                      description: A URL to a Task definition
+                  oneOf:
+                    - required: ["name", "kind"]
+                    - required: ["url"]
+                schema:
+                  type: object
+                  description: Validation definition that should be applied on the Handler configuration passed.
+                  properties:
+                    openAPIV3Schema:
+                      x-kubernetes-preserve-unknown-fields: true
+                      type: object
+                      description: "OpenAPI v3 formatted validation.
+                        More info: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md"
+                  required:
+                    - "openAPIV3Schema"
+
+                workspaces:
+                  type: array
+                  description: "List of workspace mappings between Agogos workspace and Task being the implementation of Handler"
+                  items:
+                    type: object
+                    properties:
+                      # source:
+                      #   type: string
+                      #   description: "Name of the Agogos exposed workspace"
+                      name:
+                        type: string
+                        description: "Name of the target pipeline in the Task implementation"
+                      subPath:
+                        type: string
+                        description: "Subpath on the source workspace that should be exposed as the target workspace"
+                    required:
+                      - "name"
+              required:
+                - "taskRef"
+            status:
+              description: HandlerStatus defines the observed state of Handler
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -639,114 +775,6 @@ spec:
         - name: Status
           jsonPath: .status.status
           type: string
-        - name: Age
-          type: date
-          jsonPath: .metadata.creationTimestamp
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []
----
-apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
-metadata:
-  name: sourcehandlers.agogos.redhat.com
-spec:
-  group: agogos.redhat.com
-  names:
-    kind: SourceHandler
-    listKind: SourceHandlerList
-    plural: sourcehandlers
-    singular: sourcehandler
-  scope: Cluster
-  versions:
-    - name: v1alpha1
-      schema:
-        openAPIV3Schema:
-          description: SourceHandler is the schema to define a handler for particular SCM type
-          properties:
-            apiVersion:
-              description:
-                "APIVersion defines the versioned schema of this representation
-                of an object. Servers should convert recognized schemas to the latest
-                internal value, and may reject unrecognized values.
-                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
-              type: string
-            kind:
-              description:
-                "Kind is a string value representing the REST resource this
-                object represents. Servers may infer this from the endpoint the client
-                submits requests to. Cannot be updated. In CamelCase.
-                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
-              type: string
-            metadata:
-              type: object
-            spec:
-              type: object
-              description: Defines the desired state of SourceHandler
-              properties:
-                taskRef:
-                  type: object
-                  description: Defines the task reference
-                  properties:
-                    name:
-                      type: string
-                      description: Name of the Tekton task being the implementation of the SourceHandler.
-                    kind:
-                      type: string
-                      description: The SourceHandler Tekton task implementation type. Can be either Task or ClusterTask. By default it is Task.
-                      default: Task
-                      enum:
-                        - Task
-                        - ClusterTask
-                    url:
-                      type: string
-                      description: A URL to a Task definition
-                  oneOf:
-                    - required: ["name", "kind"]
-                    - required: ["url"]
-                schema:
-                  type: object
-                  description: Validation definition that should be applied on the SourceHandler configuration passed.
-                  properties:
-                    openAPIV3Schema:
-                      x-kubernetes-preserve-unknown-fields: true
-                      type: object
-                      description: "OpenAPI v3 formatted validation.
-                        More info: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md"
-                  required:
-                    - "openAPIV3Schema"
-
-                workspaces:
-                  type: array
-                  description: "List of workspace mappings between Agogos workspaces and Task being the implementation of SourceHandler"
-                  items:
-                    type: object
-                    properties:
-                      source:
-                        type: string
-                        description: "Name of the Agogos exposed workspace"
-                      target:
-                        type: string
-                        description: "Name of the target pipeline in the Task implementation"
-                      subPath:
-                        type: string
-                        description: "Subpath on the source workspace that should be exposed as the target workspace"
-                    required:
-                      - "target"
-              required:
-                - "taskRef"
-            status:
-              description: SourceHandlerStatus defines the observed state of SourceHandler
-              type: object
-          type: object
-      served: true
-      storage: true
-      subresources:
-        status: {}
-      additionalPrinterColumns:
         - name: Age
           type: date
           jsonPath: .metadata.creationTimestamp

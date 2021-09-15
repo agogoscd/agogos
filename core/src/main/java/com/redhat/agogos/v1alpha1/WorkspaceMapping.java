@@ -21,21 +21,12 @@ public class WorkspaceMapping implements KubernetesResource {
 
     /**
      * <p>
-     * Name of the source workspace (provided by Agogos).
-     * </p>
-     */
-    @Getter
-    @Setter
-    private String source = MAIN_WORKSPACE_NAME;
-
-    /**
-     * <p>
      * Name of the target workspace (declared in the Task).
      * </p>
      */
     @Getter
     @Setter
-    private String target;
+    private String name;
 
     /**
      * <p>

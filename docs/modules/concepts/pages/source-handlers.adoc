@@ -1,9 +1,0 @@
-= Source Handlers
-
-include::common:partial$draft.adoc[]
-
-Source Handlers are responsible for providing the source of a xref:components.adoc[Component]
-so that it can be used xref:builders.adoc[Builder].
-
-In most cases Source Handlers will fetch the source code from a repository, but it's not a
-requirement.

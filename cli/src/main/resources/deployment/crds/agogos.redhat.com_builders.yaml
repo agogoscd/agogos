@@ -74,17 +74,14 @@ spec:
                   items:
                     type: object
                     properties:
-                      source:
-                        type: string
-                        description: "Name of the Agogos exposed workspace"
-                      target:
+                      name:
                         type: string
                         description: "Name of the target pipeline in the Task implementation"
                       subPath:
                         type: string
                         description: "Subpath on the source workspace that should be exposed as the target workspace"
                     required:
-                      - "target"
+                      - "name"
               required:
                 - "taskRef"
             status:
