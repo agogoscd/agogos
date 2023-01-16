@@ -10,7 +10,9 @@ import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.base.OperationContext;
 import io.fabric8.kubernetes.client.dsl.internal.GenericKubernetesResourceOperationsImpl;
-import io.fabric8.kubernetes.client.utils.HttpClientUtils;
+import io.fabric8.kubernetes.client.http.HttpClient;
+import io.fabric8.kubernetes.client.okhttp.OkHttpClientFactory;
+import io.fabric8.kubernetes.client.okhttp.OkHttpClientImpl;
 import io.quarkus.runtime.StartupEvent;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import okhttp3.OkHttpClient;
@@ -81,10 +83,15 @@ public class ResourceLoader {
      * Used for connecting to the Kubernetes API directly.
      */
     OkHttpClient okHttpClient;
+    HttpClient httpClient;
 
     void init(@Observes StartupEvent ev) {
         // Prepare the http client based on the Kubernetes client configuration
-        okHttpClient = HttpClientUtils.createHttpClient(kubernetesClient.getConfiguration());
+        // TODO: Replace this with the new HttpClient to avoid using OkHttpClient directly
+        OkHttpClientImpl clientImpl = new OkHttpClientFactory().createHttpClient(kubernetesClient.getConfiguration());
+
+        okHttpClient = clientImpl.getOkHttpClient();
+        httpClient = clientImpl;
     }
 
     @SuppressWarnings("unchecked")
@@ -341,7 +348,7 @@ public class ResourceLoader {
 
             OperationContext ctx = new OperationContext() //
                     .withConfig(kubernetesClient.getConfiguration())
-                    .withOkhttpClient(okHttpClient) //
+                    .withHttpClient(httpClient) //
                     .withPlural(mapping.getPlural()) //
                     .withPropagationPolicy(DeletionPropagation.FOREGROUND) //
                     .withApiGroupName(mapping.getGroup()) //
