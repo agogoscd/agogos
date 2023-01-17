@@ -10,6 +10,7 @@ import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
 import io.javaoperatorsdk.operator.api.reconciler.EventSourceContext;
+import io.javaoperatorsdk.operator.api.reconciler.EventSourceInitializer;
 import io.javaoperatorsdk.operator.processing.event.source.EventSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import java.util.List;
+import java.util.Map;
 
 @ApplicationScoped
 @ControllerConfiguration(generationAwareEventProcessing = false)
@@ -39,9 +40,11 @@ public class BuildController extends AbstractController<Build> {
      * </p>
      */
     @Override
-    public List<EventSource> prepareEventSources(EventSourceContext<Build> context) {
-        return List.of(buildEventSource);
+    public Map<String, EventSource> prepareEventSources(EventSourceContext<Build> context) {
+        return Map.of(EventSourceInitializer.generateNameFor(buildEventSource), buildEventSource);
     }
+
+    //Map<String, EventSource> prepareEventSources(EventSourceContext<P> context);
 
     /**
      * <p>
@@ -53,7 +56,7 @@ public class BuildController extends AbstractController<Build> {
      * @return {@link DeleteControl}
      */
     @Override
-    public DeleteControl cleanup(Build build, Context context) {
+    public DeleteControl cleanup(Build build, Context<Build> context) {
         return DeleteControl.defaultDelete();
     }
 

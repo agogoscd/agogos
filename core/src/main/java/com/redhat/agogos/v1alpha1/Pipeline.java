@@ -38,7 +38,7 @@ public class Pipeline extends AgogosResource<PipelineSpec, Status> implements Na
         @JsonDeserialize(using = JsonDeserializer.None.class)
         @RegisterForReflection
         public static class StageEntry implements KubernetesResource {
-            private static final long serialVersionUID = -7474791004592310761L;
+            private static final long serialVersionUID = -7474791004555510761L;
 
             @Getter
             @Setter
@@ -67,6 +67,7 @@ public class Pipeline extends AgogosResource<PipelineSpec, Status> implements Na
             @Setter
             private String kind;
 
+            @JsonIgnore // TODO: Double check if this works, added brcause of: Caused by: java.lang.IllegalArgumentException: Found a cyclic reference involving the field stages of type com.redhat.agogos.v1alpha1.Pipeline$PipelineSpec.StageEntry
             @JsonBackReference
             @Getter
             @Setter

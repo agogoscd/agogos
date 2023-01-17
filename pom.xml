@@ -32,15 +32,15 @@
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
         <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
         <failsafe-plugin.version>3.0.0-M5</failsafe-plugin.version>
-        <operator-framework.version>2.1.4</operator-framework.version>
         <cloudevents.version>2.2.0</cloudevents.version>
         <openapi-schema-validator.version>1.0.5</openapi-schema-validator.version>
         <lombok.version>1.18.16</lombok.version>
         <quarkus-tekton-client.version>0.5.0</quarkus-tekton-client.version>
         <bouncycastle.version>1.69</bouncycastle.version>
 
-        <quarkus.platform.version>2.3.1.Final</quarkus.platform.version>
-        <quarkus-operatorsdk.version>3.0.9</quarkus-operatorsdk.version>
+        <quarkus.platform.version>2.13.6.Final</quarkus.platform.version>
+        <operator-framework.version>3.2.4</operator-framework.version>
+        <quarkus-operatorsdk.version>4.0.6</quarkus-operatorsdk.version>
         <kubernetes-client.version>5.12.4</kubernetes-client.version>
     </properties>
 

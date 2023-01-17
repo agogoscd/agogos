@@ -12,6 +12,7 @@ import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.ResultableStatus;
 import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
+import io.javaoperatorsdk.operator.api.reconciler.Cleaner;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.EventSourceInitializer;
 import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
@@ -31,7 +32,7 @@ import java.util.UUID;
 
 @ApplicationScoped
 public abstract class AbstractController<T extends AgogosResource<?, ResultableStatus>>
-        implements Reconciler<T>, EventSourceInitializer<T> {
+        implements Reconciler<T>, EventSourceInitializer<T>, Cleaner<T> {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractController.class);
 
     @Inject
@@ -171,7 +172,7 @@ public abstract class AbstractController<T extends AgogosResource<?, ResultableS
      * @param resource
      */
     @Override
-    public UpdateControl<T> reconcile(T resource, Context context) {
+    public UpdateControl<T> reconcile(T resource, Context<T> context) {
 
         Optional<PipelineRun> pipelineRun = context.getSecondaryResource(PipelineRun.class);
 

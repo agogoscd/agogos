@@ -33,6 +33,7 @@ import io.fabric8.tekton.pipeline.v1beta1.TaskRef;
 import io.fabric8.tekton.pipeline.v1beta1.TaskRefBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBinding;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBindingBuilder;
+import io.javaoperatorsdk.operator.api.reconciler.Cleaner;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
@@ -53,7 +54,7 @@ import java.util.Map;
 
 @ApplicationScoped
 @ControllerConfiguration
-public class ComponentController implements Reconciler<Component> {
+public class ComponentController implements Reconciler<Component>, Cleaner<Component> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ComponentController.class);
 
@@ -88,7 +89,7 @@ public class ComponentController implements Reconciler<Component> {
      * @return {@link DeleteControl}
      */
     @Override
-    public DeleteControl cleanup(Component component, Context context) {
+    public DeleteControl cleanup(Component component, Context<Component> context) {
         LOG.info("Removing component '{}'", component.getFullName());
         return DeleteControl.defaultDelete();
     }
@@ -104,7 +105,7 @@ public class ComponentController implements Reconciler<Component> {
      * @return {@link UpdateControl}
      */
     @Override
-    public UpdateControl<Component> reconcile(Component component, Context context) {
+    public UpdateControl<Component> reconcile(Component component, Context<Component> context) {
         return onResourceUpdate(component, context);
     }
 
@@ -135,7 +136,7 @@ public class ComponentController implements Reconciler<Component> {
      * </p>
      */
     private UpdateControl<Component> onResourceUpdate(Component component,
-            Context context) {
+            Context<Component> context) {
         LOG.info("Component '{}' modified", component.getFullName());
 
         try {

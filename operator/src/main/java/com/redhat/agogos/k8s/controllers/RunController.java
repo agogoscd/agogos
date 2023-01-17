@@ -10,6 +10,7 @@ import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
 import io.javaoperatorsdk.operator.api.reconciler.EventSourceContext;
+import io.javaoperatorsdk.operator.api.reconciler.EventSourceInitializer;
 import io.javaoperatorsdk.operator.processing.event.source.EventSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,7 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import java.util.List;
+import java.util.Map;
 
 @ApplicationScoped
 @ControllerConfiguration(generationAwareEventProcessing = false)
@@ -32,13 +33,13 @@ public class RunController extends AbstractController<Run> {
     RunEventSource runEventSource;
 
     @Override
-    public DeleteControl cleanup(Run run, Context context) {
+    public DeleteControl cleanup(Run run, Context<Run> context) {
         return DeleteControl.defaultDelete();
     }
 
     @Override
-    public List<EventSource> prepareEventSources(EventSourceContext<Run> context) {
-        return List.of(runEventSource);
+    public Map<String, EventSource> prepareEventSources(EventSourceContext<Run> context) {
+        return Map.of(EventSourceInitializer.generateNameFor(runEventSource), runEventSource);
     }
 
     @Override

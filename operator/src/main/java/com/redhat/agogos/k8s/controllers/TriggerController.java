@@ -22,6 +22,7 @@ import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.fabric8.tekton.triggers.v1alpha1.TriggerBuilder;
 import io.fabric8.tekton.triggers.v1alpha1.TriggerSpecBuilder;
+import io.javaoperatorsdk.operator.api.reconciler.Cleaner;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
@@ -39,7 +40,7 @@ import java.util.Map;
 
 @ApplicationScoped
 @ControllerConfiguration
-public class TriggerController implements Reconciler<Trigger> {
+public class TriggerController implements Reconciler<Trigger>, Cleaner<Trigger> {
 
     private static final Logger LOG = LoggerFactory.getLogger(TriggerController.class);
 
@@ -56,7 +57,7 @@ public class TriggerController implements Reconciler<Trigger> {
     TriggerEventScheduler scheduler;
 
     @Override
-    public DeleteControl cleanup(Trigger trigger, Context context) {
+    public DeleteControl cleanup(Trigger trigger, Context<Trigger> context) {
         trigger.getSpec().getEvents().forEach(event -> {
             // For TimedTriggerEvents we need to schedule these ourselves
             // Currently Tekton Triggers do not support cron-like format
@@ -73,7 +74,7 @@ public class TriggerController implements Reconciler<Trigger> {
     }
 
     @Override
-    public UpdateControl<Trigger> reconcile(Trigger trigger, Context context) {
+    public UpdateControl<Trigger> reconcile(Trigger trigger, Context<Trigger> context) {
         LOG.info("Trigger '{}' modified", trigger.getMetadata().getName());
 
         updateTrigger(trigger);

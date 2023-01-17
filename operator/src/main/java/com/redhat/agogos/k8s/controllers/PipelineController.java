@@ -21,6 +21,7 @@ import io.fabric8.tekton.pipeline.v1beta1.PipelineWorkspaceDeclarationBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.TaskRefBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBinding;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBindingBuilder;
+import io.javaoperatorsdk.operator.api.reconciler.Cleaner;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
@@ -37,7 +38,7 @@ import java.util.List;
 
 @ApplicationScoped
 @ControllerConfiguration
-public class PipelineController implements Reconciler<Pipeline> {
+public class PipelineController implements Reconciler<Pipeline>, Cleaner<Pipeline> {
 
     private static final Logger LOG = LoggerFactory.getLogger(PipelineController.class);
 
@@ -51,13 +52,13 @@ public class PipelineController implements Reconciler<Pipeline> {
     ObjectMapper objectMapper;
 
     @Override
-    public DeleteControl cleanup(Pipeline resource, Context context) {
+    public DeleteControl cleanup(Pipeline resource, Context<Pipeline> context) {
         LOG.info("Pipeline '{}' deleted", resource.getNamespacedName());
         return DeleteControl.defaultDelete();
     }
 
     @Override
-    public UpdateControl<Pipeline> reconcile(Pipeline pipeline, Context context) {
+    public UpdateControl<Pipeline> reconcile(Pipeline pipeline, Context<Pipeline> context) {
         LOG.info("Pipeline '{}' modified", pipeline.getNamespacedName());
 
         // Prepare workspace for main task to share content between steps

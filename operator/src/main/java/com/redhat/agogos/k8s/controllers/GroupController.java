@@ -1,6 +1,7 @@
 package com.redhat.agogos.k8s.controllers;
 
 import com.redhat.agogos.v1alpha1.Group;
+import io.javaoperatorsdk.operator.api.reconciler.Cleaner;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
@@ -11,7 +12,7 @@ import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 @ControllerConfiguration
-public class GroupController implements Reconciler<Group> {
+public class GroupController implements Reconciler<Group>, Cleaner<Group> {
 
     @Override
     public UpdateControl<Group> reconcile(Group resource,
@@ -20,7 +21,7 @@ public class GroupController implements Reconciler<Group> {
     }
 
     @Override
-    public DeleteControl cleanup(Group resource, Context context) {
+    public DeleteControl cleanup(Group resource, Context<Group> context) {
         return DeleteControl.defaultDelete();
     }
 
