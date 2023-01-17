@@ -12,10 +12,10 @@ import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.ResultableStatus;
 import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
-import io.javaoperatorsdk.operator.api.Context;
-import io.javaoperatorsdk.operator.api.ResourceController;
-import io.javaoperatorsdk.operator.api.UpdateControl;
-import io.javaoperatorsdk.operator.processing.event.internal.CustomResourceEvent;
+import io.javaoperatorsdk.operator.api.reconciler.Context;
+import io.javaoperatorsdk.operator.api.reconciler.EventSourceInitializer;
+import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
+import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +30,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
-public abstract class AbstractController<T extends AgogosResource<?, ResultableStatus>> implements ResourceController<T> {
+public abstract class AbstractController<T extends AgogosResource<?, ResultableStatus>>
+        implements Reconciler<T>, EventSourceInitializer<T> {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractController.class);
 
     @Inject
@@ -102,15 +103,12 @@ public abstract class AbstractController<T extends AgogosResource<?, ResultableS
 
                 LOG.info("Cleaning up Tekton PipelineRun '{}' after a successful build", pipelineRunName);
 
-                boolean deleted = tektonClient.v1beta1().pipelineRuns()
+                // This may or may not remove the Tekton PipelineRun
+                // In case it is not successful (for any reason) it will be hanging there.
+                // It is the ops duty to find out why these were not removed and clean them up.
+                tektonClient.v1beta1().pipelineRuns()
                         .inNamespace(event.getPipelineRun().getMetadata().getNamespace())
                         .withName(event.getPipelineRun().getMetadata().getName()).delete();
-
-                if (deleted) {
-                    LOG.info("Tekton PipelineRun '{}' successfully cleaned up", pipelineRunName);
-                } else {
-                    LOG.warn("Could not remote '{}' Tekton PipelineRun", pipelineRunName);
-                }
 
                 break;
             case FAILED:
@@ -152,7 +150,7 @@ public abstract class AbstractController<T extends AgogosResource<?, ResultableS
         LOG.debug("Updating {} '{}' with Tekton PipelineRun state '{}'", resource.getKind(), resource.getFullName(),
                 event.getStatus());
 
-        return UpdateControl.updateStatusSubResource(resource);
+        return UpdateControl.updateStatus(resource);
     }
 
     private ResultableStatus deepCopy(ResultableStatus status) {
@@ -173,21 +171,15 @@ public abstract class AbstractController<T extends AgogosResource<?, ResultableS
      * @param resource
      */
     @Override
-    public UpdateControl<T> createOrUpdateResource(T resource, Context<T> context) {
+    public UpdateControl<T> reconcile(T resource, Context context) {
 
-        Optional<CustomResourceEvent> crEvent = context.getEvents().getLatestOfType(CustomResourceEvent.class);
+        Optional<PipelineRun> pipelineRun = context.getSecondaryResource(PipelineRun.class);
 
-        if (crEvent.isPresent()) {
+        if (!pipelineRun.isPresent()) {
             return handleResourceChange(resource);
         }
-
-        Optional<PipelineRunEvent> pipelineRunEvent = context.getEvents().getLatestOfType(PipelineRunEvent.class);
-
-        if (pipelineRunEvent.isPresent()) {
-            return handlePipelineRunEvent(resource, pipelineRunEvent.get());
-        }
-
-        return UpdateControl.noUpdate();
+        // TODO: This is a piece of code to let me easier upgrade Operator SDK. This should be updated in the future.
+        return handlePipelineRunEvent(resource, new PipelineRunEvent(pipelineRun.get()));
     }
 
     public UpdateControl<T> handleResourceChange(T resource) {
@@ -214,7 +206,7 @@ public abstract class AbstractController<T extends AgogosResource<?, ResultableS
             resource.getStatus().setReason(ex.getMessage());
             resource.getStatus().setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
 
-            return UpdateControl.updateStatusSubResource(resource);
+            return UpdateControl.updateStatus(resource);
         }
 
         return UpdateControl.noUpdate();
@@ -257,7 +249,7 @@ public abstract class AbstractController<T extends AgogosResource<?, ResultableS
             resource.getStatus().setReason(String.format("Parent resource '%s' is not ready", parent.getFullName()));
             resource.getStatus().setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
 
-            return UpdateControl.updateStatusSubResource(resource);
+            return UpdateControl.updateStatus(resource);
         }
 
         LOG.info("Handling new {} '{}', triggering new Tekton PipelineRun for this resource", resource.getKind(),
@@ -284,7 +276,7 @@ public abstract class AbstractController<T extends AgogosResource<?, ResultableS
             resource.getStatus().setReason(String.format("Could not prepare resource, ERROR: %s", error));
             resource.getStatus().setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
 
-            return UpdateControl.updateStatusSubResource(resource);
+            return UpdateControl.updateStatus(resource);
         }
 
         // Add the 'pipelinerun' label to Agogos resource to point to new Tekton
@@ -294,6 +286,6 @@ public abstract class AbstractController<T extends AgogosResource<?, ResultableS
         // Update resource with new label
         resource.getMetadata().setLabels(labels);
 
-        return UpdateControl.updateCustomResource(resource);
+        return UpdateControl.updateResource(resource);
     }
 }

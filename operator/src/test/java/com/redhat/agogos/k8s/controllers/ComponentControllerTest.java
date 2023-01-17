@@ -9,17 +9,14 @@ import com.redhat.agogos.test.CRDTestServerSetup;
 import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.ComponentBuilderSpec.BuilderRef;
-import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.ClusterTask;
 import io.fabric8.tekton.pipeline.v1beta1.ClusterTaskBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.ParamSpecBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.Task;
 import io.fabric8.tekton.pipeline.v1beta1.TaskBuilder;
-import io.javaoperatorsdk.operator.api.Context;
-import io.javaoperatorsdk.operator.api.UpdateControl;
-import io.javaoperatorsdk.operator.processing.event.EventList;
-import io.javaoperatorsdk.operator.processing.event.internal.CustomResourceEvent;
+import io.javaoperatorsdk.operator.api.reconciler.Context;
+import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,8 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.inject.Inject;
-
-import java.util.List;
 
 @WithKubernetesTestServer(setup = CRDTestServerSetup.class)
 @QuarkusTest
@@ -43,15 +38,6 @@ public class ComponentControllerTest {
 
     @Inject
     TektonClient tektonClient;
-
-    private Context<Component> withCustomResourceModifiedEvent(Component component) {
-        Context<Component> context = Mockito.mock(Context.class);
-
-        CustomResourceEvent event = new CustomResourceEvent(Watcher.Action.MODIFIED, component, null);
-        Mockito.when(context.getEvents()).thenReturn(new EventList(List.of(event)));
-
-        return context;
-    }
 
     @BeforeEach
     void registerInitTask() {
@@ -69,17 +55,17 @@ public class ComponentControllerTest {
         component.getMetadata().setName("test-fail");
         component.getSpec().getBuild().setBuilderRef(new BuilderRef("some-builder-name"));
 
-        Context<Component> context = withCustomResourceModifiedEvent(component);
+        Context context = Mockito.mock(Context.class);
 
-        UpdateControl<Component> control = componentController.createOrUpdateResource(component, context);
+        UpdateControl<Component> control = componentController.reconcile(component, context);
 
-        assertFalse(control.isUpdateCustomResource());
-        assertFalse(control.isUpdateCustomResourceAndStatusSubResource());
-        assertTrue(control.isUpdateStatusSubResource());
+        assertFalse(control.isUpdateResource());
+        assertFalse(control.isUpdateResourceAndStatus());
+        assertTrue(control.isUpdateStatus());
 
-        assertEquals("Failed", control.getCustomResource().getStatus().getStatus());
+        assertEquals("Failed", control.getResource().getStatus().getStatus());
         assertEquals("Could not create Component: Selected Builder 'some-builder-name' is not available in the system",
-                control.getCustomResource().getStatus().getReason());
+                control.getResource().getStatus().getReason());
     }
 
     @Test
@@ -90,7 +76,7 @@ public class ComponentControllerTest {
         component.getMetadata().setName("test-create");
         component.getSpec().getBuild().setBuilderRef(new BuilderRef("should-handle-component-builder-name"));
 
-        Context<Component> context = withCustomResourceModifiedEvent(component);
+        Context context = Mockito.mock(Context.class);
 
         Task task = new TaskBuilder().withNewMetadata().withName("should-handle-component").endMetadata().withNewSpec()
                 .withParams(new ParamSpecBuilder().withName("param").build()).endSpec().build();
@@ -103,14 +89,14 @@ public class ComponentControllerTest {
         // Create the builder, we will need it later
         agogosClient.v1alpha1().builders().create(builder);
 
-        UpdateControl<Component> control = componentController.createOrUpdateResource(component, context);
+        UpdateControl<Component> control = componentController.reconcile(component, context);
 
-        assertFalse(control.isUpdateCustomResource());
-        assertFalse(control.isUpdateCustomResourceAndStatusSubResource());
-        assertTrue(control.isUpdateStatusSubResource());
+        assertFalse(control.isUpdateResource());
+        assertFalse(control.isUpdateResourceAndStatus());
+        assertTrue(control.isUpdateStatus());
 
-        assertEquals("Component is ready", control.getCustomResource().getStatus().getReason());
-        assertEquals("Ready", control.getCustomResource().getStatus().getStatus());
+        assertEquals("Component is ready", control.getResource().getStatus().getReason());
+        assertEquals("Ready", control.getResource().getStatus().getStatus());
 
     }
 }

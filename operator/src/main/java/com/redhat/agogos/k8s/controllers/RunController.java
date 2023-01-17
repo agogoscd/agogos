@@ -6,18 +6,21 @@ import com.redhat.agogos.k8s.event.RunEventSource;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.Run;
-import io.javaoperatorsdk.operator.api.Context;
-import io.javaoperatorsdk.operator.api.Controller;
-import io.javaoperatorsdk.operator.api.DeleteControl;
-import io.javaoperatorsdk.operator.processing.event.EventSourceManager;
+import io.javaoperatorsdk.operator.api.reconciler.Context;
+import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
+import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
+import io.javaoperatorsdk.operator.api.reconciler.EventSourceContext;
+import io.javaoperatorsdk.operator.processing.event.source.EventSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import java.util.List;
+
 @ApplicationScoped
-@Controller(generationAwareEventProcessing = false)
+@ControllerConfiguration(generationAwareEventProcessing = false)
 public class RunController extends AbstractController<Run> {
 
     private static final Logger LOG = LoggerFactory.getLogger(RunController.class);
@@ -29,13 +32,13 @@ public class RunController extends AbstractController<Run> {
     RunEventSource runEventSource;
 
     @Override
-    public DeleteControl deleteResource(Run run, Context<Run> context) {
-        return DeleteControl.DEFAULT_DELETE;
+    public DeleteControl cleanup(Run run, Context context) {
+        return DeleteControl.defaultDelete();
     }
 
     @Override
-    public void init(EventSourceManager eventSourceManager) {
-        eventSourceManager.registerEventSource("pipeline", runEventSource);
+    public List<EventSource> prepareEventSources(EventSourceContext<Run> context) {
+        return List.of(runEventSource);
     }
 
     @Override

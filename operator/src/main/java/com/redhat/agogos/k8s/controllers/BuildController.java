@@ -6,18 +6,21 @@ import com.redhat.agogos.k8s.event.BuildEventSource;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Component;
-import io.javaoperatorsdk.operator.api.Context;
-import io.javaoperatorsdk.operator.api.Controller;
-import io.javaoperatorsdk.operator.api.DeleteControl;
-import io.javaoperatorsdk.operator.processing.event.EventSourceManager;
+import io.javaoperatorsdk.operator.api.reconciler.Context;
+import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
+import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
+import io.javaoperatorsdk.operator.api.reconciler.EventSourceContext;
+import io.javaoperatorsdk.operator.processing.event.source.EventSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import java.util.List;
+
 @ApplicationScoped
-@Controller(generationAwareEventProcessing = false)
+@ControllerConfiguration(generationAwareEventProcessing = false)
 public class BuildController extends AbstractController<Build> {
 
     private static final Logger LOG = LoggerFactory.getLogger(BuildController.class);
@@ -36,8 +39,8 @@ public class BuildController extends AbstractController<Build> {
      * </p>
      */
     @Override
-    public void init(EventSourceManager eventSourceManager) {
-        eventSourceManager.registerEventSource("component", buildEventSource);
+    public List<EventSource> prepareEventSources(EventSourceContext<Build> context) {
+        return List.of(buildEventSource);
     }
 
     /**
@@ -50,8 +53,8 @@ public class BuildController extends AbstractController<Build> {
      * @return {@link DeleteControl}
      */
     @Override
-    public DeleteControl deleteResource(Build build, Context<Build> context) {
-        return DeleteControl.DEFAULT_DELETE;
+    public DeleteControl cleanup(Build build, Context context) {
+        return DeleteControl.defaultDelete();
     }
 
     @Override
@@ -68,4 +71,5 @@ public class BuildController extends AbstractController<Build> {
 
         return component;
     }
+
 }

@@ -33,12 +33,11 @@ import io.fabric8.tekton.pipeline.v1beta1.TaskRef;
 import io.fabric8.tekton.pipeline.v1beta1.TaskRefBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBinding;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBindingBuilder;
-import io.javaoperatorsdk.operator.api.Context;
-import io.javaoperatorsdk.operator.api.Controller;
-import io.javaoperatorsdk.operator.api.DeleteControl;
-import io.javaoperatorsdk.operator.api.ResourceController;
-import io.javaoperatorsdk.operator.api.UpdateControl;
-import io.javaoperatorsdk.operator.processing.event.internal.CustomResourceEvent;
+import io.javaoperatorsdk.operator.api.reconciler.Context;
+import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
+import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
+import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
+import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,11 +50,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @ApplicationScoped
-@Controller
-public class ComponentController implements ResourceController<Component> {
+@ControllerConfiguration
+public class ComponentController implements Reconciler<Component> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ComponentController.class);
 
@@ -90,9 +88,9 @@ public class ComponentController implements ResourceController<Component> {
      * @return {@link DeleteControl}
      */
     @Override
-    public DeleteControl deleteResource(Component component, Context<Component> context) {
+    public DeleteControl cleanup(Component component, Context context) {
         LOG.info("Removing component '{}'", component.getFullName());
-        return DeleteControl.DEFAULT_DELETE;
+        return DeleteControl.defaultDelete();
     }
 
     /**
@@ -106,21 +104,8 @@ public class ComponentController implements ResourceController<Component> {
      * @return {@link UpdateControl}
      */
     @Override
-    public UpdateControl<Component> createOrUpdateResource(Component component,
-            Context<Component> context) {
-
-        // TODO: Trigger this method when used source handler was updated, implement event sources for source handlers
-
-        // Try to find the latest event
-        final Optional<CustomResourceEvent> customResourceEvent = context.getEvents()
-                .getLatestOfType(CustomResourceEvent.class);
-
-        // Handle it if available
-        if (customResourceEvent.isPresent()) {
-            return onResourceUpdate(component, context);
-        }
-
-        return UpdateControl.noUpdate();
+    public UpdateControl<Component> reconcile(Component component, Context context) {
+        return onResourceUpdate(component, context);
     }
 
     /**
@@ -150,7 +135,7 @@ public class ComponentController implements ResourceController<Component> {
      * </p>
      */
     private UpdateControl<Component> onResourceUpdate(Component component,
-            Context<Component> context) {
+            Context context) {
         LOG.info("Component '{}' modified", component.getFullName());
 
         try {
@@ -167,7 +152,7 @@ public class ComponentController implements ResourceController<Component> {
             setStatus(component, ResourceStatus.Failed, "Could not create Component: " + e.getMessage());
         }
 
-        return UpdateControl.updateStatusSubResource(component);
+        return UpdateControl.updateStatus(component);
     }
 
     /**
