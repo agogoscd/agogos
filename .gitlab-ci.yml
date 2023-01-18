@@ -23,7 +23,7 @@ docs:
   stage: test
   script:
     - npm i
-    - NODE_TLS_REJECT_UNAUTHORIZED=0 antora --fetch --to-dir public antora-playbook.yml
+    - GIT_CREDENTIALS=$GIT_CREDENTIALS NODE_TLS_REJECT_UNAUTHORIZED=0 antora --fetch --to-dir public antora-playbook.yml
   artifacts:
     paths:
       - public

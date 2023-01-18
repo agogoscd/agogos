@@ -10,7 +10,7 @@ import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
 import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
-import io.javaoperatorsdk.operator.processing.event.AbstractEventSource;
+import io.javaoperatorsdk.operator.processing.event.source.AbstractEventSource;
 import io.quarkus.runtime.StartupEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
+//TODO: Use InformerEventSource
 public abstract class AbstractTektonEventSource<T extends HasMetadata> extends AbstractEventSource {
     protected static final Logger LOG = LoggerFactory.getLogger(AbstractTektonEventSource.class);
 
@@ -173,7 +174,7 @@ public abstract class AbstractTektonEventSource<T extends HasMetadata> extends A
         LOG.trace("Handling '{}' event for PipelineRun '{}' with owner '{}'",
                 pipelineRun.getStatus().getConditions().get(0).getReason(), pipelineRun.getMetadata().getName(), uid);
 
-        eventHandler.handleEvent(new PipelineRunEvent(pipelineRun, this, uid));
+        getEventHandler().handleEvent(new PipelineRunEvent(pipelineRun, this, uid));
 
         LOG.trace("Event for PipelineRun '{}' handled", pipelineRun.getMetadata().getName());
     }

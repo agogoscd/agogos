@@ -1,6 +1,5 @@
 package com.redhat.agogos.cli;
 
-import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.redhat.agogos.errors.ApplicationException;
@@ -12,6 +11,7 @@ import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.kubernetes.client.KubernetesTestServer;
 import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.yaml.snakeyaml.scanner.ScannerException;
@@ -34,7 +34,7 @@ public class ResourceLoaderTest {
     @Test
     @DisplayName("Should handle invalid content")
     void shouldHandleInvalidYaml() throws Exception {
-        Exception ex = assertThrows(ApplicationException.class, () -> {
+        Exception ex = Assertions.assertThrows(ApplicationException.class, () -> {
             resourceLoader.installKubernetesResources(
                     ResourceUtils.testResourceAsInputStream("loader/invalid.yaml"), "namespace");
         });

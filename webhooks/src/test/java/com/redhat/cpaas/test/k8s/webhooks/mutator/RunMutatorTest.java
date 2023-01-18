@@ -41,7 +41,7 @@ public class RunMutatorTest {
             Pipeline pipeline = new Pipeline();
             pipeline.getMetadata().setName("p1");
 
-            server.getClient().customResources(Pipeline.class).inNamespace("default").create(pipeline);
+            server.getClient().resources(Pipeline.class).inNamespace("default").create(pipeline);
         }
     }
 
@@ -69,7 +69,7 @@ public class RunMutatorTest {
 
         admissionReview = new AdmissionReviewBuilder().withRequest(admissionRequest).build();
 
-        pipeline = mockServer.getClient().customResources(Pipeline.class).inNamespace("default").withName("p1").get();
+        pipeline = mockServer.getClient().resources(Pipeline.class).inNamespace("default").withName("p1").get();
     }
 
     @Test

@@ -22,11 +22,12 @@ import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.fabric8.tekton.triggers.v1alpha1.TriggerBuilder;
 import io.fabric8.tekton.triggers.v1alpha1.TriggerSpecBuilder;
-import io.javaoperatorsdk.operator.api.Context;
-import io.javaoperatorsdk.operator.api.Controller;
-import io.javaoperatorsdk.operator.api.DeleteControl;
-import io.javaoperatorsdk.operator.api.ResourceController;
-import io.javaoperatorsdk.operator.api.UpdateControl;
+import io.javaoperatorsdk.operator.api.reconciler.Cleaner;
+import io.javaoperatorsdk.operator.api.reconciler.Context;
+import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
+import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
+import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
+import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +39,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ApplicationScoped
-@Controller
-public class TriggerController implements ResourceController<Trigger> {
+@ControllerConfiguration
+public class TriggerController implements Reconciler<Trigger>, Cleaner<Trigger> {
 
     private static final Logger LOG = LoggerFactory.getLogger(TriggerController.class);
 
@@ -56,7 +57,7 @@ public class TriggerController implements ResourceController<Trigger> {
     TriggerEventScheduler scheduler;
 
     @Override
-    public DeleteControl deleteResource(Trigger trigger, Context<Trigger> context) {
+    public DeleteControl cleanup(Trigger trigger, Context<Trigger> context) {
         trigger.getSpec().getEvents().forEach(event -> {
             // For TimedTriggerEvents we need to schedule these ourselves
             // Currently Tekton Triggers do not support cron-like format
@@ -69,11 +70,11 @@ public class TriggerController implements ResourceController<Trigger> {
             }
         });
 
-        return DeleteControl.DEFAULT_DELETE;
+        return io.javaoperatorsdk.operator.api.reconciler.DeleteControl.defaultDelete();
     }
 
     @Override
-    public UpdateControl<Trigger> createOrUpdateResource(Trigger trigger, Context<Trigger> context) {
+    public UpdateControl<Trigger> reconcile(Trigger trigger, Context<Trigger> context) {
         LOG.info("Trigger '{}' modified", trigger.getMetadata().getName());
 
         updateTrigger(trigger);

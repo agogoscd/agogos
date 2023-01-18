@@ -21,11 +21,12 @@ import io.fabric8.tekton.pipeline.v1beta1.PipelineWorkspaceDeclarationBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.TaskRefBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBinding;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBindingBuilder;
-import io.javaoperatorsdk.operator.api.Context;
-import io.javaoperatorsdk.operator.api.Controller;
-import io.javaoperatorsdk.operator.api.DeleteControl;
-import io.javaoperatorsdk.operator.api.ResourceController;
-import io.javaoperatorsdk.operator.api.UpdateControl;
+import io.javaoperatorsdk.operator.api.reconciler.Cleaner;
+import io.javaoperatorsdk.operator.api.reconciler.Context;
+import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
+import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
+import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
+import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ApplicationScoped
-@Controller
-public class PipelineController implements ResourceController<Pipeline> {
+@ControllerConfiguration
+public class PipelineController implements Reconciler<Pipeline>, Cleaner<Pipeline> {
 
     private static final Logger LOG = LoggerFactory.getLogger(PipelineController.class);
 
@@ -51,13 +52,13 @@ public class PipelineController implements ResourceController<Pipeline> {
     ObjectMapper objectMapper;
 
     @Override
-    public DeleteControl deleteResource(Pipeline resource, Context<Pipeline> context) {
+    public DeleteControl cleanup(Pipeline resource, Context<Pipeline> context) {
         LOG.info("Pipeline '{}' deleted", resource.getNamespacedName());
-        return DeleteControl.DEFAULT_DELETE;
+        return DeleteControl.defaultDelete();
     }
 
     @Override
-    public UpdateControl<Pipeline> createOrUpdateResource(Pipeline pipeline, Context<Pipeline> context) {
+    public UpdateControl<Pipeline> reconcile(Pipeline pipeline, Context<Pipeline> context) {
         LOG.info("Pipeline '{}' modified", pipeline.getNamespacedName());
 
         // Prepare workspace for main task to share content between steps

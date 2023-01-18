@@ -1,6 +1,11 @@
 package com.redhat.agogos.k8s.webhooks;
 
+import com.redhat.agogos.v1alpha1.Build;
+import com.redhat.agogos.v1alpha1.Component;
+import com.redhat.agogos.v1alpha1.Handler;
+import com.redhat.agogos.v1alpha1.Run;
 import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.client.CustomResource;
 import io.fabric8.kubernetes.internal.KubernetesDeserializer;
 import io.quarkus.runtime.StartupEvent;
@@ -12,7 +17,7 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import java.lang.reflect.ParameterizedType;
+import java.util.List;
 
 @ApplicationScoped
 public class SerializationHelper {
@@ -39,9 +44,8 @@ public class SerializationHelper {
 
         LOG.debug("Registering CustomResources with Kubernetes");
 
-        for (AdmissionHandler<? extends CustomResource<?, ?>> handler : handlers) {
-            Class<CustomResource<?, ?>> clazz = (Class<CustomResource<?, ?>>) ((ParameterizedType) handler.getClass()
-                    .getGenericSuperclass()).getActualTypeArguments()[0];
+        // TODO: Make this automatic
+        for (Class<? extends KubernetesResource> clazz : List.of(Build.class, Component.class, Handler.class, Run.class)) {
 
             LOG.debug("Registering '{}' CustomResource with Kubernetes deserializer", clazz.getName());
 
