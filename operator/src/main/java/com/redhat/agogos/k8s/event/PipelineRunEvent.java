@@ -38,7 +38,7 @@ public class PipelineRunEvent extends Event {
                 .filter(r -> r.getName().equals("data")).collect(Collectors.toUnmodifiableList());
 
         if (!results.isEmpty()) {
-            result = results.get(0).getValue();
+            result = results.get(0).getValue().getStringVal();
         }
     }
 
@@ -55,7 +55,7 @@ public class PipelineRunEvent extends Event {
                 .filter(r -> r.getName().equals("data")).collect(Collectors.toUnmodifiableList());
 
         if (!results.isEmpty()) {
-            result = results.get(0).getValue();
+            result = results.get(0).getValue().getStringVal();
         }
     }
 }

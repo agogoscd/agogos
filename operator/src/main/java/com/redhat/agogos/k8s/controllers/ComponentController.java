@@ -404,8 +404,8 @@ public class ComponentController implements Reconciler<Component>, Cleaner<Compo
         // Pipeline result is the result of the main task executed
         PipelineResult pipelineResult = new PipelineResultBuilder() //
                 .withName("data") //
-                .withValue(new StringBuilder().append("$(tasks.").append(buildTask.getName())
-                        .append(".results.data)").toString()) //
+                .withValue(new ArrayOrString(new StringBuilder().append("$(tasks.").append(buildTask.getName())
+                        .append(".results.data)").toString())) //
                 .build();
 
         // Add any useful/required labels

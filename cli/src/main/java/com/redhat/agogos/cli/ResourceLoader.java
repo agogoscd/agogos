@@ -8,16 +8,13 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.base.OperationContext;
 import io.fabric8.kubernetes.client.dsl.internal.GenericKubernetesResourceOperationsImpl;
+import io.fabric8.kubernetes.client.dsl.internal.OperationContext;
 import io.fabric8.kubernetes.client.http.HttpClient;
-import io.fabric8.kubernetes.client.okhttp.OkHttpClientFactory;
-import io.fabric8.kubernetes.client.okhttp.OkHttpClientImpl;
+import io.fabric8.kubernetes.client.http.HttpResponse;
+import io.fabric8.kubernetes.client.jdkhttp.JdkHttpClientFactory;
 import io.quarkus.runtime.StartupEvent;
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.openapi4j.core.exception.ResolutionException;
 import org.openapi4j.core.validation.ValidationException;
 import org.openapi4j.parser.OpenApi3Parser;
@@ -82,16 +79,11 @@ public class ResourceLoader {
     /**
      * Used for connecting to the Kubernetes API directly.
      */
-    OkHttpClient okHttpClient;
     HttpClient httpClient;
 
     void init(@Observes StartupEvent ev) {
         // Prepare the http client based on the Kubernetes client configuration
-        // TODO: Replace this with the new HttpClient to avoid using OkHttpClient directly
-        OkHttpClientImpl clientImpl = new OkHttpClientFactory().createHttpClient(kubernetesClient.getConfiguration());
-
-        okHttpClient = clientImpl.getOkHttpClient();
-        httpClient = clientImpl;
+        httpClient = new JdkHttpClientFactory().newBuilder(kubernetesClient.getConfiguration()).build();
     }
 
     @SuppressWarnings("unchecked")
@@ -170,14 +162,12 @@ public class ResourceLoader {
                     "Could not create temporary file. Unexpected error occurred.", e);
         }
 
-        // Build the request
-        Request request = new Request.Builder().url(openApiUrl).build();
-        Response response = null;
+        final HttpResponse<String> response;
 
         try {
             // Fetch OpenAPI information
-            response = okHttpClient.newCall(request).execute();
-        } catch (IOException e) {
+            response = httpClient.sendAsync(httpClient.newHttpRequestBuilder().url(openApiUrl).build(), String.class).get();
+        } catch (Exception e) {
             throw new ApplicationException(
                     "Could not fetch OpenAPI information from Kubernetes. Unexpected error occurred.", e);
         }
@@ -192,7 +182,7 @@ public class ResourceLoader {
 
         try {
             // Write the OpenAPI content to a temporary file
-            Files.write(tempFile, response.body().bytes());
+            Files.write(tempFile, response.body().getBytes());
         } catch (IOException e) {
             throw new ApplicationException(
                     "Could not write OpenAPI information to a file.", e);
@@ -320,17 +310,20 @@ public class ResourceLoader {
             // was added as part of some other resource installation.
             if (mapping == null) {
                 URL openApiUrl = openApiUrl();
-                Request head = new Request.Builder().url(openApiUrl).head().build();
-                Response response = null;
+                // Request head = new Request.Builder().url(openApiUrl).head().build();
+                final HttpResponse<String> response;
 
                 try {
-                    response = okHttpClient.newCall(head).execute();
-                } catch (IOException e) {
+                    response = httpClient.sendAsync(
+                            httpClient.newHttpRequestBuilder().url(openApiUrl).method("HEAD", "text/plain", null).build(),
+                            String.class).get();
+                } catch (Exception e) {
                     throw new ApplicationException(
                             "Cannot fetch last modification time of Kubernetes OpenAPI schema resource: {}.", openApiUrl, e);
                 }
 
-                Instant lastModified = response.headers().getInstant("Last-Modified");
+                // TODO: Fragile!
+                Instant lastModified = Instant.parse(response.headers("Last-Modified").get(0));
 
                 if (lastModified.compareTo(lastResourceMappingUpdate) > 0) {
                     readMappings();
@@ -347,8 +340,7 @@ public class ResourceLoader {
             }
 
             OperationContext ctx = new OperationContext() //
-                    .withConfig(kubernetesClient.getConfiguration())
-                    .withHttpClient(httpClient) //
+                    .withClient(kubernetesClient) //
                     .withPlural(mapping.getPlural()) //
                     .withPropagationPolicy(DeletionPropagation.FOREGROUND) //
                     .withApiGroupName(mapping.getGroup()) //
