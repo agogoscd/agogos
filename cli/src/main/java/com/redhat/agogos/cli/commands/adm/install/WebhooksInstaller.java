@@ -328,6 +328,10 @@ public class WebhooksInstaller extends Installer {
                         new PolicyRuleBuilder().withApiGroups("agogos.redhat.com")
                                 .withResources("*")
                                 .withVerbs("get", "list", "watch", "create", "update", "patch", "delete", "deletecollection")
+                                .build(), //
+                        new PolicyRuleBuilder().withApiGroups("tekton.dev")
+                                .withResources("*")
+                                .withVerbs("get", "list", "watch")
                                 .build() //
                 ).build();
 
