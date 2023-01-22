@@ -36,7 +36,7 @@
         <openapi-schema-validator.version>1.0.5</openapi-schema-validator.version>
         <lombok.version>1.18.16</lombok.version>
         <quarkus-tekton-client.version>0.6.0</quarkus-tekton-client.version>
-        <bouncycastle.version>1.69</bouncycastle.version>
+        <bouncycastle.version>1.72</bouncycastle.version>
 
         <quarkus.platform.version>2.15.2.Final</quarkus.platform.version>
         <operator-framework.version>4.2.2</operator-framework.version>

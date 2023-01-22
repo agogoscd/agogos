@@ -32,7 +32,7 @@ docs:
 
 cli:
   image:
-    name: quay.io/quarkus/ubi-quarkus-native-image:21.0.0-java11
+    name: quay.io/quarkus/ubi-quarkus-native-image:22.3-java11
     entrypoint: ["/bin/sh", "-c"]
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
