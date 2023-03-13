@@ -3,6 +3,8 @@ package com.redhat.agogos.v1alpha1;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.redhat.agogos.errors.ApplicationException;
+import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Build.BuildSpec;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
@@ -13,6 +15,8 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import javax.enterprise.inject.spi.CDI;
 
 import java.util.Map;
 
@@ -58,5 +62,27 @@ public class Build extends AgogosResource<BuildSpec, ResultableStatus> implement
     @JsonIgnore
     public Map<?, ?> getResult() {
         return this.getStatus().getResult();
+    }
+
+    /**
+     * <p>
+     * Get the parent component of the build.
+     * </p>
+     *
+     * @return Component
+     */
+    public Component parentComponent() {
+        LOG.debug("Finding parent component resource for Build '{}'", getFullName());
+
+        AgogosClient agogosClient = CDI.current().select(AgogosClient.class).get();
+        Component component = agogosClient.v1alpha1().components().inNamespace(getMetadata().getNamespace())
+                .withName(getSpec().getComponent()).get();
+
+        if (component == null) {
+            throw new ApplicationException("Could not find Component with name '{}' in namespace '{}'",
+                    getSpec().getComponent(), getMetadata().getNamespace());
+        }
+
+        return component;
     }
 }
