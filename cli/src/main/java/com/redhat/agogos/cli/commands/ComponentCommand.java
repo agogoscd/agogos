@@ -63,7 +63,7 @@ public class ComponentCommand implements Runnable {
             build.getMetadata().setGenerateName(name + "-");
             build.getSpec().setComponent(name);
 
-            build = agogosClient.v1alpha1().builds().inNamespace(agogosClient.namespace()).create(build);
+            build = agogosClient.v1alpha1().builds().inNamespace(agogosClient.namespace()).resource(build).create();
 
             cli.run(BuildDescribeCommand.class, build.getMetadata().getName());
         }

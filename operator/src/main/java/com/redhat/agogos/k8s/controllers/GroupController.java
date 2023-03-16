@@ -16,7 +16,7 @@ public class GroupController implements Reconciler<Group>, Cleaner<Group> {
 
     @Override
     public UpdateControl<Group> reconcile(Group resource,
-            Context context) {
+            Context<Group> context) {
         return UpdateControl.noUpdate();
     }
 

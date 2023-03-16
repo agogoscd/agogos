@@ -42,7 +42,7 @@ public class BuildJob implements Job {
         build.getMetadata().setNamespace(namespace);
         build.getSpec().setComponent(name);
 
-        build = agogosClient.v1alpha1().builds().inNamespace(namespace).createOrReplace(build);
+        build = agogosClient.v1alpha1().builds().inNamespace(namespace).resource(build).createOrReplace();
 
         LOG.info("Build '{}' scheduled, next run at {}", build.getFullName(),
                 context.getNextFireTime());

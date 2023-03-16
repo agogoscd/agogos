@@ -41,7 +41,7 @@ public class RunMutatorTest {
             Pipeline pipeline = new Pipeline();
             pipeline.getMetadata().setName("p1");
 
-            server.getClient().resources(Pipeline.class).inNamespace("default").create(pipeline);
+            server.getClient().resources(Pipeline.class).inNamespace("default").resource(pipeline).create();
         }
     }
 
