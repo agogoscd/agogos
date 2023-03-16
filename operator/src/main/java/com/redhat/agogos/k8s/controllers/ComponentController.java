@@ -437,7 +437,7 @@ public class ComponentController implements Reconciler<Component>, Cleaner<Compo
                 .build();
 
         return tektonClient.v1beta1().pipelines().inNamespace(component.getMetadata().getNamespace())
-                .createOrReplace(pipeline);
+                .resource(pipeline).createOrReplace();
     }
 
 }

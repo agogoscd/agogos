@@ -215,7 +215,7 @@ public class TriggerController implements Reconciler<Trigger>, Cleaner<Trigger> 
 
         // Create the Tekton Trigger
         tektonClient.v1alpha1().triggers().inNamespace(trigger.getMetadata().getNamespace())
-                .createOrReplace(triggerBuilder.build());
+                .resource(triggerBuilder.build()).createOrReplace();
     }
 
     private void scheduleTimedTrigger(Trigger trigger, TimedTriggerEvent timed) {

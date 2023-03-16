@@ -65,13 +65,13 @@ public class TektonPipelineHelper {
 
     // TODO: temporar
     public PipelineRun run(PipelineRun pipelineRun, String namespace) {
-        return tektonClient.v1beta1().pipelineRuns().inNamespace(namespace).create(pipelineRun);
+        return tektonClient.v1beta1().pipelineRuns().inNamespace(namespace).resource(pipelineRun).create();
     }
 
     public PipelineRun run(String kind, String name, String namespace, HasMetadata owner) {
         PipelineRun pipelineRun = generate(kind, name, namespace, owner);
 
-        return tektonClient.v1beta1().pipelineRuns().inNamespace(namespace).create(pipelineRun);
+        return tektonClient.v1beta1().pipelineRuns().inNamespace(namespace).resource(pipelineRun).create();
     }
 
     public PipelineRun run(String kind, String name, String namespace) {

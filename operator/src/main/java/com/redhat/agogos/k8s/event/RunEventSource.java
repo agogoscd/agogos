@@ -51,7 +51,8 @@ public class RunEventSource extends AbstractTektonEventSource<Run> {
         run.getMetadata().setLabels(runLabels);
         run.getSpec().setPipeline(pipeline);
 
-        run = agogosClient.v1alpha1().runs().inNamespace(pipelineRun.getMetadata().getNamespace()).createOrReplace(run);
+        run = agogosClient.v1alpha1().runs().inNamespace(pipelineRun.getMetadata().getNamespace()).resource(run)
+                .createOrReplace();
 
         LOG.info("PipelineRun '{}' created out of an existing Tekton PipelineRun '{}'", run.getNamespacedName(),
                 pipelineRunName);

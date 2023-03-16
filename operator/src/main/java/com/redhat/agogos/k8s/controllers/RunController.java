@@ -12,8 +12,6 @@ import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
 import io.javaoperatorsdk.operator.api.reconciler.EventSourceContext;
 import io.javaoperatorsdk.operator.api.reconciler.EventSourceInitializer;
 import io.javaoperatorsdk.operator.processing.event.source.EventSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -23,8 +21,6 @@ import java.util.Map;
 @ApplicationScoped
 @ControllerConfiguration(generationAwareEventProcessing = false)
 public class RunController extends AbstractController<Run> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(RunController.class);
 
     @Inject
     AgogosClient agogosClient;

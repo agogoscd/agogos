@@ -102,7 +102,7 @@ public class InitCommand implements Runnable {
                 .withData(Map.of("channelTemplateSpec", "apiVersion: messaging.knative.dev/v1\nkind: InMemoryChannel"))
                 .build();
 
-        configMap = kubernetesClient.configMaps().inNamespace(namespace).createOrReplace(configMap);
+        configMap = kubernetesClient.configMaps().inNamespace(namespace).resource(configMap).createOrReplace();
 
         installedResources.add(configMap);
 
@@ -126,7 +126,7 @@ public class InitCommand implements Runnable {
                 .endSpec() //
                 .build();
 
-        broker = knativeClient.brokers().inNamespace(namespace).createOrReplace(broker);
+        broker = knativeClient.brokers().inNamespace(namespace).resource(broker).createOrReplace();
 
         installedResources.add(broker);
 
@@ -157,7 +157,7 @@ public class InitCommand implements Runnable {
                 .withData(data) //
                 .build();
 
-        cm = kubernetesClient.configMaps().inNamespace(namespace).createOrReplace(cm);
+        cm = kubernetesClient.configMaps().inNamespace(namespace).resource(cm).createOrReplace();
 
         installedResources.add(cm);
     }
@@ -243,7 +243,7 @@ public class InitCommand implements Runnable {
                 .endSpec() //
                 .build();
 
-        trigger = knativeClient.triggers().inNamespace(namespace).createOrReplace(trigger);
+        trigger = knativeClient.triggers().inNamespace(namespace).resource(trigger).createOrReplace();
 
         installedResources.add(trigger);
     }
@@ -261,7 +261,7 @@ public class InitCommand implements Runnable {
                 .endMetadata() //
                 .build();
 
-        ns = kubernetesClient.namespaces().createOrReplace(ns);
+        ns = kubernetesClient.namespaces().resource(ns).createOrReplace();
 
         installedResources.add(ns);
     }
@@ -284,7 +284,7 @@ public class InitCommand implements Runnable {
                 .endSpec() //
                 .build();
 
-        el = tektonClient.v1alpha1().eventListeners().inNamespace(namespace).createOrReplace(el);
+        el = tektonClient.v1alpha1().eventListeners().inNamespace(namespace).resource(el).createOrReplace();
 
         installedResources.add(el);
 
@@ -315,7 +315,7 @@ public class InitCommand implements Runnable {
                 .endRoleRef() //
                 .build();
 
-        roleBinding = kubernetesClient.rbac().clusterRoleBindings().createOrReplace(roleBinding);
+        roleBinding = kubernetesClient.rbac().clusterRoleBindings().resource(roleBinding).createOrReplace();
 
         installedResources.add(roleBinding);
 
@@ -339,7 +339,7 @@ public class InitCommand implements Runnable {
                 .endRoleRef() //
                 .build();
 
-        roleBinding = kubernetesClient.rbac().roleBindings().inNamespace(namespace).createOrReplace(roleBinding);
+        roleBinding = kubernetesClient.rbac().roleBindings().inNamespace(namespace).resource(roleBinding).createOrReplace();
 
         installedResources.add(roleBinding);
     }
@@ -355,7 +355,7 @@ public class InitCommand implements Runnable {
                 .endMetadata() //
                 .build();
 
-        sa = kubernetesClient.serviceAccounts().inNamespace(namespace).createOrReplace(sa);
+        sa = kubernetesClient.serviceAccounts().inNamespace(namespace).resource(sa).createOrReplace();
 
         installedResources.add(sa);
 
@@ -370,7 +370,7 @@ public class InitCommand implements Runnable {
                 .endMetadata() //
                 .build();
 
-        sa = kubernetesClient.serviceAccounts().inNamespace(namespace).createOrReplace(sa);
+        sa = kubernetesClient.serviceAccounts().inNamespace(namespace).resource(sa).createOrReplace();
 
         installedResources.add(sa);
 

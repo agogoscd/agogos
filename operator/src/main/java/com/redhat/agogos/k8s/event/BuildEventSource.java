@@ -53,7 +53,8 @@ public class BuildEventSource extends AbstractTektonEventSource<Build> {
         build.getMetadata().setLabels(buildLabels);
         build.getSpec().setComponent(component);
 
-        build = agogosClient.v1alpha1().builds().inNamespace(pipelineRun.getMetadata().getNamespace()).createOrReplace(build);
+        build = agogosClient.v1alpha1().builds().inNamespace(pipelineRun.getMetadata().getNamespace()).resource(build)
+                .createOrReplace();
 
         LOG.info("Build '{}' created out of an existing Tekton PipelineRun '{}'", build.getFullName(),
                 pipelineRunName);
