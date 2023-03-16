@@ -46,7 +46,7 @@ public class PipelineCommand implements Runnable {
             run.getMetadata().setGenerateName(name + "-");
             run.getSpec().setPipeline(name);
 
-            run = agogosClient.v1alpha1().runs().inNamespace(agogosClient.namespace()).create(run);
+            run = agogosClient.v1alpha1().runs().inNamespace(agogosClient.namespace()).resource(run).create();
 
             cli.run(RunDescribeCommand.class, run.getMetadata().getName());
         }

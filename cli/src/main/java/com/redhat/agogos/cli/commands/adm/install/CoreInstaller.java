@@ -190,7 +190,7 @@ public class CoreInstaller extends Installer {
         cs.getSpec().getTaskRef().setKind(HasMetadata.getKind(ClusterTask.class));
         cs.getSpec().getTaskRef().setName(INIT_TEKTON_TASK_NAME);
 
-        cs = agogosClient.v1alpha1().clusterstages().createOrReplace(cs);
+        cs = agogosClient.v1alpha1().clusterstages().resource(cs).createOrReplace();
 
         return cs;
     }

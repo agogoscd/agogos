@@ -52,7 +52,7 @@ public class ComponentValidatorTest {
             schema.put("required", List.of("someKey"));
             schema.put("properties", Map.of("type", "string"));
 
-            server.getClient().resources(Builder.class).create(builder);
+            server.getClient().resources(Builder.class).resource(builder).create();
 
             ParamSpec requiredParamSpec = new ParamSpecBuilder().withName("git-clone-param").build();
             ParamSpec optionalParamSpec = new ParamSpecBuilder().withName("git-clone-param-optional")
@@ -61,14 +61,14 @@ public class ComponentValidatorTest {
             Task gitTask = new TaskBuilder().withNewMetadata().withName("git-clone").endMetadata().withNewSpec()
                     .withParams(requiredParamSpec, optionalParamSpec)
                     .endSpec().build();
-            server.getClient().resources(Task.class).inNamespace("default").create(gitTask);
+            server.getClient().resources(Task.class).inNamespace("default").resource(gitTask).create();
 
             Handler handler = new Handler("git-v1");
             handler.getSpec().getTaskRef().setName("git-clone");
             handler.getSpec().getSchema().getOpenAPIV3Schema().put("git-clone-param-optional",
                     Map.of("type", "object", "properties", Map.of("id", Map.of("type", "string"))));
 
-            server.getClient().resources(Handler.class).inNamespace("default").create(handler);
+            server.getClient().resources(Handler.class).inNamespace("default").resource(handler).create();
         }
     }
 

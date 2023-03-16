@@ -166,7 +166,7 @@ public class PipelineController implements Reconciler<Pipeline>, Cleaner<Pipelin
                 .build();
 
         tektonClient.v1beta1().pipelines().inNamespace(pipeline.getMetadata().getNamespace())
-                .createOrReplace(tektonPipeline);
+                .resource(tektonPipeline).createOrReplace();
 
         return UpdateControl.noUpdate();
     }

@@ -7,8 +7,8 @@ import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.AgogosResourceStatus;
 import com.redhat.agogos.v1alpha1.ResultableStatus;
 import com.redhat.agogos.v1alpha1.Status;
+import io.fabric8.kubernetes.api.model.DefaultKubernetesResourceList;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
-import io.fabric8.kubernetes.client.CustomResourceList;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import picocli.CommandLine.Help.Ansi;
@@ -25,7 +25,7 @@ public abstract class BaseListCommand<T extends AgogosResource<?, ? extends Agog
     Long limit;
 
     @Inject
-    MixedOperation<T, ? extends CustomResourceList<T>, Resource<T>> client;
+    MixedOperation<T, ? extends DefaultKubernetesResourceList<T>, Resource<T>> client;
 
     @Override
     public void run() {

@@ -43,7 +43,7 @@ public class ComponentControllerTest {
     void registerInitTask() {
         ClusterTask task = new ClusterTaskBuilder().withNewMetadata().withName("init").endMetadata().build();
 
-        tektonClient.v1beta1().clusterTasks().createOrReplace(task);
+        tektonClient.v1beta1().clusterTasks().resource(task).createOrReplace();
     }
 
     @Test
@@ -55,7 +55,8 @@ public class ComponentControllerTest {
         component.getMetadata().setName("test-fail");
         component.getSpec().getBuild().setBuilderRef(new BuilderRef("some-builder-name"));
 
-        Context context = Mockito.mock(Context.class);
+        @SuppressWarnings("unchecked")
+        Context<Component> context = (Context<Component>) Mockito.mock(Context.class);
 
         UpdateControl<Component> control = componentController.reconcile(component, context);
 
@@ -80,14 +81,14 @@ public class ComponentControllerTest {
 
         Task task = new TaskBuilder().withNewMetadata().withName("should-handle-component").endMetadata().withNewSpec()
                 .withParams(new ParamSpecBuilder().withName("param").build()).endSpec().build();
-        tektonClient.v1beta1().tasks().inNamespace("default").createOrReplace(task);
+        tektonClient.v1beta1().tasks().inNamespace("default").resource(task).createOrReplace();
 
         Builder builder = new Builder();
         builder.getMetadata().setName("should-handle-component-builder-name");
         builder.getSpec().getTaskRef().setName("should-handle-component");
 
         // Create the builder, we will need it later
-        agogosClient.v1alpha1().builders().create(builder);
+        agogosClient.v1alpha1().builders().resource(builder).create();
 
         UpdateControl<Component> control = componentController.reconcile(component, context);
 

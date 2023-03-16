@@ -17,8 +17,6 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import java.util.List;
-
 @ApplicationScoped
 public class SerializationHelper {
     private static final Logger LOG = LoggerFactory.getLogger(SerializationHelper.class);
@@ -39,13 +37,13 @@ public class SerializationHelper {
      *
      * @param ev Startup event (ignored)
      */
-    @SuppressWarnings("unchecked")
     void registerResources(@Observes StartupEvent ev) {
 
         LOG.debug("Registering CustomResources with Kubernetes");
 
-        // TODO: Make this automatic
-        for (Class<? extends KubernetesResource> clazz : List.of(Build.class, Component.class, Handler.class, Run.class)) {
+        @SuppressWarnings("unchecked")
+        Class<? extends KubernetesResource>[] classes = new Class[] { Build.class, Component.class, Handler.class, Run.class };
+        for (Class<? extends KubernetesResource> clazz : classes) {
 
             LOG.debug("Registering '{}' CustomResource with Kubernetes deserializer", clazz.getName());
 

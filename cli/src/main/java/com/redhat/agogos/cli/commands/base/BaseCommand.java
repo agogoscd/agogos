@@ -12,7 +12,7 @@ import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.AgogosResourceStatus;
 import com.redhat.agogos.v1alpha1.ResultableStatus;
-import io.fabric8.kubernetes.client.CustomResourceList;
+import io.fabric8.kubernetes.api.model.DefaultKubernetesResourceList;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import picocli.CommandLine.Help.Ansi;
@@ -33,7 +33,7 @@ public abstract class BaseCommand<T extends AgogosResource<?, ? extends AgogosRe
     @Inject
     protected AgogosClient agogosClient;
 
-    protected void show(MixedOperation<T, ? extends CustomResourceList<T>, Resource<T>> resourceClient) {
+    protected void show(MixedOperation<T, ? extends DefaultKubernetesResourceList<T>, Resource<T>> resourceClient) {
     }
 
     protected void showResource(T resource) {
