@@ -42,8 +42,8 @@ public enum PipelineRunStatus {
         }
     }
 
-    public static PipelineRunStatus fromPipelineRun(PipelineRun pipelinerun) {
-        Condition condition = pipelinerun.getStatus().getConditions().get(0);
+    public static PipelineRunStatus fromPipelineRun(PipelineRun pipelineRun) {
+        Condition condition = pipelineRun.getStatus().getConditions().get(0);
         return PipelineRunStatus.fromTekton(condition.getStatus(), condition.getReason());
     }
 
