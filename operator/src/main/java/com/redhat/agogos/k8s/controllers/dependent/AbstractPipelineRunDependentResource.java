@@ -16,7 +16,6 @@ import io.fabric8.tekton.pipeline.v1beta1.PipelineRunBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBinding;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBindingBuilder;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
-import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUDKubernetesDependentResource;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-// public class PipelineRunDependentResource extends CRUDKubernetesDependentResource<PipelineRun, Build> {
 public abstract class AbstractPipelineRunDependentResource<T extends AgogosResource<?, ResultableStatus>>
-        extends CRUDKubernetesDependentResource<PipelineRun, T> {
+        extends AbstractBaseDependentResource<PipelineRun, T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractPipelineRunDependentResource.class);
 
@@ -55,10 +53,11 @@ public abstract class AbstractPipelineRunDependentResource<T extends AgogosResou
         PipelineRun pipelineRun = new PipelineRun();
         Optional<PipelineRun> optional = context.getSecondaryResource(PipelineRun.class);
         if (!optional.isEmpty()) {
-            LOG.debug("{} {}, using existing pipeline run", resource.getKind(), resource.getFullName());
             pipelineRun = optional.get();
+            LOG.debug("{} '{}', using existing PipelineRun '{}'", resource.getKind(),
+                    resource.getFullName(), pipelineRun.getFullResourceName());
         } else {
-            LOG.debug("{} {}, creating new pipeline run", resource.getKind(), resource.getFullName());
+            LOG.debug("{} '{}', creating new PipelineRun", resource.getKind(), resource.getFullName());
         }
 
         Map<String, Quantity> requests = new HashMap<>();
@@ -117,8 +116,7 @@ public abstract class AbstractPipelineRunDependentResource<T extends AgogosResou
             pipelineRun.getSpec().setServiceAccountName(serviceAccount.get());
         }
 
-        LOG.debug("New pipeline run '{}' created for '{}", pipelineRun.getMetadata().getName(), resource.getFullName());
+        LOG.debug("New PipelineRun '{}' created for '{}", pipelineRun.getMetadata().getName(), resource.getFullName());
         return pipelineRun;
     }
-
 }

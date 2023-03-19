@@ -1,7 +1,7 @@
 package com.redhat.agogos.k8s.controllers;
 
 import com.redhat.agogos.ResourceStatus;
-import com.redhat.agogos.k8s.controllers.dependent.PipelineDependentResource;
+import com.redhat.agogos.k8s.controllers.dependent.ComponentPipelineDependentResource;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.Status;
 import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @ApplicationScoped
 @ControllerConfiguration(generationAwareEventProcessing = false, dependents = {
-        @Dependent(type = PipelineDependentResource.class) })
+        @Dependent(type = ComponentPipelineDependentResource.class) })
 public class ComponentController extends AbstractController<Component> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ComponentController.class);
@@ -39,7 +39,7 @@ public class ComponentController extends AbstractController<Component> {
     public UpdateControl<Component> reconcile(Component component, Context<Component> context) {
         Optional<Pipeline> optional = context.getSecondaryResource(Pipeline.class);
         if (!optional.isPresent()) {
-            LOG.debug("No pipeline for Component '{}' yet, ignoring", component.getFullName());
+            LOG.debug("No pipeline for Component '{}' yet, returning noUpdate", component.getFullName());
             return UpdateControl.noUpdate();
         }
 

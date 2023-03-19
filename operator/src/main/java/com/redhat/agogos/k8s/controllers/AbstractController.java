@@ -40,13 +40,13 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
 
     @Override
     public UpdateControl<T> reconcile(T resource, Context<T> context) {
-        LOG.info("Checking '{}' '{}', returning noUpdate", resource.getKind(), resource.getFullName());
+        LOG.info("Checking {} '{}', returning noUpdate", resource.getKind(), resource.getFullName());
         return UpdateControl.noUpdate();
     }
 
     @Override
     public DeleteControl cleanup(T resource, Context<T> context) {
-        LOG.info("Removing '{}' '{}'", resource.getKind(), resource.getFullName());
+        LOG.info("Removing {} '{}'", resource.getKind(), resource.getFullName());
         return DeleteControl.defaultDelete();
     }
 

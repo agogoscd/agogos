@@ -1,11 +1,9 @@
 package com.redhat.agogos.k8s.controllers.dependent;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.k8s.Resource;
-import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.ComponentHandlerSpec;
@@ -14,7 +12,6 @@ import com.redhat.agogos.v1alpha1.WorkspaceMapping;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
-import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.ArrayOrString;
 import io.fabric8.tekton.pipeline.v1beta1.ClusterTask;
 import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
@@ -31,11 +28,8 @@ import io.fabric8.tekton.pipeline.v1beta1.TaskRefBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBinding;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBindingBuilder;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
-import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUDKubernetesDependentResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,9 +37,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class PipelineDependentResource extends CRUDKubernetesDependentResource<Pipeline, Component> {
+public class ComponentPipelineDependentResource extends AbstractBaseDependentResource<Pipeline, Component> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PipelineDependentResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ComponentPipelineDependentResource.class);
 
     private static final String BUILD_PIPELINE_INIT_TASK_NAME = "init";
     private static final String BUILD_PIPELINE_BUILDER_TASK_NAME = "build";
@@ -55,16 +49,7 @@ public class PipelineDependentResource extends CRUDKubernetesDependentResource<P
     private static final String BUILD_PIPELINE_INIT_TASK_WORKSPACE_NAME = "output";
     private static final String BUILD_PIPELINE_SOURCE_TASK_WORKSPACE_NAME = "output";
 
-    @Inject
-    TektonClient tektonClient;
-
-    @Inject
-    AgogosClient agogosClient;
-
-    @Inject
-    ObjectMapper objectMapper;
-
-    public PipelineDependentResource() {
+    public ComponentPipelineDependentResource() {
         super(Pipeline.class);
     }
 
@@ -74,10 +59,10 @@ public class PipelineDependentResource extends CRUDKubernetesDependentResource<P
 
         Optional<Pipeline> optional = context.getSecondaryResource(Pipeline.class);
         if (!optional.isEmpty()) {
-            LOG.debug("Component '{}', using existing pipeline", component.getFullName());
+            LOG.debug("Component '{}', using existing Pipeline", component.getFullName());
             pipeline = optional.get();
         } else {
-            LOG.debug("Component '{}', creating new pipeline", component.getFullName());
+            LOG.debug("Component '{}', creating new Pipeline", component.getFullName());
         }
 
         List<PipelineTask> tasks = new ArrayList<>();
@@ -136,6 +121,7 @@ public class PipelineDependentResource extends CRUDKubernetesDependentResource<P
                 .endSpec()
                 .build();
 
+        LOG.debug("New Pipeline '{}' created for Component '{}", pipeline.getMetadata().getName(), component.getFullName());
         return pipeline;
     }
 

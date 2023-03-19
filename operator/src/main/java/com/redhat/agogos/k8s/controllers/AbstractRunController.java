@@ -1,5 +1,17 @@
 package com.redhat.agogos.k8s.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.redhat.agogos.PipelineRunStatus;
+import com.redhat.agogos.ResultableResourceStatus;
+import com.redhat.agogos.v1alpha1.AgogosResource;
+import com.redhat.agogos.v1alpha1.ResultableStatus;
+import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
+import io.fabric8.tekton.pipeline.v1beta1.PipelineRunResult;
+import io.javaoperatorsdk.operator.api.reconciler.Context;
+import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -7,33 +19,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.redhat.agogos.PipelineRunStatus;
-import com.redhat.agogos.ResultableResourceStatus;
-import com.redhat.agogos.v1alpha1.AgogosResource;
-import com.redhat.agogos.v1alpha1.ResultableStatus;
-
-import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineRunResult;
-import io.javaoperatorsdk.operator.api.reconciler.Context;
-import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
-
-public abstract class AbstractRunController<T extends  AgogosResource<?, ResultableStatus>> extends AbstractController<T> {
+public abstract class AbstractRunController<T extends AgogosResource<?, ResultableStatus>> extends AbstractController<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(BuildController.class);
 
     @Override
     public UpdateControl<T> reconcile(T resource, Context<T> context) {
         Optional<PipelineRun> optional = context.getSecondaryResource(PipelineRun.class);
-        if (!optional.isPresent()) {
-            LOG.debug("No pipeline run for '{}' {} yet, ignoring", resource.getKind(), resource.getFullName());
+        if (optional.isEmpty()) {
+            LOG.debug("No PipelineRun for '{}' yet, returning noUpdate", resource.getFullName());
+            return UpdateControl.noUpdate();
+        } else if (optional.get().getStatus() == null) {
+            LOG.debug("No status for PipelineRun '{}' yet, returning noUpdate", resource.getFullName());
             return UpdateControl.noUpdate();
         }
-
-        LOG.debug("Resource status for '{}' is '{}'", resource.getFullName(), resource.getStatus());
 
         PipelineRun pipelinerun = optional.get();
         PipelineRunStatus runStatus = PipelineRunStatus.fromPipelineRun(pipelinerun);
@@ -79,7 +78,8 @@ public abstract class AbstractRunController<T extends  AgogosResource<?, Resulta
                 String pipelineRunName = String.format("%s/%s", pipelinerun.getMetadata().getNamespace(),
                         pipelinerun.getMetadata().getName());
 
-                LOG.info("Cleaning up Tekton PipelineRun '{}' after a successful {}", pipelineRunName, resource.getKind().toLowerCase());
+                LOG.info("Cleaning up PipelineRun '{}' after a successful {}", pipelineRunName,
+                        resource.getKind().toLowerCase());
 
                 // This may or may not remove the Tekton PipelineRun
                 // In case it is not successful (for any reason) it will be hanging there.
@@ -112,21 +112,21 @@ public abstract class AbstractRunController<T extends  AgogosResource<?, Resulta
         // Check whether the resource status was modified
         // If this is not the case, we are done here
         if (resourceStatus.equals(originalResourceStatus)) {
-            LOG.debug("No change to status of '{}' resource '{}', ignoring", resource.getKind(), resource.getFullName());
+            LOG.debug("No change to {} status of '{}', returning noUpdate", resource.getKind(), resource.getFullName());
             return UpdateControl.noUpdate();
-        }
-
-        try {
-            cloudEventPublisher.publish(runStatus.toEvent(), resource, resource.parentResource());
-        } catch (Exception e) {
-            LOG.warn("Could not publish {} CloudEvent for {} '{}', reason: {}", resource.getKind().toLowerCase(),
-                    resource.getKind(), resource.getFullName(), e.getMessage(), e);
         }
 
         // Update the last update field
         resourceStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
 
-        LOG.debug("Updating '{}' resource '{}' with Tekton PipelineRun state '{}'", resource.getKind(), resource.getFullName(),
+        // try {
+        //     cloudEventPublisher.publish(runStatus.toEvent(), resource, resource.parentResource());
+        // } catch (Exception e) {
+        //     LOG.warn("Could not publish {} CloudEvent for {} '{}', reason: {}", resource.getKind().toLowerCase(),
+        //             resource.getKind(), resource.getFullName(), e.getMessage(), e);
+        // }
+
+        LOG.debug("Updating {} '{}' with PipelineRun state '{}'", resource.getKind(), resource.getFullName(),
                 runStatus);
 
         return UpdateControl.updateStatus(resource);
