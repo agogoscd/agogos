@@ -3,7 +3,6 @@ package com.redhat.agogos.v1alpha1;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.v1alpha1.Run.RunSpec;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
@@ -52,17 +51,4 @@ public class Run extends AgogosResource<RunSpec, ResultableStatus> implements Na
     @Getter
     @Setter
     private ResultableStatus status = new ResultableStatus();
-
-    @Override
-    public Pipeline parentResource() {
-        Pipeline pipeline = agogosClient.v1alpha1().pipelines().inNamespace(getMetadata().getNamespace())
-                .withName(getSpec().getPipeline()).get();
-
-        if (pipeline == null) {
-            throw new ApplicationException("Could not find Pipeline with name '{}' in namespace '{}'",
-                    getSpec().getPipeline(), getMetadata().getNamespace());
-        }
-
-        return pipeline;
-    }
 }

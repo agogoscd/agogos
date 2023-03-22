@@ -55,13 +55,13 @@ public abstract class AbstractPipelineRunDependentResource<T extends AgogosResou
         if (!optional.isEmpty()) {
             pipelineRun = optional.get();
             LOG.debug("{} '{}', using existing PipelineRun '{}'", resource.getKind(),
-                    resource.getFullName(), pipelineRun.getFullResourceName());
+                    resource.getFullName(), fullPipelineRunName(pipelineRun));
         } else {
             LOG.debug("{} '{}', creating new PipelineRun", resource.getKind(), resource.getFullName());
         }
 
         Map<String, Quantity> requests = new HashMap<>();
-        requests.put("storage", Quantity.parse("1Gi"));
+        requests.put("storage", Quantity.parse("1Gi")); // TODO: This needs to be configurable
 
         PersistentVolumeClaim pvc = new PersistentVolumeClaimBuilder()
                 .withNewSpec()
@@ -88,6 +88,7 @@ public abstract class AbstractPipelineRunDependentResource<T extends AgogosResou
                 .withNewMetadata()
                 .withLabels(labels)
                 .withGenerateName(resourceName(resource) + "-")
+                .withName(pipelineRun.getMetadata() != null ? pipelineRun.getMetadata().getName() : null)
                 .withNamespace(resource.getMetadata().getNamespace())
                 .endMetadata()
                 .withNewSpec()
@@ -116,7 +117,12 @@ public abstract class AbstractPipelineRunDependentResource<T extends AgogosResou
             pipelineRun.getSpec().setServiceAccountName(serviceAccount.get());
         }
 
-        LOG.debug("New PipelineRun '{}' created for '{}", pipelineRun.getMetadata().getName(), resource.getFullName());
+        LOG.debug("PipelineRun '{}' created for '{}'", fullPipelineRunName(pipelineRun), resource.getFullName());
         return pipelineRun;
+    }
+
+    private String fullPipelineRunName(PipelineRun pipelineRun) {
+        return String.format("%s/%s", pipelineRun.getMetadata().getNamespace(),
+                (pipelineRun.getMetadata().getName() != null ? pipelineRun.getMetadata().getName() : "<no-name-yet>"));
     }
 }

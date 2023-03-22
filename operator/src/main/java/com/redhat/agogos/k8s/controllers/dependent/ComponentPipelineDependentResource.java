@@ -14,6 +14,7 @@ import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.ArrayOrString;
 import io.fabric8.tekton.pipeline.v1beta1.ClusterTask;
+import io.fabric8.tekton.pipeline.v1beta1.ParamSpec;
 import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineResult;
@@ -121,7 +122,7 @@ public class ComponentPipelineDependentResource extends AbstractBaseDependentRes
                 .endSpec()
                 .build();
 
-        LOG.debug("New Pipeline '{}' created for Component '{}", pipeline.getMetadata().getName(), component.getFullName());
+        LOG.debug("New Pipeline '{}' created for Component '{}'", pipeline.getMetadata().getName(), component.getFullName());
         return pipeline;
     }
 
@@ -215,14 +216,21 @@ public class ComponentPipelineDependentResource extends AbstractBaseDependentRes
                     builderName);
         }
 
-        // TODO: ClusterTask support?
-        Task builderTask = tektonClient.v1beta1().tasks().inNamespace(component.getMetadata().getNamespace())
-                .withName(builder.getSpec().getTaskRef().getName()).get();
+        List<ParamSpec> params = null;
+        com.redhat.agogos.v1alpha1.TaskRef taskRef = builder.getSpec().getTaskRef();
+        if ("ClusterTask".equals(taskRef.getKind())) {
+            ClusterTask clusterTask = tektonClient.v1beta1().clusterTasks().withName(taskRef.getName()).get();
+            params = clusterTask.getSpec().getParams();
+        } else {
+            Task task = tektonClient.v1beta1().tasks().inNamespace(component.getMetadata().getNamespace())
+                    .withName(taskRef.getName()).get();
+            params = task.getSpec().getParams();
+        }
 
-        if (builderTask == null) {
+        if (params == null) {
             throw new MissingResourceException(
-                    "Task '{}' being implementation of Builder '{}' requested by '{}' Component is not found",
-                    builder.getSpec().getTaskRef().getName(),
+                    "{} '{}' implementation of Builder '{}' requested by Component '{}' is not found",
+                    taskRef.getKind(), taskRef.getName(),
                     builderName, component.getFullName());
         }
 
@@ -230,8 +238,8 @@ public class ComponentPipelineDependentResource extends AbstractBaseDependentRes
 
         TaskRef buildTaskRef = new TaskRefBuilder()
                 .withApiVersion(HasMetadata.getApiVersion(Task.class))
-                .withKind(builder.getSpec().getTaskRef().getKind())
-                .withName(builder.getSpec().getTaskRef().getName())
+                .withKind(taskRef.getKind())
+                .withName(taskRef.getName())
                 .build();
 
         // Prepare main task
@@ -241,7 +249,7 @@ public class ComponentPipelineDependentResource extends AbstractBaseDependentRes
                 .withWorkspaces(workspaceBindings(builder.getSpec().getWorkspaces()))
                 .withRunAfter(lastTask.getName());
 
-        addParams(pipelineTaskBuilder, builderTask.getSpec().getParams(), component.getSpec().getBuild().getParams());
+        addParams(pipelineTaskBuilder, params, component.getSpec().getBuild().getParams());
 
         PipelineTask pipelineTask = pipelineTaskBuilder.build();
 
