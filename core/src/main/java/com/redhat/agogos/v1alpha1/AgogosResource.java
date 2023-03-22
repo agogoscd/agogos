@@ -2,6 +2,7 @@ package com.redhat.agogos.v1alpha1;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.fabric8.kubernetes.client.CustomResource;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;

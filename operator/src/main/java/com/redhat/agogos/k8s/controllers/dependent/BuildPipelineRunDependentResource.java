@@ -1,12 +1,10 @@
 package com.redhat.agogos.k8s.controllers.dependent;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.redhat.agogos.errors.ApplicationException;
-import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BuildPipelineRunDependentResource extends AbstractPipelineRunDependentResource<Build> {
 

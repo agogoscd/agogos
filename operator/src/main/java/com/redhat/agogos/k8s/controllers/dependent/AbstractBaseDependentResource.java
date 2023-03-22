@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.AgogosResource;
-
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.tekton.client.TektonClient;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUDKubernetesDependentResource;

@@ -77,7 +77,7 @@ public abstract class AbstractPipelineRunDependentResource<T extends AgogosResou
                 .build();
 
         Map<String, String> labels = new HashMap<>();
-        labels.put(Resource.RESOURCE.getLabel(), resource.parentResource().getKind().toLowerCase());
+        labels.put(Resource.RESOURCE.getLabel(), parentResource(resource).getKind().toLowerCase());
 
         PodSecurityContext podSecurityContext = new PodSecurityContextBuilder()
                 .withRunAsNonRoot(runAsNonRoot.orElse(true))

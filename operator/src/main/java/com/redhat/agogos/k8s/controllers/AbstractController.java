@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.eventing.CloudEventPublisher;
 import com.redhat.agogos.k8s.TektonPipelineHelper;
+import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.ResultableStatus;
 import io.fabric8.kubernetes.api.model.Namespaced;
@@ -27,16 +28,19 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
     private static final Logger LOG = LoggerFactory.getLogger(AbstractController.class);
 
     @Inject
-    TektonClient tektonClient;
-
-    @Inject
-    ObjectMapper objectMapper;
+    AgogosClient agogosClient;
 
     @Inject
     CloudEventPublisher cloudEventPublisher;
 
     @Inject
+    ObjectMapper objectMapper;
+
+    @Inject
     TektonPipelineHelper pipelineHelper;
+
+    @Inject
+    TektonClient tektonClient;
 
     @Override
     public UpdateControl<T> reconcile(T resource, Context<T> context) {
@@ -56,5 +60,9 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
         } catch (JsonProcessingException e) {
             throw new ApplicationException("Could not serialize status object: '{}'", status);
         }
+    }
+
+    protected AgogosResource<?, ?> parentResource(T resource) {
+        throw new ApplicationException("No implementation of parentResource for '{}'", resource.getKind());
     }
 }

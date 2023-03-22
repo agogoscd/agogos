@@ -30,13 +30,15 @@ public abstract class AbstractRunController<T extends AgogosResource<?, Resultab
             LOG.debug("No PipelineRun for '{}' yet, returning noUpdate", resource.getFullName());
             return UpdateControl.noUpdate();
         } else if (optional.get().getStatus() == null) {
-            LOG.debug("No status for PipelineRun '{}' yet, returning noUpdate", resource.getFullName());
+            LOG.debug("No PipelineRun status for '{}' yet, returning noUpdate", resource.getFullName());
             return UpdateControl.noUpdate();
         }
 
         PipelineRun pipelinerun = optional.get();
         PipelineRunStatus runStatus = PipelineRunStatus.fromPipelineRun(pipelinerun);
         ResultableResourceStatus status = runStatus.toStatus();
+
+        LOG.debug("PipelineRun status for '{}' is {}", resource.getFullName(), runStatus);
 
         ResultableStatus resourceStatus = resource.getStatus();
         final ResultableStatus originalResourceStatus = deepCopy(resourceStatus);
@@ -75,18 +77,18 @@ public abstract class AbstractRunController<T extends AgogosResource<?, Resultab
                     }
                 }
 
-                String pipelineRunName = String.format("%s/%s", pipelinerun.getMetadata().getNamespace(),
-                        pipelinerun.getMetadata().getName());
+                // String pipelineRunName = String.format("%s/%s", pipelinerun.getMetadata().getNamespace(),
+                //         pipelinerun.getMetadata().getName());
 
-                LOG.info("Cleaning up PipelineRun '{}' after a successful {}", pipelineRunName,
-                        resource.getKind().toLowerCase());
+                // LOG.info("Cleaning up PipelineRun '{}' after a successful {}", pipelineRunName,
+                //         resource.getKind().toLowerCase());
 
-                // This may or may not remove the Tekton PipelineRun
-                // In case it is not successful (for any reason) it will be hanging there.
-                // It is the ops duty to find out why these were not removed and clean them up.
-                tektonClient.v1beta1().pipelineRuns()
-                        .inNamespace(pipelinerun.getMetadata().getNamespace())
-                        .withName(pipelinerun.getMetadata().getName()).delete();
+                // // This may or may not remove the Tekton PipelineRun
+                // // In case it is not successful (for any reason) it will be hanging there.
+                // // It is the ops duty to find out why these were not removed and clean them up.
+                // tektonClient.v1beta1().pipelineRuns()
+                //         .inNamespace(pipelinerun.getMetadata().getNamespace())
+                //         .withName(pipelinerun.getMetadata().getName()).delete();
 
                 break;
             case FAILED:
@@ -119,12 +121,12 @@ public abstract class AbstractRunController<T extends AgogosResource<?, Resultab
         // Update the last update field
         resourceStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
 
-        // try {
-        //     cloudEventPublisher.publish(runStatus.toEvent(), resource, resource.parentResource());
-        // } catch (Exception e) {
-        //     LOG.warn("Could not publish {} CloudEvent for {} '{}', reason: {}", resource.getKind().toLowerCase(),
-        //             resource.getKind(), resource.getFullName(), e.getMessage(), e);
-        // }
+        try {
+            cloudEventPublisher.publish(runStatus.toEvent(), resource, parentResource(resource));
+        } catch (Exception e) {
+            LOG.warn("Could not publish {} CloudEvent for {} '{}', reason: {}", resource.getKind().toLowerCase(),
+                    resource.getKind(), resource.getFullName(), e.getMessage(), e);
+        }
 
         LOG.debug("Updating {} '{}' with PipelineRun state '{}'", resource.getKind(), resource.getFullName(),
                 runStatus);
