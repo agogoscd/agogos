@@ -1,78 +1,36 @@
 package com.redhat.agogos.k8s.controllers;
 
 import com.redhat.agogos.errors.ApplicationException;
-import com.redhat.agogos.k8s.client.AgogosClient;
-import com.redhat.agogos.k8s.event.BuildEventSource;
-import com.redhat.agogos.v1alpha1.AgogosResource;
+import com.redhat.agogos.k8s.controllers.dependent.BuildPipelineRunDependentResource;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Component;
-import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
-import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
-import io.javaoperatorsdk.operator.api.reconciler.EventSourceContext;
-import io.javaoperatorsdk.operator.api.reconciler.EventSourceInitializer;
-import io.javaoperatorsdk.operator.processing.event.source.EventSource;
+import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import java.util.Map;
 
 @ApplicationScoped
-@ControllerConfiguration(generationAwareEventProcessing = false)
-public class BuildController extends AbstractController<Build> {
+@ControllerConfiguration(generationAwareEventProcessing = false, dependents = {
+        @Dependent(type = BuildPipelineRunDependentResource.class) })
+public class BuildController extends AbstractRunController<Build> {
 
     private static final Logger LOG = LoggerFactory.getLogger(BuildController.class);
 
-    @Inject
-    AgogosClient agogosClient;
-
-    @Inject
-    BuildEventSource buildEventSource;
-
-    /**
-     * <p>
-     * Register the {@link io.fabric8.tekton.pipeline.v1alpha1.PipelineRun} event
-     * source so that we can receive events from PipelineRun's that are related to
-     * {@link Component}'s.
-     * </p>
-     */
     @Override
-    public Map<String, EventSource> prepareEventSources(EventSourceContext<Build> context) {
-        return Map.of(EventSourceInitializer.generateNameFor(buildEventSource), buildEventSource);
-    }
+    protected Component parentResource(Build build) {
+        LOG.debug("Finding parent Component for Build '{}'", build.getFullName());
 
-    //Map<String, EventSource> prepareEventSources(EventSourceContext<P> context);
-
-    /**
-     * <p>
-     * Method triggered when a {@link Build} is removed from the cluster.
-     * </p>
-     * 
-     * @param build {@link Build}
-     * @param context {@link Context}
-     * @return {@link DeleteControl}
-     */
-    @Override
-    public DeleteControl cleanup(Build build, Context<Build> context) {
-        return DeleteControl.defaultDelete();
-    }
-
-    @Override
-    protected AgogosResource<?, ?> parentResource(Build build) {
-        LOG.debug("Finding parent resource for Build '{}'", build.getFullName());
-
-        Component component = agogosClient.v1alpha1().components().inNamespace(build.getMetadata().getNamespace())
+        Component component = agogosClient.v1alpha1().components()
+                .inNamespace(build.getMetadata().getNamespace())
                 .withName(build.getSpec().getComponent()).get();
 
         if (component == null) {
-            throw new ApplicationException("Could not find Component with name '{}' in namespace '{}'",
+            throw new ApplicationException("Could not find Component '{}' in namespace '{}'",
                     build.getSpec().getComponent(), build.getMetadata().getNamespace());
         }
 
         return component;
     }
-
 }

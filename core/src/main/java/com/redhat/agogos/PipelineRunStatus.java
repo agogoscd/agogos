@@ -1,5 +1,8 @@
 package com.redhat.agogos;
 
+import io.fabric8.knative.internal.pkg.apis.Condition;
+import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
+
 public enum PipelineRunStatus {
     STARTED,
     RUNNING,
@@ -37,6 +40,11 @@ public enum PipelineRunStatus {
             return status;
 
         }
+    }
+
+    public static PipelineRunStatus fromPipelineRun(PipelineRun pipelineRun) {
+        Condition condition = pipelineRun.getStatus().getConditions().get(0);
+        return PipelineRunStatus.fromTekton(condition.getStatus(), condition.getReason());
     }
 
     public PipelineRunState toEvent() {

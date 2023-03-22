@@ -1,22 +1,18 @@
-package com.redhat.agogos.k8s.controllers;
+package com.redhat.agogos.k8s.controllers.dependent;
 
 import com.redhat.agogos.errors.ApplicationException;
-import com.redhat.agogos.k8s.controllers.dependent.RunPipelineRunDependentResource;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.Run;
-import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
-import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.enterprise.context.ApplicationScoped;
+public class RunPipelineRunDependentResource extends AbstractPipelineRunDependentResource<Run> {
 
-@ApplicationScoped
-@ControllerConfiguration(generationAwareEventProcessing = false, dependents = {
-        @Dependent(type = RunPipelineRunDependentResource.class) })
-public class RunController<T> extends AbstractRunController<Run> {
+    protected static final Logger LOG = LoggerFactory.getLogger(RunPipelineRunDependentResource.class);
 
-    private static final Logger LOG = LoggerFactory.getLogger(RunController.class);
+    public String resourceName(Run run) {
+        return run.getSpec().getPipeline();
+    }
 
     @Override
     protected Pipeline parentResource(Run run) {
@@ -30,5 +26,4 @@ public class RunController<T> extends AbstractRunController<Run> {
 
         return pipeline;
     }
-
 }
