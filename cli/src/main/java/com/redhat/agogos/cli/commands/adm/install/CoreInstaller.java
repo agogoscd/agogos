@@ -61,7 +61,7 @@ public class CoreInstaller extends Installer {
             "app.kubernetes.io/component", "core"//
     );
 
-    @ConfigProperty(name = "agogos.container-image.init", defaultValue = "quay.io/cpaas/agogos-poc-stage-init:latest")
+    @ConfigProperty(name = "agogos.container-image.init", defaultValue = "quay.io/agogos/stage-init:v1")
     String containerImageInit;
 
     @Inject
