@@ -27,7 +27,7 @@ quarkus:
 
   agogos:
     container-image:
-      init: quay.io/cpaas/agogos-poc-stage-init:latest
+      init: quay.io/agogos/stage-init:v1
 
 "%prod":
   quarkus:

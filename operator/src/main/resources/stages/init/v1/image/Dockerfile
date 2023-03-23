@@ -1,4 +1,4 @@
-FROM fedora:33
+FROM fedora:37
 
 ENV LC_ALL=C KUBECTL_VERSION=v1.21.2
 
