@@ -51,8 +51,8 @@ public class InstallCommandTest {
         assertEquals(0, exitCode);
 
         assertTrue(handler.contains("💻 Selected profile: local"));
-        assertTrue(handler.contains("✅ Tekton v0.24.0 installed"));
-        assertTrue(handler.contains("✅ Tekton Triggers v0.14.2 installed"));
+        assertTrue(handler.contains("✅ Tekton v0.41.1 installed"));
+        assertTrue(handler.contains("✅ Tekton Triggers v0.22.2 installed"));
         assertTrue(handler.contains("✅ Knative Eventing v0.21.4 installed"));
         assertTrue(handler.contains("✅ Agogos CRDs installed"));
         assertTrue(handler.contains("✅ Agogos core resources installed"));
@@ -70,8 +70,8 @@ public class InstallCommandTest {
         assertEquals(0, exitCode);
 
         assertTrue(handler.contains("💻 Selected profile: dev"));
-        assertTrue(handler.contains("✅ Tekton v0.24.0 installed"));
-        assertTrue(handler.contains("✅ Tekton Triggers v0.14.2 installed"));
+        assertTrue(handler.contains("✅ Tekton v0.41.1 installed"));
+        assertTrue(handler.contains("✅ Tekton Triggers v0.22.2 installed"));
         assertTrue(handler.contains("✅ Knative Eventing v0.21.4 installed"));
         assertTrue(handler.contains("✅ Agogos CRDs installed"));
         assertTrue(handler.contains("✅ Agogos core resources installed"));
