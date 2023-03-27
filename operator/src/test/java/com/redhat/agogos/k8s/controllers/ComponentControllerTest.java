@@ -3,6 +3,7 @@ package com.redhat.agogos.k8s.controllers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.test.CRDTestServerSetup;
@@ -13,6 +14,7 @@ import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.ClusterTask;
 import io.fabric8.tekton.pipeline.v1beta1.ClusterTaskBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.ParamSpecBuilder;
+import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
 import io.fabric8.tekton.pipeline.v1beta1.Task;
 import io.fabric8.tekton.pipeline.v1beta1.TaskBuilder;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
@@ -25,6 +27,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.inject.Inject;
+
+import java.util.Optional;
 
 @WithKubernetesTestServer(setup = CRDTestServerSetup.class)
 @QuarkusTest
@@ -57,6 +61,7 @@ public class ComponentControllerTest {
 
         @SuppressWarnings("unchecked")
         Context<Component> context = (Context<Component>) Mockito.mock(Context.class);
+        when(context.getSecondaryResource(Pipeline.class)).thenReturn(Optional.empty());
 
         UpdateControl<Component> control = componentController.reconcile(component, context);
 
@@ -65,8 +70,7 @@ public class ComponentControllerTest {
         assertTrue(control.isUpdateStatus());
 
         assertEquals("Failed", control.getResource().getStatus().getStatus());
-        assertEquals("Could not create Component: Selected Builder 'some-builder-name' is not available in the system",
-                control.getResource().getStatus().getReason());
+        assertEquals("Could not create Component", control.getResource().getStatus().getReason());
     }
 
     @Test
@@ -77,7 +81,10 @@ public class ComponentControllerTest {
         component.getMetadata().setName("test-create");
         component.getSpec().getBuild().setBuilderRef(new BuilderRef("should-handle-component-builder-name"));
 
-        Context context = Mockito.mock(Context.class);
+        @SuppressWarnings("unchecked")
+        Context<Component> context = (Context<Component>) Mockito.mock(Context.class);
+        // when(context.getSecondaryResource(Pipeline.class)).thenReturn(Optional.of(new Pipeline()));
+        when(context.getSecondaryResource(Pipeline.class)).thenReturn(Optional.of(new Pipeline()));
 
         Task task = new TaskBuilder().withNewMetadata().withName("should-handle-component").endMetadata().withNewSpec()
                 .withParams(new ParamSpecBuilder().withName("param").build()).endSpec().build();
