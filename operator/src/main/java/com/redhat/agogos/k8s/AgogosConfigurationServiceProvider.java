@@ -1,5 +1,6 @@
 package com.redhat.agogos.k8s;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -35,6 +36,7 @@ public class AgogosConfigurationServiceProvider {
 
         private final QuarkusConfigurationService delegate;
         private final ObjectMapper mapper;
+        private final Cloner cloner;
 
         @Override
         public Config getClientConfiguration() {
@@ -118,7 +120,7 @@ public class AgogosConfigurationServiceProvider {
 
         @Override
         public Cloner getResourceCloner() {
-            return delegate.getResourceCloner();
+            return cloner;
         }
 
         @Override
@@ -145,6 +147,17 @@ public class AgogosConfigurationServiceProvider {
             this.delegate = delegate;
             mapper = new ObjectMapper();
             mapper.registerModule(new JavaTimeModule());
+            cloner = new Cloner() {
+                @Override
+                @SuppressWarnings("unchecked")
+                public <R extends HasMetadata> R clone(R r) {
+                    try {
+                        return (R) mapper.readValue(mapper.writeValueAsString(r), r.getClass());
+                    } catch (JsonProcessingException e) {
+                        throw new IllegalStateException(e);
+                    }
+                }
+            };
         }
     }
 }
