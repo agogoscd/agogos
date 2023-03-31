@@ -23,7 +23,7 @@ If this is not the case and a `root` user is used, the pod will fail with
 `CreateContainerConfigError` status.
 
 `runAsUser`::
-Default: `65532`
+Default: `31415`
 +
 This settings defines the uid of the user running the main process in the container.
 This setting overrides any setting in the container image.
