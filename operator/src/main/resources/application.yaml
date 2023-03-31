@@ -52,7 +52,7 @@ agogos:
       # To unify permissions of files created as part of Builds and Pipeline execution
       # we set the used ID.
       # https://kubernetes.io/docs/concepts/policy/pod-security-policy/#users-and-groups
-      runAsUser: 65532
+      runAsUser: 31415
 
 kubernetes:
   # Default storage class name in minikube

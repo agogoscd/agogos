@@ -102,50 +102,50 @@ public class TektonPipelineHelper {
         Map<String, Quantity> requests = new HashMap<>();
         requests.put("storage", Quantity.parse("1Gi"));
 
-        PersistentVolumeClaim pvc = new PersistentVolumeClaimBuilder() //
-                .withNewSpec() //
-                .withAccessModes("ReadWriteOnce") //
-                .withNewResources().withRequests(requests).endResources() //
-                .withStorageClassName(storageClass.orElse("")) //
-                .endSpec() //
+        PersistentVolumeClaim pvc = new PersistentVolumeClaimBuilder()
+                .withNewSpec()
+                .withAccessModes("ReadWriteOnce")
+                .withNewResources().withRequests(requests).endResources()
+                .withStorageClassName(storageClass.orElse(""))
+                .endSpec()
                 .build();
 
-        WorkspaceBinding workspace = new WorkspaceBindingBuilder() //
-                .withName(WorkspaceMapping.MAIN_WORKSPACE_NAME) //
-                .withVolumeClaimTemplate(pvc) //
+        WorkspaceBinding workspace = new WorkspaceBindingBuilder()
+                .withName(WorkspaceMapping.MAIN_WORKSPACE_NAME)
+                .withVolumeClaimTemplate(pvc)
                 .build();
 
         Map<String, String> labels = new HashMap<>();
         labels.put(Resource.RESOURCE.getLabel(), kind.toLowerCase());
 
-        PodSecurityContext podSecurityContext = new PodSecurityContextBuilder() //
-                .withRunAsNonRoot(runAsNonRoot.orElse(true)) //
-                .withRunAsUser(runAsUser.orElse(65532l)) // 
+        PodSecurityContext podSecurityContext = new PodSecurityContextBuilder()
+                .withRunAsNonRoot(runAsNonRoot.orElse(true))
+                .withRunAsUser(runAsUser.orElse(31415l)) // 
                 .build();
 
-        PipelineRun pipelineRun = new PipelineRunBuilder() //
-                .withNewMetadata() //
-                .withLabels(labels) //
-                .withGenerateName(name + "-") //
-                .withNamespace(namespace) //
-                .endMetadata() //
-                .withNewSpec() //
-                .withNewPipelineRef().withName(name).endPipelineRef() //
-                .withWorkspaces(workspace) //
-                .withNewPodTemplate() //
-                .withSecurityContext(podSecurityContext) //
-                .endPodTemplate() //
-                .endSpec() //
+        PipelineRun pipelineRun = new PipelineRunBuilder()
+                .withNewMetadata()
+                .withLabels(labels)
+                .withGenerateName(name + "-")
+                .withNamespace(namespace)
+                .endMetadata()
+                .withNewSpec()
+                .withNewPipelineRef().withName(name).endPipelineRef()
+                .withWorkspaces(workspace)
+                .withNewPodTemplate()
+                .withSecurityContext(podSecurityContext)
+                .endPodTemplate()
+                .endSpec()
                 .build();
 
         if (owner != null) {
-            OwnerReference ownerReference = new OwnerReferenceBuilder() //
-                    .withApiVersion(owner.getApiVersion()) //
-                    .withKind(owner.getKind()) //
-                    .withName(owner.getMetadata().getName()) //
-                    .withUid(owner.getMetadata().getUid()) //
-                    .withBlockOwnerDeletion(true) //
-                    .withController(true) //
+            OwnerReference ownerReference = new OwnerReferenceBuilder()
+                    .withApiVersion(owner.getApiVersion())
+                    .withKind(owner.getKind())
+                    .withName(owner.getMetadata().getName())
+                    .withUid(owner.getMetadata().getUid())
+                    .withBlockOwnerDeletion(true)
+                    .withController(true)
                     .build();
 
             pipelineRun.getMetadata().setOwnerReferences(Arrays.asList(ownerReference));

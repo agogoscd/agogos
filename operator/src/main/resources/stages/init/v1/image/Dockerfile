@@ -6,6 +6,6 @@ COPY scripts/ /usr/local/bin/
 
 RUN install-kubectl
 
-USER 65532
+USER 31415
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint" ]
