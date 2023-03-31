@@ -65,10 +65,9 @@
             <artifactId>quarkus-security</artifactId>
         </dependency>
         <dependency>
-<!--            todo: fixme-->
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-httpclient-jdk</artifactId>
-            <version>6.3.1</version>
+            <version>${kubernetes-client.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -83,6 +82,7 @@
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>knative-client</artifactId>
+            <version>${kubernetes-client.version}</version>
         </dependency>
         <dependency>
             <groupId>io.quarkiverse.tektonclient</groupId>

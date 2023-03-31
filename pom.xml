@@ -38,13 +38,21 @@
         <quarkus-tekton-client.version>0.6.0</quarkus-tekton-client.version>
         <bouncycastle.version>1.72</bouncycastle.version>
 
-        <quarkus.platform.version>2.16.5.Final</quarkus.platform.version>
+        <quarkus.platform.version>2.15.2.Final</quarkus.platform.version>
         <operator-framework.version>4.2.2</operator-framework.version>
-        <quarkus-operatorsdk.version>5.1.2</quarkus-operatorsdk.version>
+        <quarkus-operatorsdk.version>5.0.2</quarkus-operatorsdk.version>
+        <kubernetes-client.version>6.2.0</kubernetes-client.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-client-bom</artifactId>
+                <version>${kubernetes-client.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>${quarkus.platform.artifact-id}</artifactId>
@@ -53,11 +61,9 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>io.quarkiverse.operatorsdk</groupId>
-                <artifactId>quarkus-operator-sdk-bom</artifactId>
-                <version>${quarkus-operatorsdk.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
+                <groupId>io.javaoperatorsdk</groupId>
+                <artifactId>operator-framework-core</artifactId>
+                <version>${operator-framework.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
