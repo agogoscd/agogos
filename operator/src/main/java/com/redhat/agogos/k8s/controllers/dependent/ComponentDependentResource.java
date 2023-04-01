@@ -7,7 +7,7 @@ import io.javaoperatorsdk.operator.processing.dependent.kubernetes.KubernetesDep
 
 public class ComponentDependentResource extends KubernetesDependentResource<Component, Build> {
 
-    public ComponentDependentResource(Class<Component> resourceType) {
-        super(resourceType);
+    public ComponentDependentResource() {
+        super(Component.class);
     }
 }
