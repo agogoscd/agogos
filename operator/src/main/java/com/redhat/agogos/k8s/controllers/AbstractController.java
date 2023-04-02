@@ -7,6 +7,7 @@ import com.redhat.agogos.eventing.CloudEventPublisher;
 import com.redhat.agogos.k8s.TektonPipelineHelper;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.AgogosResource;
+import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.ResultableStatus;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.tekton.client.TektonClient;
@@ -62,7 +63,7 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
         }
     }
 
-    protected AgogosResource<?, ?> parentResource(T resource) {
+    protected AgogosResource<?, ?> parentResource(T resource, Context<T> context) {
         throw new ApplicationException("No implementation of parentResource for '{}'", resource.getKind());
     }
 }

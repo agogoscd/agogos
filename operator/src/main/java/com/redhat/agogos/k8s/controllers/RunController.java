@@ -4,6 +4,7 @@ import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.k8s.controllers.dependent.RunPipelineRunDependentResource;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.Run;
+import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
 import org.slf4j.Logger;
@@ -14,12 +15,12 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 @ControllerConfiguration(generationAwareEventProcessing = false, dependents = {
         @Dependent(type = RunPipelineRunDependentResource.class) })
-public class RunController<T> extends AbstractRunController<Run> {
+public class RunController extends AbstractRunController<Run> {
 
     private static final Logger LOG = LoggerFactory.getLogger(RunController.class);
 
     @Override
-    protected Pipeline parentResource(Run run) {
+    protected Pipeline parentResource(Run run, Context<Run> context) {
         Pipeline pipeline = agogosClient.v1alpha1().pipelines().inNamespace(run.getMetadata().getNamespace())
                 .withName(run.getSpec().getPipeline()).get();
 
