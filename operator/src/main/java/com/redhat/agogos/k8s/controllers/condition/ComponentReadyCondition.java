@@ -1,17 +1,15 @@
 package com.redhat.agogos.k8s.controllers.condition;
 
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.redhat.agogos.ResourceStatus;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Component;
-
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.processing.dependent.workflow.Condition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
 
 public class ComponentReadyCondition implements Condition<Component, Build> {
 
@@ -32,7 +30,7 @@ public class ComponentReadyCondition implements Condition<Component, Build> {
             LOG.debug("Component '{}/{}' does not exist.", namespace, name);
         }
         return component != null
-            && ResourceStatus.valueOf(component.getStatus().getStatus()) == ResourceStatus.Ready;       
+                && ResourceStatus.valueOf(component.getStatus().getStatus()) == ResourceStatus.Ready;
     }
-    
+
 }

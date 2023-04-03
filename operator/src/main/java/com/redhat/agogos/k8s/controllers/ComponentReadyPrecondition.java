@@ -1,16 +1,17 @@
 package com.redhat.agogos.k8s.controllers;
 
+import com.redhat.agogos.ResourceStatus;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Component;
+
+import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.processing.dependent.workflow.Condition;
-import io.javaoperatorsdk.operator.processing.event.ResourceID;
-import io.javaoperatorsdk.operator.processing.event.source.informer.InformerEventSource;
 
-public class ComponentReadyPrecondition implements Condition<Component, Build> {
+public class ComponentReadyPrecondition implements Condition<PipelineRun, Build> {
     @Override
-    public boolean isMet(Build build, Component secondary, Context<Build> context) {
-        var component =  context.getSecondaryResource(Component.class);
-        return component.map(c->"ready".equals(c.getStatus().getStatus())).orElse(false);
+    public boolean isMet(Build build, PipelineRun secondary, Context<Build> context) {
+        var component = context.getSecondaryResource(Component.class);
+        return component.map(c -> ResourceStatus.valueOf(c.getStatus().getStatus()) == ResourceStatus.Ready).orElse(false);
     }
 }

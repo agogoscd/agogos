@@ -7,7 +7,6 @@ import com.redhat.agogos.eventing.CloudEventPublisher;
 import com.redhat.agogos.k8s.TektonPipelineHelper;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.AgogosResource;
-import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.ResultableStatus;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.tekton.client.TektonClient;

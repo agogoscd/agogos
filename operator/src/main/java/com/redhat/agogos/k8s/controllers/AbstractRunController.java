@@ -123,7 +123,7 @@ public abstract class AbstractRunController<T extends AgogosResource<?, Resultab
         resourceStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
 
         try {
-            cloudEventPublisher.publish(runStatus.toEvent(), resource, parentResource(resource,context));
+            cloudEventPublisher.publish(runStatus.toEvent(), resource, parentResource(resource, context));
         } catch (Exception e) {
             LOG.warn("Could not publish {} CloudEvent for {} '{}', reason: {}", resource.getKind().toLowerCase(),
                     resource.getKind(), resource.getFullName(), e.getMessage(), e);
