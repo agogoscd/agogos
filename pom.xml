@@ -23,6 +23,8 @@
     </modules>
 
     <properties>
+        <main.basedir>.</main.basedir>
+
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
@@ -116,17 +118,17 @@
                             </includes>
                             <removeUnusedImports />
                             <importOrder>
-                                <file>spotless-importorder.properties</file>
+                                <file>${main.basedir}/spotless-importorder.properties</file>
                             </importOrder>
                             <eclipse>
-                                <file>eclipse-format.xml</file>
+                                <file>${main.basedir}/eclipse-format.xml</file>
                             </eclipse>
                         </java>
                     </configuration>
                     <executions>
                         <execution>
                             <goals>
-                                <goal>check</goal>
+                                <goal>apply</goal>
                             </goals>
                             <phase>compile</phase>
                         </execution>

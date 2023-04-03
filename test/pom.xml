@@ -13,6 +13,10 @@
     <name>Agogos Test</name>
     <description>Useful utilities used in tests across Agogos modules</description>
 
+    <properties>
+        <main.basedir>${project.parent.basedir}</main.basedir>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.redhat.agogos</groupId>

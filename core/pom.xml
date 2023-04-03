@@ -12,6 +12,10 @@
     <version>1.0-SNAPSHOT</version>
     <name>Agogos Core</name>
 
+    <properties>
+        <main.basedir>${project.parent.basedir}</main.basedir>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
