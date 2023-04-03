@@ -79,17 +79,10 @@
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>tekton-model-triggers-v1beta1</artifactId>
-            <version>${kubernetes-client.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.fabric8</groupId>
-            <artifactId>tekton-client</artifactId>
-            <version>${kubernetes-client.version}</version>
         </dependency>
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>knative-client</artifactId>
-            <version>${kubernetes-client.version}</version>
         </dependency>
         <dependency>
             <groupId>io.quarkiverse.tektonclient</groupId>
@@ -105,7 +98,6 @@
         <dependency>
             <groupId>org.eclipse.microprofile.rest.client</groupId>
             <artifactId>microprofile-rest-client-api</artifactId>
-            <version>2.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -116,7 +108,6 @@
         <dependency>
             <groupId>io.quarkiverse.operatorsdk</groupId>
             <artifactId>quarkus-operator-sdk</artifactId>
-            <version>${quarkus-operatorsdk.version}</version>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>

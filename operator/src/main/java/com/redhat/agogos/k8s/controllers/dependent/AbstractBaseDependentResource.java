@@ -8,8 +8,7 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.tekton.client.TektonClient;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUDKubernetesDependentResource;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.KubernetesDependent;
-
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 @KubernetesDependent
 public abstract class AbstractBaseDependentResource<R extends HasMetadata, P extends HasMetadata>

@@ -1,6 +1,7 @@
 package com.redhat.agogos.cli.commands.adm.certs;
 
 import com.redhat.agogos.errors.ApplicationException;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -20,8 +21,6 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
-
-import javax.enterprise.context.ApplicationScoped;
 
 import java.io.IOException;
 import java.io.StringWriter;

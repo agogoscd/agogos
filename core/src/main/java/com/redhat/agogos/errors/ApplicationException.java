@@ -1,11 +1,10 @@
 package com.redhat.agogos.errors;
 
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response.Status;
 import org.slf4j.helpers.MessageFormatter;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -15,7 +14,7 @@ public class ApplicationException extends RuntimeException {
     private final Object[] params;
 
     private String formattedMessage;
-    private Integer statusCode;
+    private final Integer statusCode;
 
     public ApplicationException(String msg, Object... params) {
         this(Status.BAD_REQUEST, msg, params);

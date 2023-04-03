@@ -2,9 +2,8 @@ package com.redhat.agogos.k8s.client;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.quarkus.runtime.annotations.RegisterForReflection;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 @ApplicationScoped
 @RegisterForReflection

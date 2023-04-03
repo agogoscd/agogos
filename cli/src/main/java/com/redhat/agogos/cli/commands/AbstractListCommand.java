@@ -11,10 +11,9 @@ import io.fabric8.kubernetes.api.model.DefaultKubernetesResourceList;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import jakarta.inject.Inject;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.Option;
-
-import javax.inject.Inject;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;

@@ -12,12 +12,11 @@ import com.redhat.agogos.cli.commands.trigger.TriggerCommand;
 
 import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
+import jakarta.inject.Inject;
 import lombok.Getter;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ScopeType;
-
-import javax.inject.Inject;
 
 import java.io.PrintWriter;
 

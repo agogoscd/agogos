@@ -9,13 +9,12 @@ import com.redhat.agogos.test.InMemoryLogHandler;
 import com.redhat.agogos.test.KubernetesTestServerSetup;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
+import jakarta.inject.Inject;
 import org.jboss.logmanager.LogContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import javax.inject.Inject;
 
 @WithKubernetesTestServer(setup = KubernetesTestServerSetup.class)
 @QuarkusTest
