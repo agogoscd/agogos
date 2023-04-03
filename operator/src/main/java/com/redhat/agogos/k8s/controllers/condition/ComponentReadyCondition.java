@@ -5,11 +5,11 @@ import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Component;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
+import io.javaoperatorsdk.operator.api.reconciler.dependent.DependentResource;
 import io.javaoperatorsdk.operator.processing.dependent.workflow.Condition;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
 
 public class ComponentReadyCondition implements Condition<Component, Build> {
 
@@ -19,7 +19,7 @@ public class ComponentReadyCondition implements Condition<Component, Build> {
     AgogosClient agogosClient;
 
     @Override
-    public boolean isMet(Build primary, Component secondary, Context<Build> context) {
+    public boolean isMet(DependentResource<Component, Build> dependentResource, Build primary, Context<Build> context) {
         String name = primary.getSpec().getComponent();
         String namespace = primary.getMetadata().getNamespace();
         Component component = agogosClient.v1alpha1().components().inNamespace(namespace).withName(name).get();
@@ -32,5 +32,4 @@ public class ComponentReadyCondition implements Condition<Component, Build> {
         return component != null
                 && ResourceStatus.valueOf(component.getStatus().getStatus()) == ResourceStatus.Ready;
     }
-
 }
