@@ -38,15 +38,14 @@ public class ComponentController extends AbstractController<Component> {
     @Override
     public UpdateControl<Component> reconcile(Component component, Context<Component> context) {
         Optional<Pipeline> optional = context.getSecondaryResource(Pipeline.class);
-        if (!optional.isPresent()) {
-            LOG.debug("No pipeline for Component '{}' yet, returning noUpdate", component.getFullName());
-            return UpdateControl.noUpdate();
-        }
-
-        // Set the component status.
         Status componentStatus = component.getStatus();
-        componentStatus.setStatus(String.valueOf(ResourceStatus.Ready));
-        componentStatus.setReason("Component is ready");
+        if (optional.isPresent()) {
+            componentStatus.setStatus(String.valueOf(ResourceStatus.Ready));
+            componentStatus.setReason("Component is ready");
+        } else {
+            componentStatus.setStatus(String.valueOf(ResourceStatus.Failed));
+            componentStatus.setReason("Could not create Component");
+        }
         componentStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
 
         LOG.info("Set status for Component '{}' to {}", component.getFullName(), component.getStatus().getStatus());
