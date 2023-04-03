@@ -3,7 +3,6 @@ package com.redhat.agogos.k8s.controllers;
 import com.redhat.agogos.ResourceStatus;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Component;
-
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.processing.dependent.workflow.Condition;
