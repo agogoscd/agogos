@@ -62,7 +62,7 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
         }
     }
 
-    protected AgogosResource<?, ?> parentResource(T resource) {
+    protected AgogosResource<?, ?> parentResource(T resource, Context<T> context) {
         throw new ApplicationException("No implementation of parentResource for '{}'", resource.getKind());
     }
 }
