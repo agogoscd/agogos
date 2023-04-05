@@ -1,26 +1,7 @@
-*// ** xref:contributing.adoc[]*
-
-* Developer Guide
-
-** xref:overview.adoc[]
-
+* xref:index.adoc[]
 ** xref:contributing.adoc[]
-** xref:ide.adoc[]
-
 ** xref:development-mode.adoc[]
-
+** xref:ide.adoc[]
 ** xref:testing/index.adoc[]
-
 ** xref:stages/index.adoc[]
-
 ** xref:builders/index.adoc[]
-
-// *** xref:stage/builder_tutorial.adoc[]
-// *** xref:stage/stage_api.adoc[]
-
-// ** xref:webhooks/index.adoc[]
-// *** xref:webhooks/deployment.adoc[]
-// *** xref:webhooks/ssl_certificates.adoc[]
-
-// ** xref:operator/index.adoc[]
-// *** xref:operator/deployment.adoc[]
