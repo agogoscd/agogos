@@ -64,9 +64,9 @@ spec:
               value: tekton.dev/triggers
           securityContext:
             allowPrivilegeEscalation: false
-            # User 31415 is the distroless nonroot user ID
-            runAsUser: 31415
-            runAsGroup: 31415
+            # User 65532 is the distroless nonroot user ID
+            runAsUser: 65532
+            runAsGroup: 65532
             capabilities:
               drop:
                 - all
