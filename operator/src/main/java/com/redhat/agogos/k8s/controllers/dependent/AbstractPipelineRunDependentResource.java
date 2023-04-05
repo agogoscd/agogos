@@ -81,7 +81,7 @@ public abstract class AbstractPipelineRunDependentResource<T extends AgogosResou
 
         PodSecurityContext podSecurityContext = new PodSecurityContextBuilder()
                 .withRunAsNonRoot(runAsNonRoot.orElse(true))
-                .withRunAsUser(runAsUser.orElse(31415l))
+                .withRunAsUser(runAsUser.orElse(65532l))
                 .build();
 
         pipelineRun = new PipelineRunBuilder(pipelineRun)
