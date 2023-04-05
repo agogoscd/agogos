@@ -1,157 +1,199 @@
 = Development Mode
 
-// include::common:partial$draft.adoc[]
+This tutorial shows you how to run a simple component build on Agogos using Minikube.
 
-Here you will find on how to run Agogos in development mode which will make it easy to
-contribute to Agogos!
+== Objectives
 
-== Kubernetes Cluster
+* Install Agogos into a Minikube cluster
+* Define a simple component to build
+* Build the component
 
-To be able to deploy Agogos you need to have a Kubernetes cluster where
-it can be deployed.
-If you don't have a cluster you maintain which could be used to deploy Agogos, you can
-use Minikube.
+== Before you begin
+This tutorial assumes you have already setup `minikube`, `kubectl` and, at
+least, OpenJDK 11 . See
+link:https://minikube.sigs.k8s.io/docs/start/[minikube start],
+link:https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/[kubectl] and
+link:https://openjdk.org/[OpenJDK]
+for installation instructions.
 
-TIP: If you use Minikube, see the xref:environment.adoc#managing-kubernetes-contexts[note about managing contexts].
-
-[#minikube]
-=== Minikube
-
-Recommended version:: Latest
-Documentation:: link:https://minikube.sigs.k8s.io/docs/start/[Official installation guide].
-
-You may want to assign more resources to your installation. In case you use `kvm2`
-driver you could use this command:
-
-[source,bash]
-----
-❯ minikube start --driver=kvm2 --cpus=4 --memory=6g --disk-size=30GB
-----
-
-==== Tips
-
-[#managing-kubernetes-contexts]
-===== Managing contexts
-
-You can maintain the minikube context in a separate kubeconfig file.
-
-This will make it possible to switch to Minikube context by setting an environment variable.
-Run the below command to create (or update) your minikube context in specified file.
+== Untrusted Certificates
+We need Minikube to trust the Red{nbsp}Hat root certificates as Agogos interacts
+with many different internal services. The internal certificates are self-signed,
+so they are considered
+link:https://minikube.sigs.k8s.io/docs/handbook/untrusted_certs/[unstrusted certificates].
+Run:
 
 [source,bash]
 ----
-❯ export KUBECONFIG=~/.kube/minikube.yaml
-❯ minikube update-context
-🎉  "minikube" context has been updated to point to 192.168.39.112:8443
-💗  Current context is "minikube"
+mkdir $HOME/.minikube/certs/
+wget -O $HOME/.minikube/certs/RH-IT-Root-CA.crt https://certs.corp.redhat.com/certs/2015-IT-Root-CA.pem
+wget -O $HOME/.minikube/certs/2022-IT-Root-CA.pem https://certs.corp.redhat.com/certs/2022-IT-Root-CA.pem
 ----
 
-To use the Minikube context you will need to run `export KUBECONFIG=~/.kube/minikube.yaml`
-in the terminal before interacting with the cluster.
-
-==== Known issues
-
-This section describes known issues and limitations with the setup.
-
-===== Failure to call webhooks due to a refused connection
-
-An error appears because your firewall blocks the connection between Kubernetes
-running in Minikube and Agogos Webhooks application running outside of Minikube.
-
-Running the following command will fix the issue.
+== Create a Minikube Cluster
 
 [source,bash]
 ----
-❯ sudo firewall-cmd --permanent --zone=libvirt --add-port=8443/tcp
+minikube start --driver=kvm2 --cpus=4 --memory=6g --disk-size=30GB --kubernetes-version=1.21.14 --embed-certs
 ----
 
-NOTE: The `--permanent` option activates after restarting your system.
+Minikube configures your [filename]`$HOME/.kube/config` to use the newly created
+cluster. `kubectl` supports different contexts, see
+link:https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/[organize cluster access]
+for detailed information.
+
+Use `kubectl config current-context` to see the context you are working in. It
+should return `minikube`.
+
+== Open Firewall Ports From Minikube To The Host
+The Kubernetes cluster needs to contact Agogos' Webhooks for resource validation.
+In development mode this means that Minikube needs to access some host ports. Here,
+we provide information about how to achieve when using `firewalld`. Make
+sure `firewalld` is running, then run:
+
+[source,bash]
+----
+sudo firewall-cmd --permanent --zone=libvirt --add-port=8443/tcp  # This opens the port after restart
+sudo firewall-cmd --zone=libvirt --add-port=8443/tcp  # This opens the port immediately
+----
+
+To open the port 8443 from the Minikube Virtual Machine to localhost.
 
 == Installing Agogos in Development Mode
-
-To be able to develop Agogos you need to install it in the `dev` mode. This will register
-resources within the cluster, but it will make it possible to run Agogos components outside
-of the cluster.
+In the root of the repository, run:
 
 [source,bash]
 ----
-❯ agogosctl adm install --profile dev
+./mvnw clean package -D skipTests
 ----
 
-[NOTE]
-====
-Please note that installing Agogos using the `agogosctl` CLI will ensure proper dependencies
-are installed automatically.
+This command compiles all the Agogos packages. To install the Agogos, run:
 
-This includes:
+[source,bash]
+----
+java -jar cli/target/quarkus-app/quarkus-run.jar adm install --profile dev --namespace default
+----
 
-* Tekton Pipelines
-* Tekton Triggers
-* Knative Eventing
-====
+This command install Tekton, Knative Eventing and the Agogos CustomResourceDefinitions,
+as well as the Agogos webhooks. It also creates a self-signed certificate
+([filename]`key.pem` and [filename]`webhooks.crt`) to encrypt the Agogos
+webhooks endpoint.
 
-Development mode prepares certificates that are required to secure
-communication between Kubernetes and Webhooks application.
+== Forwarding the Knative Eventing Broker Ingress
+Agogos sends events to the Knative Eventing service. In this tutorial, we run
+Agogos locally, so the Knative Eventing service needs to be available at localhost.
+Run:
 
-The install process will print all required information.
+[source,bash]
+----
+kubectl -n knative-eventing port-forward service/broker-ingress 8111:http
+----
 
-== Running Agogos Operator in Development Mode
+This command forwards the HTTP port of the service to the port `8111` on
+localhost. It is a blocking command, so run it in a separate shell.
 
-You can run the Operator in dev mode that enables live coding using:
+== Running Agogos
+Agogos has two components: operator and webhooks. You need to run them in
+separate shells:
 
 [source,bash]
 .Running the Operator
 ----
-❯ ./mvnw quarkus:dev -pl operator -am
+./mvnw quarkus:dev -pl operator -am
 ----
 
-After running this command you should see the Agogos Operator running.
+[source,bash]
+.Running the Webhooks
+----
+QUARKUS_HTTP_SSL_CERTIFICATE_FILE="$(pwd)/webhooks.crt" \
+QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE="$(pwd)/key.pem" \
+./mvnw quarkus:dev -pl webhooks -am -Dquarkus.http.host=0.0.0.0
+----
 
+Quarkus runs a debug port by default. Since we are running two instances of
+Quarkus, an error is printed:
+
+[source,text]
 ----
-2021-04-06 10:18:46,079 INFO  [io.jav.ope.Operator] (Quarkus Main Thread) Registered Controller: 'PipelineController_ClientProxy' for CRD: 'class com.redhat.cpaas.v1alpha1.PipelineResource' for namespaces: [all namespaces]
-2021-04-06 10:18:46,080 INFO  [com.red.cpa.k8s.PlatformOperator] (Quarkus Main Thread) Starting operator
-2021-04-06 10:18:46,156 INFO  [io.quarkus] (Quarkus Main Thread) agogos-operator 1.0-SNAPSHOT on JVM (powered by Quarkus 1.12.0.Final) started in 1.332s. Listening on: http://localhost:7070
-2021-04-06 10:18:46,158 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
-2021-04-06 10:18:46,158 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, config-yaml, hibernate-validator, kubernetes, kubernetes-client, openshift-client, operator-sdk, quarkiverse-tekton-client, quartz, rest-client, rest-client-jackson, resteasy, resteasy-jackson, scheduler, smallrye-health]
+[ERROR] Port 5005 in use, not starting in debug mode
 ----
+
+If you want the Quarkus debugger for both processes, you need to change the debug
+port. See the Quarkus documentation for detailed information.
 
 [TIP]
 ====
-To enable hot reload, visit http://localhost:7070/ and refresh the page.
-
-This page provides a useful development UI available at http://localhost:7070/q/dev/ as well!
+You can start Agogos directly from Visual Studio Code, see the
+xref:ide.adoc[IDE guide].
 ====
 
-=== Setting Up Broker Port Forwarding
-
-To be able to publish CloudEvents we need to expose the Broker outside of the cluster.
-The `kubectl port-forward` command could be used to achieve this goal.
+== Creating Agogos Resources
+When you have Agogos up and running, run:
 
 [source,bash]
 ----
-❯ kubectl port-forward service/broker-ingress 8111:80 -n knative-eventing
+kubectl apply -f https://gitlab.cee.redhat.com/api/v4/projects/agogos%2Fbuilder-dummy/repository/files/v1%2Fdummy.yaml/raw?ref=main
 ----
 
-== Running Agogos Webhooks in Development Mode
-
-To run Webhooks application you need to run this command:
-
-[NOTE]
-====
-We assume here that you have checked out the code at the `~/agogos` path. If this
-is not the case, replace it with the proper one.
-====
+This command registers the Agogos dummy builder and the Tekton dummy
+ClusterTask. Retrieve the builder using:
 
 [source,bash]
-.Running Webhooks
 ----
-❯ QUARKUS_HTTP_SSL_CERTIFICATE_FILE=~/agogos/cli/target/webhooks.crt QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE=~/agogos/cli/target/key.pem ./mvnw clean quarkus:dev -pl webhooks -am -Dquarkus.http.host=0.0.0.0
+kubectl get builders
+# or
+java -jar cli/target/quarkus-app/quarkus-run.jar -v builders list
 ----
 
-After running this command you should see the Agogos Webhooks running.
+Next, create a file called [filename]`component.yml`:
 
+[source,yaml]
 ----
-2021-05-19 12:26:27,451 INFO  [io.quarkus] (Quarkus Main Thread) agogos-webhooks 1.0-SNAPSHOT on JVM (powered by Quarkus 1.13.1.Final) started in 5.781s. Listening on: http://0.0.0.0:7080 and https://0.0.0.0:8443
-2021-05-19 12:26:27,453 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
-2021-05-19 12:26:27,453 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, config-yaml, hibernate-validator, kubernetes, kubernetes-client, quarkiverse-tekton-client, resteasy, resteasy-jackson]
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Component
+metadata:
+  name: dummy
+spec:
+  build:
+    builderRef:
+      kind: Builder
+      name: dummy-v1
+----
+
+And apply it with `kubectl`:
+
+[source,bash]
+----
+kubectl apply -f component.yml
+----
+
+And then run your first build using the Agogos CLI:
+
+[source,bash]
+----
+$ java -jar cli/target/quarkus-app/quarkus-run.jar -v components list
+NAME      STATUS    CREATED
+dummy     Ready     2023-04-05 08:51:13
+
+$ java -jar cli/target/quarkus-app/quarkus-run.jar -v components build dummy
+💖 About
+
+Name:           dummy-xv5jx
+
+🎉 Status
+
+Status:         New 
+Reason:         N/A
+Created:        2023-04-05 08:55:49
+Started:        N/A
+Finished:       N/A
+----
+
+You can check its result running:
+
+[source,bash]
+----
+java -jar cli/target/quarkus-app/quarkus-run.jar -v builds list
+NAME            STATUS       CREATED
+dummy-xv5jx     Finished     2023-04-05 08:55:49
 ----
