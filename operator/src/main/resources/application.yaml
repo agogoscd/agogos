@@ -3,6 +3,7 @@ quarkus:
     crd:
       generate: false
       apply: false
+    fail-on-version-check: false
 
 
   http:
