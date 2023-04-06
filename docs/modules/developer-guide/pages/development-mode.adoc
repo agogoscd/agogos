@@ -105,9 +105,7 @@ separate shells:
 [source,bash]
 .Running the Webhooks
 ----
-QUARKUS_HTTP_SSL_CERTIFICATE_FILE="$(pwd)/webhooks.crt" \
-QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE="$(pwd)/key.pem" \
-./mvnw quarkus:dev -pl webhooks -am -Dquarkus.http.host=0.0.0.0
+./mvnw quarkus:dev -pl webhooks -am
 ----
 
 Quarkus runs a debug port by default. Since we are running two instances of
