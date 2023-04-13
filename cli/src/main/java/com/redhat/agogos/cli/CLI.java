@@ -18,6 +18,8 @@ import picocli.CommandLine.ScopeType;
 
 import javax.inject.Inject;
 
+import java.io.PrintWriter;
+
 @QuarkusMain
 @CommandLine.Command(name = "agogosctl", mixinStandardHelpOptions = true, subcommands = { //
         AdmCommand.class,
@@ -54,11 +56,24 @@ public class CLI implements QuarkusApplication {
 
     @Override
     public int run(String... args) throws Exception {
-        return new CommandLine(this, factory).setExecutionExceptionHandler(new ExceptionHandler()).execute(args);
-
+        return run(null, null, new CommandLine(this, factory), args);
     }
 
     public int run(Class<? extends Runnable> command, String... args) {
-        return new CommandLine(command, factory).execute(args);
+        return run(null, null, new CommandLine(command, factory), args);
+    }
+
+    public int run(PrintWriter out, PrintWriter err, String... args) {
+        return run(out, err, new CommandLine(this, factory), args);
+    }
+
+    private int run(PrintWriter out, PrintWriter err, CommandLine cl, String... args) {
+        if (out != null) {
+            cl.setOut(out);
+        }
+        if (err != null) {
+            cl.setErr(err);
+        }
+        return cl.setExecutionExceptionHandler(new ExceptionHandler()).execute(args);
     }
 }

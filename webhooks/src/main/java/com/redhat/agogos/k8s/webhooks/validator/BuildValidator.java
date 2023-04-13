@@ -29,10 +29,10 @@ public class BuildValidator extends Validator<Build> {
         } catch (ApplicationException e) {
             LOG.error("An error occurred while validating Component Build", e);
 
-            responseBuilder.withAllowed(false) //
-                    .withStatus(new StatusBuilder() //
-                            .withCode(400) //
-                            .withMessage(e.getMessage()) //
+            responseBuilder.withAllowed(false)
+                    .withStatus(new StatusBuilder()
+                            .withCode(e.getCode())
+                            .withMessage(e.getMessage())
                             .build());
         }
     }
@@ -44,7 +44,7 @@ public class BuildValidator extends Validator<Build> {
                 .withName(componentBuild.getSpec().getComponent()).get();
 
         if (component == null) {
-            throw new MissingResourceException("Selected Component '{}' does not exist in '{}' namespace",
+            throw new MissingResourceException("Component '{}' does not exist in namespace '{}'",
                     componentBuild.getSpec().getComponent(), componentBuild.getMetadata().getNamespace());
         }
 

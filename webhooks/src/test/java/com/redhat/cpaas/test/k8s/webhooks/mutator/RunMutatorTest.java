@@ -75,17 +75,17 @@ public class RunMutatorTest {
     @Test
     @DisplayName("Should allow the request")
     public void testAllow() {
-        JsonObject owner = Json.createObjectBuilder() //
-                .add("apiVersion", "agogos.redhat.com/v1alpha1") //
-                .add("kind", "Pipeline") //
-                .add("name", "p1") //
+        JsonObject owner = Json.createObjectBuilder()
+                .add("apiVersion", "agogos.redhat.com/v1alpha1")
+                .add("kind", "Pipeline")
+                .add("name", "p1")
                 .add("uid", pipeline.getMetadata().getUid()) // This is dynamically set by the mock server
-                .add("blockOwnerDeletion", true) //
-                .add("controller", true) //
+                .add("blockOwnerDeletion", true)
+                .add("controller", true)
                 .build();
 
-        JsonObject label = Json.createObjectBuilder() //
-                .add("agogos.redhat.com/pipeline", "p1") //
+        JsonObject label = Json.createObjectBuilder()
+                .add("agogos.redhat.com/pipeline", "p1")
                 .build();
 
         JsonArray patch = Json.createArrayBuilder()
@@ -111,6 +111,6 @@ public class RunMutatorTest {
                 .then().statusCode(200).body("response.allowed", CoreMatchers.equalTo(false))
                 .body("response.uid", CoreMatchers.equalTo("bc1c421c-412c-40ae-86e3-52bc51b961a4"))
                 .body("response.status.message", CoreMatchers.equalTo(
-                        "Selected Pipeline 'doesntexist' does not exist in 'default' namespace"));
+                        "Pipeline 'doesntexist' does not exist in namespace 'default'"));
     }
 }

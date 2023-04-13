@@ -55,8 +55,8 @@ public class ComponentValidator extends Validator<Component> {
 
             responseBuilder.withAllowed(false) //
                     .withStatus(new StatusBuilder() //
-                            .withCode(400) //
-                            .withMessage(e.getMessage()) //
+                            .withCode(e.getCode()) //
+                            .withMessage(e.getMessage())
                             .build());
         }
     }

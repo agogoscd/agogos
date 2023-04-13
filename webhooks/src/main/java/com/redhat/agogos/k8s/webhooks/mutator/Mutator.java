@@ -45,10 +45,10 @@ public abstract class Mutator<T extends CustomResource<?, ?>> extends AdmissionH
             } catch (ApplicationException e) {
                 LOG.error("An error occurred while mutating", e);
 
-                response.withAllowed(false) //
-                        .withStatus(new StatusBuilder() //
-                                .withCode(400) //
-                                .withMessage(e.getMessage()) //
+                response.withAllowed(false)
+                        .withStatus(new StatusBuilder()
+                                .withCode(e.getCode())
+                                .withMessage(e.getMessage())
                                 .build());
             }
         });
@@ -56,12 +56,14 @@ public abstract class Mutator<T extends CustomResource<?, ?>> extends AdmissionH
 
     /**
      * <p>
-     * Returns the namespace for the object which is subject of the {@link AdmissionRequest}.
+     * Returns the namespace for the object which is subject of the
+     * {@link AdmissionRequest}.
      * </p>
      * 
      * <p>
-     * For some requests the namespace in the object itself may not be set. This applies to object creation requests. We are
-     * intercepting the request before the object is created and the namespace is set. In such cases we will use the
+     * For some requests the namespace in the object itself may not be set. This
+     * applies to object creation requests. We are intercepting the request before
+     * the object is created and the namespace is set. In such cases we will use the
      * {@link AdmissionRequest} namespace.
      * </p>
      * 
