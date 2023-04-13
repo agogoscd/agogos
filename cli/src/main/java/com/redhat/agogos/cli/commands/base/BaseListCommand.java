@@ -20,7 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 
-public abstract class BaseListCommand<T extends AgogosResource<?, ? extends AgogosResourceStatus>> extends BaseCommand<T> {
+public abstract class BaseListCommand<T extends AgogosResource<?, ? extends AgogosResourceStatus>> extends AbstractSubcommand<T> {
     @Option(names = "--limit", defaultValue = "0", description = "Number of items to display, if not provided all resources will be returned.", hidden = true)
     Long limit;
 
@@ -117,7 +117,7 @@ public abstract class BaseListCommand<T extends AgogosResource<?, ? extends Agog
 
             sb.append(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(resource.creationTime()));
 
-            System.out.println(Ansi.AUTO.string(sb.toString()));
+            spec.commandLine().getOut().println(Ansi.AUTO.string(sb.toString()));
 
         });
     }

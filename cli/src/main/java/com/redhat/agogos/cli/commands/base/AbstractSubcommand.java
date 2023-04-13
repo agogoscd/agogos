@@ -16,6 +16,8 @@ import io.fabric8.kubernetes.api.model.DefaultKubernetesResourceList;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import picocli.CommandLine.Help.Ansi;
+import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Spec;
 
 import javax.inject.Inject;
 
@@ -25,10 +27,13 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
-public abstract class BaseCommand<T extends AgogosResource<?, ? extends AgogosResourceStatus>> implements Runnable {
+public abstract class AbstractSubcommand<T extends AgogosResource<?, ? extends AgogosResourceStatus>> implements Runnable {
+
+    @Spec
+    protected CommandSpec spec;
 
     @Inject
-    CLI cli;
+    protected CLI cli;
 
     @Inject
     protected AgogosClient agogosClient;
@@ -123,7 +128,7 @@ public abstract class BaseCommand<T extends AgogosResource<?, ? extends AgogosRe
 
         }
 
-        System.out.println(sb.toString());
+       spec.commandLine().getOut().println(sb.toString());
 
     }
 

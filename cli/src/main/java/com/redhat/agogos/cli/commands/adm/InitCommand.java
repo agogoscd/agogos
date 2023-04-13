@@ -2,6 +2,7 @@ package com.redhat.agogos.cli.commands.adm;
 
 import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller;
+import com.redhat.agogos.cli.commands.base.AbstractCommand;
 import com.redhat.agogos.errors.ApplicationException;
 import io.fabric8.knative.client.KnativeClient;
 import io.fabric8.knative.eventing.v1.Broker;
@@ -42,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @Command(mixinStandardHelpOptions = true, name = "init", description = "Initialize selected namespace to work with Agogos")
-public class InitCommand implements Runnable {
+public class InitCommand extends AbstractCommand {
     private static final Logger LOG = LoggerFactory.getLogger(InitCommand.class);
 
     private static final String RESOURCE_NAME = "agogos";
