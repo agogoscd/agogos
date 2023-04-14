@@ -25,6 +25,11 @@ quarkus:
 "%dev":
   quarkus:
     http:
+      host: 0.0.0.0
+      ssl:
+        certificate:
+          files: ["${PWD}/webhooks.crt"]
+          key-files: ["${PWD}/key.pem"]
       access-log:
         enabled: true
         pattern: combined
