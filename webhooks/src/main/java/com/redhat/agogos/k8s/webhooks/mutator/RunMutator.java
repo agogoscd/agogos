@@ -1,4 +1,3 @@
-
 package com.redhat.agogos.k8s.webhooks.mutator;
 
 import com.redhat.agogos.errors.MissingResourceException;
@@ -77,20 +76,21 @@ public class RunMutator extends Mutator<Run> {
                 .get();
 
         if (pipeline == null) {
-            throw new MissingResourceException("Selected Pipeline '{}' does not exist in '{}' namespace",
+            throw new MissingResourceException(
+                    "Pipeline '{}' does not exist in namespace '{}'",
                     run.getSpec().getPipeline(), namespace);
         }
 
-        JsonObject owner = Json.createObjectBuilder() //
-                .add("apiVersion", HasMetadata.getApiVersion(Pipeline.class)) //
-                .add("kind", HasMetadata.getKind(Pipeline.class)) //
-                .add("name", pipeline.getMetadata().getName()) //
-                .add("uid", pipeline.getMetadata().getUid()) //
-                .add("blockOwnerDeletion", true) //
-                .add("controller", true) //
+        JsonObject owner = Json.createObjectBuilder()
+                .add("apiVersion", HasMetadata.getApiVersion(Pipeline.class))
+                .add("kind", HasMetadata.getKind(Pipeline.class))
+                .add("name", pipeline.getMetadata().getName())
+                .add("uid", pipeline.getMetadata().getUid())
+                .add("blockOwnerDeletion", true)
+                .add("controller", true)
                 .build();
 
-        JsonArray owners = Json.createArrayBuilder() //
+        JsonArray owners = Json.createArrayBuilder()
                 .add(owner).build();
 
         return owners;

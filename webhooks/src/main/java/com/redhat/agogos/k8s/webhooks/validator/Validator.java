@@ -30,7 +30,7 @@ public abstract class Validator<T extends CustomResource<?, ?>> extends Admissio
 
                 response.withAllowed(false) //
                         .withStatus(new StatusBuilder() //
-                                .withCode(400) //
+                                .withCode(e.getCode()) //
                                 .withMessage(e.getMessage()) //
                                 .build());
             }

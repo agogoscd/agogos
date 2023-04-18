@@ -1,5 +1,8 @@
 package com.redhat.agogos.cli;
 
+import java.io.PrintWriter;
+
+import io.fabric8.kubernetes.client.KubernetesClientException;
 import picocli.CommandLine;
 import picocli.CommandLine.IExecutionExceptionHandler;
 import picocli.CommandLine.ParseResult;
@@ -9,22 +12,29 @@ public class ExceptionHandler implements IExecutionExceptionHandler {
     @Override
     public int handleExecutionException(Exception ex, CommandLine cmd, ParseResult parseResult) throws Exception {
         CLI cli = (CLI) cmd.getCommandSpec().root().userObject();
+        PrintWriter err = cmd.getErr();
 
-        cmd.getErr().println();
-        cmd.getErr().println(cmd.getColorScheme().errorText("🛑 Ooops, an error occurred!"));
-        cmd.getErr().println();
-        cmd.getErr().println(cmd.getColorScheme().errorText(ex.getMessage()));
+        StringBuilder msg = new StringBuilder()
+                .append("🛑 Oops, an error occurred!")
+                .append(System.getProperty("line.separator"));
 
-        if (cli.verbose) {
-            cmd.getErr().println();
-            cmd.getErr().println("Stacktrace:");
-            cmd.getErr().println();
-            ex.printStackTrace(cmd.getErr());
+        if (ex instanceof KubernetesClientException && ((KubernetesClientException)ex).getStatus() != null) {
+            msg.append(((KubernetesClientException)ex).getStatus().getMessage());
+        } else {
+            msg.append(ex.getMessage());
         }
 
-        return cmd.getExitCodeExceptionMapper() != null
-                ? cmd.getExitCodeExceptionMapper().getExitCode(ex)
+        err.println();
+        err.println(cmd.getColorScheme().errorText(msg.toString()));
+
+        if (cli.verbose) {
+            err.println();
+            err.println("Stacktrace:");
+            err.println();
+            ex.printStackTrace(err);
+        }
+
+        return cmd.getExitCodeExceptionMapper() != null ? cmd.getExitCodeExceptionMapper().getExitCode(ex)
                 : cmd.getCommandSpec().exitCodeOnExecutionException();
     }
-
 }

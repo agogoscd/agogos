@@ -43,10 +43,10 @@ public class HandlerValidator extends Validator<Handler> {
         } catch (ApplicationException e) {
             LOG.error("An error occurred while validating Handler", e);
 
-            responseBuilder.withAllowed(false) //
-                    .withStatus(new StatusBuilder() //
-                            .withCode(400) //
-                            .withMessage(e.getMessage()) //
+            responseBuilder.withAllowed(false)
+                    .withStatus(new StatusBuilder()
+                            .withCode(e.getCode())
+                            .withMessage(e.getMessage())
                             .build());
         }
     }

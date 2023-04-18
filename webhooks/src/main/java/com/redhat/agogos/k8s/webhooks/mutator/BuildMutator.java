@@ -1,4 +1,3 @@
-
 package com.redhat.agogos.k8s.webhooks.mutator;
 
 import com.redhat.agogos.errors.MissingResourceException;
@@ -77,20 +76,20 @@ public class BuildMutator extends Mutator<Build> {
                 .withName(build.getSpec().getComponent()).get();
 
         if (component == null) {
-            throw new MissingResourceException("Selected Component '{}' does not exist in '{}' namespace",
-                    build.getSpec().getComponent(), build.getMetadata().getNamespace());
+            throw new MissingResourceException("Component '{}' does not exist in namespace '{}'",
+                    build.getSpec().getComponent(), namespace);
         }
 
-        JsonObject owner = Json.createObjectBuilder() //
-                .add("apiVersion", HasMetadata.getApiVersion(Component.class)) //
-                .add("kind", HasMetadata.getKind(Component.class)) //
-                .add("name", component.getMetadata().getName()) //
-                .add("uid", component.getMetadata().getUid()) //
-                .add("blockOwnerDeletion", true) //
-                .add("controller", true) //
+        JsonObject owner = Json.createObjectBuilder()
+                .add("apiVersion", HasMetadata.getApiVersion(Component.class))
+                .add("kind", HasMetadata.getKind(Component.class))
+                .add("name", component.getMetadata().getName())
+                .add("uid", component.getMetadata().getUid())
+                .add("blockOwnerDeletion", true)
+                .add("controller", true)
                 .build();
 
-        JsonArray owners = Json.createArrayBuilder() //
+        JsonArray owners = Json.createArrayBuilder()
                 .add(owner).build();
 
         return owners;
