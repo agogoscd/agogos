@@ -79,6 +79,15 @@ as well as the Agogos webhooks. It also creates a self-signed certificate
 ([filename]`key.pem` and [filename]`webhooks.crt`) to encrypt the Agogos
 webhooks endpoint.
 
+Configure the namespace where Agogos runs. Execute:
+
+[source,bash]
+----
+java -jar cli/target/quarkus-app/quarkus-run.jar adm init --namespace default
+----
+
+This command creates service accounts, rolebindings, configuration maps...
+
 == Forwarding the Knative Eventing Broker Ingress
 Agogos sends events to the Knative Eventing service. In this tutorial, we run
 Agogos locally, so the Knative Eventing service needs to be available at localhost.
