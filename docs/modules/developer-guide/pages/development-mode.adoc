@@ -139,7 +139,8 @@ When you have Agogos up and running, run:
 
 [source,bash]
 ----
-kubectl apply -f https://gitlab.cee.redhat.com/api/v4/projects/agogos%2Fbuilder-dummy/repository/files/v1%2Fdummy.yaml/raw?ref=main
+kubectl apply -f https://gitlab.cee.redhat.com/agogos/extensions-internal/-/raw/main/builders/dummy/v1/manifests/builder.yaml
+kubectl apply -f https://gitlab.cee.redhat.com/agogos/extensions-internal/-/raw/main/builders/dummy/v1/manifests/clustertask.yaml
 ----
 
 This command registers the Agogos dummy builder and the Tekton dummy
@@ -152,10 +153,11 @@ kubectl get builders
 java -jar cli/target/quarkus-app/quarkus-run.jar -v builders list
 ----
 
-Next, create a file called [filename]`component.yml`:
+Next, create a component called `dummy` with `kubectl`:
 
-[source,yaml]
+[source,bash]
 ----
+kubectl apply -f - <<EOF
 apiVersion: agogos.redhat.com/v1alpha1
 kind: Component
 metadata:
@@ -165,13 +167,7 @@ spec:
     builderRef:
       kind: Builder
       name: dummy-v1
-----
-
-And apply it with `kubectl`:
-
-[source,bash]
-----
-kubectl apply -f component.yml
+EOF
 ----
 
 And then run your first build using the Agogos CLI:
