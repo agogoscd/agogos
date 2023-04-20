@@ -1,44 +1,54 @@
 package com.redhat.agogos.cli.commands;
 
-import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.cli.commands.BuildCommand.BuildDescribeCommand;
 import com.redhat.agogos.cli.commands.BuildCommand.BuildListCommand;
-import com.redhat.agogos.cli.commands.base.BaseCommand;
+import com.redhat.agogos.cli.commands.base.AbstractCommand;
+import com.redhat.agogos.cli.commands.base.AbstractSubcommand;
 import com.redhat.agogos.cli.commands.base.BaseListCommand;
-import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Build;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-import javax.inject.Inject;
+import java.util.Comparator;
+import java.util.List;
 
 @Command(mixinStandardHelpOptions = true, name = "build", aliases = {
         "builds", "b" }, description = "Interact with builds", subcommands = { // 
                 BuildDescribeCommand.class,
                 BuildListCommand.class
         })
-public class BuildCommand implements Runnable {
-
-    @Inject
-    CLI cli;
-
-    @Override
-    public void run() {
-        cli.usage(this.getClass());
-    }
+public class BuildCommand extends AbstractCommand {
 
     @Command(mixinStandardHelpOptions = true, name = "describe", aliases = { "d", "desc" }, description = "describe build")
-    public static class BuildDescribeCommand extends BaseCommand<Build> {
-        @Parameters(index = "0", description = "Name of the build")
-        String name;
+    public static class BuildDescribeCommand extends AbstractSubcommand<Build> {
 
-        @Inject
-        AgogosClient agogosClient;
+        @Option(names = { "-l", "--last" }, description = "Show description for last build")
+        boolean last;
+
+        @Parameters(arity = "0..1", description = "Name of the build")
+        String name;
 
         @Override
         public void run() {
-            Build build = agogosClient.v1alpha1().builds().inNamespace(agogosClient.namespace()).withName(name).get();
+            Build build;
+
+            if (last) {
+                List<Build> resources = agogosClient.v1alpha1().builds().inNamespace(agogosClient.namespace()).list()
+                        .getItems();
+
+                build = resources.stream().sorted(byCreationTime()).findFirst().get();
+            } else {
+                build = agogosClient.v1alpha1().builds().inNamespace(agogosClient.namespace()).withName(name).get();
+            }
+
             showResource(build);
+        }
+
+        Comparator<Build> byCreationTime() {
+            return (r1, r2) -> {
+                return r1.creationTime().compareTo(r2.creationTime());
+            };
         }
     }
 

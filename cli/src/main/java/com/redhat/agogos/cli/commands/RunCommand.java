@@ -1,9 +1,9 @@
 package com.redhat.agogos.cli.commands;
 
-import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.cli.commands.RunCommand.RunDescribeCommand;
 import com.redhat.agogos.cli.commands.RunCommand.RunListCommand;
-import com.redhat.agogos.cli.commands.base.BaseCommand;
+import com.redhat.agogos.cli.commands.base.AbstractCommand;
+import com.redhat.agogos.cli.commands.base.AbstractSubcommand;
 import com.redhat.agogos.cli.commands.base.BaseListCommand;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Run;
@@ -17,17 +17,10 @@ import javax.inject.Inject;
                 RunDescribeCommand.class,
                 RunListCommand.class
         })
-public class RunCommand implements Runnable {
-    @Inject
-    CLI cli;
-
-    @Override
-    public void run() {
-        cli.usage(this.getClass());
-    }
+public class RunCommand extends AbstractCommand {
 
     @Command(mixinStandardHelpOptions = true, name = "describe", description = "describe run")
-    public static class RunDescribeCommand extends BaseCommand<Run> {
+    public static class RunDescribeCommand extends AbstractSubcommand<Run> {
         @Parameters(index = "0", description = "Name of the run")
         String name;
 

@@ -1,0 +1,213 @@
+- apiVersion: "agogos.redhat.com/v1alpha1"
+  kind: "Build"
+  metadata:
+    finalizers:
+    - "builds.agogos.redhat.com/finalizer"
+    generateName: "new-component-"
+    generation: 1
+    labels:
+      agogos.redhat.com/component: "new-component"
+      agogos.redhat.com/pipelinerun: "new-component-mc6nx"
+    managedFields:
+    - apiVersion: "agogos.redhat.com/v1alpha1"
+      fieldsType: "FieldsV1"
+      fieldsV1:
+        f:metadata:
+          f:finalizers:
+            ".": {}
+            v:"builds.agogos.redhat.com/finalizer": {}
+          f:generateName: {}
+          f:labels:
+            f:agogos.redhat.com/pipelinerun: {}
+        f:status:
+          ".": {}
+          f:completionTime: {}
+          f:lastUpdate: {}
+          f:reason: {}
+          f:startTime: {}
+          f:status: {}
+        f:spec:
+          ".": {}
+          f:component: {}
+      manager: "okhttp"
+      operation: "Update"
+      time: "2021-08-12T08:33:35Z"
+    name: "new-component-ml68b"
+    ownerReferences:
+    - apiVersion: "agogos.redhat.com/v1alpha1"
+      kind: "Component"
+      blockOwnerDeletion: true
+      controller: true
+      name: "new-component"
+      uid: "f34ba5ae-ab47-495d-bb3c-e556184613fc"
+    resourceVersion: "183357"
+    uid: "9f578641-a851-45ba-94c1-e3d268986821"
+  spec:
+    component: "new component"
+  status:
+    status: "Finished"
+    reason: "Build finished"
+    lastUpdate: "2021-08-12T03:33:34-05:00"
+    startTime: "2021-08-12T08:31:10Z"
+    completionTime: "2021-08-12T08:33:32Z"
+    result: null
+- apiVersion: "agogos.redhat.com/v1alpha1"
+  kind: "Build"
+  metadata:
+    finalizers:
+    - "builds.agogos.redhat.com/finalizer"
+    generateName: "new-component-"
+    generation: 1
+    labels:
+      agogos.redhat.com/component: "new-component"
+      agogos.redhat.com/pipelinerun: "new-component-457qp"
+    managedFields:
+    - apiVersion: "agogos.redhat.com/v1alpha1"
+      fieldsType: "FieldsV1"
+      fieldsV1:
+        f:metadata:
+          f:finalizers:
+            ".": {}
+            v:"builds.agogos.redhat.com/finalizer": {}
+          f:generateName: {}
+          f:labels:
+            f:agogos.redhat.com/pipelinerun: {}
+        f:status:
+          ".": {}
+          f:completionTime: {}
+          f:lastUpdate: {}
+          f:reason: {}
+          f:startTime: {}
+          f:status: {}
+        f:spec:
+          ".": {}
+          f:component: {}
+      manager: "okhttp"
+      operation: "Update"
+      time: "2021-08-12T08:33:29Z"
+    name: "new-component-ctd5l"
+    ownerReferences:
+    - apiVersion: "agogos.redhat.com/v1alpha1"
+      kind: "Component"
+      blockOwnerDeletion: true
+      controller: true
+      name: "new-component"
+      uid: "af399274-48e4-40c4-9755-a97533664e9b"
+    resourceVersion: "183244"
+    uid: "6de4d492-a669-4019-bf09-876a7a83ece6"
+  spec:
+    component: "new-component"
+  status:
+    status: "Finished"
+    reason: "Build finished"
+    lastUpdate: "2021-08-12T03:33:29-05:00"
+    startTime: "2021-08-12T08:29:08Z"
+    completionTime: "2021-08-12T08:33:26Z"
+    result: null
+- apiVersion: "agogos.redhat.com/v1alpha1"
+  kind: "Build"
+  metadata:
+    finalizers:
+    - "builds.agogos.redhat.com/finalizer"
+    generateName: "new-component-"
+    generation: 1
+    labels:
+      agogos.redhat.com/component: "new-component"
+      agogos.redhat.com/pipelinerun: "new-component-6d2n7"
+    managedFields:
+    - apiVersion: "agogos.redhat.com/v1alpha1"
+      fieldsType: "FieldsV1"
+      fieldsV1:
+        f:metadata:
+          f:finalizers:
+            ".": {}
+            v:"builds.agogos.redhat.com/finalizer": {}
+          f:generateName: {}
+          f:labels:
+            f:agogos.redhat.com/pipelinerun: {}
+        f:status:
+          ".": {}
+          f:completionTime: {}
+          f:lastUpdate: {}
+          f:reason: {}
+          f:startTime: {}
+          f:status: {}
+        f:spec:
+          ".": {}
+          f:component: {}
+      manager: "okhttp"
+      operation: "Update"
+      time: "2021-08-12T08:33:33Z"
+    name: "new-component-mp7n4"
+    ownerReferences:
+    - apiVersion: "agogos.redhat.com/v1alpha1"
+      kind: "Component"
+      blockOwnerDeletion: true
+      controller: true
+      name: "new-component"
+      uid: "af399274-48e4-40c4-9755-a97533664e9b"
+    resourceVersion: "183306"
+    uid: "415300c6-69a3-40f1-9078-e1ac9ea0f135"
+  spec:
+    component: "new-component"
+  status:
+    status: "Finished"
+    reason: "Build finished"
+    lastUpdate: "2021-08-12T03:33:33-05:00"
+    startTime: "2021-08-12T08:30:08Z"
+    completionTime: "2021-08-12T08:33:31Z"
+    result: null
+- apiVersion: "agogos.redhat.com/v1alpha1"
+  kind: "Build"
+  metadata:
+    finalizers:
+    - "builds.agogos.redhat.com/finalizer"
+    generateName: "new-component-"
+    generation: 1
+    labels:
+      agogos.redhat.com/component: "new-component"
+      agogos.redhat.com/pipelinerun: "new-component-tr6h5"
+    managedFields:
+    - apiVersion: "agogos.redhat.com/v1alpha1"
+      fieldsType: "FieldsV1"
+      fieldsV1:
+        f:metadata:
+          f:finalizers:
+            ".": {}
+            v:"builds.agogos.redhat.com/finalizer": {}
+          f:generateName: {}
+          f:labels:
+            f:agogos.redhat.com/pipelinerun: {}
+        f:status:
+          ".": {}
+          f:completionTime: {}
+          f:lastUpdate: {}
+          f:reason: {}
+          f:startTime: {}
+          f:status: {}
+        f:spec:
+          ".": {}
+          f:component: {}
+      manager: "okhttp"
+      operation: "Update"
+      time: "2021-08-12T08:33:33Z"
+    name: "new-component-zcsls"
+    ownerReferences:
+    - apiVersion: "agogos.redhat.com/v1alpha1"
+      kind: "Component"
+      blockOwnerDeletion: true
+      controller: true
+      name: "new-component"
+      uid: "af399274-48e4-40c4-9755-a97533664e9b"
+    resourceVersion: "183308"
+    uid: "591f7c98-5ce1-489d-91f7-02d2385894cf"
+  spec:
+    component: "new-component"
+  status:
+    status: "Finished"
+    reason: "Build finished"
+    lastUpdate: "2021-08-12T03:33:33-05:00"
+    startTime: "2021-08-12T08:29:24Z"
+    completionTime: "2021-08-12T08:33:30Z"
+    result: null
+

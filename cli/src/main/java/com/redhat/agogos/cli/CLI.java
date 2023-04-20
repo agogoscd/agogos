@@ -50,21 +50,27 @@ public class CLI implements QuarkusApplication {
     @Getter
     Output output;
 
+    @Getter
+    CommandLine commandLine;
+
     public void usage(Class<? extends Runnable> command) {
         new CommandLine(command, factory).usage(System.out);
     }
 
     @Override
     public int run(String... args) throws Exception {
-        return run(null, null, new CommandLine(this, factory), args);
+        commandLine = new CommandLine(this, factory);
+        return run(null, null, commandLine, args);
     }
 
     public int run(Class<? extends Runnable> command, String... args) {
-        return run(null, null, new CommandLine(command, factory), args);
+        commandLine = new CommandLine(command, factory);
+        return run(null, null, commandLine, args);
     }
 
     public int run(PrintWriter out, PrintWriter err, String... args) {
-        return run(out, err, new CommandLine(this, factory), args);
+        commandLine = new CommandLine(this, factory);
+        return run(out, err, commandLine, args);
     }
 
     private int run(PrintWriter out, PrintWriter err, CommandLine cl, String... args) {

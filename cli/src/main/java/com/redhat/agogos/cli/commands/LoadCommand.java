@@ -2,6 +2,7 @@ package com.redhat.agogos.cli.commands;
 
 import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.ResourceLoader;
+import com.redhat.agogos.cli.commands.base.AbstractCommand;
 import com.redhat.agogos.errors.ApplicationException;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ import java.util.List;
 
 @Command(mixinStandardHelpOptions = true, name = "load", aliases = {
         "l" }, description = "Load agogos descriptors from files")
-public class LoadCommand implements Runnable {
+public class LoadCommand extends AbstractCommand {
 
     private static final Logger LOG = LoggerFactory.getLogger(LoadCommand.class);
 
