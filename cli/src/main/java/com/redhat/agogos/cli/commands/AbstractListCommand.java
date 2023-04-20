@@ -1,4 +1,4 @@
-package com.redhat.agogos.cli.commands.base;
+package com.redhat.agogos.cli.commands;
 
 import com.redhat.agogos.ResourceStatus;
 import com.redhat.agogos.ResultableResourceStatus;
@@ -20,7 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 
-public abstract class BaseListCommand<T extends AgogosResource<?, ? extends AgogosResourceStatus>> extends AbstractSubcommand<T> {
+public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends AgogosResourceStatus>> extends AbstractSubcommand<T> {
     @Option(names = "--limit", defaultValue = "0", description = "Number of items to display, if not provided all resources will be returned.", hidden = true)
     Long limit;
 

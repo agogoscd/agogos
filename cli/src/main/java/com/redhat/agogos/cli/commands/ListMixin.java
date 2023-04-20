@@ -1,4 +1,4 @@
-package com.redhat.agogos.cli.commands.base;
+package com.redhat.agogos.cli.commands;
 
 import lombok.Getter;
 import picocli.CommandLine.Option;

@@ -1,10 +1,10 @@
 package com.redhat.agogos.cli.commands.adm;
 
+import com.redhat.agogos.cli.commands.AbstractCommand;
 import com.redhat.agogos.cli.commands.adm.install.Installer;
 import com.redhat.agogos.cli.commands.adm.install.Priority;
 import com.redhat.agogos.cli.commands.adm.install.Profile;
 import com.redhat.agogos.cli.commands.adm.install.Profiles;
-import com.redhat.agogos.cli.commands.base.AbstractCommand;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
