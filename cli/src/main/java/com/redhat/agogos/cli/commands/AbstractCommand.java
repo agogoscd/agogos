@@ -5,6 +5,8 @@ import jakarta.inject.Inject;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Spec;
 
+import javax.inject.Inject;
+
 public abstract class AbstractCommand implements Runnable {
 
     @Spec

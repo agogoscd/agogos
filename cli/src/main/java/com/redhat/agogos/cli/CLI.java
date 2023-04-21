@@ -14,8 +14,10 @@ import io.quarkus.runtime.annotations.QuarkusMain;
 import jakarta.inject.Inject;
 import lombok.Getter;
 import picocli.CommandLine;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ScopeType;
+import picocli.CommandLine.Spec;
 
 import java.io.PrintWriter;
 
@@ -32,6 +34,10 @@ import java.io.PrintWriter;
         LoadCommand.class,
 })
 public class CLI implements QuarkusApplication {
+
+    @Spec
+    protected CommandSpec spec;
+
     @Inject
     CommandLine.IFactory factory;
 
@@ -53,7 +59,7 @@ public class CLI implements QuarkusApplication {
     CommandLine commandLine;
 
     public void usage(Class<? extends Runnable> command) {
-        new CommandLine(command, factory).usage(System.out);
+        new CommandLine(command, factory).usage(spec.commandLine().getOut());
     }
 
     @Override

@@ -7,6 +7,8 @@ import jakarta.inject.Inject;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
+import javax.inject.Inject;
+
 @Command(mixinStandardHelpOptions = true, name = "describe", description = "describe run")
 public class RunDescribeCommand extends AbstractSubcommand<Run> {
     @Parameters(index = "0", description = "Name of the run")

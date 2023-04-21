@@ -1,13 +1,13 @@
-package com.redhat.cpaas.test.k8s.webhooks.validator;
+package com.redhat.agogos.k8s.webhooks.validator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.k8s.webhooks.WebhookHandler;
+import com.redhat.agogos.k8s.webhooks.validator.ComponentValidatorTest.ComponentValidatorTestServerSetup;
 import com.redhat.agogos.test.CRDTestServerSetup;
 import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.ComponentHandlerSpec;
 import com.redhat.agogos.v1alpha1.Handler;
-import com.redhat.cpaas.test.k8s.webhooks.validator.ComponentValidatorTest.ComponentValidatorTestServerSetup;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionRequest;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReview;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReviewBuilder;
