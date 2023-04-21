@@ -1,7 +1,6 @@
 package com.redhat.agogos.cli.commands.component;
 
 import com.redhat.agogos.cli.commands.AbstractCommand;
-
 import picocli.CommandLine.Command;
 
 @Command(mixinStandardHelpOptions = true, name = "components", aliases = {

@@ -127,7 +127,7 @@ public abstract class AbstractSubcommand<T extends AgogosResource<?, ? extends A
 
         }
 
-       spec.commandLine().getOut().println(sb.toString());
+        spec.commandLine().getOut().println(sb.toString());
 
     }
 

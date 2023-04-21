@@ -4,12 +4,11 @@ import com.redhat.agogos.cli.commands.adm.AdmCommand;
 import com.redhat.agogos.cli.commands.build.BuildCommand;
 import com.redhat.agogos.cli.commands.builder.BuilderCommand;
 import com.redhat.agogos.cli.commands.component.ComponentCommand;
-import com.redhat.agogos.cli.commands.pipeline.PipelineCommand;
 import com.redhat.agogos.cli.commands.load.LoadCommand;
+import com.redhat.agogos.cli.commands.pipeline.PipelineCommand;
 import com.redhat.agogos.cli.commands.run.RunCommand;
 import com.redhat.agogos.cli.commands.stage.StageCommand;
 import com.redhat.agogos.cli.commands.trigger.TriggerCommand;
-
 import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
 import jakarta.inject.Inject;

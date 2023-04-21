@@ -1,11 +1,11 @@
 package com.redhat.agogos.cli;
 
-import java.io.PrintWriter;
-
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import picocli.CommandLine;
 import picocli.CommandLine.IExecutionExceptionHandler;
 import picocli.CommandLine.ParseResult;
+
+import java.io.PrintWriter;
 
 public class ExceptionHandler implements IExecutionExceptionHandler {
 
@@ -18,8 +18,8 @@ public class ExceptionHandler implements IExecutionExceptionHandler {
                 .append("🛑 Oops, an error occurred!")
                 .append(System.getProperty("line.separator"));
 
-        if (ex instanceof KubernetesClientException && ((KubernetesClientException)ex).getStatus() != null) {
-            msg.append(((KubernetesClientException)ex).getStatus().getMessage());
+        if (ex instanceof KubernetesClientException && ((KubernetesClientException) ex).getStatus() != null) {
+            msg.append(((KubernetesClientException) ex).getStatus().getMessage());
         } else {
             msg.append(ex.getMessage());
         }
