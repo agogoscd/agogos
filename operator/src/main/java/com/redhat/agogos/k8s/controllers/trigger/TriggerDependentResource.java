@@ -14,11 +14,11 @@ import com.redhat.agogos.k8s.controllers.AbstractDependentResource;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.triggers.TimedTriggerEvent;
+import com.redhat.agogos.v1alpha1.triggers.Trigger;
 import com.redhat.agogos.v1alpha1.triggers.TriggerTarget;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
-import io.fabric8.tekton.triggers.v1alpha1.Trigger;
 import io.fabric8.tekton.triggers.v1alpha1.TriggerBuilder;
 import io.fabric8.tekton.triggers.v1alpha1.TriggerSpecBuilder;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class TriggerDependentResource
-        extends AbstractDependentResource<Trigger, com.redhat.agogos.v1alpha1.triggers.Trigger> {
+        extends AbstractDependentResource<io.fabric8.tekton.triggers.v1alpha1.Trigger, Trigger> {
 
     @Inject
     TektonPipelineHelper pipelineHelper;
@@ -43,14 +43,13 @@ public class TriggerDependentResource
     private static final Logger LOG = LoggerFactory.getLogger(TriggerDependentResource.class);
 
     public TriggerDependentResource() {
-        super(Trigger.class);
+        super(io.fabric8.tekton.triggers.v1alpha1.Trigger.class);
     }
 
     @Override
-    public Trigger desired(com.redhat.agogos.v1alpha1.triggers.Trigger agogos,
-            Context<com.redhat.agogos.v1alpha1.triggers.Trigger> context) {
-        Trigger trigger = new Trigger();
-        Optional<Trigger> optional = context.getSecondaryResource(Trigger.class);
+    public io.fabric8.tekton.triggers.v1alpha1.Trigger desired(Trigger agogos, Context<Trigger> context) {
+        io.fabric8.tekton.triggers.v1alpha1.Trigger trigger = new io.fabric8.tekton.triggers.v1alpha1.Trigger();
+        Optional<io.fabric8.tekton.triggers.v1alpha1.Trigger> optional = context.getSecondaryResource(io.fabric8.tekton.triggers.v1alpha1.Trigger.class);
         if (!optional.isEmpty()) {
             trigger = optional.get();
             LOG.debug("Agogos Trigger '{}', using existing Tekton Trigger '{}'",
@@ -92,23 +91,25 @@ public class TriggerDependentResource
 
         // Set the owner for Tekton Trigger to Agogos Trigger
         OwnerReference ownerReference = new OwnerReferenceBuilder()
-                .withApiVersion(trigger.getApiVersion())
-                .withKind(trigger.getKind())
-                .withName(trigger.getMetadata().getName())
-                .withUid(trigger.getMetadata().getUid())
+                .withApiVersion(agogos.getApiVersion())
+                .withKind(agogos.getKind())
+                .withName(agogos.getMetadata().getName())
+                .withUid(agogos.getMetadata().getUid())
                 .withBlockOwnerDeletion(true)
                 .withController(true)
                 .build();
 
         TriggerBuilder triggerBuilder = new TriggerBuilder(trigger)
                 .withNewMetadata()
-                .withName(trigger.getMetadata().getName()).withOwnerReferences(ownerReference)
+                .withName(agogos.getMetadata().getName()).withOwnerReferences(ownerReference)
+                .withNamespace(agogos.getMetadata().getNamespace())
                 .endMetadata()
                 .withSpec(triggerSpecBuilder.build());
 
+        trigger = triggerBuilder.build();
         LOG.debug("New Tekton Trigger '{}' created for Agogos Trigger '{}", trigger.getMetadata().getName(),
                 agogos.getFullName());
-        return triggerBuilder.build();
+        return trigger;
     }
 
     /**
@@ -119,15 +120,15 @@ public class TriggerDependentResource
      * @param target {@link TriggerTarget} object
      * @return {@link TriggerSpecBuilder} object
      */
-    private TriggerSpecBuilder initTriggerSpecBuilder(com.redhat.agogos.v1alpha1.triggers.Trigger trigger) {
+    private TriggerSpecBuilder initTriggerSpecBuilder(Trigger agogogs) {
         // TODO: TriggerTarget apiVersion is unused, check this
-        TriggerTarget target = trigger.getSpec().getTarget();
+        TriggerTarget target = agogogs.getSpec().getTarget();
         PipelineRun pipelineRun = null;
         Map<String, String> labels = null;
 
         switch (target.getKind()) {
             case "Component":
-                Component component = agogosClient.v1alpha1().components().inNamespace(trigger.getMetadata().getNamespace())
+                Component component = agogosClient.v1alpha1().components().inNamespace(agogogs.getMetadata().getNamespace())
                         .withName(target.getName()).get();
 
                 // TODO: Move to validation admission webhook
@@ -148,7 +149,7 @@ public class TriggerDependentResource
                 break;
             case "Pipeline":
                 // TODO: Make it possible to specify namespace on the Trigger target?
-                Pipeline pipeline = agogosClient.v1alpha1().pipelines().inNamespace(trigger.getMetadata().getNamespace())
+                Pipeline pipeline = agogosClient.v1alpha1().pipelines().inNamespace(agogogs.getMetadata().getNamespace())
                         .withName(target.getName()).get();
                 ;
 
@@ -186,7 +187,7 @@ public class TriggerDependentResource
         return triggerSpecBuilder;
     }
 
-    private void scheduleTimedTrigger(com.redhat.agogos.v1alpha1.triggers.Trigger trigger, TimedTriggerEvent timed) {
+    private void scheduleTimedTrigger(Trigger agogos, TimedTriggerEvent timed) {
         CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(CronType.UNIX);
         CronParser parser = new CronParser(cronDefinition);
         Cron cron;
@@ -196,16 +197,16 @@ public class TriggerDependentResource
         } catch (IllegalArgumentException e) {
             throw new ApplicationException(
                     "Cron expression '{}' defined in '{}' trigger is not a valid UNIX Cron expression", timed.getCron(),
-                    trigger.getNamespacedName());
+                    agogos.getNamespacedName());
         }
 
         CronMapper cronMapper = CronMapper.fromUnixToQuartz();
 
         try {
-            scheduler.scheduleTimedTriggerEvent(trigger, cronMapper.map(cron).asString());
+            scheduler.scheduleTimedTriggerEvent(agogos, cronMapper.map(cron).asString());
         } catch (SchedulerException e) {
             throw new ApplicationException("Could not schedule timed event trigger '{}' for '{}' trigger",
-                    timed.getCron(), trigger.getNamespacedName(), e);
+                    timed.getCron(), agogos.getNamespacedName(), e);
         }
     }
 }
