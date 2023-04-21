@@ -1,4 +1,4 @@
-package com.redhat.cpaas.test;
+package com.redhat.agogos.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

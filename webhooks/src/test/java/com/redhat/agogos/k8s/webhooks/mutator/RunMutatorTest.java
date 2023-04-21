@@ -1,10 +1,10 @@
-package com.redhat.cpaas.test.k8s.webhooks.mutator;
+package com.redhat.agogos.k8s.webhooks.mutator;
 
 import com.redhat.agogos.k8s.webhooks.WebhookHandler;
+import com.redhat.agogos.k8s.webhooks.mutator.RunMutatorTest.RunMutatorTestServerSetup;
 import com.redhat.agogos.test.CRDTestServerSetup;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.Run;
-import com.redhat.cpaas.test.k8s.webhooks.mutator.RunMutatorTest.RunMutatorTestServerSetup;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionRequest;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReview;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReviewBuilder;
