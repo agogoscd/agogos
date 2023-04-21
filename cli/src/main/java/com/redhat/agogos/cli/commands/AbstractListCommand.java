@@ -54,7 +54,7 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
 
     protected void printList(List<T> resources) {
         if (resources.isEmpty()) {
-            System.out.println("No resources found");
+            spec.commandLine().getOut().println("No resources found");
             return;
         }
 
@@ -71,7 +71,7 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
                 .getAsInt() + 4; // It's 4 instead of 5, because we need to add a space later so that the color formatting can be escaped.
 
         // Header
-        System.out.println(Ansi.AUTO.string(
+        spec.commandLine().getOut().println(Ansi.AUTO.string(
                 String.format(
                         "@|bold %-" + nameColumnLength + "." + nameColumnLength + "s%-" + statusColumnLength + "."
                                 + statusColumnLength + "s CREATED|@",
