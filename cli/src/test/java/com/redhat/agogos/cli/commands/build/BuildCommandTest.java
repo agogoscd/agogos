@@ -3,9 +3,6 @@ package com.redhat.agogos.cli.commands.build;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.redhat.agogos.cli.commands.AbstractCommandTest;
 import com.redhat.agogos.test.ResourceUtils;
 import io.quarkus.test.junit.QuarkusTest;
@@ -15,10 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.List;
+
 @QuarkusTest
 public class BuildCommandTest extends AbstractCommandTest {
     private static final Logger LOG = LoggerFactory.getLogger(BuildCommandTest.class);
-    
+
     @Override
     @BeforeEach
     protected void setup() {
@@ -31,9 +31,9 @@ public class BuildCommandTest extends AbstractCommandTest {
     void shouldHandleLastOption() throws Exception {
         List<String> args = Arrays.asList("-l", "--last");
 
-        args.stream().forEach(arg ->  {
+        args.stream().forEach(arg -> {
             LOG.info("Testing build command option: " + arg);
-            
+
             catcher.reset();
 
             int exitCode = cli.run(catcher.getOut(), catcher.getErr(), "build", "describe", "--last");

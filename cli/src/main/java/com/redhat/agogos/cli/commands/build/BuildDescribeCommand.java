@@ -1,14 +1,13 @@
 package com.redhat.agogos.cli.commands.build;
 
-import java.util.Comparator;
-import java.util.List;
-
 import com.redhat.agogos.cli.commands.AbstractSubcommand;
 import com.redhat.agogos.v1alpha1.Build;
-
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+
+import java.util.Comparator;
+import java.util.List;
 
 @Command(mixinStandardHelpOptions = true, name = "describe", aliases = { "d", "desc" }, description = "describe build")
 public class BuildDescribeCommand extends AbstractSubcommand<Build> {

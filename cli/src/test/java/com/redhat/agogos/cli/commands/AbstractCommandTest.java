@@ -1,17 +1,15 @@
 package com.redhat.agogos.cli.commands;
 
-import javax.inject.Inject;
-
-import org.junit.jupiter.api.BeforeEach;
-
 import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.cli.ResourceLoader;
 import com.redhat.agogos.test.InMemoryOutputCatcher;
 import com.redhat.agogos.test.KubernetesTestServerSetup;
-
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
 import io.quarkus.test.kubernetes.client.KubernetesTestServer;
 import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
+import org.junit.jupiter.api.BeforeEach;
+
+import javax.inject.Inject;
 
 @WithKubernetesTestServer(setup = KubernetesTestServerSetup.class)
 public abstract class AbstractCommandTest {
@@ -21,7 +19,7 @@ public abstract class AbstractCommandTest {
 
     @KubernetesTestServer
     protected KubernetesServer mockServer;
-        
+
     @Inject
     protected CLI cli;
 

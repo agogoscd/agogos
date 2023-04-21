@@ -5,7 +5,6 @@ import com.redhat.agogos.cli.commands.adm.install.Installer;
 import com.redhat.agogos.cli.commands.adm.install.Priority;
 import com.redhat.agogos.cli.commands.adm.install.Profile;
 import com.redhat.agogos.cli.commands.adm.install.Profiles;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
