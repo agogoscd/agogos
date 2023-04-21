@@ -165,12 +165,12 @@ public abstract class AbstractSubcommand<T extends AgogosResource<?, ? extends A
     }
 
     private void printJson(Object resource) {
-        System.out.println(toJson(resource));
+        spec.commandLine().getOut().println(toJson(resource));
     }
 
     private void printYaml(Object resource) {
         try {
-            System.out.println(new ObjectMapper(new YAMLFactory().disable(Feature.WRITE_DOC_START_MARKER))
+            spec.commandLine().getOut().println(new ObjectMapper(new YAMLFactory().disable(Feature.WRITE_DOC_START_MARKER))
                     .writerWithDefaultPrettyPrinter().writeValueAsString(resource));
         } catch (JsonProcessingException e) {
             throw new ApplicationException("Cannot convert resource to YAML", e);
