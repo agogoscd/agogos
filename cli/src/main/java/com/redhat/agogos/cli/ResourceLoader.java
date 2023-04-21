@@ -12,9 +12,12 @@ import io.fabric8.kubernetes.client.dsl.internal.GenericKubernetesResourceOperat
 import io.fabric8.kubernetes.client.dsl.internal.OperationContext;
 import io.fabric8.kubernetes.client.http.HttpClient;
 import io.fabric8.kubernetes.client.http.HttpResponse;
-import io.fabric8.kubernetes.client.jdkhttp.JdkHttpClientFactory;
+import io.fabric8.kubernetes.client.vertx.VertxHttpClientFactory;
 import io.quarkus.runtime.StartupEvent;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
 import org.openapi4j.core.exception.ResolutionException;
 import org.openapi4j.core.validation.ValidationException;
 import org.openapi4j.parser.OpenApi3Parser;
@@ -23,10 +26,6 @@ import org.openapi4j.parser.model.v3.Path;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
 
 import java.io.File;
 import java.io.IOException;
@@ -83,7 +82,7 @@ public class ResourceLoader {
 
     void init(@Observes StartupEvent ev) {
         // Prepare the http client based on the Kubernetes client configuration
-        httpClient = new JdkHttpClientFactory().newBuilder(kubernetesClient.getConfiguration()).build();
+        httpClient = new VertxHttpClientFactory().newBuilder(kubernetesClient.getConfiguration()).build();
     }
 
     @SuppressWarnings("unchecked")

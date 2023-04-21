@@ -21,11 +21,10 @@ import io.fabric8.tekton.triggers.v1alpha1.Trigger;
 import io.fabric8.tekton.triggers.v1alpha1.TriggerBuilder;
 import io.fabric8.tekton.triggers.v1alpha1.TriggerSpecBuilder;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
+import jakarta.inject.Inject;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
 
 import java.util.HashMap;
 import java.util.Map;

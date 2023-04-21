@@ -4,8 +4,7 @@ import com.redhat.agogos.k8s.controllers.dependent.AgogosPipelineDependentResour
 import com.redhat.agogos.v1alpha1.Pipeline;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
-
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 @ControllerConfiguration(generationAwareEventProcessing = false, dependents = {

@@ -3,6 +3,7 @@ quarkus:
     crd:
       generate: false
       apply: false
+    fail-on-version-check: false
 
 
   http:
@@ -15,12 +16,12 @@ quarkus:
     #   operatorsdk:
     #     group-id: "io.javaoperatorsdk"
     #     artifact-id: "operator-framework-core"
-    okhttp:
-      group-id: com.squareup.okhttp3
-      artifact-id: okhttp
-    okio:
-      group-id: com.squareup.okio
-      artifact-id: okio
+#    okhttp:
+#      group-id: com.squareup.okhttp3
+#      artifact-id: okhttp
+#    okio:
+#      group-id: com.squareup.okio
+#      artifact-id: okio
 
   banner:
     enabled: true

@@ -5,12 +5,11 @@ import com.redhat.agogos.cli.ResourceLoader;
 import com.redhat.agogos.cli.commands.AbstractCommand;
 import com.redhat.agogos.errors.ApplicationException;
 import io.fabric8.kubernetes.api.model.HasMetadata;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-
-import javax.inject.Inject;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

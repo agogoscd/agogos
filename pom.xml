@@ -37,21 +37,31 @@
         <cloudevents.version>2.2.0</cloudevents.version>
         <openapi-schema-validator.version>1.0.5</openapi-schema-validator.version>
         <lombok.version>1.18.16</lombok.version>
-        <quarkus-tekton-client.version>0.6.0</quarkus-tekton-client.version>
+        <quarkus-tekton-client.version>1.0.0</quarkus-tekton-client.version>
         <bouncycastle.version>1.72</bouncycastle.version>
 
-        <quarkus.platform.version>2.15.2.Final</quarkus.platform.version>
-        <operator-framework.version>4.2.2</operator-framework.version>
-        <quarkus-operatorsdk.version>5.0.2</quarkus-operatorsdk.version>
-        <kubernetes-client.version>6.2.0</kubernetes-client.version>
+        <quarkus.platform.version>3.0.0.Final</quarkus.platform.version>
+        <quarkus-operatorsdk.version>6.0.0.CR1</quarkus-operatorsdk.version>
+        <fabric8-client.version>6.6-SNAPSHOT</fabric8-client.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>io.fabric8</groupId>
                 <artifactId>kubernetes-client-bom</artifactId>
-                <version>${kubernetes-client.version}</version>
+                <version>${fabric8-client.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -63,9 +73,11 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>io.javaoperatorsdk</groupId>
-                <artifactId>operator-framework-core</artifactId>
-                <version>${operator-framework.version}</version>
+                <groupId>io.quarkiverse.operatorsdk</groupId>
+                <artifactId>quarkus-operator-sdk-bom</artifactId>
+                <version>${quarkus-operatorsdk.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

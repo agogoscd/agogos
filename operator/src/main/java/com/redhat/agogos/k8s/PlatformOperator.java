@@ -5,11 +5,10 @@ import io.javaoperatorsdk.operator.Operator;
 import io.javaoperatorsdk.operator.api.config.ConfigurationService;
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
 import org.jboss.logging.Logger;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
 
 @ApplicationScoped
 public class PlatformOperator {

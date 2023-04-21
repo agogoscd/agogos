@@ -7,9 +7,8 @@ import com.redhat.agogos.test.KubernetesTestServerSetup;
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
 import io.quarkus.test.kubernetes.client.KubernetesTestServer;
 import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
-
-import javax.inject.Inject;
 
 @WithKubernetesTestServer(setup = KubernetesTestServerSetup.class)
 public abstract class AbstractCommandTest {

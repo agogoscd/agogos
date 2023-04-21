@@ -1,6 +1,6 @@
 package com.redhat.agogos.errors;
 
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response.Status;
 
 public class MissingResourceException extends ApplicationException {
 

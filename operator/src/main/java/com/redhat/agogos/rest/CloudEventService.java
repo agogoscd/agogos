@@ -1,9 +1,8 @@
 package com.redhat.agogos.rest;
 
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.Path;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
-
-import javax.inject.Singleton;
-import javax.ws.rs.Path;
 
 @Path("/")
 @RegisterRestClient(configKey = "broker")

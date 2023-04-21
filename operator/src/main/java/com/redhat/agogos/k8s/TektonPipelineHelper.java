@@ -21,10 +21,9 @@ import io.fabric8.tekton.pipeline.v1beta1.PipelineRunBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBinding;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBindingBuilder;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import java.util.Arrays;
 import java.util.HashMap;

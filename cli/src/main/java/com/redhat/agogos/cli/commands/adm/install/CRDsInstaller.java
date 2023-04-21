@@ -3,10 +3,9 @@ package com.redhat.agogos.cli.commands.adm.install;
 import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.ApplicationScoped;
 
 import java.io.InputStream;
 

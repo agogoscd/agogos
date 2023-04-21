@@ -8,11 +8,10 @@ import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Group;
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import jakarta.enterprise.inject.spi.CDI;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import javax.enterprise.inject.spi.CDI;
 
 import java.util.Arrays;
 import java.util.Iterator;

@@ -3,8 +3,7 @@ package com.redhat.agogos;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import io.quarkus.jackson.ObjectMapperCustomizer;
-
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class DefaultObjectMapperCustomizer implements ObjectMapperCustomizer {
