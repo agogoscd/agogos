@@ -115,10 +115,10 @@ public class PipelineDependentResource
             PipelineTask task = new PipelineTaskBuilder()
                     .withName(stageRef.getName())
                     .withTaskRef(new TaskRefBuilder()
-                                    .withApiVersion("") // AGOGOS-96
-                                    .withKind(taskType)
-                                    .withName(stage.getSpec().getTaskRef().getName())
-                                    .build())
+                            .withApiVersion("") // AGOGOS-96
+                            .withKind(taskType)
+                            .withName(stage.getSpec().getTaskRef().getName())
+                            .build())
                     .addNewParam()
                     .withName("config")
                     .withNewValue(stageConfig)

@@ -10,7 +10,6 @@ import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.ComponentHandlerSpec;
 import com.redhat.agogos.v1alpha1.Handler;
 import com.redhat.agogos.v1alpha1.WorkspaceMapping;
-import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.ArrayOrString;
@@ -161,7 +160,7 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
                 .withName(BUILD_PIPELINE_INIT_TASK_NAME)
                 .withTaskRef(new TaskRefBuilder()
                         .withName(initTask.getMetadata().getName())
-                        .withApiVersion("")  // AGOGOS-96
+                        .withApiVersion("") // AGOGOS-96
                         .withKind(initTask.getKind())
                         .build())
                 .addNewParam()
@@ -193,7 +192,7 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
                     .withRunAfter(lastTask.getName())
                     .withTaskRef(
                             new TaskRefBuilder().withName(handlerTask.getMetadata().getName())
-                                    .withApiVersion("")  // AGOGOS-96
+                                    .withApiVersion("") // AGOGOS-96
                                     .withKind(handlerTask.getKind())
                                     .build())
                     .withWorkspaces(workspaceBindings(handler.getSpec().getWorkspaces()));
@@ -238,7 +237,7 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         PipelineTask lastTask = tasks.get(tasks.size() - 1);
 
         TaskRef buildTaskRef = new TaskRefBuilder()
-                .withApiVersion("")  // AGOGOS-96
+                .withApiVersion("") // AGOGOS-96
                 .withKind(taskRef.getKind())
                 .withName(taskRef.getName())
                 .build();
