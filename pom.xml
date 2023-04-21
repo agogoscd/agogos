@@ -40,7 +40,7 @@
         <quarkus-tekton-client.version>1.0.0</quarkus-tekton-client.version>
         <bouncycastle.version>1.72</bouncycastle.version>
 
-        <quarkus.platform.version>3.0.0.CR1</quarkus.platform.version>
+        <quarkus.platform.version>3.0.0.Final</quarkus.platform.version>
         <quarkus-operatorsdk.version>6.0.0.CR1</quarkus-operatorsdk.version>
         <fabric8-client.version>6.6-SNAPSHOT</fabric8-client.version>
     </properties>
