@@ -1,4 +1,4 @@
-package com.redhat.agogos.cli.commands;
+package com.redhat.agogos.cli.commands.build;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Arrays;
 import java.util.List;
 
+import com.redhat.agogos.cli.commands.AbstractCommandTest;
 import com.redhat.agogos.test.ResourceUtils;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +21,7 @@ public class BuildCommandTest extends AbstractCommandTest {
     
     @Override
     @BeforeEach
-    void setup() {
+    protected void setup() {
         super.setup();
         resourceLoader.installKubernetesResources(ResourceUtils.testResourceAsInputStream("loader/builds-list.yaml"), "test");
     }

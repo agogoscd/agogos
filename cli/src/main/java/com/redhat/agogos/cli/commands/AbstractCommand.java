@@ -1,4 +1,4 @@
-package com.redhat.agogos.cli.commands.base;
+package com.redhat.agogos.cli.commands;
 
 import javax.inject.Inject;
 

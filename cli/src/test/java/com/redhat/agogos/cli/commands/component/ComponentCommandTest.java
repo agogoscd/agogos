@@ -1,4 +1,4 @@
-package com.redhat.agogos.cli.commands;
+package com.redhat.agogos.cli.commands.component;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -7,6 +7,8 @@ import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import com.redhat.agogos.cli.commands.AbstractCommandTest;
 
 import javax.ws.rs.core.Response.Status;
 

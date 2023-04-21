@@ -1,8 +1,6 @@
-package com.redhat.agogos.cli.commands;
+package com.redhat.agogos.cli.commands.adm;
 
-import com.redhat.agogos.cli.commands.adm.InitCommand;
-import com.redhat.agogos.cli.commands.adm.InstallCommand;
-import com.redhat.agogos.cli.commands.base.AbstractCommand;
+import com.redhat.agogos.cli.commands.AbstractCommand;
 
 import picocli.CommandLine.Command;
 

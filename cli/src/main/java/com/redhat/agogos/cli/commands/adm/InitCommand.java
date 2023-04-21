@@ -1,8 +1,8 @@
 package com.redhat.agogos.cli.commands.adm;
 
 import com.redhat.agogos.cli.Helper;
+import com.redhat.agogos.cli.commands.AbstractCommand;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller;
-import com.redhat.agogos.cli.commands.base.AbstractCommand;
 import com.redhat.agogos.errors.ApplicationException;
 import io.fabric8.knative.client.KnativeClient;
 import io.fabric8.knative.eventing.v1.Broker;

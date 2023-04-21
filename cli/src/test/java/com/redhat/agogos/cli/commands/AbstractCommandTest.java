@@ -17,19 +17,18 @@ import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 public abstract class AbstractCommandTest {
 
     @Inject
-    ResourceLoader resourceLoader;
+    protected ResourceLoader resourceLoader;
 
     @KubernetesTestServer
-    KubernetesServer mockServer;
+    protected KubernetesServer mockServer;
         
     @Inject
-    CLI cli;
+    protected CLI cli;
 
-    InMemoryOutputCatcher catcher = new InMemoryOutputCatcher();
+    protected InMemoryOutputCatcher catcher = new InMemoryOutputCatcher();
 
     @BeforeEach
-    void setup() {
+    protected void setup() {
         catcher.reset();
     }
-
 }
