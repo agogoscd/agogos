@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.redhat.agogos.k8s.client.AgogosClient;
+import com.redhat.agogos.k8s.controllers.component.ComponentController;
 import com.redhat.agogos.test.CRDTestServerSetup;
 import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;

@@ -1,14 +1,15 @@
-package com.redhat.agogos.k8s.controllers.dependent;
+package com.redhat.agogos.k8s.controllers.build;
 
 import com.redhat.agogos.errors.ApplicationException;
+import com.redhat.agogos.k8s.controllers.AbstractPipelineRunDependentResource;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BuildPipelineRunDependentResource extends AbstractPipelineRunDependentResource<Build> {
+public class PipelineRunDependentResource extends AbstractPipelineRunDependentResource<Build> {
 
-    protected static final Logger LOG = LoggerFactory.getLogger(BuildPipelineRunDependentResource.class);
+    protected static final Logger LOG = LoggerFactory.getLogger(PipelineRunDependentResource.class);
 
     public String resourceName(Build build) {
         return build.getSpec().getComponent();

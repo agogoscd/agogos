@@ -27,19 +27,19 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
     private static final Logger LOG = LoggerFactory.getLogger(AbstractController.class);
 
     @Inject
-    AgogosClient agogosClient;
+    protected AgogosClient agogosClient;
 
     @Inject
-    CloudEventPublisher cloudEventPublisher;
+    protected CloudEventPublisher cloudEventPublisher;
 
     @Inject
-    ObjectMapper objectMapper;
+    protected ObjectMapper objectMapper;
 
     @Inject
-    TektonPipelineHelper pipelineHelper;
+    protected TektonPipelineHelper pipelineHelper;
 
     @Inject
-    TektonClient tektonClient;
+    protected TektonClient tektonClient;
 
     @Override
     public UpdateControl<T> reconcile(T resource, Context<T> context) {

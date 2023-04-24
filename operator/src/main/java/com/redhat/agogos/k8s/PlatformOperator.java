@@ -1,6 +1,6 @@
 package com.redhat.agogos.k8s;
 
-import com.redhat.agogos.k8s.controllers.ComponentController;
+import com.redhat.agogos.k8s.controllers.component.ComponentController;
 import io.javaoperatorsdk.operator.Operator;
 import io.javaoperatorsdk.operator.api.config.ConfigurationService;
 import io.quarkus.runtime.ShutdownEvent;

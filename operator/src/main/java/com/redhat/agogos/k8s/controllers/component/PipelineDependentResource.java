@@ -1,9 +1,10 @@
-package com.redhat.agogos.k8s.controllers.dependent;
+package com.redhat.agogos.k8s.controllers.component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.k8s.Resource;
+import com.redhat.agogos.k8s.controllers.AbstractDependentResource;
 import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.ComponentHandlerSpec;
@@ -38,9 +39,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class ComponentPipelineDependentResource extends AbstractBaseDependentResource<Pipeline, Component> {
+public class PipelineDependentResource extends AbstractDependentResource<Pipeline, Component> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ComponentPipelineDependentResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PipelineDependentResource.class);
 
     private static final String BUILD_PIPELINE_INIT_TASK_NAME = "init";
     private static final String BUILD_PIPELINE_BUILDER_TASK_NAME = "build";
@@ -50,7 +51,7 @@ public class ComponentPipelineDependentResource extends AbstractBaseDependentRes
     private static final String BUILD_PIPELINE_INIT_TASK_WORKSPACE_NAME = "output";
     private static final String BUILD_PIPELINE_SOURCE_TASK_WORKSPACE_NAME = "output";
 
-    public ComponentPipelineDependentResource() {
+    public PipelineDependentResource() {
         super(Pipeline.class);
     }
 

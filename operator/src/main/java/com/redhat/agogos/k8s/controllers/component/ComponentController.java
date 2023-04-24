@@ -1,7 +1,7 @@
-package com.redhat.agogos.k8s.controllers;
+package com.redhat.agogos.k8s.controllers.component;
 
 import com.redhat.agogos.ResourceStatus;
-import com.redhat.agogos.k8s.controllers.dependent.ComponentPipelineDependentResource;
+import com.redhat.agogos.k8s.controllers.AbstractController;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.Status;
 import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
@@ -19,7 +19,7 @@ import java.util.Optional;
 
 @ApplicationScoped
 @ControllerConfiguration(generationAwareEventProcessing = false, dependents = {
-        @Dependent(type = ComponentPipelineDependentResource.class) })
+        @Dependent(type = PipelineDependentResource.class) })
 public class ComponentController extends AbstractController<Component> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ComponentController.class);
