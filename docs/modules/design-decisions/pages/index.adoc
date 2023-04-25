@@ -1,0 +1,8 @@
+= Design Decisions Overview
+
+This section contains documentation for major design decisions we make in the
+project. The spirit of this is related to
+link:https://adr.github.io/[Architectural Decision Records] and
+link:https://www.redhat.com/architect/architecture-decision-records[Red{nbsp}Hat Architecture Decision Records].
+
+See the sidebar for the different design decisions.

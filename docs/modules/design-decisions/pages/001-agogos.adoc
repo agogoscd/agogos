@@ -1,0 +1,39 @@
+= 001 - Agogos
+
+**Status**: DRAFT
+**Date**: 2023-04-14
+
+== Why
+CPaaS (Continuous Productization as a Service) has a series of limitations in its
+design and technology mainly:
+
+* CPaaS does not have a centralized view
+* Jenkins design is enforced on CPaaS, so development and testing is slow
+* CPaaS is not flexible enough and enforce too much
+
+== What/How
+The CPaaS team decided to create a new iteration of the CPaaS service, called
+"Agogos" (**pipeline** in Greek). Agogos...:
+
+* uses of Red{nbsp}Hat technologies: Quarkus, Tekton and OpenShift
+* does not have a custom UI: it relies on Kubernetes objects and the Tekton UI
+* wraps Tekton using Kubernetes Custom Resource Definitions (CRDs)
+* is a Kubernetes Operator: keeps state and performs validation on CRDs
+* has a small codebase: it contains the core resources, business logic is external
+  to the Agogos core
+* provides flexibility for users, while still complies with Red{nbsp}Hat policies.
+
+== Consequences
+Main benefits of Agogos:
+
+* Its underlying technologies make ask for support and features easier.
+* Its development is easier and faster.
+* Its ecosystem is modern.
+* Allows for a modularity, where each business component is isolated.
+* Allows for user customization, while some processes are enforced.
+
+Main drawbacks of Agogos:
+
+* Is tied to Kubernetes
+* Requires sync and validation of contracts that external components need to
+  comply with

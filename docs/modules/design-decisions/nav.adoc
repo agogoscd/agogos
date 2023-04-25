@@ -1,0 +1,4 @@
+* Design Decisions
+
+** xref:index.adoc[]
+** xref:001-agogos.adoc[]
