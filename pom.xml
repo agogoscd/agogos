@@ -34,7 +34,7 @@
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
         <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
         <failsafe-plugin.version>3.0.0-M5</failsafe-plugin.version>
-        <cloudevents.version>2.2.0</cloudevents.version>
+        <cloudevents.version>2.5.0</cloudevents.version>
         <openapi-schema-validator.version>1.0.5</openapi-schema-validator.version>
         <lombok.version>1.18.16</lombok.version>
         <quarkus-tekton-client.version>1.0.0</quarkus-tekton-client.version>
