@@ -7,6 +7,11 @@ import com.redhat.agogos.CloudEventHelper;
 import com.redhat.agogos.PipelineRunState;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.v1alpha1.AgogosResource;
+import com.redhat.agogos.v1alpha1.Build;
+import com.redhat.agogos.v1alpha1.Component;
+import com.redhat.agogos.v1alpha1.Component.ComponentSpec;
+import com.redhat.agogos.v1alpha1.ComponentBuilderSpec.BuilderRef;
+
 import io.cloudevents.CloudEvent;
 import io.cloudevents.core.builder.CloudEventBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -43,10 +48,10 @@ public class CloudEventPublisher {
     ObjectMapper objectMapper;
 
     @ConfigProperty(name = "agogos.cloud-events.base-url", defaultValue = "http://broker-ingress.knative-eventing.svc.cluster.local")
-    String baseurl;
+    String baseurl = "http://broker-ingress.knative-eventing.svc.cluster.local";
 
     @ConfigProperty(name = "agogos.cloud-events.publish")
-    Optional<Boolean> publish;
+    Optional<Boolean> publish = Optional.of(true);
 
     Map<String, BrokerRestClient> brokers = new HashMap<>();
 
@@ -88,6 +93,14 @@ public class CloudEventPublisher {
 
         JsonObjectBuilder dataBuilder = Json.createObjectBuilder();
 
+        objectMapper = new ObjectMapper();
+        try {
+            System.out.println(objectMapper.writeValueAsString(resource));
+        } catch (JsonProcessingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         payload.forEach((key, o) -> {
             try {
                 dataBuilder.add(key,
@@ -126,5 +139,17 @@ public class CloudEventPublisher {
         LOG.debug("CloudEvent payload: '{}'", data);
 
         broker.sendEvent(cloudEvent);
+    }
+
+    public static void main(String[] args) {
+        CloudEventPublisher cep = new CloudEventPublisher();
+        Build b = new Build();
+        b.setKind("Build");
+        b.getMetadata().setNamespace("default");
+        Component c = new Component("test-component");
+        c.setKind("Component");
+        c.setSpec(new ComponentSpec());
+        c.getSpec().getBuild().setBuilderRef(new BuilderRef("my-builder"));
+        cep.publish(PipelineRunState.SUCCEEDED, b, c);
     }
 }
