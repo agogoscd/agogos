@@ -23,7 +23,7 @@ public class KnativeEventingInstaller extends Installer {
     private static final Logger LOG = LoggerFactory.getLogger(KnativeEventingInstaller.class);
 
     // In sync with https://docs.openshift.com/container-platform/4.7/serverless/serverless-release-notes.html#serverless-rn-1-15-0_serverless-release-notes
-    private static final String VERSION = "v0.21.4";
+    public static final String VERSION = "v1.10.0";
     private static final String NAMESPACE = "knative-eventing";
 
     @Override

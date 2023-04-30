@@ -16,7 +16,8 @@ kind: ClusterRole
 metadata:
   name: knative-eventing-mt-channel-broker-controller
   labels:
-    eventing.knative.dev/release: "v0.21.4"
+    app.kubernetes.io/version: "1.10.0"
+    app.kubernetes.io/name: knative-eventing
 rules:
   # Configs resources and status we care about.
   - apiGroups:
@@ -57,7 +58,8 @@ kind: ClusterRole
 metadata:
   name: knative-eventing-mt-broker-filter
   labels:
-    eventing.knative.dev/release: "v0.21.4"
+    app.kubernetes.io/version: "1.10.0"
+    app.kubernetes.io/name: knative-eventing
 rules:
   - apiGroups:
       - eventing.knative.dev
@@ -97,7 +99,8 @@ metadata:
   name: mt-broker-filter
   namespace: knative-eventing
   labels:
-    eventing.knative.dev/release: "v0.21.4"
+    app.kubernetes.io/version: "1.10.0"
+    app.kubernetes.io/name: knative-eventing
 
 ---
 # Copyright 2020 The Knative Authors
@@ -118,7 +121,8 @@ kind: ClusterRole
 metadata:
   name: knative-eventing-mt-broker-ingress
   labels:
-    eventing.knative.dev/release: "v0.21.4"
+    app.kubernetes.io/version: "1.10.0"
+    app.kubernetes.io/name: knative-eventing
 rules:
   - apiGroups:
       - eventing.knative.dev
@@ -157,7 +161,8 @@ metadata:
   name: mt-broker-ingress
   namespace: knative-eventing
   labels:
-    eventing.knative.dev/release: "v0.21.4"
+    app.kubernetes.io/version: "1.10.0"
+    app.kubernetes.io/name: knative-eventing
 
 ---
 # Copyright 2020 The Knative Authors
@@ -179,7 +184,8 @@ kind: ClusterRoleBinding
 metadata:
   name: eventing-mt-channel-broker-controller
   labels:
-    eventing.knative.dev/release: "v0.21.4"
+    app.kubernetes.io/version: "1.10.0"
+    app.kubernetes.io/name: knative-eventing
 subjects:
   - kind: ServiceAccount
     name: eventing-controller
@@ -209,7 +215,8 @@ kind: ClusterRoleBinding
 metadata:
   name: knative-eventing-mt-broker-filter
   labels:
-    eventing.knative.dev/release: "v0.21.4"
+    app.kubernetes.io/version: "1.10.0"
+    app.kubernetes.io/name: knative-eventing
 subjects:
   - kind: ServiceAccount
     name: mt-broker-filter
@@ -239,7 +246,8 @@ kind: ClusterRoleBinding
 metadata:
   name: knative-eventing-mt-broker-ingress
   labels:
-    eventing.knative.dev/release: "v0.21.4"
+    app.kubernetes.io/version: "1.10.0"
+    app.kubernetes.io/name: knative-eventing
 subjects:
   - kind: ServiceAccount
     name: mt-broker-ingress
@@ -270,7 +278,9 @@ metadata:
   name: mt-broker-filter
   namespace: knative-eventing
   labels:
-    eventing.knative.dev/release: "v0.21.4"
+    app.kubernetes.io/component: broker-filter
+    app.kubernetes.io/version: "1.10.0"
+    app.kubernetes.io/name: knative-eventing
 spec:
   selector:
     matchLabels:
@@ -279,14 +289,16 @@ spec:
     metadata:
       labels:
         eventing.knative.dev/brokerRole: filter
-        eventing.knative.dev/release: "v0.21.4"
+        app.kubernetes.io/component: broker-filter
+        app.kubernetes.io/version: "1.10.0"
+        app.kubernetes.io/name: knative-eventing
     spec:
       serviceAccountName: mt-broker-filter
       enableServiceLinks: false
       containers:
         - name: filter
           terminationMessagePolicy: FallbackToLogsOnError
-          image: gcr.io/knative-releases/knative.dev/eventing/cmd/mtbroker/filter@sha256:b06ec57119040a5f82844c6e89cf1a90a51047fc702968bcc55e3de18588cd10
+          image: gcr.io/knative-releases/knative.dev/eventing/cmd/broker/filter@sha256:16782b39892d6b65d8a1df5ab2a2eab6a3c32023c420fbcdbd69e246d126c48b
           readinessProbe: &probe
             failureThreshold: 3
             httpGet:
@@ -338,13 +350,22 @@ spec:
               value: "8080"
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
     eventing.knative.dev/brokerRole: filter
-    eventing.knative.dev/release: "v0.21.4"
+    app.kubernetes.io/component: broker-filter
+    app.kubernetes.io/version: "1.10.0"
+    app.kubernetes.io/name: knative-eventing
   name: broker-filter
   namespace: knative-eventing
 spec:
@@ -381,7 +402,9 @@ metadata:
   name: mt-broker-ingress
   namespace: knative-eventing
   labels:
-    eventing.knative.dev/release: "v0.21.4"
+    app.kubernetes.io/component: broker-ingress
+    app.kubernetes.io/version: "1.10.0"
+    app.kubernetes.io/name: knative-eventing
 spec:
   selector:
     matchLabels:
@@ -390,14 +413,16 @@ spec:
     metadata:
       labels:
         eventing.knative.dev/brokerRole: ingress
-        eventing.knative.dev/release: "v0.21.4"
+        app.kubernetes.io/component: broker-ingress
+        app.kubernetes.io/version: "1.10.0"
+        app.kubernetes.io/name: knative-eventing
     spec:
       serviceAccountName: mt-broker-ingress
       enableServiceLinks: false
       containers:
         - name: ingress
           terminationMessagePolicy: FallbackToLogsOnError
-          image: gcr.io/knative-releases/knative.dev/eventing/cmd/mtbroker/ingress@sha256:580d4ebdb97dab42295dba5e74cb5012ee88fa0ba6d5cf017c2058c6faeef9c3
+          image: gcr.io/knative-releases/knative.dev/eventing/cmd/broker/ingress@sha256:339b84cf4f86fb4cc62920d6840ed650e8932a28283828e644c96c0765ff0c18
           readinessProbe: &probe
             failureThreshold: 3
             httpGet:
@@ -449,13 +474,22 @@ spec:
               value: "8080"
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
 ---
 apiVersion: v1
 kind: Service
 metadata:
   labels:
     eventing.knative.dev/brokerRole: ingress
-    eventing.knative.dev/release: "v0.21.4"
+    app.kubernetes.io/component: broker-ingress
+    app.kubernetes.io/version: "1.10.0"
+    app.kubernetes.io/name: knative-eventing
   name: broker-ingress
   namespace: knative-eventing
 spec:
@@ -492,7 +526,9 @@ metadata:
   name: mt-broker-controller
   namespace: knative-eventing
   labels:
-    eventing.knative.dev/release: "v0.21.4"
+    app.kubernetes.io/component: mt-broker-controller
+    app.kubernetes.io/version: "1.10.0"
+    app.kubernetes.io/name: knative-eventing
 spec:
   selector:
     matchLabels:
@@ -501,7 +537,9 @@ spec:
     metadata:
       labels:
         app: mt-broker-controller
-        eventing.knative.dev/release: "v0.21.4"
+        app.kubernetes.io/component: broker-controller
+        app.kubernetes.io/version: "1.10.0"
+        app.kubernetes.io/name: knative-eventing
     spec:
       # To avoid node becoming SPOF, spread our replicas to different nodes.
       affinity:
@@ -518,7 +556,7 @@ spec:
       containers:
         - name: mt-broker-controller
           terminationMessagePolicy: FallbackToLogsOnError
-          image: gcr.io/knative-releases/knative.dev/eventing/cmd/mtchannel_broker@sha256:aeee177aba05adcc54643f387ea0478a200f1d8896371a5210b63f2764358b05
+          image: gcr.io/knative-releases/knative.dev/eventing/cmd/mtchannel_broker@sha256:ebc1df57853d77bd0285e6a0f4462dbf1c3590a08cb89c98e8294229866586a6
           resources:
             requests:
               cpu: 100m
@@ -534,19 +572,19 @@ spec:
               value: config-observability
             - name: METRICS_DOMAIN
               value: knative.dev/eventing
-            # Due to the trivial per-Broker cost, we _can_ inject Brokers into every
-            # namespace by default. To change this default simply change this
-            # to "true".  To opt namespaces out of Broker injection, label
-            # them with:
-            #    knative-eventing-injection: disabled
-            - name: BROKER_INJECTION_DEFAULT
-              value: "false"
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
           ports:
             - name: metrics
               containerPort: 9090
@@ -568,13 +606,15 @@ spec:
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: broker-ingress-hpa
   namespace: knative-eventing
   labels:
-    eventing.knative.dev/release: "v0.21.4"
+    app.kubernetes.io/component: broker-ingress
+    app.kubernetes.io/version: "1.10.0"
+    app.kubernetes.io/name: knative-eventing
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -590,13 +630,15 @@ spec:
           type: Utilization
           averageUtilization: 70
 ---
-apiVersion: autoscaling/v2beta2
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: broker-filter-hpa
   namespace: knative-eventing
   labels:
-    eventing.knative.dev/release: "v0.21.4"
+    app.kubernetes.io/component: broker-filter
+    app.kubernetes.io/version: "1.10.0"
+    app.kubernetes.io/name: knative-eventing
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

@@ -279,9 +279,7 @@ public class ResourceLoader {
             consumer.accept(resources);
         }
 
-        if (resourceMappings.isEmpty()) {
-            readMappings();
-        }
+        readMappings();
 
         List<HasMetadata> installed = new ArrayList<>();
 
@@ -303,39 +301,9 @@ public class ResourceLoader {
             }
 
             ResourceMapping mapping = resourceMappings.get(resourceMapKey);
-
-            // For a given resource we don't have the mapping.
-            // In such case we may need to query Kubernetes to understand whether the mapping
-            // was added as part of some other resource installation.
             if (mapping == null) {
-                URL openApiUrl = openApiUrl();
-                // Request head = new Request.Builder().url(openApiUrl).head().build();
-                final HttpResponse<String> response;
-
-                try {
-                    response = httpClient.sendAsync(
-                            httpClient.newHttpRequestBuilder().url(openApiUrl).method("HEAD", "text/plain", null).build(),
-                            String.class).get();
-                } catch (Exception e) {
-                    throw new ApplicationException(
-                            "Cannot fetch last modification time of Kubernetes OpenAPI schema resource: {}.", openApiUrl, e);
-                }
-
-                // TODO: Fragile!
-                Instant lastModified = Instant.parse(response.headers("Last-Modified").get(0));
-
-                if (lastModified.compareTo(lastResourceMappingUpdate) > 0) {
-                    readMappings();
-                }
-
-                mapping = resourceMappings.get(resourceMapKey);
-
-                // We tried to find whether the cluster knows about the resource, but we failed,
-                // it is still unknown to the cluster. We cannot proceed, so we fail here.
-                if (mapping == null) {
-                    throw new ApplicationException(
-                            "Cannot install resource because it is unknown to the Kubernetes cluster: '{}'", genericResource);
-                }
+                throw new ApplicationException(
+                        "Cannot install resource because it is unknown to the Kubernetes cluster: '{}'", genericResource);
             }
 
             OperationContext ctx = new OperationContext() //
@@ -376,12 +344,10 @@ public class ResourceLoader {
                                 .createOrReplace(genericResource));
 
             } else {
-
                 installed.add(new GenericKubernetesResourceOperationsImpl(
                         ctx, false).createOrReplace(genericResource));
 
             }
-
         });
 
         return installed;
