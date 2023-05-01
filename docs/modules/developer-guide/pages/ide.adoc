@@ -13,7 +13,8 @@ codebase.
 
 === Installation
 
-You can obtain vscode from the link:https://code.visualstudio.com/[official page].
+You can obtain vscode from the
+link:https://code.visualstudio.com/[official page].
 
 === Task Configuration
 
@@ -28,9 +29,10 @@ Choosing the task to run:
 image::vscode-select-task.png[vscode select tasks]
 
 You can configure vscode to be able to automatically launch special tasks. Place
-the following configuration into `.vscode/tasks.json` file.
+the following configuration into the [filename]`~/.vscode/tasks.json` file.
 
-NOTE: Read more about vscode task configuration from the link:https://code.visualstudio.com/docs/editor/tasks[official documentation].
+NOTE: Read more about vscode task configuration from the
+link:https://code.visualstudio.com/docs/editor/tasks[official documentation].
 
 [source,json]
 ..vscode/tasks.json
@@ -137,7 +139,7 @@ NOTE: Read more about vscode task configuration from the link:https://code.visua
 image::vscode-launch-selection.png[vscode launch selection]
 
 To be able to launch debug tasks in the IDE you can add following content to the
-`.vscode/launch.json` file.
+[filename]`~/.vscode/launch.json` file.
 
 [source,json]
 ..vscode/launch.json
