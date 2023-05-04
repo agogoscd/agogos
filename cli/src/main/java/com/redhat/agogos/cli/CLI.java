@@ -4,6 +4,7 @@ import com.redhat.agogos.cli.commands.adm.AdmCommand;
 import com.redhat.agogos.cli.commands.build.BuildCommand;
 import com.redhat.agogos.cli.commands.builder.BuilderCommand;
 import com.redhat.agogos.cli.commands.component.ComponentCommand;
+import com.redhat.agogos.cli.commands.info.InfoCommand;
 import com.redhat.agogos.cli.commands.load.LoadCommand;
 import com.redhat.agogos.cli.commands.pipeline.PipelineCommand;
 import com.redhat.agogos.cli.commands.run.RunCommand;
@@ -24,14 +25,15 @@ import java.io.PrintWriter;
 @QuarkusMain
 @CommandLine.Command(name = "agogosctl", mixinStandardHelpOptions = true, subcommands = { //
         AdmCommand.class,
+        BuilderCommand.class,
         BuildCommand.class,
         ComponentCommand.class,
+        InfoCommand.class,
+        LoadCommand.class,
         PipelineCommand.class,
         RunCommand.class,
-        TriggerCommand.class,
         StageCommand.class,
-        BuilderCommand.class,
-        LoadCommand.class,
+        TriggerCommand.class,
 })
 public class CLI implements QuarkusApplication {
 

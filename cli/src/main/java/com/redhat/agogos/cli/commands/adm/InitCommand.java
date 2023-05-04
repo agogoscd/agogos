@@ -4,7 +4,6 @@ import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.AbstractCommand;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller;
 import com.redhat.agogos.errors.ApplicationException;
-import io.fabric8.knative.client.KnativeClient;
 import io.fabric8.knative.eventing.v1.Broker;
 import io.fabric8.knative.eventing.v1.BrokerBuilder;
 import io.fabric8.knative.eventing.v1.Trigger;
@@ -22,11 +21,9 @@ import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.RoleBinding;
 import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.triggers.v1alpha1.EventListener;
 import io.fabric8.tekton.triggers.v1alpha1.EventListenerBuilder;
-import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -57,15 +54,6 @@ public class InitCommand extends AbstractCommand {
 
     @Option(names = { "--namespace", "-n" }, required = true, description = "Name of the namespace to be initialized")
     String namespace;
-
-    @Inject
-    KubernetesClient kubernetesClient;
-
-    @Inject
-    TektonClient tektonClient;
-
-    @Inject
-    KnativeClient knativeClient;
 
     private List<HasMetadata> installedResources = new ArrayList<>();
 
