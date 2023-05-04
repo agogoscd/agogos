@@ -1,4 +1,4 @@
-package com.redhat.agogos.k8s.controllers.dependent;
+package com.redhat.agogos.k8s.controllers.trigger;
 
 import com.cronutils.mapper.CronMapper;
 import com.cronutils.model.Cron;
@@ -10,6 +10,7 @@ import com.redhat.agogos.cron.TriggerEventScheduler;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.k8s.Resource;
 import com.redhat.agogos.k8s.TektonPipelineHelper;
+import com.redhat.agogos.k8s.controllers.AbstractDependentResource;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.triggers.TimedTriggerEvent;
@@ -31,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class TriggerDependentResource
-        extends AbstractBaseDependentResource<Trigger, com.redhat.agogos.v1alpha1.triggers.Trigger> {
+        extends AbstractDependentResource<Trigger, com.redhat.agogos.v1alpha1.triggers.Trigger> {
 
     @Inject
     TektonPipelineHelper pipelineHelper;

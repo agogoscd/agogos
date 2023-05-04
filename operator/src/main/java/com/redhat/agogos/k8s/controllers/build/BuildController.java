@@ -1,6 +1,6 @@
-package com.redhat.agogos.k8s.controllers;
+package com.redhat.agogos.k8s.controllers.build;
 
-import com.redhat.agogos.k8s.controllers.dependent.BuildPipelineRunDependentResource;
+import com.redhat.agogos.k8s.controllers.AbstractRunController;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Component;
 import io.javaoperatorsdk.operator.api.config.informer.InformerConfiguration;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 @ApplicationScoped
 @ControllerConfiguration(generationAwareEventProcessing = false, dependents = {
-        @Dependent(type = BuildPipelineRunDependentResource.class, reconcilePrecondition = ComponentReadyPrecondition.class)
+        @Dependent(type = PipelineRunDependentResource.class, reconcilePrecondition = PipelineRunPrecondition.class)
 })
 public class BuildController extends AbstractRunController<Build> implements EventSourceInitializer<Build> {
 

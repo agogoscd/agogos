@@ -1,4 +1,4 @@
-package com.redhat.agogos.k8s.controllers.dependent;
+package com.redhat.agogos.k8s.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.errors.ApplicationException;
@@ -11,21 +11,21 @@ import io.javaoperatorsdk.operator.processing.dependent.kubernetes.KubernetesDep
 import jakarta.inject.Inject;
 
 @KubernetesDependent
-public abstract class AbstractBaseDependentResource<R extends HasMetadata, P extends HasMetadata>
+public abstract class AbstractDependentResource<R extends HasMetadata, P extends HasMetadata>
         extends CRUDKubernetesDependentResource<R, P> {
 
-    public AbstractBaseDependentResource(Class<R> resourceType) {
+    public AbstractDependentResource(Class<R> resourceType) {
         super(resourceType);
     }
 
     @Inject
-    TektonClient tektonClient;
+    protected TektonClient tektonClient;
 
     @Inject
-    AgogosClient agogosClient;
+    protected AgogosClient agogosClient;
 
     @Inject
-    ObjectMapper objectMapper;
+    protected ObjectMapper objectMapper;
 
     protected AgogosResource<?, ?> parentResource(P resource) {
         throw new ApplicationException("No implementation of parentResource for '{}'", resource.getKind());

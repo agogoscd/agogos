@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractRunController<T extends AgogosResource<?, ResultableStatus>> extends AbstractController<T> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BuildController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractRunController.class);
 
     @Override
     public UpdateControl<T> reconcile(T resource, Context<T> context) {
@@ -129,8 +129,8 @@ public abstract class AbstractRunController<T extends AgogosResource<?, Resultab
                     resource.getKind(), resource.getFullName(), e.getMessage(), e);
         }
 
-        LOG.debug("Updating {} '{}' with PipelineRun state '{}'", resource.getKind(), resource.getFullName(),
-                runStatus);
+        LOG.debug("Updating {} '{}' with status '{}' (PipelineRun state '{}')",
+                resource.getKind(), resource.getFullName(), status, runStatus);
 
         return UpdateControl.updateStatus(resource);
     }

@@ -1,7 +1,7 @@
-package com.redhat.agogos.k8s.controllers;
+package com.redhat.agogos.k8s.controllers.trigger;
 
 import com.redhat.agogos.cron.TriggerEventScheduler;
-import com.redhat.agogos.k8s.controllers.dependent.TriggerDependentResource;
+import com.redhat.agogos.k8s.controllers.AbstractController;
 import com.redhat.agogos.v1alpha1.triggers.TimedTriggerEvent;
 import com.redhat.agogos.v1alpha1.triggers.Trigger;
 import io.javaoperatorsdk.operator.api.reconciler.Context;

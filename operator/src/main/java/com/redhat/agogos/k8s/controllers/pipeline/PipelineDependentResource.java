@@ -1,8 +1,9 @@
-package com.redhat.agogos.k8s.controllers.dependent;
+package com.redhat.agogos.k8s.controllers.pipeline;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
+import com.redhat.agogos.k8s.controllers.AbstractDependentResource;
 import com.redhat.agogos.v1alpha1.AbstractStage;
 import com.redhat.agogos.v1alpha1.Pipeline.PipelineSpec.StageEntry;
 import com.redhat.agogos.v1alpha1.Pipeline.PipelineSpec.StageReference;
@@ -26,12 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class AgogosPipelineDependentResource
-        extends AbstractBaseDependentResource<Pipeline, com.redhat.agogos.v1alpha1.Pipeline> {
+public class PipelineDependentResource
+        extends AbstractDependentResource<Pipeline, com.redhat.agogos.v1alpha1.Pipeline> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AgogosPipelineDependentResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PipelineDependentResource.class);
 
-    public AgogosPipelineDependentResource() {
+    public PipelineDependentResource() {
         super(Pipeline.class);
     }
 

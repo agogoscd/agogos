@@ -1,4 +1,4 @@
-package com.redhat.agogos.k8s.controllers.dependent;
+package com.redhat.agogos.k8s.controllers;
 
 import com.redhat.agogos.k8s.Resource;
 import com.redhat.agogos.v1alpha1.AgogosResource;
@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public abstract class AbstractPipelineRunDependentResource<T extends AgogosResource<?, ResultableStatus>>
-        extends AbstractBaseDependentResource<PipelineRun, T> {
+        extends AbstractDependentResource<PipelineRun, T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractPipelineRunDependentResource.class);
 

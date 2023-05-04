@@ -2,7 +2,7 @@ package com.redhat.agogos.test.unit.k8s.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.redhat.agogos.k8s.controllers.ComponentController;
+import com.redhat.agogos.k8s.controllers.component.ComponentController;
 import com.redhat.agogos.v1alpha1.Component;
 import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
 import org.junit.jupiter.api.DisplayName;
