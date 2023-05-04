@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.cli.CLI;
+import com.redhat.agogos.cli.commands.adm.install.KnativeEventingInstaller;
+import com.redhat.agogos.cli.commands.adm.install.TektonInstaller;
 import com.redhat.agogos.test.InMemoryLogHandler;
 import com.redhat.agogos.test.KubernetesTestServerSetup;
 import io.quarkus.test.junit.QuarkusTest;
@@ -51,8 +53,8 @@ public class InstallCommandTest {
 
         assertTrue(handler.contains("💻 Selected profile: local"));
         assertTrue(handler.contains("✅ Tekton v0.41.1 installed"));
-        assertTrue(handler.contains("✅ Tekton Triggers v0.22.2 installed"));
-        assertTrue(handler.contains("✅ Knative Eventing v0.21.4 installed"));
+        assertTrue(handler.contains("✅ Tekton Triggers " + TektonInstaller.VERSION + " installed"));
+        assertTrue(handler.contains("✅ Knative Eventing " + KnativeEventingInstaller.VERSION + " installed"));
         assertTrue(handler.contains("✅ Agogos CRDs installed"));
         assertTrue(handler.contains("✅ Agogos core resources installed"));
         assertTrue(handler.contains("✅ Agogos Webhook installed"));

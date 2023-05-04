@@ -19,7 +19,7 @@ public class TektonInstaller extends Installer {
     private static final Logger LOG = LoggerFactory.getLogger(TektonInstaller.class);
 
     // In sync with https://docs.openshift.com/container-platform/4.7/cicd/pipelines/op-release-notes.html#getting-support
-    private static final String VERSION = "v0.41.1";
+    public static final String VERSION = "v0.44.2";
     private static final String NAMESPACE = "tekton-pipelines";
 
     @Override
