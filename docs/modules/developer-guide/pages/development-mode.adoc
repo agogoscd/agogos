@@ -34,7 +34,7 @@ wget -O $HOME/.minikube/certs/2022-IT-Root-CA.pem https://certs.corp.redhat.com/
 
 [source,bash]
 ----
-minikube start --driver=kvm2 --cpus=4 --memory=6g --disk-size=30GB --kubernetes-version=1.21.14 --embed-certs
+minikube start --driver=kvm2 --cpus=4 --memory=6g --disk-size=30GB --kubernetes-version=1.26.1 --embed-certs
 ----
 
 Minikube configures your [filename]`$HOME/.kube/config` to use the newly created
