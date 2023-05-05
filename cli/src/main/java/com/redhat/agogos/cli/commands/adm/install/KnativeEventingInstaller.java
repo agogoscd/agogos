@@ -1,40 +1,37 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
-import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
-import io.fabric8.kubernetes.api.model.HasMetadata;
+import com.redhat.agogos.config.KnativeEventingDependency;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 @Profile(InstallProfile.local)
 @Profile(InstallProfile.dev)
 @Priority(20)
 @ApplicationScoped
 @RegisterForReflection
-public class KnativeEventingInstaller extends Installer {
+public class KnativeEventingInstaller extends DependencyInstaller {
 
     private static final Logger LOG = LoggerFactory.getLogger(KnativeEventingInstaller.class);
 
-    // In sync with https://docs.openshift.com/container-platform/4.7/serverless/serverless-release-notes.html#serverless-rn-1-15-0_serverless-release-notes
-    public static final String VERSION = "v1.10.0";
-    private static final String NAMESPACE = "knative-eventing";
+    @Inject
+    KnativeEventingDependency eventing;
 
     @Override
     public void install(InstallProfile profile, String namespace) {
-        LOG.info("🕞 Installing Knative Eventing {}...", VERSION);
+        LOG.info("🕞 Installing Knative Eventing {}...", eventing.version());
 
         cleanup();
-
-        Helper.status(install());
-
-        LOG.info("✅ Knative Eventing {} installed", VERSION);
+        install(eventing, profile, namespace, loaded -> {
+            loaded.removeIf(
+                    resource -> resource instanceof Deployment
+                            && resource.getMetadata().getName().equals("pingsource-mt-adapter"));
+        });
+        LOG.info("✅ Knative Eventing {} installed", eventing.version());
     }
 
     /**
@@ -59,30 +56,6 @@ public class KnativeEventingInstaller extends Installer {
                 .withLabel(releaseLabel)
                 .delete();
 
-        kubernetesClient.apps().deployments().inNamespace(NAMESPACE).withName("eventing-webhook").delete();
-    }
-
-    private List<HasMetadata> install() {
-        List<HasMetadata> resources = new ArrayList<>();
-
-        String[] files = new String[] { "core", "in-memory-channel", "mt-channel-broker" };
-
-        for (String file : files) {
-            String path = String.format("dependencies/knative-eventing-%s.yaml", file);
-            InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
-
-            resources.addAll(
-                    resourceLoader.installKubernetesResources(
-                            is,
-                            NAMESPACE,
-                            loaded -> {
-                                loaded.removeIf(
-                                        resource -> resource instanceof Deployment
-                                                && resource.getMetadata().getName().equals("pingsource-mt-adapter"));
-                            }));
-        }
-
-        return resources;
-
+        kubernetesClient.apps().deployments().inNamespace(eventing.namespace()).withName("eventing-webhook").delete();
     }
 }

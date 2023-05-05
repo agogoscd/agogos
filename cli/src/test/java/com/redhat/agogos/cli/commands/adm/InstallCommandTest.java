@@ -5,8 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.cli.CLI;
-import com.redhat.agogos.cli.commands.adm.install.KnativeEventingInstaller;
-import com.redhat.agogos.cli.commands.adm.install.TektonInstaller;
+import com.redhat.agogos.config.KnativeEventingDependency;
+import com.redhat.agogos.config.TektonPipelineDependency;
+import com.redhat.agogos.config.TektonTriggersDependency;
 import com.redhat.agogos.test.InMemoryLogHandler;
 import com.redhat.agogos.test.KubernetesTestServerSetup;
 import io.quarkus.test.junit.QuarkusTest;
@@ -21,6 +22,15 @@ import org.junit.jupiter.api.Test;
 @WithKubernetesTestServer(setup = KubernetesTestServerSetup.class)
 @QuarkusTest
 public class InstallCommandTest {
+
+    @Inject
+    TektonPipelineDependency tekton;
+
+    @Inject
+    TektonTriggersDependency triggers;
+
+    @Inject
+    KnativeEventingDependency eventing;
 
     @Inject
     CLI cli;
@@ -52,9 +62,9 @@ public class InstallCommandTest {
         assertEquals(0, exitCode);
 
         assertTrue(handler.contains("💻 Selected profile: local"));
-        assertTrue(handler.contains("✅ Tekton v0.41.1 installed"));
-        assertTrue(handler.contains("✅ Tekton Triggers " + TektonInstaller.VERSION + " installed"));
-        assertTrue(handler.contains("✅ Knative Eventing " + KnativeEventingInstaller.VERSION + " installed"));
+        assertTrue(handler.contains("✅ Tekton " + tekton.version() + " installed"));
+        assertTrue(handler.contains("✅ Tekton Triggers " + triggers.version() + " installed"));
+        assertTrue(handler.contains("✅ Knative Eventing " + eventing.version() + " installed"));
         assertTrue(handler.contains("✅ Agogos CRDs installed"));
         assertTrue(handler.contains("✅ Agogos core resources installed"));
         assertTrue(handler.contains("✅ Agogos Webhook installed"));
@@ -71,9 +81,9 @@ public class InstallCommandTest {
         assertEquals(0, exitCode);
 
         assertTrue(handler.contains("💻 Selected profile: dev"));
-        assertTrue(handler.contains("✅ Tekton v0.41.1 installed"));
-        assertTrue(handler.contains("✅ Tekton Triggers v0.22.2 installed"));
-        assertTrue(handler.contains("✅ Knative Eventing v0.21.4 installed"));
+        assertTrue(handler.contains("✅ Tekton " + tekton.version() + " installed"));
+        assertTrue(handler.contains("✅ Tekton Triggers " + triggers.version() + " installed"));
+        assertTrue(handler.contains("✅ Knative Eventing " + eventing.version() + " installed"));
         assertTrue(handler.contains("✅ Agogos CRDs installed"));
         assertTrue(handler.contains("✅ Agogos core resources installed"));
     }
