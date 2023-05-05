@@ -90,7 +90,7 @@ public class InitCommand extends AbstractCommand {
                 .withData(Map.of("channelTemplateSpec", "apiVersion: messaging.knative.dev/v1\nkind: InMemoryChannel"))
                 .build();
 
-        configMap = kubernetesClient.configMaps().inNamespace(namespace).resource(configMap).createOrReplace();
+        configMap = kubernetesClient.configMaps().inNamespace(namespace).resource(configMap).serverSideApply();
 
         installedResources.add(configMap);
 
@@ -114,7 +114,7 @@ public class InitCommand extends AbstractCommand {
                 .endSpec() //
                 .build();
 
-        broker = knativeClient.brokers().inNamespace(namespace).resource(broker).createOrReplace();
+        broker = knativeClient.brokers().inNamespace(namespace).resource(broker).serverSideApply();
 
         installedResources.add(broker);
 
@@ -145,7 +145,7 @@ public class InitCommand extends AbstractCommand {
                 .withData(data) //
                 .build();
 
-        cm = kubernetesClient.configMaps().inNamespace(namespace).resource(cm).createOrReplace();
+        cm = kubernetesClient.configMaps().inNamespace(namespace).resource(cm).serverSideApply();
 
         installedResources.add(cm);
     }
@@ -231,7 +231,7 @@ public class InitCommand extends AbstractCommand {
                 .endSpec() //
                 .build();
 
-        trigger = knativeClient.triggers().inNamespace(namespace).resource(trigger).createOrReplace();
+        trigger = knativeClient.triggers().inNamespace(namespace).resource(trigger).serverSideApply();
 
         installedResources.add(trigger);
     }
@@ -249,7 +249,7 @@ public class InitCommand extends AbstractCommand {
                 .endMetadata() //
                 .build();
 
-        ns = kubernetesClient.namespaces().resource(ns).createOrReplace();
+        ns = kubernetesClient.namespaces().resource(ns).serverSideApply();
 
         installedResources.add(ns);
     }
@@ -272,7 +272,7 @@ public class InitCommand extends AbstractCommand {
                 .endSpec() //
                 .build();
 
-        el = tektonClient.v1alpha1().eventListeners().inNamespace(namespace).resource(el).createOrReplace();
+        el = tektonClient.v1alpha1().eventListeners().inNamespace(namespace).resource(el).serverSideApply();
 
         installedResources.add(el);
 
@@ -303,7 +303,7 @@ public class InitCommand extends AbstractCommand {
                 .endRoleRef() //
                 .build();
 
-        roleBinding = kubernetesClient.rbac().clusterRoleBindings().resource(roleBinding).createOrReplace();
+        roleBinding = kubernetesClient.rbac().clusterRoleBindings().resource(roleBinding).serverSideApply();
 
         installedResources.add(roleBinding);
 
@@ -327,7 +327,7 @@ public class InitCommand extends AbstractCommand {
                 .endRoleRef() //
                 .build();
 
-        roleBinding = kubernetesClient.rbac().roleBindings().inNamespace(namespace).resource(roleBinding).createOrReplace();
+        roleBinding = kubernetesClient.rbac().roleBindings().inNamespace(namespace).resource(roleBinding).serverSideApply();
 
         installedResources.add(roleBinding);
     }
@@ -343,7 +343,7 @@ public class InitCommand extends AbstractCommand {
                 .endMetadata() //
                 .build();
 
-        sa = kubernetesClient.serviceAccounts().inNamespace(namespace).resource(sa).createOrReplace();
+        sa = kubernetesClient.serviceAccounts().inNamespace(namespace).resource(sa).serverSideApply();
 
         installedResources.add(sa);
 
@@ -358,7 +358,7 @@ public class InitCommand extends AbstractCommand {
                 .endMetadata() //
                 .build();
 
-        sa = kubernetesClient.serviceAccounts().inNamespace(namespace).resource(sa).createOrReplace();
+        sa = kubernetesClient.serviceAccounts().inNamespace(namespace).resource(sa).serverSideApply();
 
         installedResources.add(sa);
 

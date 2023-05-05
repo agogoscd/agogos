@@ -334,7 +334,7 @@ public class ResourceLoader {
                                 .endSpec()
                                 .build();
 
-                        installed.add(kubernetesClient.services().inNamespace(ns).resource(service).replace());
+                        installed.add(kubernetesClient.services().inNamespace(ns).resource(service).update());
                         return;
                     }
                 }

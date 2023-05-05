@@ -47,7 +47,7 @@ public class ComponentControllerTest {
     void registerInitTask() {
         ClusterTask task = new ClusterTaskBuilder().withNewMetadata().withName("init").endMetadata().build();
 
-        tektonClient.v1beta1().clusterTasks().resource(task).createOrReplace();
+        tektonClient.v1beta1().clusterTasks().resource(task).serverSideApply();
     }
 
     @Test
@@ -88,7 +88,7 @@ public class ComponentControllerTest {
 
         Task task = new TaskBuilder().withNewMetadata().withName("should-handle-component").endMetadata().withNewSpec()
                 .withParams(new ParamSpecBuilder().withName("param").build()).endSpec().build();
-        tektonClient.v1beta1().tasks().inNamespace("default").resource(task).createOrReplace();
+        tektonClient.v1beta1().tasks().inNamespace("default").resource(task).serverSideApply();
 
         Builder builder = new Builder();
         builder.getMetadata().setName("should-handle-component-builder-name");
