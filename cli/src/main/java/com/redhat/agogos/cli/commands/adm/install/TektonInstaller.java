@@ -1,34 +1,31 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
-import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
+import com.redhat.agogos.config.TektonPipelineDependency;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.InputStream;
 
 @Profile(InstallProfile.local)
 @Profile(InstallProfile.dev)
 @Priority(10)
 @ApplicationScoped
 @RegisterForReflection
-public class TektonInstaller extends Installer {
+public class TektonInstaller extends DependencyInstaller {
 
     private static final Logger LOG = LoggerFactory.getLogger(TektonInstaller.class);
 
-    // In sync with https://docs.openshift.com/container-platform/4.7/cicd/pipelines/op-release-notes.html#getting-support
-    public static final String VERSION = "v0.44.2";
-    private static final String NAMESPACE = "tekton-pipelines";
+    @Inject
+    TektonPipelineDependency tekton;
 
     @Override
     public void install(InstallProfile profile, String namespace) {
-        LOG.info("🕞 Installing Tekton {}...", VERSION);
+        LOG.info("🕞 Installing Tekton {}...", tekton.version());
 
-        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("dependencies/tekton.yaml");
-        Helper.status(resourceLoader.installKubernetesResources(is, NAMESPACE));
+        install(tekton, profile, namespace);
 
-        LOG.info("✅ Tekton {} installed", VERSION);
+        LOG.info("✅ Tekton {} installed", tekton.version());
     }
 }
