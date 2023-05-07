@@ -21,14 +21,16 @@ public class InstallCommand extends AbstractCommand {
     private static final Logger LOG = LoggerFactory.getLogger(InstallCommand.class);
 
     public static enum InstallProfile {
-        local,
         dev,
+        local,
+        prod
     }
 
     @Option(names = { "--profile", "-p" }, description = {
             "Selected installation profile, valid values: ${COMPLETION-CANDIDATES}.\n", "Available profiles:\n",
-            "* local: everything is installed in the cluster you are already logged-in, Agogos is deployed in the 'agogos' namespace, self-signed certificates are used",
-            "* dev: everything is installed in the cluster you are already logged-in, Agogos resources are meant to be run outside of the cluster in the development environment, self-signed certificates are generated and can be used to connect to cluster" })
+            "* dev: everything is installed in the cluster where you are already logged in, Agogos resources are meant to be run outside of the cluster in the development environment, self-signed certificates are generated and can be used to connect to cluster",
+            "* local: everything is installed in the cluster where you are already logged in, Agogos is deployed in the 'agogos' namespace, self-signed certificates are used",
+            "* prod: everything is installed in the cluster where you are already logged in, Agogos is deployed in the 'agogos' namespace," })
     InstallProfile profile = InstallProfile.dev;
 
     @Option(names = { "--namespace",

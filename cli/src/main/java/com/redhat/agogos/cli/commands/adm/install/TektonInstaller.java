@@ -11,8 +11,8 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Profile(InstallProfile.local)
 @Profile(InstallProfile.dev)
+@Profile(InstallProfile.local)
 @Priority(10)
 @ApplicationScoped
 @RegisterForReflection

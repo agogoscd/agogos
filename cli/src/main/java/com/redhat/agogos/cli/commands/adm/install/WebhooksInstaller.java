@@ -62,6 +62,7 @@ import java.util.Map;
 
 @Profile(InstallProfile.dev)
 @Profile(InstallProfile.local)
+@Profile(InstallProfile.prod)
 @Priority(95)
 @ApplicationScoped
 @RegisterForReflection
@@ -79,7 +80,6 @@ public class WebhooksInstaller extends Installer {
     CertProvider certProvider;
 
     private static final Map<String, String> LABELS = Map.of(
-            "app.kubernetes.io/instance", "default",
             "app.kubernetes.io/part-of", "agogos",
             "app.kubernetes.io/component", "webhooks");
 
@@ -97,23 +97,23 @@ public class WebhooksInstaller extends Installer {
                         admissionValidation(profile, namespace),
                         admissionMutation(profile, namespace)));
 
-        // For local profile we need to add more resources
-        if (profile == InstallProfile.local) {
+        // For local and prod profiles we need to add more resources
+        if (profile == InstallProfile.local || profile == InstallProfile.prod) {
             resources.addAll(
                     List.of(
-                            serviceAccount(),
+                            serviceAccount(namespace),
                             clusterRole(),
                             clusterRoleBinding(namespace),
-                            secret(),
-                            service(),
-                            deployment()));
+                            secret(namespace),
+                            service(namespace),
+                            deployment(namespace)));
         }
 
         Service webhooksService = kubernetesClient.services().inNamespace(namespace).withName(ServiceAccountName).get();
 
         resources = resourceLoader.installKubernetesResources(resources, namespace);
 
-        if (webhooksService != null && profile == InstallProfile.local) {
+        if (webhooksService != null && (profile == InstallProfile.local || profile == InstallProfile.prod)) {
             LOG.info("🕞 Restarting Webhooks service after updating certificates...");
 
             kubernetesClient.apps().deployments().inNamespace(namespace).withName(ServiceAccountName).rolling().restart();
@@ -150,7 +150,7 @@ public class WebhooksInstaller extends Installer {
         LOG.info("👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILE={}", certPath.toAbsolutePath());
     }
 
-    private Deployment deployment() {
+    private Deployment deployment(String namespace) {
         Probe livenessProbe = new ProbeBuilder()
                 .withHttpGet(new HTTPGetActionBuilder().withPath("/").withPort(new IntOrString(7080)).build())
                 .withInitialDelaySeconds(3).withPeriodSeconds(3).build();
@@ -179,28 +179,60 @@ public class WebhooksInstaller extends Installer {
                 .endResources()
                 .build();
 
-        Deployment webhookDeployment = new DeploymentBuilder().withNewMetadata().withName(ServiceAccountName)
+        Deployment webhookDeployment = new DeploymentBuilder()
+                .withNewMetadata()
+                .withName(ServiceAccountName)
+                .withNamespace(namespace)
                 .withLabels(LABELS)
-                .endMetadata().withNewSpec().withReplicas(1).withNewSelector().withMatchLabels(LABELS).endSelector()
-                .withNewTemplate().withNewMetadata().withLabels(LABELS).endMetadata().withNewSpec()
+                .endMetadata()
+                .withNewSpec()
+                .withReplicas(1)
+                .withNewSelector()
+                .withMatchLabels(LABELS)
+                .endSelector()
+                .withNewTemplate()
+                .withNewMetadata()
+                .withLabels(LABELS)
+                .endMetadata()
+                .withNewSpec()
                 .withContainers(webhookContainer)
                 .withVolumes(new VolumeBuilder().withName("certs")
                         .withSecret(new SecretVolumeSourceBuilder().withSecretName(ServiceAccountName).build())
                         .build())
                 .withServiceAccount(ServiceAccountName)
-                .endSpec().endTemplate().endSpec().build();
+                .endSpec()
+                .endTemplate()
+                .endSpec()
+                .build();
 
         return webhookDeployment;
     }
 
-    private Service service() {
-        ServicePort httpPort = new ServicePortBuilder().withName("http").withPort(80).withProtocol("TCP")
-                .withTargetPort(new IntOrString(7080)).build();
-        ServicePort httpsPort = new ServicePortBuilder().withName("https").withPort(443).withProtocol("TCP")
-                .withTargetPort(new IntOrString(8443)).build();
+    private Service service(String namespace) {
+        ServicePort httpPort = new ServicePortBuilder()
+                .withName("http")
+                .withPort(80)
+                .withProtocol("TCP")
+                .withTargetPort(new IntOrString(7080))
+                .build();
 
-        Service webhookService = new ServiceBuilder().withNewMetadata().withName(ServiceAccountName).withLabels(LABELS)
-                .endMetadata().withNewSpec().withPorts(httpPort, httpsPort).withType("ClusterIP").withSelector(LABELS)
+        ServicePort httpsPort = new ServicePortBuilder()
+                .withName("https")
+                .withPort(443)
+                .withProtocol("TCP")
+                .withTargetPort(new IntOrString(8443))
+                .build();
+
+        Service webhookService = new ServiceBuilder()
+                .withNewMetadata()
+                .withName(ServiceAccountName)
+                .withNamespace(namespace)
+                .withLabels(LABELS)
+                .endMetadata()
+                .withNewSpec()
+                .withPorts(httpPort, httpsPort)
+                .withType("ClusterIP")
+                .withSelector(LABELS)
                 .endSpec()
                 .build();
 
@@ -225,7 +257,15 @@ public class WebhooksInstaller extends Installer {
                 .withRules(validationRules);
 
         switch (profile) {
+            case dev:
+                validatingWebhookBuilder
+                        .withNewClientConfig()
+                        .withUrl("https://192.168.39.1:8443/webhooks/validate")
+                        .withCaBundle(certProvider.caBundle())
+                        .endClientConfig();
+                break;
             case local:
+            case prod:
                 validatingWebhookBuilder
                         .withNewClientConfig()
                         .withNewService()
@@ -237,12 +277,6 @@ public class WebhooksInstaller extends Installer {
                         .withCaBundle(certProvider.caBundle())
                         .endClientConfig();
                 break;
-            case dev:
-                validatingWebhookBuilder
-                        .withNewClientConfig()
-                        .withUrl("https://192.168.39.1:8443/webhooks/validate")
-                        .withCaBundle(certProvider.caBundle())
-                        .endClientConfig();
             default:
                 break;
         }
@@ -271,7 +305,14 @@ public class WebhooksInstaller extends Installer {
                 .withRules(mutationRules);
 
         switch (profile) {
+            case dev:
+                mutatingWebhookBuilder
+                        .withNewClientConfig()
+                        .withUrl("https://192.168.39.1:8443/webhooks/mutate")
+                        .withCaBundle(certProvider.caBundle())
+                        .endClientConfig();
             case local:
+            case prod:
                 mutatingWebhookBuilder
                         .withNewClientConfig()
                         .withNewService()
@@ -283,12 +324,6 @@ public class WebhooksInstaller extends Installer {
                         .withCaBundle(certProvider.caBundle())
                         .endClientConfig();
                 break;
-            case dev:
-                mutatingWebhookBuilder
-                        .withNewClientConfig()
-                        .withUrl("https://192.168.39.1:8443/webhooks/mutate")
-                        .withCaBundle(certProvider.caBundle())
-                        .endClientConfig();
             default:
                 break;
         }
@@ -301,21 +336,31 @@ public class WebhooksInstaller extends Installer {
         return mutatingWebhookConfiguration;
     }
 
-    private Secret secret() {
+    private Secret secret(String namespace) {
         Map<String, String> certData = new HashMap<>();
         certData.put("tls.crt", CertProvider.toBase64(certProvider.certificate()));
         certData.put("tls.key", CertProvider.toBase64(certProvider.privateKey()));
 
-        Secret secret = new SecretBuilder().withNewMetadata().withName(ServiceAccountName).withLabels(LABELS)
+        Secret secret = new SecretBuilder()
+                .withNewMetadata()
+                .withName(ServiceAccountName)
+                .withNamespace(namespace)
+                .withLabels(LABELS)
                 .endMetadata()
-                .withType("kubernetes.io/tls").withData(certData).build();
+                .withType("kubernetes.io/tls")
+                .withData(certData)
+                .build();
 
         return secret;
     }
 
-    private ServiceAccount serviceAccount() {
-        ServiceAccount sa = new ServiceAccountBuilder().withNewMetadata().withName(ServiceAccountName)
-                .withLabels(LABELS).endMetadata()
+    private ServiceAccount serviceAccount(String namespace) {
+        ServiceAccount sa = new ServiceAccountBuilder()
+                .withNewMetadata()
+                .withName(ServiceAccountName)
+                .withNamespace(namespace)
+                .withLabels(LABELS)
+                .endMetadata()
                 .build();
 
         return sa;

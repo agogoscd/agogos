@@ -8,8 +8,8 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Profile(InstallProfile.local)
 @Profile(InstallProfile.dev)
+@Profile(InstallProfile.local)
 @Priority(15)
 @ApplicationScoped
 @RegisterForReflection
