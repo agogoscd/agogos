@@ -44,10 +44,12 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
 
     Comparator<T> byCreationTime() {
         return (r1, r2) -> {
-            if (r1.creationTime().isBefore(r2.creationTime()))
+            if (r1.creationTime().isBefore(r2.creationTime())) {
                 return -1;
-            else
+            } else if (r2.creationTime().isBefore(r1.creationTime())) {
                 return 1;
+            }
+            return 0;
         };
     }
 
