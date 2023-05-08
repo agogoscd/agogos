@@ -70,6 +70,17 @@ spec:
                     - "openAPIV3Schema"
               required:
                 - "taskRef"
+            status:
+              description: ClusterStageStatus defines the observed state of ClusterStage
+              type: object
           type: object
       served: true
       storage: true
+      subresources:
+        status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
