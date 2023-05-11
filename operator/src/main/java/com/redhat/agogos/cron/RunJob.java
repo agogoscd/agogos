@@ -55,7 +55,7 @@ public class RunJob implements Job {
         run.getSpec().setPipeline(name);
         run.getMetadata().getOwnerReferences().add(ownerReference);
 
-        run = agogosClient.v1alpha1().runs().inNamespace(namespace).resource(run).createOrReplace();
+        run = agogosClient.v1alpha1().runs().inNamespace(namespace).resource(run).serverSideApply();
 
         LOG.info("Run '{}' scheduled, next run at {}", run.getFullName(),
                 context.getNextFireTime());

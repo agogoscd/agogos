@@ -40,9 +40,8 @@
         <quarkus-tekton-client.version>1.0.0</quarkus-tekton-client.version>
         <bouncycastle.version>1.72</bouncycastle.version>
 
-        <quarkus.platform.version>3.0.0.Final</quarkus.platform.version>
-        <quarkus-operatorsdk.version>6.0.0.CR1</quarkus-operatorsdk.version>
-        <fabric8-client.version>6.6-SNAPSHOT</fabric8-client.version>
+        <quarkus.platform.version>3.0.3.Final</quarkus.platform.version>
+        <quarkus-operatorsdk.version>6.0.1</quarkus-operatorsdk.version>
     </properties>
 
     <repositories>
@@ -58,13 +57,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>io.fabric8</groupId>
-                <artifactId>kubernetes-client-bom</artifactId>
-                <version>${fabric8-client.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <dependency>
                 <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>${quarkus.platform.artifact-id}</artifactId>
