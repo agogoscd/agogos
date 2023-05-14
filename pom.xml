@@ -28,7 +28,7 @@
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <maven.min.version>3.6.2</maven.min.version>
+        <maven.min.version>3.8.2</maven.min.version>
         <version.compiler.plugin>3.8.1</version.compiler.plugin>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>

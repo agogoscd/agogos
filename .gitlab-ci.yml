@@ -1,5 +1,5 @@
 verify:
-  image: maven:3.6-openjdk-11
+  image: maven:3.8-openjdk-11
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
     MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
