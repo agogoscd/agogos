@@ -112,6 +112,7 @@ public class CoreInstaller extends Installer {
                                 .withApiGroups(HasMetadata.getGroup(Trigger.class))
                                 .withResources( //
                                         HasMetadata.getPlural(EventListener.class),
+                                        "interceptors", //HasMetadata.getPlural(Interceptor.class),
                                         HasMetadata.getPlural(TriggerBinding.class),
                                         HasMetadata.getPlural(TriggerTemplate.class),
                                         HasMetadata.getPlural(Trigger.class),
