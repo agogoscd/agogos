@@ -15,12 +15,10 @@ import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
 import io.javaoperatorsdk.operator.api.reconciler.Reconciler;
 import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ApplicationScoped
 public abstract class AbstractController<T extends AgogosResource<?, ?>>
         implements Namespaced, Reconciler<T>, Cleaner<T> {
 
@@ -31,9 +29,6 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
 
     @Inject
     protected CloudEventPublisher cloudEventPublisher;
-
-    @Inject
-    protected ObjectMapper objectMapper;
 
     @Inject
     protected TektonPipelineHelper pipelineHelper;
@@ -53,7 +48,12 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
         return DeleteControl.defaultDelete();
     }
 
-    protected ResultableStatus deepCopy(ResultableStatus status) {
+    protected ObjectMapper getObjectMapper(Context<T> context) {
+        return context.getControllerConfiguration().getConfigurationService().getObjectMapper();
+    }
+
+    protected ResultableStatus deepCopy(ResultableStatus status, Context<T> context) {
+        final var objectMapper = getObjectMapper(context);
         try {
             return objectMapper.readValue(objectMapper.writeValueAsString(status), ResultableStatus.class);
         } catch (JsonProcessingException e) {

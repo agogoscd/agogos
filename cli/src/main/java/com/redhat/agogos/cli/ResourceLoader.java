@@ -341,7 +341,7 @@ public class ResourceLoader {
 
                 installed.add(new GenericKubernetesResourceOperationsImpl(
                         ctx, true).inNamespace(ns)
-                                .createOrReplace(genericResource));
+                        .createOrReplace(genericResource));
 
             } else {
                 installed.add(new GenericKubernetesResourceOperationsImpl(

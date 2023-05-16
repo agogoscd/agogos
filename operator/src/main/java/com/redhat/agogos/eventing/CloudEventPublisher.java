@@ -8,7 +8,9 @@ import com.redhat.agogos.PipelineRunState;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import io.cloudevents.CloudEvent;
+import io.cloudevents.CloudEventData;
 import io.cloudevents.core.builder.CloudEventBuilder;
+import io.cloudevents.core.data.PojoCloudEventData;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.json.Json;
@@ -100,12 +102,14 @@ public class CloudEventPublisher {
 
         String type = CloudEventHelper.type(resource.getClass(), state);
         String data = dataBuilder.build().toString();
+
+        final var eventData = PojoCloudEventData.wrap(payload, (p) -> data.getBytes());
         BrokerRestClient client = restClient(resource.getMetadata().getNamespace());
 
-        send(client, type, data);
+        send(client, type, eventData);
     }
 
-    private void send(BrokerRestClient broker, String type, String data) {
+    private void send(BrokerRestClient broker, String type, CloudEventData data) {
         if (!publish.orElse(true)) {
             LOG.debug(
                     "Publishing CloudEvent '{}' skipped because it is disabled in configuration; see 'agogos.cloud-events.publish' property",
@@ -118,7 +122,7 @@ public class CloudEventPublisher {
                 .withSource(URI.create("http://localhost")) // TODO: change this
                 .withId(UUID.randomUUID().toString()) // TODO: is this sufficient?
                 .withDataContentType(MediaType.APPLICATION_JSON) //
-                .withData(data.getBytes());
+                .withData(data);
 
         CloudEvent cloudEvent = cloudEventBuilder.build();
 
