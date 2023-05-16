@@ -41,7 +41,7 @@
         <bouncycastle.version>1.72</bouncycastle.version>
 
         <quarkus.platform.version>3.0.3.Final</quarkus.platform.version>
-        <quarkus-operatorsdk.version>6.0.2</quarkus-operatorsdk.version>
+        <quarkus-operatorsdk.version>6.0.3</quarkus-operatorsdk.version>
     </properties>
 
     <repositories>
