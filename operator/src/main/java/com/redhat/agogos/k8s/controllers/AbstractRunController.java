@@ -42,7 +42,7 @@ public abstract class AbstractRunController<T extends AgogosResource<?, Resultab
         LOG.debug("PipelineRun status for '{}' is {}", resource.getFullName(), runStatus);
 
         ResultableStatus resourceStatus = resource.getStatus();
-        final ResultableStatus originalResourceStatus = deepCopy(resourceStatus);
+        final ResultableStatus originalResourceStatus = deepCopy(resourceStatus, context);
 
         String message = null;
         Map<?, ?> result = null;
@@ -70,7 +70,7 @@ public abstract class AbstractRunController<T extends AgogosResource<?, Resultab
 
                 if (resultJson != null) {
                     try {
-                        result = objectMapper.readValue(resultJson, Map.class);
+                        result = getObjectMapper(context).readValue(resultJson, Map.class);
                     } catch (JsonProcessingException e) {
                         // ceType = CloudEventType.BUILD_FAILURE; TODO ?!?!?!?
                         status = ResultableResourceStatus.Failed;
