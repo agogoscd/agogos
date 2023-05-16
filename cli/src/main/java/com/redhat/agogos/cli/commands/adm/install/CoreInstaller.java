@@ -10,7 +10,6 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
 import io.fabric8.kubernetes.api.model.ServiceAccount;
-import io.fabric8.kubernetes.api.model.ServiceAccountBuilder;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRole;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBuilder;
 import io.fabric8.kubernetes.api.model.rbac.PolicyRuleBuilder;
@@ -52,13 +51,10 @@ public class CoreInstaller extends Installer {
     private static final String INIT_TEKTON_TASK_NAME = "init";
     private static final String INIT_STAGE_NAME = "init";
 
-    private static final String SERVICE_ACCOUNT_NAME = "agogos";
-
-    private static final Map<String, String> LABELS = Map.of(//
-            "app.kubernetes.io/instance", "default", //
-            "app.kubernetes.io/part-of", "agogos", //
-            "app.kubernetes.io/component", "core"//
-    );
+    private static final Map<String, String> LABELS = Map.of(
+            "app.kubernetes.io/instance", "default",
+            "app.kubernetes.io/part-of", "agogos",
+            "app.kubernetes.io/component", "core");
 
     @ConfigProperty(name = "agogos.container-image.init", defaultValue = "quay.io/agogos/stage-init:v1")
     String containerImageInit;
@@ -73,10 +69,9 @@ public class CoreInstaller extends Installer {
     public void install(InstallProfile profile, String namespace) {
         LOG.info("🕞 Installing Agogos core resources...");
 
-        List<HasMetadata> resources = resourceLoader.installKubernetesResources( //
-                List.of( //
+        List<HasMetadata> resources = resourceLoader.installKubernetesResources(
+                List.of(
                         namespace(namespace),
-                        serviceAccount(),
                         clusterRoleView(),
                         clusterRoleEventing(),
                         initClusterTask()),
@@ -89,14 +84,6 @@ public class CoreInstaller extends Installer {
         LOG.info("✅ Agogos core resources installed");
     }
 
-    private ServiceAccount serviceAccount() {
-        ServiceAccount sa = new ServiceAccountBuilder().withNewMetadata().withName(SERVICE_ACCOUNT_NAME)
-                .withLabels(LABELS).endMetadata()
-                .build();
-
-        return sa;
-    }
-
     /**
      * <p>
      * Prepares {@link ClusterRole} that is used
@@ -106,11 +93,11 @@ public class CoreInstaller extends Installer {
      */
     private ClusterRole clusterRoleEventing() {
         return new ClusterRoleBuilder().withNewMetadata().withName(RESOURCE_NAME_EVENTING).withLabels(LABELS)
-                .endMetadata().withRules( //
+                .endMetadata().withRules(
                         // Tekton Triggers
                         new PolicyRuleBuilder()
                                 .withApiGroups(HasMetadata.getGroup(Trigger.class))
-                                .withResources( //
+                                .withResources(
                                         HasMetadata.getPlural(EventListener.class),
                                         "interceptors", //HasMetadata.getPlural(Interceptor.class),
                                         HasMetadata.getPlural(TriggerBinding.class),
@@ -118,22 +105,22 @@ public class CoreInstaller extends Installer {
                                         HasMetadata.getPlural(Trigger.class),
                                         HasMetadata.getPlural(ClusterTriggerBinding.class),
                                         HasMetadata.getPlural(ClusterInterceptor.class))
-                                .withVerbs("get", "list", "watch").build(), //
+                                .withVerbs("get", "list", "watch").build(),
                         new PolicyRuleBuilder().withApiGroups("").withResources(HasMetadata.getPlural(ConfigMap.class))
-                                .withVerbs("get", "list", "watch").build(), //
+                                .withVerbs("get", "list", "watch").build(),
                         new PolicyRuleBuilder().withApiGroups("")
                                 .withResources(HasMetadata.getPlural(ServiceAccount.class)).withVerbs("impersonate")
-                                .build(), //
+                                .build(),
                         new PolicyRuleBuilder().withApiGroups(HasMetadata.getGroup(PipelineRun.class))
-                                .withResources(HasMetadata.getPlural(PipelineRun.class)).withVerbs("create").build() //
-                ).build();
+                                .withResources(HasMetadata.getPlural(PipelineRun.class)).withVerbs("create").build())
+                .build();
 
     }
 
     private ClusterRole clusterRoleView() {
         ClusterRole cr = new ClusterRoleBuilder().withNewMetadata().withName(CLUSTER_ROLE_VIEW_NAME).withLabels(LABELS)
                 .withLabels(Map.of("rbac.authorization.k8s.io/aggregate-to-view", "true"))
-                .endMetadata().withRules( //
+                .endMetadata().withRules(
                         new PolicyRuleBuilder().withApiGroups("agogos.redhat.com")
                                 .withResources("*")
                                 .withVerbs("get", "list", "watch")
@@ -150,33 +137,32 @@ public class CoreInstaller extends Installer {
     }
 
     private ClusterTask initClusterTask() {
-        ClusterTask ct = new ClusterTaskBuilder() //
-                .withNewMetadata() //
-                .withName(INIT_TEKTON_TASK_NAME) //
-                .endMetadata() //
-                .withNewSpec() //
-                .withWorkspaces(new WorkspaceDeclarationBuilder().withName("output").build()) //
-                .withParams( //
-                        new ParamSpecBuilder() //
-                                .withName("image") //
-                                .withType("string") //
-                                .withNewDefault() //
-                                .withStringVal(containerImageInit) //
-                                .endDefault() //
+        ClusterTask ct = new ClusterTaskBuilder()
+                .withNewMetadata()
+                .withName(INIT_TEKTON_TASK_NAME)
+                .endMetadata()
+                .withNewSpec()
+                .withWorkspaces(new WorkspaceDeclarationBuilder().withName("output").build())
+                .withParams(
+                        new ParamSpecBuilder()
+                                .withName("image")
+                                .withType("string")
+                                .withNewDefault()
+                                .withStringVal(containerImageInit)
+                                .endDefault()
                                 .build(),
-                        new ParamSpecBuilder() //
-                                .withName("resource") //
-                                .withType("string") //
-                                .build() //
-                ) //
+                        new ParamSpecBuilder()
+                                .withName("resource")
+                                .withType("string")
+                                .build())
                 .withSteps(
-                        new StepBuilder()//
-                                .withName("execute") //
-                                .withImage("$(params.image)") //
-                                .withCommand("/usr/local/bin/entrypoint") //
-                                .withArgs("$(params.resource)", "$(workspaces.output.path)") //
-                                .build()) //
-                .endSpec()//
+                        new StepBuilder()
+                                .withName("execute")
+                                .withImage("$(params.image)")
+                                .withCommand("/usr/local/bin/entrypoint")
+                                .withArgs("$(params.resource)", "$(workspaces.output.path)")
+                                .build())
+                .endSpec()
                 .build();
 
         return ct;

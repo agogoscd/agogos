@@ -27,6 +27,7 @@ import io.fabric8.kubernetes.api.model.rbac.PolicyRuleBuilder;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,28 +42,29 @@ import java.util.Map;
 public class OperatorInstaller extends Installer {
 
     private static final Logger LOG = LoggerFactory.getLogger(OperatorInstaller.class);
-    private static final String CONTAINER_IMAGE = "quay.io/cpaas/agogos-poc-operator:devel";
 
-    private static final String OPERATOR = "agogos-operator";
+    @ConfigProperty(name = "agogos.operator.container-image")
+    private String ContainerImage;
 
-    private static final Map<String, String> LABELS = Map.of(//
-            "app.kubernetes.io/instance", "default", //
-            "app.kubernetes.io/part-of", "agogos", //
-            "app.kubernetes.io/component", "operator"//
-    );
+    @ConfigProperty(name = "agogos.operator.service-account")
+    private String ServiceAccountName;
+
+    private static final Map<String, String> LABELS = Map.of(
+            "app.kubernetes.io/instance", "default",
+            "app.kubernetes.io/part-of", "agogos",
+            "app.kubernetes.io/component", "operator");
 
     @Override
     public void install(InstallProfile profile, String namespace) {
         LOG.info("🕞 Installing Agogos Operator component...");
 
-        List<HasMetadata> resources = resourceLoader.installKubernetesResources( //
-                List.of( //
+        List<HasMetadata> resources = resourceLoader.installKubernetesResources(
+                List.of(
                         serviceAccount(),
                         clusterRole(),
-                        clusterRoleBinding(namespace), //
-                        service(), //
-                        deployment() //
-                ),
+                        clusterRoleBinding(namespace),
+                        service(),
+                        deployment()),
                 namespace);
 
         Helper.status(resources);
@@ -71,7 +73,7 @@ public class OperatorInstaller extends Installer {
     }
 
     private ServiceAccount serviceAccount() {
-        ServiceAccount sa = new ServiceAccountBuilder().withNewMetadata().withName(OPERATOR)
+        ServiceAccount sa = new ServiceAccountBuilder().withNewMetadata().withName(ServiceAccountName)
                 .withLabels(LABELS).endMetadata()
                 .build();
 
@@ -79,21 +81,20 @@ public class OperatorInstaller extends Installer {
     }
 
     private ClusterRole clusterRole() {
-        ClusterRole cr = new ClusterRoleBuilder().withNewMetadata().withName(OPERATOR).withLabels(LABELS)
-                .endMetadata().withRules( //
+        ClusterRole cr = new ClusterRoleBuilder().withNewMetadata().withName(ServiceAccountName).withLabels(LABELS)
+                .endMetadata().withRules(
                         new PolicyRuleBuilder().withApiGroups("agogos.redhat.com")
                                 .withResources("*")
                                 .withVerbs("get", "list", "watch", "create", "update", "patch", "delete", "deletecollection")
-                                .build(), //
+                                .build(),
                         new PolicyRuleBuilder().withApiGroups("apiextensions.k8s.io").withResources("customresourcedefinitions")
-                                .withVerbs("get", "list", "watch").build(), //
+                                .withVerbs("get", "list", "watch").build(),
                         new PolicyRuleBuilder().withApiGroups("tekton.dev").withResources("*")
                                 .withVerbs("get", "list", "watch", "create", "update", "patch", "delete", "deletecollection")
-                                .build(), //
+                                .build(),
                         new PolicyRuleBuilder().withApiGroups("triggers.tekton.dev").withResources("*")
                                 .withVerbs("get", "list", "watch", "create", "update", "patch", "delete", "deletecollection")
-                                .build() //
-                )
+                                .build())
                 .build();
 
         return cr;
@@ -101,15 +102,15 @@ public class OperatorInstaller extends Installer {
 
     private ClusterRoleBinding clusterRoleBinding(String namespace) {
 
-        ClusterRoleBinding crb = new ClusterRoleBindingBuilder().withNewMetadata().withName(OPERATOR)
+        ClusterRoleBinding crb = new ClusterRoleBindingBuilder().withNewMetadata().withName(ServiceAccountName)
                 .withLabels(LABELS).endMetadata()
                 .withSubjects(
-                        new SubjectBuilder().withKind(HasMetadata.getKind(ServiceAccount.class)).withName(OPERATOR)
+                        new SubjectBuilder().withKind(HasMetadata.getKind(ServiceAccount.class)).withName(ServiceAccountName)
                                 .withNamespace(namespace)
                                 .build())
                 .withNewRoleRef().withApiGroup(HasMetadata.getGroup(ClusterRole.class))
                 .withKind(HasMetadata.getKind(ClusterRole.class))
-                .withName(OPERATOR)
+                .withName(ServiceAccountName)
                 .endRoleRef().build();
 
         return crb;
@@ -129,22 +130,21 @@ public class OperatorInstaller extends Installer {
         limits.put("cpu", Quantity.parse("1000m"));
 
         Container container = new ContainerBuilder()
-                .withName("operator").withImage(CONTAINER_IMAGE).withImagePullPolicy("Always") //
-                .withPorts(//
-                        new ContainerPortBuilder().withName("http").withContainerPort(7070).withProtocol("TCP").build() //
-                )//
-                .withLivenessProbe(livenessProbe) //
-                .withNewResources() //
-                .withRequests(requests).withLimits(limits) //
-                .endResources() //
+                .withName("operator").withImage(ContainerImage).withImagePullPolicy("Always")
+                .withPorts(
+                        new ContainerPortBuilder().withName("http").withContainerPort(7070).withProtocol("TCP").build())
+                .withLivenessProbe(livenessProbe)
+                .withNewResources()
+                .withRequests(requests).withLimits(limits)
+                .endResources()
                 .build();
 
-        Deployment deployment = new DeploymentBuilder().withNewMetadata().withName(OPERATOR)
+        Deployment deployment = new DeploymentBuilder().withNewMetadata().withName(ServiceAccountName)
                 .withLabels(LABELS)
                 .endMetadata().withNewSpec().withReplicas(1).withNewSelector().withMatchLabels(LABELS).endSelector()
                 .withNewTemplate().withNewMetadata().withLabels(LABELS).endMetadata().withNewSpec()
                 .withContainers(container)
-                .withServiceAccount(OPERATOR)
+                .withServiceAccount(ServiceAccountName)
                 .endSpec().endTemplate().endSpec().build();
 
         return deployment;
@@ -154,7 +154,7 @@ public class OperatorInstaller extends Installer {
         ServicePort httpPort = new ServicePortBuilder().withName("http").withPort(80).withProtocol("TCP")
                 .withTargetPort(new IntOrString(7070)).build();
 
-        Service service = new ServiceBuilder().withNewMetadata().withName(OPERATOR).withLabels(LABELS)
+        Service service = new ServiceBuilder().withNewMetadata().withName(ServiceAccountName).withLabels(LABELS)
                 .endMetadata().withNewSpec().withPorts(httpPort).withType("ClusterIP").withSelector(LABELS)
                 .endSpec()
                 .build();

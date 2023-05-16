@@ -47,6 +47,7 @@ import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,17 +69,19 @@ public class WebhooksInstaller extends Installer {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebhooksInstaller.class);
 
-    private static final String NAME = "agogos-webhooks";
-    private static final String CONTAINER_IMAGE = "quay.io/cpaas/agogos-poc-webhooks:devel";
+    @ConfigProperty(name = "agogos.webhooks.container-image")
+    private String ContainerImage;
+
+    @ConfigProperty(name = "agogos.webhooks.service-account")
+    private String ServiceAccountName;
 
     @Inject
     CertProvider certProvider;
 
-    private static final Map<String, String> LABELS = Map.of(//
-            "app.kubernetes.io/instance", "default", //
-            "app.kubernetes.io/part-of", "agogos", //
-            "app.kubernetes.io/component", "webhooks"//
-    );
+    private static final Map<String, String> LABELS = Map.of(
+            "app.kubernetes.io/instance", "default",
+            "app.kubernetes.io/part-of", "agogos",
+            "app.kubernetes.io/component", "webhooks");
 
     @Override
     public void install(InstallProfile profile, String namespace) {
@@ -89,33 +92,31 @@ public class WebhooksInstaller extends Installer {
         List<HasMetadata> resources = new ArrayList<>();
 
         // Default resources for any profile selected
-        resources.addAll(//
-                List.of( //
+        resources.addAll(
+                List.of(
                         admissionValidation(profile, namespace),
-                        admissionMutation(profile, namespace) //
-                ));
+                        admissionMutation(profile, namespace)));
 
         // For local profile we need to add more resources
         if (profile == InstallProfile.local) {
-            resources.addAll( //
-                    List.of( //
+            resources.addAll(
+                    List.of(
                             serviceAccount(),
                             clusterRole(),
                             clusterRoleBinding(namespace),
                             secret(),
                             service(),
-                            deployment() //
-                    ));
+                            deployment()));
         }
 
-        Service webhooksService = kubernetesClient.services().inNamespace(namespace).withName(NAME).get();
+        Service webhooksService = kubernetesClient.services().inNamespace(namespace).withName(ServiceAccountName).get();
 
         resources = resourceLoader.installKubernetesResources(resources, namespace);
 
         if (webhooksService != null && profile == InstallProfile.local) {
             LOG.info("🕞 Restarting Webhooks service after updating certificates...");
 
-            kubernetesClient.apps().deployments().inNamespace(namespace).withName(NAME).rolling().restart();
+            kubernetesClient.apps().deployments().inNamespace(namespace).withName(ServiceAccountName).rolling().restart();
         }
 
         Helper.status(resources);
@@ -163,31 +164,30 @@ public class WebhooksInstaller extends Installer {
         limits.put("cpu", Quantity.parse("800m"));
 
         Container webhookContainer = new ContainerBuilder()
-                .withName("webhooks").withImage(CONTAINER_IMAGE).withImagePullPolicy("Always") //
+                .withName("webhooks").withImage(ContainerImage).withImagePullPolicy("Always")
                 .withEnv(
-                        new EnvVarBuilder().withName("QUARKUS_HTTP_SSL_CERTIFICATE_FILE").withValue("/certs/tls.crt").build(), //
+                        new EnvVarBuilder().withName("QUARKUS_HTTP_SSL_CERTIFICATE_FILE").withValue("/certs/tls.crt").build(),
                         new EnvVarBuilder().withName("QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE").withValue("/certs/tls.key")
-                                .build()) //
-                .withVolumeMounts(new VolumeMountBuilder().withName("certs").withMountPath("/certs").withReadOnly(true).build()) //
-                .withPorts(//
-                        new ContainerPortBuilder().withName("http").withContainerPort(7080).withProtocol("TCP").build(), //
-                        new ContainerPortBuilder().withName("https").withContainerPort(8443).withProtocol("TCP").build() //
-                )//
-                .withLivenessProbe(livenessProbe) //
-                .withNewResources() //
-                .withRequests(requests).withLimits(limits) //
-                .endResources() //
+                                .build())
+                .withVolumeMounts(new VolumeMountBuilder().withName("certs").withMountPath("/certs").withReadOnly(true).build())
+                .withPorts(
+                        new ContainerPortBuilder().withName("http").withContainerPort(7080).withProtocol("TCP").build(),
+                        new ContainerPortBuilder().withName("https").withContainerPort(8443).withProtocol("TCP").build())
+                .withLivenessProbe(livenessProbe)
+                .withNewResources()
+                .withRequests(requests).withLimits(limits)
+                .endResources()
                 .build();
 
-        Deployment webhookDeployment = new DeploymentBuilder().withNewMetadata().withName(NAME)
+        Deployment webhookDeployment = new DeploymentBuilder().withNewMetadata().withName(ServiceAccountName)
                 .withLabels(LABELS)
                 .endMetadata().withNewSpec().withReplicas(1).withNewSelector().withMatchLabels(LABELS).endSelector()
                 .withNewTemplate().withNewMetadata().withLabels(LABELS).endMetadata().withNewSpec()
                 .withContainers(webhookContainer)
                 .withVolumes(new VolumeBuilder().withName("certs")
-                        .withSecret(new SecretVolumeSourceBuilder().withSecretName(NAME).build())
+                        .withSecret(new SecretVolumeSourceBuilder().withSecretName(ServiceAccountName).build())
                         .build())
-                .withServiceAccount(NAME)
+                .withServiceAccount(ServiceAccountName)
                 .endSpec().endTemplate().endSpec().build();
 
         return webhookDeployment;
@@ -199,7 +199,7 @@ public class WebhooksInstaller extends Installer {
         ServicePort httpsPort = new ServicePortBuilder().withName("https").withPort(443).withProtocol("TCP")
                 .withTargetPort(new IntOrString(8443)).build();
 
-        Service webhookService = new ServiceBuilder().withNewMetadata().withName(NAME).withLabels(LABELS)
+        Service webhookService = new ServiceBuilder().withNewMetadata().withName(ServiceAccountName).withLabels(LABELS)
                 .endMetadata().withNewSpec().withPorts(httpPort, httpsPort).withType("ClusterIP").withSelector(LABELS)
                 .endSpec()
                 .build();
@@ -208,51 +208,51 @@ public class WebhooksInstaller extends Installer {
     }
 
     private ValidatingWebhookConfiguration admissionValidation(InstallProfile profile, String namespace) {
-        RuleWithOperations validationRules = new RuleWithOperationsBuilder() //
+        RuleWithOperations validationRules = new RuleWithOperationsBuilder()
                 .withOperations("CREATE", "UPDATE")
-                .withApiGroups("agogos.redhat.com") //
-                .withApiVersions("v1alpha1")//
+                .withApiGroups("agogos.redhat.com")
+                .withApiVersions("v1alpha1")
                 .withResources(HasMetadata.getPlural(Build.class), HasMetadata.getPlural(Component.class),
-                        HasMetadata.getPlural(Handler.class)) //
-                .withScope("*") //
+                        HasMetadata.getPlural(Handler.class))
+                .withScope("*")
                 .build();
 
-        ValidatingWebhookBuilder validatingWebhookBuilder = new ValidatingWebhookBuilder() //
-                .withName("validate.webhook.agogos.redhat.com") //
-                .withSideEffects("None") //
-                .withFailurePolicy("Fail") //
-                .withAdmissionReviewVersions("v1")//
-                .withRules(validationRules); //
+        ValidatingWebhookBuilder validatingWebhookBuilder = new ValidatingWebhookBuilder()
+                .withName("validate.webhook.agogos.redhat.com")
+                .withSideEffects("None")
+                .withFailurePolicy("Fail")
+                .withAdmissionReviewVersions("v1")
+                .withRules(validationRules);
 
         switch (profile) {
             case local:
                 validatingWebhookBuilder
-                        .withNewClientConfig() //
-                        .withNewService() //
-                        .withNamespace(namespace) //
-                        .withName(NAME) //
-                        .withPath("/webhooks/validate") //
-                        .withPort(443)//
-                        .endService()//
-                        .withCaBundle(certProvider.caBundle())//
-                        .endClientConfig(); //
+                        .withNewClientConfig()
+                        .withNewService()
+                        .withNamespace(namespace)
+                        .withName(ServiceAccountName)
+                        .withPath("/webhooks/validate")
+                        .withPort(443)
+                        .endService()
+                        .withCaBundle(certProvider.caBundle())
+                        .endClientConfig();
                 break;
             case dev:
                 validatingWebhookBuilder
-                        .withNewClientConfig() //
+                        .withNewClientConfig()
                         .withUrl("https://192.168.39.1:8443/webhooks/validate")
-                        .withCaBundle(certProvider.caBundle())//
-                        .endClientConfig(); //
+                        .withCaBundle(certProvider.caBundle())
+                        .endClientConfig();
             default:
                 break;
         }
 
         ValidatingWebhookConfiguration validatingWebhookConfiguration = new ValidatingWebhookConfigurationBuilder()
-                .withNewMetadata() //
-                .withName("webhook.agogos.redhat.com") //
-                .withLabels(LABELS)//
-                .endMetadata() //
-                .withWebhooks(validatingWebhookBuilder.build()) //
+                .withNewMetadata()
+                .withName("webhook.agogos.redhat.com")
+                .withLabels(LABELS)
+                .endMetadata()
+                .withWebhooks(validatingWebhookBuilder.build())
                 .build();
 
         return validatingWebhookConfiguration;
@@ -263,32 +263,32 @@ public class WebhooksInstaller extends Installer {
                 .withApiGroups("agogos.redhat.com").withApiVersions("v1alpha1").withResources("builds", "runs")
                 .withScope("*").build();
 
-        MutatingWebhookBuilder mutatingWebhookBuilder = new MutatingWebhookBuilder() //
-                .withName("mutate.webhook.agogos.redhat.com") //
-                .withSideEffects("None") //
-                .withFailurePolicy("Fail") //
-                .withAdmissionReviewVersions("v1") //
+        MutatingWebhookBuilder mutatingWebhookBuilder = new MutatingWebhookBuilder()
+                .withName("mutate.webhook.agogos.redhat.com")
+                .withSideEffects("None")
+                .withFailurePolicy("Fail")
+                .withAdmissionReviewVersions("v1")
                 .withRules(mutationRules);
 
         switch (profile) {
             case local:
                 mutatingWebhookBuilder
-                        .withNewClientConfig()//
-                        .withNewService() //
-                        .withNamespace(namespace) //
-                        .withName(NAME) //
-                        .withPath("/webhooks/mutate") //
-                        .withPort(443) //
-                        .endService() //
-                        .withCaBundle(certProvider.caBundle()) //
+                        .withNewClientConfig()
+                        .withNewService()
+                        .withNamespace(namespace)
+                        .withName(ServiceAccountName)
+                        .withPath("/webhooks/mutate")
+                        .withPort(443)
+                        .endService()
+                        .withCaBundle(certProvider.caBundle())
                         .endClientConfig();
                 break;
             case dev:
                 mutatingWebhookBuilder
-                        .withNewClientConfig() //
+                        .withNewClientConfig()
                         .withUrl("https://192.168.39.1:8443/webhooks/mutate")
-                        .withCaBundle(certProvider.caBundle())//
-                        .endClientConfig(); //
+                        .withCaBundle(certProvider.caBundle())
+                        .endClientConfig();
             default:
                 break;
         }
@@ -306,7 +306,7 @@ public class WebhooksInstaller extends Installer {
         certData.put("tls.crt", CertProvider.toBase64(certProvider.certificate()));
         certData.put("tls.key", CertProvider.toBase64(certProvider.privateKey()));
 
-        Secret secret = new SecretBuilder().withNewMetadata().withName(NAME).withLabels(LABELS)
+        Secret secret = new SecretBuilder().withNewMetadata().withName(ServiceAccountName).withLabels(LABELS)
                 .endMetadata()
                 .withType("kubernetes.io/tls").withData(certData).build();
 
@@ -314,7 +314,7 @@ public class WebhooksInstaller extends Installer {
     }
 
     private ServiceAccount serviceAccount() {
-        ServiceAccount sa = new ServiceAccountBuilder().withNewMetadata().withName(NAME)
+        ServiceAccount sa = new ServiceAccountBuilder().withNewMetadata().withName(ServiceAccountName)
                 .withLabels(LABELS).endMetadata()
                 .build();
 
@@ -322,31 +322,31 @@ public class WebhooksInstaller extends Installer {
     }
 
     private ClusterRole clusterRole() {
-        ClusterRole cr = new ClusterRoleBuilder().withNewMetadata().withName(NAME).withLabels(LABELS)
-                .endMetadata().withRules( //
+        ClusterRole cr = new ClusterRoleBuilder().withNewMetadata().withName(ServiceAccountName).withLabels(LABELS)
+                .endMetadata().withRules(
                         new PolicyRuleBuilder().withApiGroups("agogos.redhat.com")
                                 .withResources("*")
                                 .withVerbs("get", "list", "watch", "create", "update", "patch", "delete", "deletecollection")
-                                .build(), //
+                                .build(),
                         new PolicyRuleBuilder().withApiGroups("tekton.dev")
                                 .withResources("*")
                                 .withVerbs("get", "list", "watch")
-                                .build() //
-                ).build();
+                                .build())
+                .build();
 
         return cr;
     }
 
     private ClusterRoleBinding clusterRoleBinding(String namespace) {
 
-        ClusterRoleBinding crb = new ClusterRoleBindingBuilder().withNewMetadata().withName(NAME)
+        ClusterRoleBinding crb = new ClusterRoleBindingBuilder().withNewMetadata().withName(ServiceAccountName)
                 .withLabels(LABELS).endMetadata()
                 .withSubjects(
-                        new SubjectBuilder().withKind("ServiceAccount").withName(NAME).withNamespace(namespace)
+                        new SubjectBuilder().withKind("ServiceAccount").withName(ServiceAccountName).withNamespace(namespace)
                                 .build())
                 .withNewRoleRef().withApiGroup(HasMetadata.getGroup(ClusterRole.class))
                 .withKind(HasMetadata.getKind(ClusterRole.class))
-                .withName(NAME)
+                .withName(ServiceAccountName)
                 .endRoleRef().build();
 
         return crb;
