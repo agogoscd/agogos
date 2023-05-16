@@ -32,6 +32,10 @@ quarkus:
     name: agogos-poc-operator
     registry: quay.io
 
+  kubernetes:
+    namespace: agogos
+    service-account: agogos-operator
+
   quartz:
     start-mode: FORCED
 

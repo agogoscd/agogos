@@ -15,6 +15,10 @@ quarkus:
     name: agogos-poc-webhooks
     registry: quay.io
 
+  kubernetes:
+    namespace: agogos
+    service-account: agogos-webhooks
+
 "%test":
   quarkus:
     log:

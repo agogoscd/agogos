@@ -25,10 +25,6 @@ quarkus:
         # "io.quarkus":
         #   level: "OFF"
 
-  agogos:
-    container-image:
-      init: quay.io/agogos/stage-init:v1
-
 "%prod":
   quarkus:
     # http:
@@ -44,6 +40,16 @@ quarkus:
           level: ERROR
         "io.quarkus":
           level: "OFF"
+
+agogos:
+  container-image:
+    init: quay.io/agogos/stage-init:v1
+  webhooks:
+    container-image: quay.io/cpaas/agogos-poc-webhooks:devel
+    service-account: agogos-operator
+  operator:
+    container-image: quay.io/cpaas/agogos-poc-operator:devel
+    service-account: agogos-webhooks
 
 dependencies:
   tekton-pipeline:
