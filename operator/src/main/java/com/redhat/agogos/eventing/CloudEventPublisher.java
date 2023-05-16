@@ -7,13 +7,10 @@ import com.redhat.agogos.CloudEventHelper;
 import com.redhat.agogos.PipelineRunState;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.v1alpha1.AgogosResource;
-import com.redhat.agogos.v1alpha1.Build;
-import com.redhat.agogos.v1alpha1.Component;
-import com.redhat.agogos.v1alpha1.Component.ComponentSpec;
-import com.redhat.agogos.v1alpha1.ComponentBuilderSpec.BuilderRef;
-
 import io.cloudevents.CloudEvent;
+import io.cloudevents.CloudEventData;
 import io.cloudevents.core.builder.CloudEventBuilder;
+import io.cloudevents.core.data.PojoCloudEventData;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.json.Json;
@@ -48,10 +45,10 @@ public class CloudEventPublisher {
     ObjectMapper objectMapper;
 
     @ConfigProperty(name = "agogos.cloud-events.base-url", defaultValue = "http://broker-ingress.knative-eventing.svc.cluster.local")
-    String baseurl = "http://broker-ingress.knative-eventing.svc.cluster.local";
+    String baseurl;
 
     @ConfigProperty(name = "agogos.cloud-events.publish")
-    Optional<Boolean> publish = Optional.of(true);
+    Optional<Boolean> publish;
 
     Map<String, BrokerRestClient> brokers = new HashMap<>();
 
@@ -93,14 +90,6 @@ public class CloudEventPublisher {
 
         JsonObjectBuilder dataBuilder = Json.createObjectBuilder();
 
-        objectMapper = new ObjectMapper();
-        try {
-            System.out.println(objectMapper.writeValueAsString(resource));
-        } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
         payload.forEach((key, o) -> {
             try {
                 dataBuilder.add(key,
@@ -113,12 +102,14 @@ public class CloudEventPublisher {
 
         String type = CloudEventHelper.type(resource.getClass(), state);
         String data = dataBuilder.build().toString();
+
+        final var eventData = PojoCloudEventData.wrap(payload, (p) -> data.getBytes());
         BrokerRestClient client = restClient(resource.getMetadata().getNamespace());
 
-        send(client, type, data);
+        send(client, type, eventData);
     }
 
-    private void send(BrokerRestClient broker, String type, String data) {
+    private void send(BrokerRestClient broker, String type, CloudEventData data) {
         if (!publish.orElse(true)) {
             LOG.debug(
                     "Publishing CloudEvent '{}' skipped because it is disabled in configuration; see 'agogos.cloud-events.publish' property",
@@ -131,7 +122,7 @@ public class CloudEventPublisher {
                 .withSource(URI.create("http://localhost")) // TODO: change this
                 .withId(UUID.randomUUID().toString()) // TODO: is this sufficient?
                 .withDataContentType(MediaType.APPLICATION_JSON) //
-                .withData(data.getBytes());
+                .withData(data);
 
         CloudEvent cloudEvent = cloudEventBuilder.build();
 
@@ -139,17 +130,5 @@ public class CloudEventPublisher {
         LOG.debug("CloudEvent payload: '{}'", data);
 
         broker.sendEvent(cloudEvent);
-    }
-
-    public static void main(String[] args) {
-        CloudEventPublisher cep = new CloudEventPublisher();
-        Build b = new Build();
-        b.setKind("Build");
-        b.getMetadata().setNamespace("default");
-        Component c = new Component("test-component");
-        c.setKind("Component");
-        c.setSpec(new ComponentSpec());
-        c.getSpec().getBuild().setBuilderRef(new BuilderRef("my-builder"));
-        cep.publish(PipelineRunState.SUCCEEDED, b, c);
     }
 }
