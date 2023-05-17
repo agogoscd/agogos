@@ -1,7 +1,5 @@
 = Agogos Operator Release Guide
 
-include::common:partial$draft.adoc[]
-
 == Building And Pushing Container Image
 
 It is possible to build and push container images with the application automatically using

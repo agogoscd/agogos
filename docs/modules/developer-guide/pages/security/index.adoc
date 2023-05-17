@@ -1,7 +1,5 @@
 = Security
 
-include::common:partial$draft.adoc[]
-
 == Pod Security Policies
 
 NOTE: Pod Security Policy settings are covered under the `agogos.security.pod-security-policy` hierarchy.

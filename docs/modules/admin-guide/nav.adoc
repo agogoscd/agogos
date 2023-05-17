@@ -1,5 +1,0 @@
-* Admin Guide
-
-** xref:overview.adoc[]
-
-** xref:security/index.adoc[]

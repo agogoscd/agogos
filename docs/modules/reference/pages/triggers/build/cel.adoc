@@ -1,7 +1,5 @@
 = CEL Build Trigger
 
-include::common:partial$draft.adoc[]
-
 NOTE: This Trigger is part of xref:reference:triggers/build/index.adoc[Build triggers].
 
 The CEL trigger is a variation of the xref:triggers/event.adoc[Event trigger]

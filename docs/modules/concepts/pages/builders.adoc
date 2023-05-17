@@ -1,7 +1,5 @@
 = Builders
 
-include::common:partial$draft.adoc[]
-
 Builders are responsible for building xref:components.adoc[Components].
 
 Builders registered in the system influence what Component types

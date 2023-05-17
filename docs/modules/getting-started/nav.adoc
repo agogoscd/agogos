@@ -1,4 +1,0 @@
-* Getting Started
-
-** xref:overview.adoc[]
-** xref:cli.adoc[]

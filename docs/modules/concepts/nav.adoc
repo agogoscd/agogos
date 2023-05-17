@@ -1,5 +1,4 @@
 * Concepts
-** xref:overview.adoc[]
 ** xref:components.adoc[]
 ** xref:builds.adoc[]
 ** xref:groups.adoc[]

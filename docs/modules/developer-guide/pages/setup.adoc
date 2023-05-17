@@ -1,7 +1,5 @@
 = Agogos Setup
 
-include::common:partial$draft.adoc[]
-
 This page describes the initial setup that needs to be performed
 in order to be able to develop Agogos.
 

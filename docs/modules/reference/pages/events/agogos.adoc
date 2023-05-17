@@ -1,7 +1,5 @@
 = Agogos Events
 
-include::common:partial$draft.adoc[]
-
 This page describes all available CloudEvents that are emitted by the Agogos platform.
 
 [cols="1m,1"]

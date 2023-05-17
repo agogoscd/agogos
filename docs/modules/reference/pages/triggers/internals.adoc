@@ -1,7 +1,5 @@
 = Internals
 
-include::common:partial$draft.adoc[]
-
 == Internal Representation of Triggers
 
 Triggers are implemented internally using link:https://knative.dev/docs/eventing/[Knative Eventing]

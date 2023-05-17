@@ -1,7 +1,5 @@
 = Component Build Trigger
 
-include::common:partial$draft.adoc[]
-
 TIP: Read more about the xref:concepts:components.adoc[_Component_ concept].
 
 NOTE: This Trigger is part of xref:reference:triggers/build/index.adoc[Build triggers].

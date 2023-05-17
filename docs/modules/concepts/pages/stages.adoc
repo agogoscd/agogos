@@ -1,7 +1,5 @@
 = Stages
 
-include::common:partial$draft.adoc[]
-
 == About Stages
 
 Stages are organized into directories exposing the phase when
