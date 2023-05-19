@@ -1,7 +1,5 @@
 = Build Triggers
 
-include::common:partial$draft.adoc[]
-
 Build Triggers are a way to define what action should be performed in case of
 a successful Build event.
 

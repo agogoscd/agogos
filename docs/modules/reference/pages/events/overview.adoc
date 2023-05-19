@@ -1,7 +1,5 @@
 = Overview
 
-include::common:partial$draft.adoc[]
-
 == CloudEvents
 
 Agogos uses link:https://cloudevents.io/[CloudEvents].

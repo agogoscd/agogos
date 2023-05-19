@@ -1,7 +1,5 @@
 = Components
 
-include::common:partial$draft.adoc[]
-
 Component is a concept that describes a single buildable element.
 
 We can identify following Component's tasks:

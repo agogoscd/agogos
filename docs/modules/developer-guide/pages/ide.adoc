@@ -1,8 +1,6 @@
 = IDE support
 :experimental: true
 
-include::common:partial$draft.adoc[]
-
 We provide instructions on how to set up the IDE so that it works the best with our
 codebase.
 

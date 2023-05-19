@@ -1,3 +1,0 @@
-= Overview
-
-This is a getting started guide that should introduce you to the most basic Agogos usage.

@@ -1,7 +1,5 @@
 = CEL Trigger
 
-include::common:partial$draft.adoc[]
-
 Event triggers use the
 link:https://github.com/google/cel-spec/blob/master/doc/langdef.md[CEL expression expression language]
 to decide whether the trigger should be fired.

@@ -1,7 +1,5 @@
 = Pipeline Run Trigger
 
-include::common:partial$draft.adoc[]
-
 Pipeline triggers are used when we want to perform an action after a particular
 Pipeline finishes successfully.
 

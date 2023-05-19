@@ -1,3 +1,0 @@
-= Overview
-
-include::common:partial$draft.adoc[]

@@ -1,6 +1,0 @@
-= Developer Guide
-
-include::common:partial$draft.adoc[]
-
-This guide is for developers wanting to extend Agogos core functionality or develop
-Agogos extensions like Builders or Stages.

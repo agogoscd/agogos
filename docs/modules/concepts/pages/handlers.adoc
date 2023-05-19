@@ -1,7 +1,5 @@
 = Handlers
 
-include::common:partial$draft.adoc[]
-
 Handlers are an extension mechanism for the build process. Handlers are defined on the
 xref:components.adoc[Component] level and are run before or after the build.
 

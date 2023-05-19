@@ -1,5 +1,0 @@
-= Builds
-
-include::common:partial$draft.adoc[]
-
-#TODO#

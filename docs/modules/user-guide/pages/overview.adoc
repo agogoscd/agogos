@@ -1,6 +1,0 @@
-= Overview
-
-include::common:partial$draft.adoc[]
-
-This guide is for Agogos users wanting to utilize its functionality on a cluster
-managed by someone else.

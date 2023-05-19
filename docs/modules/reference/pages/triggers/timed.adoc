@@ -1,3 +1,0 @@
-= Timed Trigger
-
-include::common:partial$draft.adoc[]

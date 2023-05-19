@@ -1,5 +1,0 @@
-= Overview
-
-include::common:partial$draft.adoc[]
-
-This guide is for administrators and operators wanting to install and configure Agogos.

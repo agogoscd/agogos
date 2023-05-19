@@ -5,11 +5,8 @@ version: master
 start_page: ROOT:overview.adoc
 
 nav:
-  - modules/overview/nav.adoc
   - modules/concepts/nav.adoc
-  - modules/getting-started/nav.adoc
   - modules/reference/nav.adoc
-  - modules/admin-guide/nav.adoc
   - modules/user-guide/nav.adoc
   - modules/developer-guide/nav.adoc
   - modules/design-decisions/nav.adoc

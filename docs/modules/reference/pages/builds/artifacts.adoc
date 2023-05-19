@@ -1,7 +1,5 @@
 = Build Artifacts
 
-include::common:partial$draft.adoc[]
-
 [TIP]
 ====
 Looking for xref:builds/results.adoc[Build results]?
