@@ -24,6 +24,8 @@ quarkus:
           level: ERROR
         # "io.quarkus":
         #   level: "OFF"
+  agogos:
+    cli-profile: admin
 
 "%prod":
   quarkus:
@@ -40,6 +42,9 @@ quarkus:
           level: ERROR
         "io.quarkus":
           level: "OFF"
+  agogos:
+    cli-profile: user
+
 
 agogos:
   container-image:

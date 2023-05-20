@@ -14,7 +14,9 @@ import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
 import jakarta.inject.Inject;
 import lombok.Getter;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import picocli.CommandLine;
+import picocli.CommandLine.IFactory;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ScopeType;
@@ -23,18 +25,7 @@ import picocli.CommandLine.Spec;
 import java.io.PrintWriter;
 
 @QuarkusMain
-@CommandLine.Command(name = "agogosctl", mixinStandardHelpOptions = true, subcommands = { //
-        AdmCommand.class,
-        BuilderCommand.class,
-        BuildCommand.class,
-        ComponentCommand.class,
-        InfoCommand.class,
-        LoadCommand.class,
-        PipelineCommand.class,
-        RunCommand.class,
-        StageCommand.class,
-        TriggerCommand.class,
-})
+@CommandLine.Command(name = "agogosctl", mixinStandardHelpOptions = true)
 public class CLI implements QuarkusApplication {
 
     @Spec
@@ -49,6 +40,14 @@ public class CLI implements QuarkusApplication {
         json
     }
 
+    public static enum Profile {
+        admin,
+        user
+    }
+
+    @ConfigProperty(name = "agogos.cli-profile", defaultValue = "user")
+    Profile profile;
+
     @Option(names = { "-v", "--verbose" }, scope = ScopeType.INHERIT)
     boolean verbose = false;
 
@@ -61,22 +60,22 @@ public class CLI implements QuarkusApplication {
     CommandLine commandLine;
 
     public void usage(Class<? extends Runnable> command) {
-        new CommandLine(command, factory).usage(spec.commandLine().getOut());
+        initCommandLine(command, factory).usage(spec.commandLine().getOut());
     }
 
     @Override
     public int run(String... args) throws Exception {
-        commandLine = new CommandLine(this, factory);
+        commandLine = initCommandLine(factory);
         return run(null, null, commandLine, args);
     }
 
     public int run(Class<? extends Runnable> command, String... args) {
-        commandLine = new CommandLine(command, factory);
+        commandLine = initCommandLine(command, factory);
         return run(null, null, commandLine, args);
     }
 
     public int run(PrintWriter out, PrintWriter err, String... args) {
-        commandLine = new CommandLine(this, factory);
+        commandLine = initCommandLine(factory);
         return run(out, err, commandLine, args);
     }
 
@@ -88,5 +87,29 @@ public class CLI implements QuarkusApplication {
             cl.setErr(err);
         }
         return cl.setExecutionExceptionHandler(new ExceptionHandler()).execute(args);
+    }
+
+    private CommandLine initCommandLine(Class<? extends Runnable> command, IFactory factory) {
+        commandLine = new CommandLine(command == null ? this : command, factory);
+
+        if (profile == Profile.admin) {
+            commandLine.addSubcommand(AdmCommand.class);
+        }
+
+        commandLine.addSubcommand(BuilderCommand.class)
+                .addSubcommand(BuildCommand.class)
+                .addSubcommand(ComponentCommand.class)
+                .addSubcommand(InfoCommand.class)
+                .addSubcommand(LoadCommand.class)
+                .addSubcommand(PipelineCommand.class)
+                .addSubcommand(RunCommand.class)
+                .addSubcommand(StageCommand.class)
+                .addSubcommand(TriggerCommand.class);
+
+        return commandLine;
+    }
+
+    private CommandLine initCommandLine(IFactory factory) {
+        return initCommandLine(null, factory);
     }
 }
