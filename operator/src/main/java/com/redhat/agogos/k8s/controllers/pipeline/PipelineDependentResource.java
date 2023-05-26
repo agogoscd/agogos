@@ -114,8 +114,11 @@ public class PipelineDependentResource
             // Prepare task
             PipelineTask task = new PipelineTaskBuilder()
                     .withName(stageRef.getName())
-                    .withTaskRef(new TaskRefBuilder().withApiVersion("tekton.dev/v1beta1").withKind(taskType)
-                            .withName(stage.getSpec().getTaskRef().getName()).build())
+                    .withTaskRef(new TaskRefBuilder()
+                                    .withApiVersion("") // AGOGOS-96
+                                    .withKind(taskType)
+                                    .withName(stage.getSpec().getTaskRef().getName())
+                                    .build())
                     .addNewParam()
                     .withName("config")
                     .withNewValue(stageConfig)

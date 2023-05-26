@@ -161,7 +161,7 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
                 .withName(BUILD_PIPELINE_INIT_TASK_NAME)
                 .withTaskRef(new TaskRefBuilder()
                         .withName(initTask.getMetadata().getName())
-                        .withApiVersion(initTask.getApiVersion())
+                        .withApiVersion("")  // AGOGOS-96
                         .withKind(initTask.getKind())
                         .build())
                 .addNewParam()
@@ -193,7 +193,7 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
                     .withRunAfter(lastTask.getName())
                     .withTaskRef(
                             new TaskRefBuilder().withName(handlerTask.getMetadata().getName())
-                                    .withApiVersion(handlerTask.getApiVersion())
+                                    .withApiVersion("")  // AGOGOS-96
                                     .withKind(handlerTask.getKind())
                                     .build())
                     .withWorkspaces(workspaceBindings(handler.getSpec().getWorkspaces()));
@@ -238,7 +238,7 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         PipelineTask lastTask = tasks.get(tasks.size() - 1);
 
         TaskRef buildTaskRef = new TaskRefBuilder()
-                .withApiVersion(HasMetadata.getApiVersion(Task.class))
+                .withApiVersion("")  // AGOGOS-96
                 .withKind(taskRef.getKind())
                 .withName(taskRef.getName())
                 .build();
