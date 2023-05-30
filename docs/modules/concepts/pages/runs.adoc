@@ -1,3 +1,4 @@
 = Runs
 
-Run represents the execution of a xref:pipelines.adoc[Pipeline].
+Run represents the execution of a
+xref:pipelines.adoc[Pipeline].

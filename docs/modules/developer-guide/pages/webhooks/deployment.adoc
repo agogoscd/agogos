@@ -2,20 +2,22 @@
 
 == Building And Pushing Container Image
 
-It is possible to build and push container images with the application automatically using
+It is possible to build and push container images with the application
+automatically using
 link:https://cloud.google.com/java/getting-started/jib[Jib].
 
 [source,bash]
 .Building and pushing Webhooks image
 ----
-❯ ./mvnw clean package -pl webhooks -am -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true
+❯ ./mvnw clean package -pl webhooks -am \
+  -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true
 ----
 
 == Webhook Registration
 
-In order to utilize our service to make decisions to allow or reject requests,
+In order for our service to make decisions to allow or reject requests,
 the cluster needs to be configured in such a way that requests for all resources
-we want to validate should go through our service.
+we want to validate go through our service.
 
 This is done via the `ValidatingWebhookConfiguration` resource as seen below.
 
@@ -24,7 +26,7 @@ This is done via the `ValidatingWebhookConfiguration` resource as seen below.
 In case the handler is deployed as a Service within the cluster, we can
 refer to it directly using the `service` key.
 
-NOTE: This should be used in production deployment.
+NOTE: This should be used in production deployments.
 
 [source,yaml]
 .Webhook registration within the cluster
@@ -34,10 +36,10 @@ include::example$webhooks/deployment-service.yaml[]
 
 === External Deployment
 
-In case of external deployments, we can use `url` key to point to the
+In case of external deployments, we can use the `url` key to point to the
 webhook deployment.
 
-NOTE: This deployment should be used only at development time.
+NOTE: This should only be used in development deployments.
 
 [source,yaml]
 .Webhook registration within the cluster
@@ -49,8 +51,8 @@ include::example$webhooks/deployment-external.yaml[]
 ====
 *How to find the correct IP address?*
 
-To find out what IP address should be used in the configuration you can follow below
-steps for a Minikube deployment with kvm2 driver.
+To find out what IP address should be used in the configuration you can follow
+below steps for a Minikube deployment with kvm2 driver.
 
 [source,bash]
 ----
@@ -72,7 +74,8 @@ Bridge:         virbr2
        valid_lft forever preferred_lft forever
 ----
 
-In our case the `virbr2` interface used by Minikube has the `192.168.39.1` IP address set.
+In our case the `virbr2` interface used by Minikube has the `192.168.39.1` IP
+address set.
 
 Please make sure you add this address to the certificate hosts' as well!
 ====
@@ -81,8 +84,9 @@ Please make sure you add this address to the certificate hosts' as well!
 
 [NOTE]
 ====
-Please refer to the link:ssl-certificates{outfilesuffix}[certificates document] for information
-on how to generate SSL certificates on the Kubernetes platform.
+Please refer to the
+link:ssl-certificates{outfilesuffix}[certificates document]
+for information on how to generate SSL certificates on the Kubernetes platform.
 
 This section assumes that you have available certificate and key.
 ====
@@ -90,18 +94,22 @@ This section assumes that you have available certificate and key.
 === Development Mode With SSL Enabled
 
 It is possible to develop the Webhooks application without SSL, but in order to
-test it working on a cluster it is required to secure it with a SSL certificate.
+test it working on a cluster it is required to secure it with an SSL certificate.
 
-To start standalone Quarkus application with SSL support, you need to export two environment variables:
+To start standalone Quarkus application with SSL support, you need to export
+two environment variables:
 
-1. `QUARKUS_HTTP_SSL_CERTIFICATE_FILE`
-2. `QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE`
+. `QUARKUS_HTTP_SSL_CERTIFICATE_FILE`
+. `QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE`
 
 These variables should point to our certificate and private key files.
 
 [source,bash]
 ----
-❯ QUARKUS_HTTP_SSL_CERTIFICATE_FILE=$(pwd)/server.crt QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE=$(pwd)/server-key.pem ./mvnw quarkus:dev -pl webhooks -Dquarkus.http.host=0.0.0.0
+❯ QUARKUS_HTTP_SSL_CERTIFICATE_FILE=$(pwd)/server.crt \
+  QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE=$(pwd)/server-key.pem \
+  ./mvnw quarkus:dev -pl webhooks -Dquarkus.http.host=0.0.0.0
+
 [INFO] Scanning for projects...
 
 ...
@@ -111,17 +119,19 @@ These variables should point to our certificate and private key files.
 2021-02-10 22:08:11,795 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, config-yaml, hibernate-validator, kubernetes, kubernetes-client, quarkiverse-tekton-client, resteasy, resteasy-jackson]
 ----
 
-Now the application is available on port `7070` (insecure) as well as `8443` (secured).
+Now the application is available on port `7070` (insecure) as well as `8443`
+(secured).
 
 [NOTE]
 ====
 *Firewall setting*
 
-Depending on your Minikube configuration, it may be required to configure firewall properly to
-allow requests from pods into the application.
+Depending on your Minikube configuration, it may be required to configure
+the firewall properly to allow requests from pods into the application.
 
-For example when Minikube is deployed using the kvm2 driver, it may be required to open the port
-on which the application is running in the `libvirt` Firewalld zone.
+For example when Minikube is deployed using the kvm2 driver, it may be
+required to open the port on which the application is running in the
+`libvirt` Firewalld zone.
 
 [source,bash]
 ----
@@ -130,6 +140,4 @@ success
 ❯ sudo firewall-cmd --reload
 success
 ----
-
-
 ====

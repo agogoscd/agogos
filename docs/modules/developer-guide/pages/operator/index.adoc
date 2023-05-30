@@ -2,7 +2,8 @@
 
 == Building And Pushing Container Image
 
-It is possible to build and push container images with the application automatically using
+It is possible to build and push container images with the application
+automatically using
 link:https://cloud.google.com/java/getting-started/jib[Jib].
 
 [source,bash]

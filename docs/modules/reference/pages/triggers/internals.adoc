@@ -2,36 +2,41 @@
 
 == Internal Representation of Triggers
 
-Triggers are implemented internally using link:https://knative.dev/docs/eventing/[Knative Eventing]
-and link:https://tekton.dev/docs/triggers/[Tekton Triggers]. This section
-explains how these projects are used to deliver Agogos Triggers functionality.
+Triggers are implemented internally using
+link:https://knative.dev/docs/eventing/[Knative Eventing]
+and
+link:https://tekton.dev/docs/triggers/[Tekton Triggers].
+This section explains how these projects are used to deliver Agogos
+Triggers functionality.
 
 When an Agogos Trigger is created, the object is validated by Agogos to ensure
 that it contains valid content. Once this is done, Kubernetes creates
 the resource.
 
 Agogos operator is notified about the new Trigger resource. The first thing it
-does is to create a Tekton link:https://tekton.dev/docs/triggers/triggers/[Trigger]
-which is the representation of the
-Agogos Trigger in Tekton world.
+does is to create a Tekton
+link:https://tekton.dev/docs/triggers/triggers/[Trigger]
+which is the representation of the Agogos Trigger in Tekton.
 
 [NOTE]
 ====
 There's more behind the scenes!
 
-Tekton Trigger uses specific
+A Tekton Trigger uses a specific
 link:https://tekton.dev/docs/triggers/triggertemplates/[TriggerTemplate]
-that is responsible for creating new
-link:https://tekton.dev/docs/pipelines/pipelineruns/[PipelineRun] resources.
-Besides the template a link:https://tekton.dev/docs/triggers/triggerbindings/[TriggerBinding]
+that is responsible for creating a new
+link:https://tekton.dev/docs/pipelines/pipelineruns/[PipelineRun]
+resource. Besides the template a
+link:https://tekton.dev/docs/triggers/triggerbindings/[TriggerBinding]
 is used which provides required parameters to the template based on the event.
 ====
 
-Last part is to create or update Tekton link:https://tekton.dev/docs/triggers/eventlisteners/[EventListener].
+Last part is to create or update Tekton
+link:https://tekton.dev/docs/triggers/eventlisteners/[EventListener].
 Such listener is responsible for receiving events from Knative and evaluating
 registered triggers.
 
-Above flow can be seen in the sequence diagram below.
+The above flow can be seen in the sequence diagram below.
 
 [seqdiag,trigger,svg]
 .Agogos Trigger creation
@@ -68,16 +73,18 @@ Tekton EventListener is handling events that come from Knative.
 Every event the Knative Broker receives is filtered based on the type
 of the event and forwarded to appropriate EventListener.
 
-NOTE: See the xref:events/index.adoc#eventing-overview[overview diagram].
+[NOTE]
+====
+See the
+xref:events/index.adoc#eventing-overview[overview diagram].
+====
 
 #TODO#
 
 == Resource Workflow
 
-Let's see now what's happening underneath.
-
-When Agogos operator is run it creates a Tekton Triggers EventListener responsible
-for handling any events related to Component builds in the system.
+When Agogos operator is run it creates a Tekton Triggers EventListener
+responsible for handling any events related to Component builds in the system.
 
 [source,yaml]
 ----
@@ -90,7 +97,8 @@ spec:
   serviceAccountName: agogos-el
 ----
 
-After the Trigger is created within Agogos an appropriate Tekton Triggers Trigger resource is created:
+After the Trigger is created within Agogos an appropriate Tekton Triggers
+Trigger resource is created:
 
 [source,yaml]
 ----

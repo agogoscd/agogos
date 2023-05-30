@@ -3,18 +3,20 @@
 Build Triggers are a way to define what action should be performed in case of
 a successful Build event.
 
-There are different ways how such triggers can be defined. Correct usage depends on the use case.
-It can be as generic or as detailed as the user wants.
+There are different ways how such triggers can be defined. Correct usage
+depends on the use case. It can be as generic or as detailed as the user wants.
 
-We can watch builds of a specific Component. Or a Group
-a Component belongs to. Finally, we can utilize link:https://github.com/google/cel-spec/blob/master/doc/langdef.md[CEL expressions]
+We can watch builds of a specific Component or a group
+a Component belongs to. Finally, we can utilize
+link:https://github.com/google/cel-spec/blob/master/doc/langdef.md[CloudEvent Listener (CEL) expressions]
 to have full control.
 
-Below table should help with the decision which Component build trigger is the right one to use.
+This table should help with the decision of which Component build trigger is
+the right one to use.
 
 [cols="1,1,3",options=header]
 |===
-|What information you have?
+|What information do you have?
 |Suggested Trigger type
 |More information
 
@@ -30,16 +32,24 @@ Component build triggers are a good starting point.
 
 |Group name
 |xref:triggers/build/group.adoc[Group]
-a|Useful when the are Pipelines that work on the same set of Components. In such case it
-is convenient to put all relevant Components into a Group and reference this Group in Trigger.
+a|Useful when the are Pipelines that work on the same set of Components.
+In such case it is convenient to put all relevant Components into a Group
+and reference this Group in Trigger.
 
-NOTE: Builds of any Components from the Group will trigger the Pipeline.
-|=== 
+[NOTE]
+====
+Builds of any Components from the Group will trigger the Pipeline.
+====
+
+|===
 
 [TIP]
 ====
-To have fine-grained control over which Build triggers some action the xref:triggers/build/cel.adoc[CEL Build] Trigger could be used.
+To have fine-grained control over which Build triggers some action the
+xref:triggers/build/cel.adoc[CEL Build Trigger]
+could be used.
 
-This is useful when we do not know the name of the Component or Group that is related to the Build,
-but at the same time we know that Component or Build metadata contains required information.
+This is useful when we do not know the name of the Component or Group that
+is related to the Build, but at the same time we know that the Component or
+Build metadata contains the required information.
 ====

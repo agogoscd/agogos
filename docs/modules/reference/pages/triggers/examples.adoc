@@ -1,10 +1,11 @@
 = Examples
 
-This page contains examples of common use cases for xref:reference:triggers/index.adoc[_Trigger_].
+This page contains examples of common use cases for a
+xref:reference:triggers/index.adoc[_Trigger_].
 
 == Component Resource
 
-=== Rebuild a Component after other Component is built
+=== Rebuild a Component After Another Component is Built
 
 [source,yaml]
 ----
@@ -21,12 +22,12 @@ spec:
     name: cpaas-test-brew-container
 ----
 
-Once the `cpaas-test-brew-rpm` Component build finishes, the `cpaas-test-brew-container`
-Component build will be started.
+Once the `cpaas-test-brew-rpm` Component build finishes, the
+`cpaas-test-brew-container` Component build will be started.
 
 == Pipeline Resource
 
-=== Run Pipeline when a Component from a Group is built
+=== Run a Pipeline When a Component from a Group is Built
 
 [source,yaml]
 ----
@@ -43,10 +44,10 @@ spec:
     name: testing
 ----
 
-After a Component from the `cpaas-test-example` Group is built, the `testing` Pipeline
-will be run.
+After a Component from the `cpaas-test-example` Group is built, the
+`testing` Pipeline will be run.
 
-=== Run a Pipeline after a specific component type is built
+=== Run a Pipeline After a Specific Component Type is Built
 
 [source,yaml]
 ----
@@ -63,10 +64,14 @@ spec:
     name: test
 ----
 
-Run the `test` Pipeline after a Component is built which meets following requirements:
+Run the `test` Pipeline after a Component is built which meets following
+requirements:
 
 * `brew` builder was used
-*  within the configuration passed to the Builder `type` key was set with value `bundle`
+* within the configuration passed to the Builder, the `type` key was set to `bundle`
 
-NOTE: The `test` Pipeline will be run for any Component that matches above criteria. We don't
-"bind" the Trigger to any particular Component instance here.
+[NOTE]
+====
+The `test` Pipeline will be run for any Component that matches the criteria.
+We don't "bind" the Trigger to any particular Component instance here.
+====

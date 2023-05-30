@@ -2,51 +2,65 @@
 
 [TIP]
 ====
-Looking for xref:builds/results.adoc[Build results]?
+Looking for
+xref:builds/results.adoc[Build results]?
 ====
 
-Artifacts are files being the output of a Build. Every xref:concepts:builds.adoc[Build] can define *zero or more* artifacts.
+Artifacts are files being the output of a Build. Every
+xref:concepts:builds.adoc[Build]
+can define *zero or more* artifacts.
 
-Artifacts are important for xref:concepts:pipelines.adoc[Pipeline] and xref:concepts:builds.adoc[Build] concepts which
-work on the output of Builds. Artifacts together with xref:builds/results.adoc[Build Results] provide required information so that
-other Builds and Pipelines can utilize the output of a previous Build.
+Artifacts are important for
+xref:concepts:pipelines.adoc[Pipeline]
+and
+xref:concepts:builds.adoc[Build]
+concepts which work on the output of Builds. Artifacts together with
+xref:builds/results.adoc[Build Results]
+provide required information so that other Builds and Pipelines can utilize
+the output of a previous Build.
 
 We can define two types of artifacts:
 
-1. Local artifacts -- produced as part of the Build process in the Builder Pod and not uploaded anywhere,
-2. External artifacts -- could be either:
+. Local artifacts -- produced as part of the Build process in the Builder
+  Pod and not uploaded anywhere,
+. External artifacts -- could be either:
+.. produced locally (just like local artifacts), but uploaded to an external
+   storage, or
+.. produced by an external system and stored externally (image registry,
+   Maven repository, etc) as well
 
-a. produced locally (just like local artifacts), but uploaded to an external storage, or
-b. produced by an external system and stored externally (image registry, Maven repository, etc) as well
+In case of external artifacts -- we usually do not have the need to store them
+internally to Agogos as well. What we need to do though is to have pointers to
+these files. This can be achieved in two ways:
 
-In case of external artifacts -- we usually do not have the need to store them internally to Agogos as well.
-What we need to do though is to have pointers to these files. This can be achieved in two ways:
-
-1. Using xref:builds/results.adoc[Build results] in case there is not much data, or
-2. Storing this information in a file (or files!) which describe the output.
+. Using
+  xref:builds/results.adoc[Build results]
+  in case there is not much data, or
+. Storing this information in a file (or files!) which describe the output.
 
 [NOTE]
 ====
-Generation of Build results is out of control of a user -- it is the Builder implementation that
-provides this content. Please refer to the particular Builder implementation documentation.
+Generation of Build results is out of control of a user -- it is the Builder
+implementation that provides this content. Please refer to the particular
+Builder implementation documentation.
 ====
 
-For local artifacts we need to do more -- we need to store these files itself. Agogos does not define what
-is the file type of the artifact, it can be anything: a binary or a text file.
-Agogos does not investigate these files.
+For local artifacts we need to do more -- we need to store these files.
+Agogos does not define the file type of the artifact, it can be anything:
+a binary or a text file. Agogos does not investigate these files.
 
 == Defining Artifacts
 
 #TODO#
 
-It is the responsibility of the user to define which files from the Build output should be
-
+It is the responsibility of the user to define which files from the Build
+output should be.
 
 == Artifact Handlers
 
 Artifact handlers have two responsibilities:
 
-1. Storing artifacts in a (potentially long-living) storage
-2. Retrieving artifacts from the storage
+. Storing artifacts in (potentially long-living) storage.
+. Retrieving artifacts from storage.
 
 Artifact handlers are run as part of a Build process.

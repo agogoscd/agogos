@@ -4,18 +4,22 @@ Component is a concept that describes a single buildable element.
 
 We can identify following Component's tasks:
 
-. Define what xref:builders.adoc[Builder] should be used to build it
-. Optionally provide a list of pre and post xref:handlers.adoc[Handlers]
+. Define what
+  xref:builders.adoc[Builder]
+  should be used to build it
+. Optionally provide a list of pre and post
+  xref:handlers.adoc[Handlers]
 
 Component is an abstract concept which is not directly tied to any build tool
-that should be used to build the source code. This is where xref:builders.adoc[Builders]
+that should be used to build the source code. This is where
+xref:builders.adoc[Builders]
 come into play which expose a particular tool (or a build service!)
 in the system.
 
 A particular Component can be registered only when the specified
 Builder is available in the system.
 
-Once a Component is successfully created a build could be run which uses the
+Once a Component is successfully created, a build could be run which uses the
 specified Builder to perform the task of transforming the Component
 (metadata) into one or more artifacts.
 
@@ -39,8 +43,9 @@ builder -> artifact2;
 }
 ....
 
-A xref:builds.adoc[Build] object is created every time a new build of a Component
-is executed. Builds contain 
+A
+xref:builds.adoc[Build]
+object is created every time a new build of a Component is executed.
 
 == Example Component Definition
 

@@ -2,15 +2,17 @@
 
 [TIP]
 ====
-Looking for xref:builds/artifacts.adoc[Build artifacts]?
+Looking for
+xref:builds/artifacts.adoc[Build artifacts]?
 ====
 
 A Build result is a short JSON-formatted content that describes the build output.
 Build results are created *automatically*.
 
-Structure and content depends on the xref:concepts:builders.adoc[Builder] implementation
-that created it. Please refer to the particular Builder documentation for more information
-about the Build result schema.
+Structure and content depends on the
+xref:concepts:builders.adoc[Builder]
+implementation that created it. Please refer to the particular Builder
+documentation for more information about the Build result schema.
 
 [WARNING]
 ====

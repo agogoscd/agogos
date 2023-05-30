@@ -1,14 +1,17 @@
 = Handlers
 
 Handlers are an extension mechanism for the build process. Handlers are defined on the
-xref:components.adoc[Component] level and are run before or after the build.
+xref:components.adoc[Component]
+level and are run before or after the build.
 
 A potential use cases for Handlers include:
 
 * obtaining source code required for the build execution (*pre handler*)
 * storing built artifacts in some particular storage after the build is done (*post handler*)
 
-Handlers have full access to a volume shared with other handlers and the xref:builders.adoc[Builder] itself.
+Handlers have full access to a volume shared with other handlers and the
+xref:builders.adoc[Builder]
+itself.
 
 ====
 Below you can see an example workflow where the Handler is fetching the source code
@@ -40,16 +43,19 @@ builder -> stop;
 }
 ....
 
-NOTE: This is a simplified view of the process. In reality there a volume shared by the Handler
-and Builder. Fetched data is stored there so that Builder can access it later.
+[NOTE]
+====
+This is a simplified view of the process. In reality there a volume shared
+by the Handler and Builder. Fetched data is stored there so that Builder can
+access it later.
 ====
 
 == Example Handler Usage
 
 In the example found below we can see two handlers:
 
-1. pre handler which is responsible for obtaining the source code from a git repository
-2. post handler which stores selected artifacts on a volume within the cluster
+1. Pre handler which is responsible for obtaining the source code from a git repository
+2. Post handler which stores selected artifacts on a volume within the cluster
 
 [source,yaml]
 ----
