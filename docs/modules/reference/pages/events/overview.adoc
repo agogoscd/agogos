@@ -2,23 +2,25 @@
 
 == CloudEvents
 
-Agogos uses link:https://cloudevents.io/[CloudEvents].
+Agogos uses
+link:https://cloudevents.io/[CloudEvents].
 
 This is the primary and only type of events within the system.
-In order to expose an event in Agogos it needs to be converted into CloudEvent first in
-case it is using a different format.
+In order to expose an event in Agogos it needs to be converted into
+CloudEvent first in case it is using a different format.
 
-Agogos exposes a single HTTP endpoint to which events can be delivered. Once the event
-is published, it becomes available within the system for consumption and certain
-actions can be performed according to the event type and content.
+Agogos exposes a single HTTP endpoint to which events can be delivered.
+Once the event is published, it becomes available within the system for
+consumption and certain actions can be performed according to the event
+type and content.
 
 [TIP]
 ====
 Agogos itself emits CloudEvents as well!
 
-Please refer to the xref:reference:events/agogos.adoc[Agogos Events reference guide]
+Please refer to the
+xref:reference:events/agogos.adoc[Agogos Events reference guide]
 for a full list of CloudEvents emitted by Agogos.
-
 ====
 
 == Overview
@@ -26,20 +28,25 @@ for a full list of CloudEvents emitted by Agogos.
 Below you can find a diagram which explains CloudEvent flow within the
 system.
 
-A link:https://knative.dev/docs/eventing/broker/[Knative Eventing Broker] is used as
-the central piece of the architecture.
+A
+link:https://knative.dev/docs/eventing/broker/[Knative Eventing Broker]
+is used as the central piece of the architecture.
 
 For development environment an In-Memory implementation of the Broker is used.
-For production deployment an link:https://knative.dev/docs/eventing/broker/kafka-broker/[Apache Kafka Broker] is used.
+For production deployment an
+link:https://knative.dev/docs/eventing/broker/kafka-broker/[Apache Kafka Broker]
+is used.
 
-Additionally multiple link:https://knative.dev/docs/eventing/triggers/[Knative Triggers] are used to send filtered events to particular event handlers.
+Additionally multiple
+link:https://knative.dev/docs/eventing/triggers/[Knative Triggers]
+are used to send filtered events to particular event handlers.
 
-Each Agogos project has it's own namespace dedicated and a dedicated event handler as well.
-Handlers are located in the project's namespace.
+Each Agogos project has it's own namespace dedicated and a dedicated event
+handler as well. Handlers are located in the project's namespace.
 
 [#eventing-overview]
 [graphviz,eventing,svg]
-....
+----
 digraph G {
 splines="false";
 rankdir="LR";
@@ -86,7 +93,7 @@ other -> broker [headport="w",label="External CloudEvents",style="dashed"];
 knative_trigger_1 -> tekton_el_1 [label="Events"];
 knative_trigger_2 -> tekton_el_2 [label="Events"];
 }
-....
+----
 
 == Event Sources
 
@@ -97,15 +104,21 @@ There are two main event sources within the system:
 
 Agogos is a CloudEvent emitter as well. Sometimes these messages will be
 processed by the system again to perform certain actions such as
-xref:reference:triggers/index.adoc[triggering] builds or running pipelines.
+xref:reference:triggers/index.adoc[triggering]
+builds or running pipelines.
 
-Besides this Agogos handles all other types of CloudEvents that become
-available within the system. Source of such events can be located inside of
-cluster or outside of it.
+Besides this, Agogos handles all other types of CloudEvents that become
+available within the system. The source of such events can be located inside of
+a cluster or outside of it.
 
 == Event Handlers
 
-In Agogos all events are handled by link:https://tekton.dev/docs/triggers/[Tekton Triggers]
+In Agogos all events are handled by
+link:https://tekton.dev/docs/triggers/[Tekton Trigger]
 link:https://tekton.dev/docs/triggers/eventlisteners/[EventListeners].
 
-NOTE: Triggers are explained in xref:triggers.adoc[separate section].
+[NOTE]
+====
+Triggers are explained in a
+xref:triggers/overview.adoc[separate section].
+====

@@ -1,6 +1,7 @@
 = Builders
 
-Builders are responsible for building xref:components.adoc[Components].
+Builders are responsible for building
+xref:components.adoc[Components].
 
 Builders registered in the system influence what Component types
 can be added to the system. It is because when defining a Component
@@ -29,7 +30,6 @@ spec:
 == Implementation
 
 Builder implementations are **Tekton Tasks**.
-
 
 In the simplest case to register a Builder in the system the particular
 Tekton Tasks needs to be registered as well together with the `Builder`
@@ -61,5 +61,6 @@ This means that artifacts produced by the Builder needs to be stored
 outside of the workspace.
 
 Some Builders will upload artifacts automatically, some don't.
-In case of a Builder producing only local artifacts, xref:handlers.adoc[Handlers]
+In case of a Builder producing only local artifacts,
+xref:handlers.adoc[Handlers]
 can be used to ensure artifacts can be copied to some storage (volume, S3, registry, etc).

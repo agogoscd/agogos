@@ -1,17 +1,16 @@
 = IDE support
 :experimental: true
 
-We provide instructions on how to set up the IDE so that it works the best with our
-codebase.
-
-* xref:ide.adoc#vscode[Visual Studio Code (vscode)]
+Instructions on setting up the IDE (Integrated Development Environment)
+link:link:https://code.visualstudio.com/[Visual Studio Code]
+so that it works best with our code base.
 
 [#vscode]
 == Visual Studio Code
 
 === Installation
 
-You can obtain vscode from the
+You can obtain [filename]`vscode` from the
 link:https://code.visualstudio.com/[official page].
 
 === Task Configuration

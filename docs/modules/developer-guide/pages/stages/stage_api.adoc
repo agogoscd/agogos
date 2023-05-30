@@ -29,9 +29,9 @@ information produced by particular Builder when building the Component. This cou
 
 Below you can find guidelines about what should and what shouldn't be stored:
 
-1. Stored files should be small. This is not the place where artifacts built by the
-Builder should be saved.
-2. Refrain from storing binary files.
+. Stored files should be small. This is not the place where artifacts built
+  by the Builder should be saved.
+. Refrain from storing binary files.
 
 === `shared` workspace
 
@@ -57,8 +57,8 @@ Following parameters will be passed to every Builder task:
 
 The `component` parameter contains all the metadata that describes:
 
-1. What is the component (metadata)
-2. How to build it (source coordinates)
+. What is the component (metadata)
+. How to build it (source coordinates)
 
 It is responsibility of the Task to parse the data an use it in a way it is designed.
 
@@ -81,8 +81,11 @@ TIP: Tekton docs: https://tekton.dev/docs/pipelines/tasks/#emitting-results
 
 It's up to the Task developer to define and populate results of the task.
 
-Results must be small (<4kB of data). If there is a requirement to store bigger data, workspace should be used to do so and result should have a pointer to it.
+Results must be small (<4kB of data). If there is a requirement to store bigger
+data, workspace should be used to do so and result should have a pointer to it.
 
 === Best practices
 
-* If possible Build metadata should be stored within the system (usage of results and workspaces). Querying information about results should not involve external systems.
+* If possible Build metadata should be stored within the system (usage of
+  results and workspaces). Querying information about results should not
+  involve external systems.

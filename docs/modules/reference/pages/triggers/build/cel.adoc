@@ -1,10 +1,15 @@
-= CEL Build Trigger
+= CloudEvent Listener Build Trigger
 
-NOTE: This Trigger is part of xref:reference:triggers/build/index.adoc[Build triggers].
+[NOTE]
+====
+This Trigger is part of
+xref:reference:triggers/build/index.adoc[Build triggers].
+====
 
-The CEL trigger is a variation of the xref:triggers/event.adoc[Event trigger]
-which is evaluated on the payload of the
-xref:events/agogos.adoc#componentbuild-events[successful Component build CloudEvent].
+The CloudEvent Listener (CEL) trigger is a variation of the
+xref:triggers/event.adoc[Event trigger]
+which is evaluated on the payload of the successful
+xref:events/agogos.adoc#componentbuild-events[Component Build CloudEvent].
 
 .Example of a CEL build trigger
 [source,yaml]
@@ -22,14 +27,14 @@ spec:
     name: p1
 ----
 
-In above example trigger will be fired when the Component uses the `brew` Builder
-and the data that is passed to the Builder contains `type` set to `bundle`. Any Build
-of a Component that satisfies this requirement will trigger the resource.
+In the above example, the trigger will be fired when the Component uses the
+`brew` Builder and the data that is passed to the Builder contains `type` set
+to `bundle`. Any Build of a Component that satisfies this requirement will
+trigger the resource.
 
 [TIP]
 ====
 You can use the `kubectl` command with the `-o json` switch to get the relevant
-Component and Component Build data to have better understanding how
+Component and Component Build data to have a better understanding of how
 to craft your CEL expression.
 ====
-

@@ -1,13 +1,23 @@
 = Group Build Trigger
 
-TIP: Read more about the xref:concepts:groups.adoc[_Group_ concept].
+[TIP]
+====
+Read more about the
+xref:concepts:groups.adoc[_Group_ concept].
+====
 
-NOTE: This Trigger is part of xref:reference:triggers/build/index.adoc[Build triggers].
+[NOTE]
+====
+This Trigger is part of
+xref:reference:triggers/build/index.adoc[Build triggers].
+====
 
-Group triggers are similar to xref:reference:triggers/build/component.adoc[Component triggers].
-Group triggers can be used in case there is a xref:concepts:groups.adoc[Group] defined
-and we want to trigger the pipeline
-if any of the Components referenced in this Group should trigger the pipeline.
+Group triggers are similar to
+xref:reference:triggers/build/component.adoc[Component triggers].
+Group triggers can be used in case there is a
+xref:concepts:groups.adoc[Group]
+defined and we want to trigger the pipeline if any of the Components
+referenced in this Group should trigger the pipeline.
 
 .Example of a Group build trigger
 [source,yaml]
@@ -25,13 +35,17 @@ spec:
     name: p1
 ----
 
-In above example the pipeline will be triggered when a build of any Component referenced
-in the `g1` Group is finished.
+In above example the pipeline will be triggered when a build of any Component
+referenced in the `g1` Group is finished.
 
 Assuming the `g1` Group will have two Components referenced: `c1` and `c2`,
-the `p1` Pipeline will be triggered when either a build of the Component `c1` or the
- Component `c2` finishes.
+the `p1` Pipeline will be triggered when either a build of the Component `c1`
+or the Component `c2` finishes.
 
-WARNING:    See xref:reference:triggers/index#multiple-triggers[note about multiple triggers].
-            Group name build triggers are implemented as multiple Component
-            triggers internally.
+[WARNING]
+====
+See the
+xref:reference:triggers/index#multiple-triggers[note about multiple triggers].
+Group name build triggers are implemented as multiple Component
+triggers internally.
+====

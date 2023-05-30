@@ -4,7 +4,7 @@ This page describes all available CloudEvents that are emitted by the Agogos pla
 
 [cols="1m,1"]
 |===
-|Event type |Sent when 
+|Event type |Sent when
 
 2+s|xref:#build-events[Build events]
 
@@ -27,30 +27,27 @@ This page describes all available CloudEvents that are emitted by the Agogos pla
 
 |com.redhat.agogos.event.pipeline.failed.v1alpha1
 |Pipeline failed.
-|=== 
+|===
 
-== Event Types vs. Versions
-
-Every event emitted by the system has assigned a type which is versioned.
+== Event Versions
+Every event emitted by the system is assigned a type which is versioned.
 This is to ensure that the payload available within the event has
 predictable content.
 
-Versions are bound to the particular resource versions the event is providing.
+Versions are bound to the particular resource version the event is providing.
 
 == Event Structure
 
 [#build-events]
 === Component Build Events
+Every Component Build event sends the JSON representation of Agogos
+`Component` and `Build` resources.
 
-====
 Applies to:
 
 * `com.redhat.agogos.event.build.started.v1alpha1`
 * `com.redhat.agogos.event.build.succeeded.v1alpha1`
 * `com.redhat.agogos.event.build.failed.v1alpha1`
-====
-
-Every Component build event contains a JSON payload with following structure:
 
 [source,json]
 ----
@@ -59,12 +56,11 @@ Every Component build event contains a JSON payload with following structure:
    "build": {} <2>
 }
 ----
-<1> The `component` key contains the `Component` custom resource representation in the JSON format
-<2> The `build` key contains the `Build` custom resource representation in the JSON format
-
-Example of such JSON file can be found below.
+<1> The `component` key contains the `Component` custom resource representation in JSON format.
+<2> The `build` key contains the `Build` custom resource representation in JSON format.
 
 [source,json]
+.Example Component Build Event
 ----
 {
   "component": {
@@ -108,21 +104,18 @@ Example of such JSON file can be found below.
 }
 ----
 
-NOTE: Such event can contain more fields in case 
+NOTE: An event can contain additional fields.
 
 [#pipeline-events]
 === Pipeline Run Events
+Every Pipeline Run event sends the JSON representation of Agogos
+`Pipeline` and `Run` resources.
 
-====
 Applies to:
 
 * `com.redhat.agogos.event.pipeline.started.v1alpha1`
 * `com.redhat.agogos.event.pipeline.succeeded.v1alpha1`
 * `com.redhat.agogos.event.pipeline.failed.v1alpha1`
-====
-
-Every Pipeline event is sending the JSON representation of an Agogos
-`Pipeline` and `Run` resources.
 
 [source,json]
 ----
@@ -131,5 +124,5 @@ Every Pipeline event is sending the JSON representation of an Agogos
    "run": {} <2>
 }
 ----
-<1> The `pipeline` key contains the `Pipeline` custom resource representation in the JSON format
-<2> The `run` key contains the `Run` custom resource representation in the JSON format
+<1> The `pipeline` key contains the `Pipeline` custom resource representation in JSON format.
+<2> The `run` key contains the `Run` custom resource representation in JSON format.

@@ -1,6 +1,6 @@
 = Pipeline Run Trigger
 
-Pipeline triggers are used when we want to perform an action after a particular
+Pipeline triggers are used to perform an action after a particular
 Pipeline finishes successfully.
 
 Common use case for Pipeline triggers is chaining of Pipelines.
@@ -21,5 +21,5 @@ spec:
     name: p2
 ----
 
-In above example the `p2` Pipeline will be run after the
+In the above example the `p2` Pipeline will be run after the
 `p1` Pipeline finishes.

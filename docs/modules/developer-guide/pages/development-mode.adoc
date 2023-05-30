@@ -20,7 +20,7 @@ for installation instructions.
 We need Minikube to trust the Red{nbsp}Hat root certificates as Agogos interacts
 with many different internal services. The internal certificates are self-signed,
 so they are considered
-link:https://minikube.sigs.k8s.io/docs/handbook/untrusted_certs/[unstrusted certificates].
+link:https://minikube.sigs.k8s.io/docs/handbook/untrusted_certs/[untrusted certificates].
 Run:
 
 [source,bash]
@@ -185,7 +185,7 @@ Name:           dummy-xv5jx
 
 🎉 Status
 
-Status:         New 
+Status:         New
 Reason:         N/A
 Created:        2023-04-05 08:55:49
 Started:        N/A

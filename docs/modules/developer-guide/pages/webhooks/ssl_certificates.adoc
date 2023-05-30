@@ -6,23 +6,29 @@
 In order to create SSL certificates we will use the
 link:https://github.com/cloudflare/cfssl[CFSSL (Cloudflare's PKI and TLS toolkit)].
 
-Please download and install all the required cfssl tools.
+Please download and install all the required [filename]`cfssl` tools.
 
-Below you can find helper commands to install link:https://github.com/cloudflare/cfssl/releases/tag/v{cfssl-version}[version {cfssl-version}].
+Below you can find helper commands to install
+link:https://github.com/cloudflare/cfssl/releases/tag/v{cfssl-version}[version {cfssl-version}].
 
 [source,bash,subs="attributes+"]
 ----
-curl -L https://github.com/cloudflare/cfssl/releases/download/v{cfssl-version}/cfssl_{cfssl-version}_linux_amd64 -o cfssl
+curl -L https://github.com/cloudflare/cfssl/releases/download/v{cfssl-version}/cfssl_{cfssl-version}_linux_amd64 \
+     -o cfssl
 chmod +x cfssl
-curl -L https://github.com/cloudflare/cfssl/releases/download/v{cfssl-version}/cfssljson_{cfssl-version}_linux_amd64 -o cfssljson
+
+curl -L https://github.com/cloudflare/cfssl/releases/download/v{cfssl-version}/cfssljson_{cfssl-version}_linux_amd64 \
+     -o cfssljson
 chmod +x cfssljson
-curl -L https://github.com/cloudflare/cfssl/releases/download/v{cfssl-version}/cfssl-certinfo_{cfssl-version}_linux_amd64 -o cfssl-certinfo
+
+curl -L https://github.com/cloudflare/cfssl/releases/download/v{cfssl-version}/cfssl-certinfo_{cfssl-version}_linux_amd64 \
+     -o cfssl-certinfo
 chmod +x cfssl-certinfo
 ----
 
 == Certificate generation
 
-Create a `csr.json` input file for CFSSL with following content:
+Create a [filename]`csr.json` input file for CFSSL with the following content:
 
 [source,json]
 .csr.json
@@ -50,7 +56,8 @@ Create a `csr.json` input file for CFSSL with following content:
 }
 
 ----
-<1> If you want to use this certificate outside of the cluster, make sure you add relevant IP addresses and/or DNS names.
+<1> If you want to use this certificate outside of the cluster, make sure you
+add the relevant IP addresses and/or DNS names.
 
 [source,bash]
 ----
@@ -63,8 +70,8 @@ Create a `csr.json` input file for CFSSL with following content:
 
 This generates two files:
 
-1. `server.csr` which contains the CSR, and
-2. `server-key.pem` being a private key in PEM format.
+. `server.csr` which contains the CSR, and
+. `server-key.pem` being a private key in PEM format.
 
 To create a signing request in the cluster, please run this command:
 
@@ -85,8 +92,9 @@ spec:
 EOF
 ----
 
-A new signing request `certificatesigningrequest.certificates.k8s.io/agogos.default` should be created.
-You can confirm it by running:
+A new signing request
+`certificatesigningrequest.certificates.k8s.io/agogos.default`
+should be created. You can confirm it by running:
 
 [source,bash]
 ----
@@ -103,7 +111,8 @@ Now, let's approve it:
 certificatesigningrequest.certificates.k8s.io/agogos-webhooks.default approved
 ----
 
-After this step is completed you should have the certificate issued and ready to be used:
+After this step is completed you should have the certificate issued and ready
+to use:
 
 [source,bash]
 ----
@@ -112,12 +121,14 @@ NAME                      AGE   SIGNERNAME                      REQUESTOR       
 agogos-webhooks.default   13s   kubernetes.io/kubelet-serving   minikube-user   Approved,Issued
 ----
 
-Now we can fetch the certificate.
+Now we can fetch the certificate:
 
 [source,bash]
 ----
-❯ kubectl get csr agogos-webhooks.default -o jsonpath='{.status.certificate}' | base64 --decode > server.crt
+❯ kubectl get csr agogos-webhooks.default \
+  -o jsonpath='{.status.certificate}' | base64 --decode > server.crt
 ----
 
-The server certificate is now available in the `server.crt` file. Together with the
-`server-key.pem` it can be used to server data over SSL.
+The server certificate is now available in the [filename]`server.crt` file.
+Together with the [filename]`server-key.pem` it can be used to server data
+over SSL.

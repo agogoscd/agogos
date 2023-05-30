@@ -8,25 +8,26 @@ WARNING: #This content is outdated and needs to be updated#
 
 Builder consists from following pieces:
 
-1. Container image(s)
-2. Tekton Task definition (together with any optional resources)
-3. Builder definition
+. Container image(s)
+. Tekton Task definition (together with any optional resources)
+. Builder definition
 
 == Container image
 
-It's up to the Builder maintainer how the container image implementing the Builder is created
-although general [OpenShift guidelines for creating images](https://docs.openshift.com/container-platform/4.5/openshift_images/create-images.html)
+It's up to the Builder maintainer how the container image implementing the
+Builder is created although general
+link:https://docs.openshift.com/container-platform/4.5/openshift_images/create-images.html[OpenShift guidelines for creating images]
 should be followed.
 
-Builder container image should contain every tool to successfully execute a build of
-the passed Component definition.
+Builder container image should contain every tool to successfully execute a
+build of the passed Component definition.
 
 == Tekton Task definition
 
 Next step is to create a Tekton Task which is responsible for:
 
-1. Exposing the container image as a Tekton Task
-2. Implement the platform API which will be used to pass data to container
+. Exposing the container image as a Tekton Task
+. Implement the platform API which will be used to pass data to container
 
 Minimal template:
 
@@ -51,7 +52,11 @@ spec:
       args: ["[ARG1]", "$(params.component)", "$(workspaces.results.path)"]
 ----
 
-TIP: See link:stage-api{outfilesuffix}[the API definition for Tekton Tasks].
+[TIP]
+====
+See
+link:stage-api{outfilesuffix}[the API definition for Tekton Tasks].
+====
 
 This can be extended so that it fits the requirements of the Builder.
 Builder developer knows what is the best way to pass the data and run the specific tool.
@@ -77,8 +82,8 @@ The last step is to create a Builder definition.
 
 Builder responsibilities:
 
-1. Exposing the Tekton Task within the platform
-2. Providing a place to define supported Component types (validation)
+. Exposing the Tekton Task within the platform
+. Providing a place to define supported Component types (validation)
 
 Minimal template:
 

@@ -1,7 +1,7 @@
 = Agogos Setup
 
 This page describes the initial setup that needs to be performed
-in order to be able to develop Agogos.
+in order to develop Agogos code.
 
 [NOTE]
 ====
@@ -10,20 +10,23 @@ Any files referenced in this guide are relative to the root of the main Agogos r
 
 [NOTE]
 ====
-It is assumed that you are logged in to the cluster and using the the correct target namespace.
-In case of xref:environment/local.adoc[local environment] this would be a Minikube cluster and `default` namespace.
+It is assumed that you are logged in to the cluster and using the the correct
+target namespace. In case of
+xref:environment/local.adoc[local environment]
+this would be a Minikube cluster and `default` namespace.
 ====
 
 == Resource Initialization
 
-In order to be able to use Agogos you need to register required resources within the cluster.
+In order to use Agogos you need to register required resources within the cluster.
 
 WARNING: Registration of resources needs to be performed before you start the service.
 
 === CRD's Registration
 
-Once you have required tools installed and running on your system the next thing
-to do is to register CRD's within the system. This can be done by running this command:
+Once you have the required tools installed and running on your system the next
+thing to do is to register CRDs (Custom Resource Definitions) within the system.
+This can be done by running this command:
 
 [source,bash]
 .Registering CRD's
@@ -46,7 +49,7 @@ namespace/agogos created
 [#pull-secret]
 === (Optional) Pull Secret
 
-In case the need to access container images in a secured private registry, you need to
+To access container images in a secured private registry, you need to
 grant access to it by preparing a pull secret.
 
 [source,bash]
@@ -58,15 +61,15 @@ secret/agogos-pull-secret created
 
 === Service Accounts
 
-The `agogos` Service Account is required to ensure propagating
+The `agogos` service account is required to ensure propagating
 correct permissions for services run by Agogos.
 
-Service Account is used to provide xref:#pull-secret[image pull secrets]
-for secured registries and images that are not
-freely accessible.
+The service account is used to provide
+xref:#pull-secret[image pull secrets]
+for secured registries and images that are not freely accessible.
 
-The `agogos-el` Service Account is used by Tekton Event Listener
-so that it could create appropriate resources in the cluster.
+The `agogos-el` service account is used by Tekton Event Listener
+so that it can create appropriate resources in the cluster.
 
 [source,yaml]
 .sa.yaml
