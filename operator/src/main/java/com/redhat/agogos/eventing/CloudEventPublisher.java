@@ -7,6 +7,11 @@ import com.redhat.agogos.CloudEventHelper;
 import com.redhat.agogos.PipelineRunState;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.v1alpha1.AgogosResource;
+import com.redhat.agogos.v1alpha1.Build;
+import com.redhat.agogos.v1alpha1.Component;
+import com.redhat.agogos.v1alpha1.Component.ComponentSpec;
+import com.redhat.agogos.v1alpha1.ComponentBuilderSpec.BuilderRef;
+
 import io.cloudevents.CloudEvent;
 import io.cloudevents.CloudEventData;
 import io.cloudevents.core.builder.CloudEventBuilder;
@@ -45,10 +50,10 @@ public class CloudEventPublisher {
     ObjectMapper objectMapper;
 
     @ConfigProperty(name = "agogos.cloud-events.base-url", defaultValue = "http://broker-ingress.knative-eventing.svc.cluster.local")
-    String baseurl;
+    String baseurl = "http://broker-ingress.knative-eventing.svc.cluster.local";
 
     @ConfigProperty(name = "agogos.cloud-events.publish")
-    Optional<Boolean> publish;
+    Optional<Boolean> publish = Optional.of(true);
 
     Map<String, BrokerRestClient> brokers = new HashMap<>();
 
@@ -89,6 +94,14 @@ public class CloudEventPublisher {
                 parent.getKind().toLowerCase(), parent);
 
         JsonObjectBuilder dataBuilder = Json.createObjectBuilder();
+
+        objectMapper = new ObjectMapper();
+        try {
+            System.out.println(objectMapper.writeValueAsString(resource));
+        } catch (JsonProcessingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         payload.forEach((key, o) -> {
             try {

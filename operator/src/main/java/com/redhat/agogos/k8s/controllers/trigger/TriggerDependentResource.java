@@ -56,7 +56,7 @@ public class TriggerDependentResource
             LOG.debug("Agogos Trigger '{}', using existing Tekton Trigger '{}'",
                     agogos.getFullName(), trigger.getFullResourceName());
         } else {
-            LOG.debug("Agogos Trigger '{}', creating new PipelineRun", agogos.getFullName());
+            LOG.debug("Agogos Trigger '{}', creating new Tekton Trigger", agogos.getFullName());
         }
         // Depending on the configuration of the Trigger a correct target resource is
         // created and bound with the Tekton Trigger
