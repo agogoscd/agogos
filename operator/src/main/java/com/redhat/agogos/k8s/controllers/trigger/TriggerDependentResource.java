@@ -49,7 +49,8 @@ public class TriggerDependentResource
     @Override
     public io.fabric8.tekton.triggers.v1alpha1.Trigger desired(Trigger agogos, Context<Trigger> context) {
         io.fabric8.tekton.triggers.v1alpha1.Trigger trigger = new io.fabric8.tekton.triggers.v1alpha1.Trigger();
-        Optional<io.fabric8.tekton.triggers.v1alpha1.Trigger> optional = context.getSecondaryResource(io.fabric8.tekton.triggers.v1alpha1.Trigger.class);
+        Optional<io.fabric8.tekton.triggers.v1alpha1.Trigger> optional = context
+                .getSecondaryResource(io.fabric8.tekton.triggers.v1alpha1.Trigger.class);
         if (!optional.isEmpty()) {
             trigger = optional.get();
             LOG.debug("Agogos Trigger '{}', using existing Tekton Trigger '{}'",

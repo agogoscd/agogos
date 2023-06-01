@@ -1,17 +1,15 @@
 package com.redhat.agogos.k8s.webhooks.validator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.triggers.ComponentTriggerEvent;
 import com.redhat.agogos.v1alpha1.triggers.Trigger;
-
 import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class TriggerValidator extends Validator<Trigger> {

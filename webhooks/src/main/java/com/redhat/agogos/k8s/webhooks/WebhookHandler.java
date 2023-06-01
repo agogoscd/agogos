@@ -11,7 +11,6 @@ import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.Handler;
 import com.redhat.agogos.v1alpha1.Run;
 import com.redhat.agogos.v1alpha1.triggers.Trigger;
-
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReview;
 import jakarta.enterprise.context.ApplicationScoped;

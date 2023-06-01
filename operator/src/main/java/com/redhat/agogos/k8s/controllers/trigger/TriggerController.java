@@ -66,5 +66,5 @@ public class TriggerController extends AbstractController<Trigger> {
         LOG.info("Set status for Trigger '{}' to {}", agogos.getFullName(), agogos.getStatus().getStatus());
 
         return UpdateControl.updateStatus(agogos);
-     }
+    }
 }
