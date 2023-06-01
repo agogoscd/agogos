@@ -1,15 +1,11 @@
 package com.redhat.agogos.k8s.webhooks.validator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.errors.ApplicationException;
-import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Handler;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
-import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.Task;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,15 +17,6 @@ import java.util.stream.Collectors;
 public class HandlerValidator extends Validator<Handler> {
 
     private static final Logger LOG = LoggerFactory.getLogger(HandlerValidator.class);
-
-    @Inject
-    ObjectMapper objectMapper;
-
-    @Inject
-    AgogosClient agogosClient;
-
-    @Inject
-    TektonClient tektonClient;
 
     @Override
     protected void validateResource(Handler resource, AdmissionResponseBuilder responseBuilder) {

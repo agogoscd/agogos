@@ -1,21 +1,17 @@
 package com.redhat.agogos.k8s.webhooks.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.errors.ValidationException;
-import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.ComponentHandlerSpec;
 import com.redhat.agogos.v1alpha1.Handler;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
-import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.Task;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import org.openapi4j.core.exception.ResolutionException;
 import org.openapi4j.schema.validator.ValidationData;
 import org.openapi4j.schema.validator.v3.SchemaValidator;
@@ -30,15 +26,6 @@ import java.util.stream.Collectors;
 public class ComponentValidator extends Validator<Component> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ComponentValidator.class);
-
-    @Inject
-    ObjectMapper objectMapper;
-
-    @Inject
-    AgogosClient agogosClient;
-
-    @Inject
-    TektonClient tektonClient;
 
     @Override
     protected void validateResource(Component component, AdmissionResponseBuilder responseBuilder) {

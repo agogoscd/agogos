@@ -7,11 +7,6 @@ import com.redhat.agogos.CloudEventHelper;
 import com.redhat.agogos.PipelineRunState;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.v1alpha1.AgogosResource;
-import com.redhat.agogos.v1alpha1.Build;
-import com.redhat.agogos.v1alpha1.Component;
-import com.redhat.agogos.v1alpha1.Component.ComponentSpec;
-import com.redhat.agogos.v1alpha1.ComponentBuilderSpec.BuilderRef;
-
 import io.cloudevents.CloudEvent;
 import io.cloudevents.CloudEventData;
 import io.cloudevents.core.builder.CloudEventBuilder;
@@ -94,14 +89,6 @@ public class CloudEventPublisher {
                 parent.getKind().toLowerCase(), parent);
 
         JsonObjectBuilder dataBuilder = Json.createObjectBuilder();
-
-        objectMapper = new ObjectMapper();
-        try {
-            System.out.println(objectMapper.writeValueAsString(resource));
-        } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
 
         payload.forEach((key, o) -> {
             try {
