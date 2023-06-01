@@ -111,18 +111,14 @@
                                 <spaces>true</spaces>
                             </indent>
                             <includes>
-                                <include>webhooks/src/main/java/**/*.java</include>
-                                <include>webhooks/src/test/java/**/*.java</include>
-                                <include>operator/src/main/java/**/*.java</include>
-                                <include>operator/src/test/java/**/*.java</include>
-                                <include>core/src/main/java/**/*.java</include>
-                                <include>core/src/test/java/**/*.java</include>
-                                <include>cli/src/main/java/**/*.java</include>
-                                <include>cli/src/test/java/**/*.java</include>
+                                <include>**/src/main/java/**/*.java</include>
+                                <include>**/src/test/java/**/*.java</include>
                             </includes>
                             <removeUnusedImports />
                             <importOrder>
-                                <file>${main.basedir}/spotless-importorder.properties</file>
+                                <!-- Everything first, then java|javax -->
+                                <!-- Note the leading comma -->
+                                <order>,java|javax</order>
                             </importOrder>
                             <eclipse>
                                 <file>${main.basedir}/eclipse-format.xml</file>

@@ -21,7 +21,7 @@ public class CRDTestServerSetup extends KubernetesTestServerSetup {
     @SuppressWarnings("rawtypes")
     @Override
     public void accept(KubernetesServer server) {
-        super.accept(server); 
+        super.accept(server);
 
         @SuppressWarnings("unchecked")
         Class<? extends CustomResource>[] classes = new Class[] { Build.class, Component.class, Run.class, Pipeline.class,

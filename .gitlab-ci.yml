@@ -3,11 +3,9 @@ verify:
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
     MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
-  # cache:
-  #   paths:
-  #     - .m2/repository
   stage: test
   script:
+    - mvn spotless:check
     - mvn verify -s ci_settings.xml -Dmaven.wagon.http.ssl.insecure=true
   artifacts:
     when: always
@@ -37,9 +35,6 @@ cli:
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
     MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
-  # cache:
-  #   paths:
-  #     - .m2/repository
   stage: build
   script:
     - ./mvnw clean package -pl cli -am -Pnative -s ci_settings.xml -Dmaven.wagon.http.ssl.insecure=true -Dnative-image.xmx=4g
