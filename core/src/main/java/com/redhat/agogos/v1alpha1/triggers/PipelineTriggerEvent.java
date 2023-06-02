@@ -1,5 +1,6 @@
 package com.redhat.agogos.v1alpha1.triggers;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.redhat.agogos.CloudEventHelper;
 import com.redhat.agogos.PipelineRunState;
@@ -16,6 +17,7 @@ import java.util.List;
 @Setter
 @ToString
 @RegisterForReflection
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeName("pipeline")
 public class PipelineTriggerEvent implements TriggerEvent {
     private static final long serialVersionUID = -4379042700549506262L;

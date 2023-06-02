@@ -1,6 +1,7 @@
 package com.redhat.agogos.v1alpha1;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.ResourceStatus;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @RegisterForReflection
 @Kind("Component")
 @Group("agogos.redhat.com")
@@ -26,6 +28,7 @@ import java.util.List;
 public class Component extends AgogosResource<ComponentSpec, Status> implements Namespaced {
     private static final long serialVersionUID = 9122121231081986174L;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class ComponentSpec implements KubernetesResource {

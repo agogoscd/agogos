@@ -1,6 +1,7 @@
 package com.redhat.agogos.v1alpha1;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.redhat.agogos.ResultableResourceStatus;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Objects;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @RegisterForReflection
 public class ResultableStatus extends AgogosResourceStatus {
 

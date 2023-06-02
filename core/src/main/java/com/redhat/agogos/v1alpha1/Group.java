@@ -1,5 +1,6 @@
 package com.redhat.agogos.v1alpha1;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.Group.ComponentGroupResourceSpec;
@@ -16,12 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @RegisterForReflection
 @Kind("Group")
 @io.fabric8.kubernetes.model.annotation.Group("agogos.redhat.com")
 @Version("v1alpha1")
 public class Group extends AgogosResource<ComponentGroupResourceSpec, Void> implements Namespaced {
     @ToString
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class ComponentGroupResourceSpec implements KubernetesResource {

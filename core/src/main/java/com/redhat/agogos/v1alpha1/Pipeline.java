@@ -2,6 +2,7 @@ package com.redhat.agogos.v1alpha1;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.Pipeline.PipelineSpec;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @RegisterForReflection
 @Kind("Pipeline")
 @Group("agogos.redhat.com")
@@ -30,6 +32,7 @@ public class Pipeline extends AgogosResource<PipelineSpec, Status> implements Na
     private static final long serialVersionUID = 4918853237265675286L;
 
     @ToString
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class PipelineSpec implements KubernetesResource {
@@ -54,6 +57,7 @@ public class Pipeline extends AgogosResource<PipelineSpec, Status> implements Na
         }
 
         @ToString
+        @JsonInclude(JsonInclude.Include.NON_NULL)
         @JsonDeserialize(using = JsonDeserializer.None.class)
         @RegisterForReflection
         public static class StageReference implements KubernetesResource {

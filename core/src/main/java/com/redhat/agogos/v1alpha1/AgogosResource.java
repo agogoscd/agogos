@@ -1,6 +1,7 @@
 package com.redhat.agogos.v1alpha1;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.fabric8.kubernetes.client.CustomResource;
 
 import java.time.LocalDateTime;
@@ -8,6 +9,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AgogosResource<S, T> extends CustomResource<S, T> {
 
     private static final long serialVersionUID = -1042563779571490559L;

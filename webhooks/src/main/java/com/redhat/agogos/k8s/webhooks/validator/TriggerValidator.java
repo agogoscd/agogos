@@ -18,7 +18,6 @@ public class TriggerValidator extends Validator<Trigger> {
 
     @Override
     protected void validateResource(Trigger trigger, AdmissionResponseBuilder responseBuilder) {
-        LOG.error("GREG: HERE");
         try {
             trigger.getSpec().getEvents().stream().forEach(event -> {
                 if (event instanceof ComponentTriggerEvent) {

@@ -1,5 +1,6 @@
 package com.redhat.agogos.v1alpha1;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.Builder.BuilderSpec;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @ToString(callSuper = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Kind("Builder")
 @Group("agogos.redhat.com")
 @Version("v1alpha1")
@@ -25,6 +27,7 @@ public class Builder extends AgogosResource<BuilderSpec, Status> {
     private static final long serialVersionUID = 1184222810180288956L;
 
     @ToString
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class BuilderSchema implements KubernetesResource {
@@ -36,6 +39,7 @@ public class Builder extends AgogosResource<BuilderSpec, Status> {
     }
 
     @ToString
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class BuilderSpec implements KubernetesResource {

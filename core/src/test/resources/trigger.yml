@@ -1,0 +1,15 @@
+---
+apiVersion: "agogos.redhat.com/v1alpha1"
+kind: "Trigger"
+metadata:
+  name: "test-trigger"
+spec:
+  events:
+  - component:
+      name: "test-dep"
+  target:
+    apiVersion: "agogos.redhat.com/v1alpha1"
+    kind: "Component"
+    name: "test-main"
+status:
+  status: "New"

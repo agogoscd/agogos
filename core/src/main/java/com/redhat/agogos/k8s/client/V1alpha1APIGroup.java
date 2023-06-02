@@ -18,8 +18,8 @@ import com.redhat.agogos.v1alpha1.Run;
 import com.redhat.agogos.v1alpha1.RunList;
 import com.redhat.agogos.v1alpha1.Stage;
 import com.redhat.agogos.v1alpha1.StageList;
-import com.redhat.agogos.v1alpha1.TriggerList;
 import com.redhat.agogos.v1alpha1.triggers.Trigger;
+import com.redhat.agogos.v1alpha1.triggers.TriggerList;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 
