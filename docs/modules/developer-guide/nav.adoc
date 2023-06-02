@@ -1,5 +1,6 @@
 * Developer Guide
 ** xref:development-mode.adoc[]
+** xref:testing.adoc[]
 ** xref:ide.adoc[]
 ** Stages
 *** xref:stages/builder_tutorial.adoc[]
