@@ -1,6 +1,7 @@
 package com.redhat.agogos.v1alpha1.triggers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.JsonDeserializer;
@@ -12,14 +13,15 @@ import java.util.List;
 
 @RegisterForReflection
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
-@JsonSubTypes({ //
-        @JsonSubTypes.Type(BuildTriggerEvent.class), //
-        @JsonSubTypes.Type(CelTriggerEvent.class), //
-        @JsonSubTypes.Type(GroupTriggerEvent.class), //
-        @JsonSubTypes.Type(PipelineTriggerEvent.class), //
-        @JsonSubTypes.Type(ComponentTriggerEvent.class), //
-        @JsonSubTypes.Type(TimedTriggerEvent.class) //
+@JsonSubTypes({
+        @JsonSubTypes.Type(BuildTriggerEvent.class),
+        @JsonSubTypes.Type(CelTriggerEvent.class),
+        @JsonSubTypes.Type(GroupTriggerEvent.class),
+        @JsonSubTypes.Type(PipelineTriggerEvent.class),
+        @JsonSubTypes.Type(ComponentTriggerEvent.class),
+        @JsonSubTypes.Type(TimedTriggerEvent.class)
 })
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(using = JsonDeserializer.None.class)
 public interface TriggerEvent extends KubernetesResource {
 

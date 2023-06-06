@@ -39,11 +39,11 @@
         <cloudevents.version>2.5.0</cloudevents.version>
         <openapi-schema-validator.version>1.0.5</openapi-schema-validator.version>
         <lombok.version>1.18.16</lombok.version>
-        <quarkus-tekton-client.version>1.0.0</quarkus-tekton-client.version>
+        <quarkus-tekton-client.version>1.0.1</quarkus-tekton-client.version>
         <bouncycastle.version>1.72</bouncycastle.version>
 
-        <quarkus.platform.version>3.0.3.Final</quarkus.platform.version>
-        <quarkus-operatorsdk.version>6.0.3</quarkus-operatorsdk.version>
+        <quarkus.platform.version>3.1.0.Final</quarkus.platform.version>
+        <quarkus-operatorsdk.version>6.1.1</quarkus-operatorsdk.version>
     </properties>
 
     <repositories>

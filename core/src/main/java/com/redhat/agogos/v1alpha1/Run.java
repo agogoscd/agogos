@@ -1,6 +1,7 @@
 package com.redhat.agogos.v1alpha1;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.Run.RunSpec;
@@ -15,6 +16,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @RegisterForReflection
 @Kind("Run")
 @Group("agogos.redhat.com")
@@ -23,6 +25,7 @@ public class Run extends AgogosResource<RunSpec, ResultableStatus> implements Na
     private static final long serialVersionUID = 6688424087008846788L;
 
     @ToString
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class RunSpec implements KubernetesResource {

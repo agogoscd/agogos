@@ -1,5 +1,6 @@
 package com.redhat.agogos.v1alpha1.triggers;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.redhat.agogos.CloudEventHelper;
 import com.redhat.agogos.PipelineRunState;
@@ -21,6 +22,7 @@ import java.util.List;
 @Setter
 @ToString
 @RegisterForReflection
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeName("group")
 public class GroupTriggerEvent implements TriggerEvent {
     private static final long serialVersionUID = -2379042700549506262L;

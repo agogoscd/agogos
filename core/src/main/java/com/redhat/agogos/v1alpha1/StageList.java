@@ -1,8 +1,10 @@
 package com.redhat.agogos.v1alpha1;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize
 @RegisterForReflection
 public class StageList extends AbstractStageList<Stage> {

@@ -1,6 +1,7 @@
 package com.redhat.agogos.v1alpha1.triggers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.AgogosResource;
@@ -23,6 +24,7 @@ import java.util.List;
 @Setter
 @ToString
 @RegisterForReflection
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Kind("Trigger")
 @Group("agogos.redhat.com")
 @Version("v1alpha1")
@@ -31,6 +33,7 @@ public class Trigger extends AgogosResource<TriggerSpec, Status> implements Name
     @Getter
     @Setter
     @ToString
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class TriggerSpec implements KubernetesResource {

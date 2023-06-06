@@ -1,5 +1,6 @@
 package com.redhat.agogos.v1alpha1.triggers;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.redhat.agogos.CloudEventHelper;
 import com.redhat.agogos.PipelineRunState;
@@ -16,6 +17,7 @@ import java.util.List;
 @Setter
 @ToString
 @RegisterForReflection
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeName("build")
 public class BuildTriggerEvent implements TriggerEvent {
     private static final long serialVersionUID = -8379042700549506262L;
@@ -24,10 +26,9 @@ public class BuildTriggerEvent implements TriggerEvent {
 
     @Override
     public List<String> toCel(Trigger trigger) {
-        return Arrays.asList( //
+        return Arrays.asList(
                 String.format("header.match('ce-type', '%s')",
-                        CloudEventHelper.type(Build.class, PipelineRunState.SUCCEEDED)), //
-                filter //
-        );
+                        CloudEventHelper.type(Build.class, PipelineRunState.SUCCEEDED)),
+                filter);
     }
 }

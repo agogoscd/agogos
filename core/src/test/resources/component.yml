@@ -1,0 +1,16 @@
+---
+apiVersion: "agogos.redhat.com/v1alpha1"
+kind: "Component"
+metadata:
+  name: "test-component"
+spec:
+  pre: []
+  post: []
+  build:
+    builderRef:
+      name: "dummy-v1"
+      kind: "Builder"
+      version: "v1alpha1"
+    params: {}
+status:
+  status: "New"

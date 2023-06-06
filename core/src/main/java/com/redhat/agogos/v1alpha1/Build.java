@@ -1,6 +1,7 @@
 package com.redhat.agogos.v1alpha1;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.Build.BuildSpec;
@@ -17,6 +18,7 @@ import lombok.ToString;
 import java.util.Map;
 
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @RegisterForReflection
 @Kind("Build")
 @Group("agogos.redhat.com")

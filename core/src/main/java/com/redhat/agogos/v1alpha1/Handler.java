@@ -1,5 +1,6 @@
 package com.redhat.agogos.v1alpha1;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.Handler.HandlerSpec;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @RegisterForReflection
 @Kind("Handler")
 @Group("agogos.redhat.com")
@@ -27,6 +29,7 @@ public class Handler extends AgogosResource<HandlerSpec, Void> implements Namesp
     private static final long serialVersionUID = 9122121231081986174L;
 
     @ToString
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class HandlerSchema implements KubernetesResource {
@@ -38,6 +41,7 @@ public class Handler extends AgogosResource<HandlerSpec, Void> implements Namesp
     }
 
     @ToString
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class HandlerSpec implements KubernetesResource {
