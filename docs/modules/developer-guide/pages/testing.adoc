@@ -1,0 +1,40 @@
+= Testing Agogos
+
+== Basics
+To run the whole test suite execute:
+
+[source,bash]
+----
+$ ./mvnw clean verify
+----
+
+After running the tests, aggregate the code coverage reports run:
+
+[source,bash]
+----
+$ ./mvnw --non-recusive verify
+----
+
+Open the [filename]`target/site/jacoco/index.html` to see the report.
+
+== Single Test or Test Suite
+When you need to run a single test, execute:
+
+[source,bash]
+----
+$ ./mvnw test -D failIfNoTests=false -D "test = ClassUnderTest#TestMethodName"
+----
+
+For a single test suite, execute:
+
+[source,bash]
+----
+$ ./mvnw test -D failIfNoTests=false -D "test = ClassUnderTest"
+----
+
+[WARNING]
+====
+`-D failIfNoTests=false` is required because when you select a single test,
+all modules run for tests, but nothing matches. Removing the option makes the
+execution to fail after the first module with no matches executed.
+====
