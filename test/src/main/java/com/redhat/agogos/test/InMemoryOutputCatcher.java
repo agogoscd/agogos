@@ -1,5 +1,7 @@
 package com.redhat.agogos.test;
 
+import lombok.Getter;
+
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -7,11 +9,11 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lombok.Getter;
-
 public class InMemoryOutputCatcher {
 
-    StringWriter sout = new StringWriter();
+    StringWriter sout = new StringWriter(
+
+    );
     StringWriter serr = new StringWriter();
 
     @Getter
@@ -20,7 +22,8 @@ public class InMemoryOutputCatcher {
     @Getter
     PrintWriter err = new PrintWriter(serr);
 
-    public InMemoryOutputCatcher() {}
+    public InMemoryOutputCatcher() {
+    }
 
     public void reset() {
         out.flush();
@@ -45,12 +48,12 @@ public class InMemoryOutputCatcher {
         return contains(err, serr, message);
     }
 
-    private List<String> records(PrintWriter p, StringWriter s)  {
+    private List<String> records(PrintWriter p, StringWriter s) {
         p.flush();
         return new BufferedReader(new StringReader(s.toString())).lines().collect(Collectors.toList());
     }
 
-    private boolean contains(PrintWriter p, StringWriter s, String message)  {
+    private boolean contains(PrintWriter p, StringWriter s, String message) {
         return records(p, s).stream().anyMatch(m -> m.equals(message));
     }
 }
