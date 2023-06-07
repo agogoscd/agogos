@@ -45,10 +45,10 @@ agogos:
   container-image:
     init: quay.io/agogos/stage-init:v1
   webhooks:
-    container-image: quay.io/cpaas/agogos-poc-webhooks:devel
+    container-image: quay.io/agogos/agogos-webhooks:devel
     service-account: agogos-operator
   operator:
-    container-image: quay.io/cpaas/agogos-poc-operator:devel
+    container-image: quay.io/agogos/agogos-operator:devel
     service-account: agogos-webhooks
 
 dependencies:

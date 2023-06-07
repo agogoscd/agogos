@@ -51,7 +51,7 @@ spec:
     spec:
       containers:
         - name: service
-          image: quay.io/cpaas/agogos-poc-operator:1.0-SNAPSHOT
+          image: quay.io/agogos/agogos-operator:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 7070
