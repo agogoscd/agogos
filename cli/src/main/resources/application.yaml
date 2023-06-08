@@ -52,11 +52,12 @@ agogos:
     service-account: agogos-webhooks
 
 dependencies:
-  tekton-pipeline:
+  tekton-pipelines:
+    configmap: "config-defaults"
     namespace: "tekton-pipelines"
     version: "v0.44.2"
     urls: 
-      - "https://storage.googleapis.com/tekton-releases/pipeline/previous/${dependencies.tekton-pipeline.version}/release.yaml"
+      - "https://storage.googleapis.com/tekton-releases/pipeline/previous/${dependencies.tekton-pipelines.version}/release.yaml"
   tekton-triggers:
     namespace: "tekton-pipelines"
     version: "v0.23.0"
