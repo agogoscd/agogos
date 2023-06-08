@@ -1,43 +1,30 @@
 quarkus:
+  banner:
+    enabled: true
+    path: "banner.txt"
+  container-image:
+    group: "agogos"
+    name: "agogos-operator"
+    registry: "quay.io"
+    tag: "latest"
+  docker:
+    dockerfile-jvm-path: "src/main/docker/Dockerfile.fast-jar"
+  http:
+    port: 7070
+  kubernetes:
+    namespace: "agogos"
+    service-account: "agogos-operator"
+  log:
+    min-level: "TRACE"
+    syslog:
+      truncate: false
   operator-sdk:
     crd:
       generate: false
       apply: false
     fail-on-version-check: false
-
-
-  http:
-    port: 7070
-  log:
-    min-level: TRACE
-    syslog:
-      truncate: false
-  index-dependency:
-    #   operatorsdk:
-    #     group-id: "io.javaoperatorsdk"
-    #     artifact-id: "operator-framework-core"
-#    okhttp:
-#      group-id: com.squareup.okhttp3
-#      artifact-id: okhttp
-#    okio:
-#      group-id: com.squareup.okio
-#      artifact-id: okio
-
-  banner:
-    enabled: true
-    path: "banner.txt"
-
-  container-image:
-    group: cpaas
-    name: agogos-poc-operator
-    registry: quay.io
-
-  kubernetes:
-    namespace: agogos
-    service-account: agogos-operator
-
   quartz:
-    start-mode: FORCED
+    start-mode: "FORCED"
 
 agogos:
   service-account: agogos
