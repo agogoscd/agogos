@@ -269,6 +269,20 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>agogos</id>
+            <name>Agogos Release Repository</name>
+            <url>https://repository-basic.engineering.redhat.com/nexus/repository/agogos/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
