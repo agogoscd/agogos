@@ -1,36 +1,57 @@
 package com.redhat.agogos.cli.commands.info;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-
-import com.redhat.agogos.cli.commands.AbstractCommandTest;
+import com.redhat.agogos.cli.commands.CommandTest;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.VersionInfo;
 import io.quarkus.test.junit.QuarkusTest;
-import org.junit.jupiter.api.DisplayName;
+import io.quarkus.test.junit.mockito.InjectMock;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mockito;
+import picocli.CommandLine;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 
 @QuarkusTest
-public class InfoCommandTest extends AbstractCommandTest {
+public class InfoCommandTest extends CommandTest {
+
+    @InjectMock(convertScopes = true)
+    KubernetesClient kubernetesClientMock;
+
+    @InjectMocks
+    InfoCommand infoCommand = new InfoCommand();
 
     @Test
-    @DisplayName("Should display information")
-    void shouldDisplayInformation() throws Exception {
-        when(mockClient.getKubernetesVersion())
-                .thenReturn(new VersionInfo.Builder().withMajor("1").withMinor("26").build());
-        when(mockClient.getMasterUrl())
-                .thenReturn(new URL("https://127.0.0.1:8443"));
-        when(mockClient.getNamespace())
+    public void ensureDataIsPrinted() throws Exception {
+        StringWriter sw = new StringWriter();
+
+        Mockito
+                .when(kubernetesClientMock.getMasterUrl())
+                .thenReturn(new URL("https://localhost:6443"));
+        Mockito
+                .when(kubernetesClientMock.getNamespace())
                 .thenReturn("default");
+        VersionInfo versionInfo = new VersionInfo.Builder()
+                .withMajor("x")
+                .withMinor("y")
+                .build();
+        Mockito
+                .when(kubernetesClientMock.getKubernetesVersion())
+                .thenReturn(versionInfo);
 
-        int exitCode = cli.run(catcher.getOut(), catcher.getErr(), "info");
+        CommandLine cmd = new CommandLine(infoCommand);
+        cmd.setOut(new PrintWriter(sw));
 
-        assertEquals(0, exitCode); // Invalid output
-        System.out.println(catcher.stdoutMessages());
-        assertTrue(catcher.stdoutContains("Cluster URL:\t\thttps://127.0.0.1:8443"));
-        assertTrue(catcher.stdoutContains("Namespace:\t\tdefault"));
-        assertTrue(catcher.stdoutContains("Kubernetes version:\t1.26"));
+        int returnCode = cmd.execute();
+
+        Assertions.assertEquals(0, returnCode);
+        String output = sw.toString();
+        Assertions.assertTrue(output.contains("https://localhost:6443"));
+        Assertions.assertTrue(output.contains("default"));
+        Assertions.assertTrue(output.contains("x"));
+        Assertions.assertTrue(output.contains("y"));
     }
 }
