@@ -20,7 +20,7 @@ import java.util.Set;
 
 /**
  * Responsible for scheduling sending a {@link io.cloudevents.CloudEvent} used
- * to invoke a Tekton {@link io.fabric8.tekton.triggers.v1alpha1.Trigger}.
+ * to invoke a Tekton {@link io.fabric8.tekton.triggers.v1beta1.Trigger}.
  * 
  * A Quartz {@link Scheduler} is used as the implementation.
  */

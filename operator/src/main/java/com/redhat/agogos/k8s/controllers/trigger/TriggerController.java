@@ -50,8 +50,8 @@ public class TriggerController extends AbstractController<Trigger> {
 
     @Override
     public UpdateControl<Trigger> reconcile(Trigger agogos, Context<Trigger> context) {
-        Optional<io.fabric8.tekton.triggers.v1alpha1.Trigger> optional = context
-                .getSecondaryResource(io.fabric8.tekton.triggers.v1alpha1.Trigger.class);
+        Optional<io.fabric8.tekton.triggers.v1beta1.Trigger> optional = context
+                .getSecondaryResource(io.fabric8.tekton.triggers.v1beta1.Trigger.class);
 
         Status agogosStatus = agogos.getStatus();
         if (optional.isPresent()) {

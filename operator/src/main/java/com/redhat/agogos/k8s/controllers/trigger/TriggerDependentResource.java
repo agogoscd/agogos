@@ -19,8 +19,8 @@ import com.redhat.agogos.v1alpha1.triggers.TriggerTarget;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
-import io.fabric8.tekton.triggers.v1alpha1.TriggerBuilder;
-import io.fabric8.tekton.triggers.v1alpha1.TriggerSpecBuilder;
+import io.fabric8.tekton.triggers.v1beta1.TriggerBuilder;
+import io.fabric8.tekton.triggers.v1beta1.TriggerSpecBuilder;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import jakarta.inject.Inject;
 import org.quartz.SchedulerException;
@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class TriggerDependentResource
-        extends AbstractDependentResource<io.fabric8.tekton.triggers.v1alpha1.Trigger, Trigger> {
+        extends AbstractDependentResource<io.fabric8.tekton.triggers.v1beta1.Trigger, Trigger> {
 
     @Inject
     TektonPipelineHelper pipelineHelper;
@@ -43,14 +43,14 @@ public class TriggerDependentResource
     private static final Logger LOG = LoggerFactory.getLogger(TriggerDependentResource.class);
 
     public TriggerDependentResource() {
-        super(io.fabric8.tekton.triggers.v1alpha1.Trigger.class);
+        super(io.fabric8.tekton.triggers.v1beta1.Trigger.class);
     }
 
     @Override
-    public io.fabric8.tekton.triggers.v1alpha1.Trigger desired(Trigger agogos, Context<Trigger> context) {
-        io.fabric8.tekton.triggers.v1alpha1.Trigger trigger = new io.fabric8.tekton.triggers.v1alpha1.Trigger();
-        Optional<io.fabric8.tekton.triggers.v1alpha1.Trigger> optional = context
-                .getSecondaryResource(io.fabric8.tekton.triggers.v1alpha1.Trigger.class);
+    public io.fabric8.tekton.triggers.v1beta1.Trigger desired(Trigger agogos, Context<Trigger> context) {
+        io.fabric8.tekton.triggers.v1beta1.Trigger trigger = new io.fabric8.tekton.triggers.v1beta1.Trigger();
+        Optional<io.fabric8.tekton.triggers.v1beta1.Trigger> optional = context
+                .getSecondaryResource(io.fabric8.tekton.triggers.v1beta1.Trigger.class);
         if (!optional.isEmpty()) {
             trigger = optional.get();
             LOG.debug("Agogos Trigger '{}', using existing Tekton Trigger '{}'",
@@ -75,9 +75,11 @@ public class TriggerDependentResource
                 LOG.debug("Adding CEL interceptor: '{}' to trigger '{}'", expression, agogos.getMetadata().getName());
 
                 triggerSpecBuilder.addNewInterceptor()
-                        .withNewCel()
-                        .withFilter(expression)
-                        .endCel()
+                        .withNewRef()
+                        .withName("cel")
+                        .endRef()
+                        .withParams()
+                        .addNewParam("filter", expression)
                         .endInterceptor();
             });
         });

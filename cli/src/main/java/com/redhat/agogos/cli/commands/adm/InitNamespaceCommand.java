@@ -25,8 +25,9 @@ import io.fabric8.kubernetes.api.model.rbac.Subject;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
 import io.fabric8.kubernetes.client.utils.Serialization;
 import io.fabric8.tekton.client.TektonClient;
-import io.fabric8.tekton.triggers.v1alpha1.EventListener;
-import io.fabric8.tekton.triggers.v1alpha1.EventListenerBuilder;
+import io.fabric8.tekton.triggers.v1beta1.EventListener;
+import io.fabric8.tekton.triggers.v1beta1.EventListenerBuilder;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -52,6 +53,10 @@ import java.util.stream.Collectors;
 @Command(mixinStandardHelpOptions = true, name = "init-namespace", aliases = {
         "init" }, description = "Initialize selected namespace to work with Agogos")
 public class InitNamespaceCommand extends AbstractCommand {
+
+    @ConfigProperty(name = "agogos.cloud-events.base-url", defaultValue = "http://broker-ingress.knative-eventing.svc.cluster.local")
+    String knativeBrokerURL = "http://broker-ingress.knative-eventing.svc.cluster.local";
+
     private static final Logger LOG = LoggerFactory.getLogger(InitNamespaceCommand.class);
 
     private static final String RESOURCE_NAME = "agogos";
@@ -214,7 +219,7 @@ public class InitNamespaceCommand extends AbstractCommand {
         Callable<String> callable = () -> {
             while (true) {
                 try {
-                    EventListener elInfo = tektonClient.v1alpha1().eventListeners().inNamespace(el.getMetadata().getNamespace())
+                    EventListener elInfo = tektonClient.v1beta1().eventListeners().inNamespace(el.getMetadata().getNamespace())
                             .withName(el.getMetadata().getName()).get();
 
                     String url = elInfo.getStatus().getAddress().getUrl();
@@ -295,6 +300,7 @@ public class InitNamespaceCommand extends AbstractCommand {
                 .withName(RESOURCE_NAME)
                 .endMetadata()
                 .withNewSpec()
+                .withCloudEventURI(knativeBrokerURL)
                 .withServiceAccountName(sa.getMetadata().getName())
                 .withNewNamespaceSelector()
                 .withMatchNames(namespace)
@@ -302,7 +308,7 @@ public class InitNamespaceCommand extends AbstractCommand {
                 .endSpec()
                 .build();
 
-        el = tektonClient.v1alpha1().eventListeners().inNamespace(namespace).resource(el).serverSideApply();
+        el = tektonClient.v1beta1().eventListeners().inNamespace(namespace).resource(el).serverSideApply();
 
         installedResources.add(el);
 
