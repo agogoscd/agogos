@@ -9,16 +9,20 @@ import com.cronutils.parser.CronParser;
 import com.redhat.agogos.cron.TriggerEventScheduler;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.k8s.Resource;
-import com.redhat.agogos.k8s.TektonPipelineHelper;
 import com.redhat.agogos.k8s.controllers.AbstractDependentResource;
-import com.redhat.agogos.v1alpha1.Component;
-import com.redhat.agogos.v1alpha1.Pipeline;
+import com.redhat.agogos.v1alpha1.AgogosResource;
+import com.redhat.agogos.v1alpha1.Build;
+import com.redhat.agogos.v1alpha1.Run;
 import com.redhat.agogos.v1alpha1.triggers.TimedTriggerEvent;
 import com.redhat.agogos.v1alpha1.triggers.Trigger;
 import com.redhat.agogos.v1alpha1.triggers.TriggerTarget;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
+import io.fabric8.tekton.pipeline.v1beta1.CustomRun;
+import io.fabric8.tekton.pipeline.v1beta1.CustomRunBuilder;
+import io.fabric8.tekton.pipeline.v1beta1.CustomRunSpec;
+import io.fabric8.tekton.pipeline.v1beta1.CustomRunSpecBuilder;
 import io.fabric8.tekton.triggers.v1beta1.TriggerBuilder;
 import io.fabric8.tekton.triggers.v1beta1.TriggerSpecBuilder;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
@@ -34,8 +38,8 @@ import java.util.Optional;
 public class TriggerDependentResource
         extends AbstractDependentResource<io.fabric8.tekton.triggers.v1beta1.Trigger, Trigger> {
 
-    @Inject
-    TektonPipelineHelper pipelineHelper;
+    private static String AGOGOS_CUSTOM_RUN_PREFIX = "agogos-trigger-custom-run-";
+    public static String AGOGOS_CUSTOM_RUN_LABEL = Resource.AGOGOS_LABEL_PREFIX + "triggered-customrun";
 
     @Inject
     TriggerEventScheduler scheduler;
@@ -51,6 +55,7 @@ public class TriggerDependentResource
         io.fabric8.tekton.triggers.v1beta1.Trigger trigger = new io.fabric8.tekton.triggers.v1beta1.Trigger();
         Optional<io.fabric8.tekton.triggers.v1beta1.Trigger> optional = context
                 .getSecondaryResource(io.fabric8.tekton.triggers.v1beta1.Trigger.class);
+
         if (!optional.isEmpty()) {
             trigger = optional.get();
             LOG.debug("Agogos Trigger '{}', using existing Tekton Trigger '{}'",
@@ -116,74 +121,62 @@ public class TriggerDependentResource
     }
 
     /**
-     * Prepares the {@link PipelineRun} resource that should be created when the
-     * trigger is fired. The type of the resource depends on the provided
-     * {@link TriggerTarget} object which holds
+     * Prepares the {@link CustomRun} resource that should be created when the
+     * trigger is fired.
      * 
-     * @param target {@link TriggerTarget} object
      * @return {@link TriggerSpecBuilder} object
      */
-    private TriggerSpecBuilder initTriggerSpecBuilder(Trigger agogogs) {
+    private TriggerSpecBuilder initTriggerSpecBuilder(Trigger agogos) {
         // TODO: TriggerTarget apiVersion is unused, check this
-        TriggerTarget target = agogogs.getSpec().getTarget();
-        PipelineRun pipelineRun = null;
-        Map<String, String> labels = null;
+        TriggerTarget target = agogos.getSpec().getTarget();
+
+        Map<String, Object> data = new HashMap<>();
+        Map<String, String> labels = new HashMap<>();
+        AgogosResource<?, ?> resource = null;
 
         switch (target.getKind()) {
             case "Component":
-                Component component = agogosClient.v1alpha1().components().inNamespace(agogogs.getMetadata().getNamespace())
-                        .withName(target.getName()).get();
-
-                // TODO: Move to validation admission webhook
-                if (component == null) {
-                    throw new ApplicationException("Component '{}' could not be found", target.getName());
-                }
-
-                pipelineRun = pipelineHelper.generate(component.getKind(), component.getMetadata().getName(),
-                        component.getMetadata().getNamespace());
-
-                labels = pipelineRun.getMetadata().getLabels();
-
-                if (labels == null) {
-                    labels = new HashMap<>();
-                }
-
-                labels.put(Resource.COMPONENT.getLabel(), component.getMetadata().getName());
+                Build build = new Build();
+                build.getMetadata().setGenerateName(target.getName() + "-");
+                build.getSpec().setComponent(target.getName());
+                resource = agogosClient.v1alpha1().builds().inNamespace(agogosClient.namespace()).resource(build).create();
                 break;
             case "Pipeline":
-                // TODO: Make it possible to specify namespace on the Trigger target?
-                Pipeline pipeline = agogosClient.v1alpha1().pipelines().inNamespace(agogogs.getMetadata().getNamespace())
-                        .withName(target.getName()).get();
-                ;
-
-                // TODO: Add to validation admission webhook
-                if (pipeline == null) {
-                    throw new ApplicationException("Pipeline '{}' could not be found", target.getName());
-                }
-
-                pipelineRun = pipelineHelper.generate(pipeline.getKind(), pipeline.getMetadata().getName(),
-                        pipeline.getMetadata().getNamespace());
-
-                labels = pipelineRun.getMetadata().getLabels();
-
-                if (labels == null) {
-                    labels = new HashMap<>();
-                }
-                labels.put(Resource.PIPELINE.getLabel(), pipeline.getMetadata().getName());
+                Run run = new Run();
+                run.getMetadata().setGenerateName(target.getName() + "-");
+                run.getSpec().setPipeline(target.getName());
+                resource = agogosClient.v1alpha1().runs().inNamespace(agogosClient.namespace()).resource(run).create();
                 break;
-
             default:
                 throw new ApplicationException("Unsupported Trigger target resource type: '{}'", target.getKind());
         }
+        data.put("name", resource.getMetadata().getName());
 
-        pipelineRun.getMetadata().setLabels(labels);
+        labels.put(Resource.RESOURCE.getLabel(), target.getKind().toLowerCase());
+        labels.put(AGOGOS_CUSTOM_RUN_LABEL, Boolean.TRUE.toString().toLowerCase());
 
-        pipelineRun.getMetadata().getLabels().putIfAbsent(Resource.RESOURCE.getLabel(), target.getKind().toLowerCase());
+        CustomRunSpec customSpec = new CustomRunSpecBuilder()
+                .withNewCustomSpec()
+                .withApiVersion(resource.getApiVersion())
+                .withKind(resource.getKind())
+                .addToSpec(data)
+                .endCustomSpec()
+                .build();
+
+        CustomRun customRun = new CustomRunBuilder()
+                .withApiVersion(HasMetadata.getApiVersion(CustomRun.class))
+                .withKind(HasMetadata.getKind(CustomRun.class))
+                .withNewMetadata()
+                .withGenerateName(AGOGOS_CUSTOM_RUN_PREFIX)
+                .withLabels(labels)
+                .endMetadata()
+                .withSpec(customSpec)
+                .build();
 
         TriggerSpecBuilder triggerSpecBuilder = new TriggerSpecBuilder()
                 .withNewTemplate()
                 .withNewSpec()
-                .withResourcetemplates(pipelineRun)
+                .withResourcetemplates(customRun)
                 .endSpec()
                 .endTemplate();
 
