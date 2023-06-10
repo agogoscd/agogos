@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
 public class InitNamespaceCommand extends AbstractCommand {
 
     @ConfigProperty(name = "agogos.cloud-events.base-url", defaultValue = "http://broker-ingress.knative-eventing.svc.cluster.local")
-    String knativeBrokerURL = "http://broker-ingress.knative-eventing.svc.cluster.local";
+    String knativeBrokerURL;
 
     private static final Logger LOG = LoggerFactory.getLogger(InitNamespaceCommand.class);
 
