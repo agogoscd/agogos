@@ -47,3 +47,6 @@ node_modules
 *.crt
 *.pem
 .env
+
+# Generated CRD schema directory
+cli/src/main/resources/deployment/crds/schema/
