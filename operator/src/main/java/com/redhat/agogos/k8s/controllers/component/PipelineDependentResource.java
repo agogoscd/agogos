@@ -12,9 +12,9 @@ import com.redhat.agogos.v1alpha1.Handler;
 import com.redhat.agogos.v1alpha1.WorkspaceMapping;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.ArrayOrString;
 import io.fabric8.tekton.pipeline.v1beta1.ClusterTask;
 import io.fabric8.tekton.pipeline.v1beta1.ParamSpec;
+import io.fabric8.tekton.pipeline.v1beta1.ParamValueBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineResult;
@@ -89,8 +89,10 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         // Pipeline result is the result of the main task executed
         PipelineResult pipelineResult = new PipelineResultBuilder()
                 .withName("data")
-                .withValue(new ArrayOrString(new StringBuilder().append("$(tasks.").append(buildTask.getName())
-                        .append(".results.data)").toString()))
+                .withValue(new ParamValueBuilder()
+                        .withArrayVal(new StringBuilder().append("$(tasks.").append(buildTask.getName())
+                                .append(".results.data)").toString())
+                        .build())
                 .build();
 
         // Add any useful/required labels
@@ -314,22 +316,20 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
                 return;
             }
 
-            ArrayOrString converted = null;
-
+            ParamValueBuilder pvb = new ParamValueBuilder();
             if (value instanceof List && isListOfStrings((List<Object>) value)) {
-                converted = new ArrayOrString((List<String>) value);
+                pvb.withArrayVal((List<String>) value);
             } else if (value instanceof String) {
-                converted = new ArrayOrString(value.toString());
+                pvb.withStringVal(value.toString());
             } else {
                 try {
-                    converted = new ArrayOrString(
-                            objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(value));
+                    pvb.withStringVal(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(value));
                 } catch (JsonProcessingException e) {
                     throw new ApplicationException("Could not convert '{}' parameter to JSON", p.getName(), e);
                 }
             }
 
-            pipelineTaskBuilder.addNewParam().withName(p.getName()).withValue(converted).endParam();
+            pipelineTaskBuilder.addNewParam().withName(p.getName()).withValue(pvb.build()).endParam();
 
         });
     }

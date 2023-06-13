@@ -14,9 +14,9 @@ import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReviewBuilder;
 import io.fabric8.kubernetes.api.model.authentication.UserInfo;
 import io.fabric8.kubernetes.api.model.authentication.UserInfoBuilder;
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
-import io.fabric8.tekton.pipeline.v1beta1.ArrayOrString;
 import io.fabric8.tekton.pipeline.v1beta1.ParamSpec;
 import io.fabric8.tekton.pipeline.v1beta1.ParamSpecBuilder;
+import io.fabric8.tekton.pipeline.v1beta1.ParamValueBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.Task;
 import io.fabric8.tekton.pipeline.v1beta1.TaskBuilder;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
@@ -55,7 +55,7 @@ public class ComponentValidatorTest {
 
             ParamSpec requiredParamSpec = new ParamSpecBuilder().withName("git-clone-param").build();
             ParamSpec optionalParamSpec = new ParamSpecBuilder().withName("git-clone-param-optional")
-                    .withDefault(new ArrayOrString("default")).build();
+                    .withDefault(new ParamValueBuilder().withStringVal("default").build()).build();
 
             Task gitTask = new TaskBuilder().withNewMetadata().withName("git-clone").endMetadata().withNewSpec()
                     .withParams(requiredParamSpec, optionalParamSpec)

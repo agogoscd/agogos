@@ -1,17 +1,18 @@
 package com.redhat.agogos.k8s;
 
 public enum Resource {
-    UNKNOWN, //
-    RESOURCE, //
-    BUILD, //
-    COMPONENT, //
-    PIPELINE, //
-    PIPELINERUN;
+    BUILD,
+    COMPONENT,
+    PIPELINE,
+    PIPELINERUN,
+    RESOURCE,
+    TRIGGER,
+    UNKNOWN;
 
-    private static String PREFIX = "agogos.redhat.com/";
+    public static String AGOGOS_LABEL_PREFIX = "agogos.redhat.com/";
 
     public String getLabel() {
-        return PREFIX + this.toString().toLowerCase();
+        return AGOGOS_LABEL_PREFIX + this.toString().toLowerCase();
     }
 
     public static Resource fromType(String type) {

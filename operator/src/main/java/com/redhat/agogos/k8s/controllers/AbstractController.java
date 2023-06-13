@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.eventing.CloudEventPublisher;
-import com.redhat.agogos.k8s.TektonPipelineHelper;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.ResultableStatus;
@@ -29,9 +28,6 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
 
     @Inject
     protected CloudEventPublisher cloudEventPublisher;
-
-    @Inject
-    protected TektonPipelineHelper pipelineHelper;
 
     @Inject
     protected TektonClient tektonClient;
