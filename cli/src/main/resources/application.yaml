@@ -55,12 +55,12 @@ dependencies:
   tekton-pipelines:
     configmap: "config-defaults"
     namespace: "tekton-pipelines"
-    version: "v0.44.2"
+    version: "v0.47.2"
     urls: 
       - "https://storage.googleapis.com/tekton-releases/pipeline/previous/${dependencies.tekton-pipelines.version}/release.yaml"
   tekton-triggers:
     namespace: "tekton-pipelines"
-    version: "v0.23.0"
+    version: "v0.24.1"
     urls:
       - "https://storage.googleapis.com/tekton-releases/triggers/previous/${dependencies.tekton-triggers.version}/release.yaml"
       - "https://storage.googleapis.com/tekton-releases/triggers/previous/${dependencies.tekton-triggers.version}/interceptors.yaml"
