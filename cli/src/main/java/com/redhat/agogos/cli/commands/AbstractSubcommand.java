@@ -13,6 +13,7 @@ import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.AgogosResourceStatus;
 import com.redhat.agogos.v1alpha1.ResultableStatus;
 import io.fabric8.kubernetes.api.model.DefaultKubernetesResourceList;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import jakarta.inject.Inject;
@@ -36,6 +37,9 @@ public abstract class AbstractSubcommand<T extends AgogosResource<?, ? extends A
 
     @Inject
     protected AgogosClient agogosClient;
+
+    @Inject
+    protected KubernetesClient kubernetesClient;
 
     protected void show(MixedOperation<T, ? extends DefaultKubernetesResourceList<T>, Resource<T>> resourceClient) {
     }

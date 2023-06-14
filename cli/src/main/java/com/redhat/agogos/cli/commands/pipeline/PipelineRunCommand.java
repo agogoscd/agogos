@@ -17,9 +17,10 @@ public class PipelineRunCommand extends AbstractSubcommand<Pipeline> {
         Run run = new Run();
 
         run.getMetadata().setGenerateName(name + "-");
+        run.getMetadata().setNamespace(kubernetesClient.getNamespace());
         run.getSpec().setPipeline(name);
 
-        run = agogosClient.v1alpha1().runs().inNamespace(agogosClient.namespace()).resource(run).create();
+        run = kubernetesClient.resource(run).create();
 
         cli.run(RunDescribeCommand.class, run.getMetadata().getName());
     }
