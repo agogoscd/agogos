@@ -9,12 +9,11 @@
       }
     },
     "spec": {
-      "builderRef": {
-        "kind": "Builder",
-        "name": "dummy-v1"
-      },
-      "data": {
-        "type": "rpm"
+      "build": {
+        "builderRef": {
+          "kind": "Builder",
+          "name": "dummy-v1"
+        }
       }
     }
   },
@@ -28,12 +27,11 @@
       }
     },
     "spec": {
-      "builderRef": {
-        "kind": "Builder",
-        "name": "dummy-v1"
-      },
-      "data": {
-        "type": "container"
+      "build": {
+        "builderRef": {
+          "kind": "Builder",
+          "name": "dummy-v1"
+        }
       }
     }
   }
