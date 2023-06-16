@@ -59,12 +59,10 @@ public class CloudEventPublisher {
             URL url;
 
             try {
-                url = new URL( //
-                        new StringBuilder(baseurl) //
-                                .append("/") //
-                                .append(namespace) //
-                                // .append("/") //
-                                // .append("agogos") //
+                url = new URL(
+                        new StringBuilder(baseurl)
+                                .append("/")
+                                .append(namespace)
                                 .toString());
             } catch (MalformedURLException e) {
                 throw new ApplicationException("Could not create URL for Knative Broker in namespace {}", namespace);
@@ -117,11 +115,11 @@ public class CloudEventPublisher {
             return;
         }
 
-        CloudEventBuilder cloudEventBuilder = CloudEventBuilder.v1() //
-                .withType(type) //
+        CloudEventBuilder cloudEventBuilder = CloudEventBuilder.v1()
+                .withType(type)
                 .withSource(URI.create("http://localhost")) // TODO: change this
                 .withId(UUID.randomUUID().toString()) // TODO: is this sufficient?
-                .withDataContentType(MediaType.APPLICATION_JSON) //
+                .withDataContentType(MediaType.APPLICATION_JSON)
                 .withData(data);
 
         CloudEvent cloudEvent = cloudEventBuilder.build();

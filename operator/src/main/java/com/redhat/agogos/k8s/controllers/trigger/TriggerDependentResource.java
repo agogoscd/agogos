@@ -10,9 +10,7 @@ import com.redhat.agogos.cron.TriggerEventScheduler;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.k8s.Resource;
 import com.redhat.agogos.k8s.controllers.AbstractDependentResource;
-import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.Build;
-import com.redhat.agogos.v1alpha1.Run;
 import com.redhat.agogos.v1alpha1.triggers.TimedTriggerEvent;
 import com.redhat.agogos.v1alpha1.triggers.Trigger;
 import com.redhat.agogos.v1alpha1.triggers.TriggerTarget;
@@ -31,8 +29,6 @@ import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public class TriggerDependentResource
@@ -130,36 +126,11 @@ public class TriggerDependentResource
         // TODO: TriggerTarget apiVersion is unused, check this
         TriggerTarget target = agogos.getSpec().getTarget();
 
-        Map<String, Object> data = new HashMap<>();
-        Map<String, String> labels = new HashMap<>();
-        AgogosResource<?, ?> resource = null;
-
-        switch (target.getKind()) {
-            case "Component":
-                Build build = new Build();
-                build.getMetadata().setGenerateName(target.getName() + "-");
-                build.getSpec().setComponent(target.getName());
-                resource = agogosClient.v1alpha1().builds().inNamespace(agogosClient.namespace()).resource(build).create();
-                break;
-            case "Pipeline":
-                Run run = new Run();
-                run.getMetadata().setGenerateName(target.getName() + "-");
-                run.getSpec().setPipeline(target.getName());
-                resource = agogosClient.v1alpha1().runs().inNamespace(agogosClient.namespace()).resource(run).create();
-                break;
-            default:
-                throw new ApplicationException("Unsupported Trigger target resource type: '{}'", target.getKind());
-        }
-        data.put("name", resource.getMetadata().getName());
-
-        labels.put(Resource.RESOURCE.getLabel(), target.getKind().toLowerCase());
-        labels.put(AGOGOS_CUSTOM_RUN_LABEL, Boolean.TRUE.toString().toLowerCase());
-
         CustomRunSpec customSpec = new CustomRunSpecBuilder()
                 .withNewCustomSpec()
-                .withApiVersion(resource.getApiVersion())
-                .withKind(resource.getKind())
-                .addToSpec(data)
+                .withApiVersion(HasMetadata.getApiVersion(Build.class)) // Agogos API version.
+                .withKind(target.getKind())
+                .addToSpec("name", target.getName())
                 .endCustomSpec()
                 .build();
 
@@ -168,7 +139,8 @@ public class TriggerDependentResource
                 .withKind(HasMetadata.getKind(CustomRun.class))
                 .withNewMetadata()
                 .withGenerateName(AGOGOS_CUSTOM_RUN_PREFIX)
-                .withLabels(labels)
+                .addToLabels(Resource.RESOURCE.getLabel(), target.getKind().toLowerCase())
+                .addToLabels(AGOGOS_CUSTOM_RUN_LABEL, Boolean.TRUE.toString().toLowerCase())
                 .endMetadata()
                 .withSpec(customSpec)
                 .build();

@@ -21,7 +21,7 @@ public class TektonInstaller extends DependencyInstaller {
     private static final Logger LOG = LoggerFactory.getLogger(TektonInstaller.class);
 
     @ConfigProperty(name = "agogos.cloud-events.base-url", defaultValue = "http://broker-ingress.knative-eventing.svc.cluster.local")
-    String knativeBrokerURL;
+    String baseUrl;
 
     @Inject
     TektonPipelineDependency tekton;
@@ -35,17 +35,17 @@ public class TektonInstaller extends DependencyInstaller {
 
         install(tekton, profile, namespace);
 
-        configureForCloudEvents();
+        configureForCloudEvents(namespace);
 
         LOG.info("✅ Tekton {} installed", tekton.version());
     }
 
-    private void configureForCloudEvents() {
+    private void configureForCloudEvents(String namespace) {
         kubernetesClient.configMaps()
                 .inNamespace(tekton.namespace())
                 .withName(tekton.configmap())
                 .edit(c -> new ConfigMapBuilder(c)
-                        .addToData("default-cloud-events-sink", knativeBrokerURL)
+                        .addToData("default-cloud-events-sink", String.format("%s/%s/agogos", baseUrl, namespace))
                         .addToData("send-cloudevents-for-runs", "true")
                         .build());
 
