@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Profile(InstallProfile.local)
 @Profile(InstallProfile.dev)
@@ -53,10 +55,10 @@ public class CoreInstaller extends Installer {
     private static final String INIT_TEKTON_TASK_NAME = "init";
     private static final String INIT_STAGE_NAME = "init";
 
-    private static final Map<String, String> LABELS = Map.of(
-            "app.kubernetes.io/instance", "default",
-            "app.kubernetes.io/part-of", "agogos",
-            "app.kubernetes.io/component", "core");
+    private Map<String, String> labels = Stream.of(new String[][] {
+            { "app.kubernetes.io/part-of", "agogos" },
+            { "app.kubernetes.io/component", "core" },
+    }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
     @ConfigProperty(name = "agogos.container-image.init", defaultValue = "quay.io/agogos/stage-init:v1")
     String containerImageInit;
@@ -65,11 +67,16 @@ public class CoreInstaller extends Installer {
     AgogosClient agogosClient;
 
     @Inject
+    BrokerInstaller brokerInstaller;
+
+    @Inject
     KnativeClient knativeClient;
 
     @Override
     public void install(InstallProfile profile, String namespace) {
         LOG.info("🕞 Installing Agogos core resources...");
+
+        labels.put("app.kubernetes.io/instance", namespace);
 
         List<HasMetadata> resources = resourceLoader.installKubernetesResources(
                 List.of(
@@ -80,6 +87,7 @@ public class CoreInstaller extends Installer {
                 namespace);
 
         resources.add(installInitClusterStage());
+        resources.addAll(brokerInstaller.install(namespace));
 
         Helper.status(resources);
 
@@ -94,7 +102,7 @@ public class CoreInstaller extends Installer {
      * @return
      */
     private ClusterRole clusterRoleEventing() {
-        return new ClusterRoleBuilder().withNewMetadata().withName(RESOURCE_NAME_EVENTING).withLabels(LABELS)
+        return new ClusterRoleBuilder().withNewMetadata().withName(RESOURCE_NAME_EVENTING).withLabels(labels)
                 .endMetadata().withRules(
                         // Tekton Triggers
                         new PolicyRuleBuilder()
@@ -123,7 +131,7 @@ public class CoreInstaller extends Installer {
     }
 
     private ClusterRole clusterRoleView() {
-        ClusterRole cr = new ClusterRoleBuilder().withNewMetadata().withName(CLUSTER_ROLE_VIEW_NAME).withLabels(LABELS)
+        ClusterRole cr = new ClusterRoleBuilder().withNewMetadata().withName(CLUSTER_ROLE_VIEW_NAME).withLabels(labels)
                 .withLabels(Map.of("rbac.authorization.k8s.io/aggregate-to-view", "true"))
                 .endMetadata().withRules(
                         new PolicyRuleBuilder().withApiGroups("agogos.redhat.com")
@@ -136,7 +144,7 @@ public class CoreInstaller extends Installer {
     }
 
     private Namespace namespace(String namespace) {
-        return new NamespaceBuilder().withNewMetadata().withName(namespace).withLabels(LABELS)
+        return new NamespaceBuilder().withNewMetadata().withName(namespace).withLabels(labels)
                 .endMetadata().build();
 
     }
@@ -177,7 +185,7 @@ public class CoreInstaller extends Installer {
         ClusterStage cs = new ClusterStage();
 
         cs.getMetadata().setName(INIT_STAGE_NAME);
-        cs.getMetadata().setLabels(LABELS);
+        cs.getMetadata().setLabels(labels);
         cs.getSpec().getTaskRef().setKind(HasMetadata.getKind(ClusterTask.class));
         cs.getSpec().getTaskRef().setName(INIT_TEKTON_TASK_NAME);
 
