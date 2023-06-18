@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
 public class InitNamespaceCommand extends AbstractCommand {
 
     @ConfigProperty(name = "agogos.cloud-events.base-url", defaultValue = "http://broker-ingress.knative-eventing.svc.cluster.local")
-    String knativeBrokerURL;
+    String baseUrl;
 
     private static final Logger LOG = LoggerFactory.getLogger(InitNamespaceCommand.class);
 
@@ -103,7 +103,7 @@ public class InitNamespaceCommand extends AbstractCommand {
         installConfig();
         ConfigMap brokerConfig = installBrokerConfig();
 
-        EventListener el = installTektonEl(eventingSa);
+        EventListener el = installTektonEl(eventingSa, namespace);
         Broker broker = installKnativeBroker(brokerConfig);
 
         installKnativeTrigger(broker, el);
@@ -294,13 +294,13 @@ public class InitNamespaceCommand extends AbstractCommand {
      * Prepares Tekton {@link EventListener} responsible for handling CloudEvents coming from the broker.
      * </p>
      */
-    private EventListener installTektonEl(ServiceAccount sa) {
+    private EventListener installTektonEl(ServiceAccount sa, String namespace) {
         EventListener el = new EventListenerBuilder()
                 .withNewMetadata()
                 .withName(RESOURCE_NAME)
                 .endMetadata()
                 .withNewSpec()
-                .withCloudEventURI(knativeBrokerURL)
+                .withCloudEventURI(String.format("%s/%s/agogos", baseUrl, namespace))
                 .withServiceAccountName(sa.getMetadata().getName())
                 .withNewNamespaceSelector()
                 .withMatchNames(namespace)

@@ -14,11 +14,10 @@ import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.ClusterTask;
 import io.fabric8.tekton.pipeline.v1beta1.ParamSpec;
+import io.fabric8.tekton.pipeline.v1beta1.ParamSpecBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.ParamValueBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineResult;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineResultBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineTask;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineTaskBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineWorkspaceDeclaration;
@@ -42,12 +41,8 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
 
     private static final Logger LOG = LoggerFactory.getLogger(PipelineDependentResource.class);
 
-    private static final String BUILD_PIPELINE_INIT_TASK_NAME = "init";
     private static final String BUILD_PIPELINE_BUILDER_TASK_NAME = "build";
-
     private static final String BUILD_PIPELINE_DEFAULT_TASK_WORKSPACE_NAME = "output";
-
-    private static final String BUILD_PIPELINE_INIT_TASK_WORKSPACE_NAME = "output";
     private static final String BUILD_PIPELINE_SOURCE_TASK_WORKSPACE_NAME = "output";
 
     public PipelineDependentResource() {
@@ -68,14 +63,11 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
 
         List<PipelineTask> tasks = new ArrayList<>();
 
-        // Add the init task
-        prepareInitTask(tasks, component);
-
         // Add any pre Handlers
         prepareHandlerTasks(component, component.getSpec().getPre(), tasks);
 
         // Finally add the Builder task
-        PipelineTask buildTask = prepareBuilderTask(component, tasks);
+        prepareBuilderTask(component, tasks);
 
         // Add any post Handlers
         prepareHandlerTasks(component, component.getSpec().getPost(), tasks);
@@ -83,16 +75,7 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         // Define main workspace
         PipelineWorkspaceDeclaration workspaceMain = new PipelineWorkspaceDeclarationBuilder()
                 .withName(WorkspaceMapping.MAIN_WORKSPACE_NAME)
-                .withDescription("Main workspace that is shared across each task in the build pipeline")
-                .build();
-
-        // Pipeline result is the result of the main task executed
-        PipelineResult pipelineResult = new PipelineResultBuilder()
-                .withName("data")
-                .withValue(new ParamValueBuilder()
-                        .withArrayVal(new StringBuilder().append("$(tasks.").append(buildTask.getName())
-                                .append(".results.data)").toString())
-                        .build())
+                .withDescription("Main workspace used in the the build pipeline")
                 .build();
 
         // Add any useful/required labels
@@ -109,6 +92,11 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
                 .withController(true)
                 .build();
 
+        ParamSpec param = new ParamSpecBuilder()
+                .withName("component")
+                .withType("string")
+                .build();
+
         // Define the Pipeline itself
         pipeline = new PipelineBuilder(pipeline)
                 .withNewMetadata()
@@ -118,63 +106,14 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
                 .withNamespace(component.getMetadata().getNamespace())
                 .endMetadata()
                 .withNewSpec()
+                .withParams(param)
                 .withWorkspaces(workspaceMain)
                 .addAllToTasks(tasks)
-                //.withResults(pipelineResult)
                 .endSpec()
                 .build();
 
         LOG.debug("New Pipeline '{}' created for Component '{}'", pipeline.getMetadata().getName(), component.getFullName());
         return pipeline;
-    }
-
-    /**
-     * <p>
-     * Prepares the 'init' task which is responsible for fetching information about the resource that should be built.
-     * </p>
-     */
-    private PipelineTask prepareInitTask(List<PipelineTask> tasks, Component component) {
-        ClusterTask initTask = tektonClient.v1beta1().clusterTasks().withName(BUILD_PIPELINE_INIT_TASK_NAME).get();
-
-        if (initTask == null) {
-            throw new MissingResourceException("Could not find 'init' ClusterTask in the system");
-        }
-
-        // Construct the resource in format: [PLURAL].[VERSION].[GROUP]/[NAME]
-        // For example: 'components.v1alpha1.agogos.redhat.com/test'
-        String resource = new StringBuilder()
-                .append(component.getPlural())
-                .append(".")
-                .append(component.getVersion())
-                .append(".")
-                .append(component.getGroup())
-                .append("/")
-                .append(component.getMetadata().getName())
-                .toString();
-
-        WorkspacePipelineTaskBinding workspaceBinding = new WorkspacePipelineTaskBindingBuilder()
-                .withName(BUILD_PIPELINE_INIT_TASK_WORKSPACE_NAME)
-                .withWorkspace(WorkspaceMapping.MAIN_WORKSPACE_NAME)
-                .build();
-
-        // Build the init task
-        PipelineTask pipelineTask = new PipelineTaskBuilder()
-                .withName(BUILD_PIPELINE_INIT_TASK_NAME)
-                .withTaskRef(new TaskRefBuilder()
-                        .withName(initTask.getMetadata().getName())
-                        .withApiVersion("") // AGOGOS-96
-                        .withKind(initTask.getKind())
-                        .build())
-                .addNewParam()
-                .withName("resource")
-                .withNewValue(resource)
-                .endParam()
-                .withWorkspaces(workspaceBinding)
-                .build();
-
-        tasks.add(pipelineTask);
-
-        return pipelineTask;
     }
 
     private void prepareHandlerTasks(Component component, List<ComponentHandlerSpec> handlers, List<PipelineTask> tasks) {
@@ -207,7 +146,7 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         });
     }
 
-    private PipelineTask prepareBuilderTask(Component component, List<PipelineTask> tasks) {
+    private void prepareBuilderTask(Component component, List<PipelineTask> tasks) {
         String builderName = component.getSpec().getBuild().getBuilderRef().getName();
 
         Builder builder = agogosClient.v1alpha1().builders().withName(builderName)
@@ -236,8 +175,6 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
                     builderName, component.getFullName());
         }
 
-        PipelineTask lastTask = tasks.get(tasks.size() - 1);
-
         TaskRef buildTaskRef = new TaskRefBuilder()
                 .withApiVersion("") // AGOGOS-96
                 .withKind(taskRef.getKind())
@@ -248,16 +185,13 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         PipelineTaskBuilder pipelineTaskBuilder = new PipelineTaskBuilder()
                 .withName(BUILD_PIPELINE_BUILDER_TASK_NAME)
                 .withTaskRef(buildTaskRef)
-                .withWorkspaces(workspaceBindings(builder.getSpec().getWorkspaces()))
-                .withRunAfter(lastTask.getName());
+                .withWorkspaces(workspaceBindings(builder.getSpec().getWorkspaces()));
 
         addParams(pipelineTaskBuilder, params, component.getSpec().getBuild().getParams());
 
         PipelineTask pipelineTask = pipelineTaskBuilder.build();
 
         tasks.add(pipelineTask);
-
-        return pipelineTask;
     }
 
     /**
@@ -312,7 +246,10 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         list.forEach(p -> {
             Object value = params.get(p.getName());
 
-            if (value == null) {
+            if (p.getName().equals("component")) {
+                // Pass the component YAML, which came through as a Pipeline parameter.
+                value = "$(params.component)";
+            } else if (value == null) {
                 return;
             }
 

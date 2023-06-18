@@ -1,13 +1,11 @@
 quarkus:
   banner:
     enabled: false
-
-  security:
-    security-providers: BC
-
   native:
     resources:
-      includes: deployment/crds.yaml,dependencies/*.yaml
+      includes: "deployment/crds.yaml,dependencies/*.yaml"
+  security:
+    security-providers: "BC"
 
 "%dev":
   quarkus:
@@ -47,16 +45,25 @@ quarkus:
 
 
 agogos:
+  cloud-events:
+    base-url: "http://broker-ingress.knative-eventing.svc.cluster.local"
   container-image:
-    init: quay.io/agogos/stage-init:v1
-  webhooks:
-    container-image: quay.io/agogos/agogos-webhooks:devel
-    service-account: agogos-operator
+    init: "quay.io/agogos/stage-init:v1"
   operator:
-    container-image: quay.io/agogos/agogos-operator:devel
-    service-account: agogos-webhooks
+    container-image: "quay.io/agogos/agogos-operator:devel"
+    service-account: "agogos-webhooks"
+  webhooks:
+    container-image: "quay.io/agogos/agogos-webhooks:devel"
+    service-account: "agogos-operator"
 
 dependencies:
+  knative-eventing:
+    namespace: "knative-eventing"
+    version: "v1.10.0"
+    urls:
+      - "https://github.com/knative/eventing/releases/download/knative-${dependencies.knative-eventing.version}/eventing-core.yaml"
+      - "https://github.com/knative/eventing/releases/download/knative-${dependencies.knative-eventing.version}/in-memory-channel.yaml"
+      - "https://github.com/knative/eventing/releases/download/knative-${dependencies.knative-eventing.version}/mt-channel-broker.yaml"
   tekton-pipelines:
     configmap: "config-defaults"
     namespace: "tekton-pipelines"
@@ -69,10 +76,3 @@ dependencies:
     urls:
       - "https://storage.googleapis.com/tekton-releases/triggers/previous/${dependencies.tekton-triggers.version}/release.yaml"
       - "https://storage.googleapis.com/tekton-releases/triggers/previous/${dependencies.tekton-triggers.version}/interceptors.yaml"
-  knative-eventing:
-    namespace: "knative-eventing"
-    version: "v1.10.0"
-    urls:
-      - "https://github.com/knative/eventing/releases/download/knative-${dependencies.knative-eventing.version}/eventing-core.yaml"
-      - "https://github.com/knative/eventing/releases/download/knative-${dependencies.knative-eventing.version}/in-memory-channel.yaml"
-      - "https://github.com/knative/eventing/releases/download/knative-${dependencies.knative-eventing.version}/mt-channel-broker.yaml"

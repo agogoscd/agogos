@@ -15,11 +15,13 @@ import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBuilder;
 import io.fabric8.kubernetes.api.model.rbac.PolicyRuleBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.ClusterTask;
 import io.fabric8.tekton.pipeline.v1beta1.ClusterTaskBuilder;
+import io.fabric8.tekton.pipeline.v1beta1.CustomRun;
 import io.fabric8.tekton.pipeline.v1beta1.ParamSpecBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.fabric8.tekton.pipeline.v1beta1.StepBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspaceDeclarationBuilder;
 import io.fabric8.tekton.triggers.v1alpha1.ClusterInterceptor;
+import io.fabric8.tekton.triggers.v1alpha1.Interceptor;
 import io.fabric8.tekton.triggers.v1beta1.ClusterTriggerBinding;
 import io.fabric8.tekton.triggers.v1beta1.EventListener;
 import io.fabric8.tekton.triggers.v1beta1.Trigger;
@@ -99,7 +101,7 @@ public class CoreInstaller extends Installer {
                                 .withApiGroups(HasMetadata.getGroup(Trigger.class))
                                 .withResources(
                                         HasMetadata.getPlural(EventListener.class),
-                                        "interceptors", //HasMetadata.getPlural(Interceptor.class),
+                                        HasMetadata.getPlural(Interceptor.class),
                                         HasMetadata.getPlural(TriggerBinding.class),
                                         HasMetadata.getPlural(TriggerTemplate.class),
                                         HasMetadata.getPlural(Trigger.class),
@@ -112,7 +114,10 @@ public class CoreInstaller extends Installer {
                                 .withResources(HasMetadata.getPlural(ServiceAccount.class)).withVerbs("impersonate")
                                 .build(),
                         new PolicyRuleBuilder().withApiGroups(HasMetadata.getGroup(PipelineRun.class))
-                                .withResources(HasMetadata.getPlural(PipelineRun.class)).withVerbs("create").build())
+                                .withResources(
+                                        HasMetadata.getPlural(CustomRun.class),
+                                        HasMetadata.getPlural(PipelineRun.class))
+                                .withVerbs("create").build())
                 .build();
 
     }
