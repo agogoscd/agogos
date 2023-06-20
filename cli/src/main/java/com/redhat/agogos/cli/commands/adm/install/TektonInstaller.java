@@ -35,7 +35,7 @@ public class TektonInstaller extends DependencyInstaller {
 
         install(tekton, profile, namespace);
 
-        configureForCloudEvents(namespace);
+        // configureForCloudEvents(namespace);
 
         LOG.info("✅ Tekton {} installed", tekton.version());
     }
