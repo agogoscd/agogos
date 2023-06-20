@@ -234,23 +234,14 @@ public class BrokerInstaller {
                     .build();
         }
 
-        Subject subject = roleBinding.getSubjects().stream()
-                .filter(s -> sa.getKind().equals(s.getKind())
-                        && sa.getMetadata().getName().equals(s.getName())
-                        && namespace.equals(s.getNamespace()))
-                .findAny()
-                .orElse(null);
+        Subject subject = new SubjectBuilder()
+                .withKind(sa.getKind())
+                .withName(sa.getMetadata().getName())
+                .withNamespace(namespace)
+                .build();
 
-        if (subject == null) {
-            subject = new SubjectBuilder()
-                    .withApiGroup(HasMetadata.getGroup(sa.getClass()))
-                    .withKind(sa.getKind())
-                    .withName(sa.getMetadata().getName())
-                    .withNamespace(namespace)
-                    .build();
-
+        if (!roleBinding.getSubjects().contains(subject)) {
             roleBinding.getSubjects().add(subject);
-
             roleBinding = kubernetesClient.rbac().clusterRoleBindings().resource(roleBinding).serverSideApply();
         }
         resources.add(roleBinding);

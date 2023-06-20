@@ -10,6 +10,7 @@ import com.redhat.agogos.v1alpha1.Pipeline.PipelineSpec.StageReference;
 import com.redhat.agogos.v1alpha1.WorkspaceMapping;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
+import io.fabric8.kubernetes.client.utils.Serialization;
 import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineTask;
@@ -39,6 +40,7 @@ public class PipelineDependentResource
     @Override
     protected Pipeline desired(com.redhat.agogos.v1alpha1.Pipeline agogos,
             Context<com.redhat.agogos.v1alpha1.Pipeline> context) {
+        LOG.error(Serialization.asYaml(agogos));
         Pipeline pipeline = new Pipeline();
 
         Optional<Pipeline> optional = context.getSecondaryResource(Pipeline.class);
@@ -48,6 +50,7 @@ public class PipelineDependentResource
         } else {
             LOG.debug("Agogos Pipeline '{}', creating new Tekton Pipeline", agogos.getFullName());
         }
+
         // Prepare workspace for main task to share content between steps
         WorkspacePipelineTaskBinding pipelineWsBinding = new WorkspacePipelineTaskBindingBuilder()
                 .withName(WorkspaceMapping.MAIN_WORKSPACE_NAME)
@@ -56,10 +59,10 @@ public class PipelineDependentResource
                 .build();
 
         OwnerReference ownerReference = new OwnerReferenceBuilder()
-                .withApiVersion(pipeline.getApiVersion())
-                .withKind(pipeline.getKind())
-                .withName(pipeline.getMetadata().getName())
-                .withUid(pipeline.getMetadata().getUid())
+                .withApiVersion(agogos.getApiVersion())
+                .withKind(agogos.getKind())
+                .withName(agogos.getMetadata().getName())
+                .withUid(agogos.getMetadata().getUid())
                 .withBlockOwnerDeletion(true)
                 .withController(true)
                 .build();
@@ -78,7 +81,7 @@ public class PipelineDependentResource
 
             switch (stageRef.getKind()) {
                 case "Stage":
-                    stage = agogosClient.v1alpha1().stages().inNamespace(pipeline.getMetadata().getNamespace())
+                    stage = agogosClient.v1alpha1().stages().inNamespace(agogos.getMetadata().getNamespace())
                             .withName(stageRef.getName()).get();
                     break;
                 case "ClusterStage":
@@ -145,7 +148,8 @@ public class PipelineDependentResource
                 .withNewMetadata()
                 .withOwnerReferences(ownerReference)
                 // .withLabels(labels)
-                .withName(pipeline.getMetadata().getName())
+                .withName(agogos.getMetadata().getName())
+                .withNamespace(agogos.getMetadata().getNamespace())
                 .endMetadata()
                 .withNewSpec()
                 .withWorkspaces(workspaceMain)
