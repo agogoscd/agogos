@@ -8,6 +8,7 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.dsl.internal.GenericKubernetesResourceOperationsImpl;
 import io.fabric8.kubernetes.client.dsl.internal.OperationContext;
 import io.fabric8.kubernetes.client.http.HttpClient;
@@ -23,6 +24,8 @@ import org.openapi4j.core.validation.ValidationException;
 import org.openapi4j.parser.OpenApi3Parser;
 import org.openapi4j.parser.model.v3.OpenApi3;
 import org.openapi4j.parser.model.v3.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -44,6 +47,8 @@ import java.util.function.Consumer;
 @RegisterForReflection
 @ApplicationScoped
 public class ResourceLoader {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Helper.class);
 
     @Inject
     KubernetesClient kubernetesClient;
@@ -300,7 +305,7 @@ public class ResourceLoader {
                 resourceMapKey = "/" + resourceMapKey;
             }
 
-            ResourceMapping mapping = resourceMappings.get(resourceMapKey);
+            ResourceMapping mapping = getResourceMapping(resourceMapKey);
             if (mapping == null) {
                 throw new ApplicationException(
                         "Cannot install resource because it is unknown to the Kubernetes cluster: '{}'", genericResource);
@@ -339,17 +344,48 @@ public class ResourceLoader {
                     }
                 }
 
-                installed.add(new GenericKubernetesResourceOperationsImpl(
-                        ctx, true).inNamespace(ns)
-                        .createOrReplace(genericResource));
+                installed.add(createResource(ctx, genericResource, namespace));
 
             } else {
-                installed.add(new GenericKubernetesResourceOperationsImpl(
-                        ctx, false).createOrReplace(genericResource));
-
+                installed.add(createResource(ctx, genericResource, null));
             }
         });
-
         return installed;
+    }
+
+    private GenericKubernetesResource createResource(OperationContext ctx, GenericKubernetesResource resource,
+            String namespace) {
+        for (int i = 0; i < 10; i++) {
+            try {
+                GenericKubernetesResourceOperationsImpl op = new GenericKubernetesResourceOperationsImpl(ctx,
+                        namespace != null);
+                if (namespace != null) {
+                    op.inNamespace(namespace);
+                }
+                return op.createOrReplace(resource);
+            } catch (KubernetesClientException kce) {
+                if (i == 9) {
+                    throw kce;
+                }
+            }
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        }
+        return null;
+    }
+
+    private ResourceMapping getResourceMapping(String key) {
+        for (int i = 0; i < 10 && !resourceMappings.keySet().contains(key); i++) {
+            readMappings();
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        }
+        return resourceMappings.get(key);
     }
 }
