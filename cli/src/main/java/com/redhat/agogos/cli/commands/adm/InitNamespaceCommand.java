@@ -58,6 +58,9 @@ public class InitNamespaceCommand extends AbstractCommand {
             "app.kubernetes.io/part-of", "agogos",
             "app.kubernetes.io/component", "namespace");
 
+    @ConfigProperty(name = "agogos.operator.service-account")
+    private String ServiceAccountName;
+
     @Option(names = { "--namespace", "-n" }, required = true, description = "Name of the namespace to be initialized")
     String namespace;
 
@@ -77,6 +80,10 @@ public class InitNamespaceCommand extends AbstractCommand {
 
     @Override
     public void run() {
+        if (isAgogosCoreNamespace()) {
+            LOG.error("Unable to initialize namespace '{}' as it is an Agogos core namespace.", namespace);
+            System.exit(picocli.CommandLine.ExitCode.USAGE);
+        }
         LOG.info("Initializing '{}' namespace with Agogos resources...", namespace);
 
         installNamespace();
@@ -257,5 +264,18 @@ public class InitNamespaceCommand extends AbstractCommand {
         } catch (FileNotFoundException e) {
             LOG.error("File " + quotaFile.getName() + " not found, no resource quota applied", e);
         }
+    }
+
+    private boolean isAgogosCoreNamespace() {
+        Namespace ns = kubernetesClient.namespaces().withName(namespace).get();
+        if (ns != null) {
+            for (String label : CoreInstaller.LABELS.keySet()) {
+                if (!CoreInstaller.LABELS.get(label).equals(ns.getMetadata().getLabels().get(label))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 }

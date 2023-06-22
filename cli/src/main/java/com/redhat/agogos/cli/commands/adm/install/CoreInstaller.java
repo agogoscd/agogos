@@ -2,8 +2,6 @@ package com.redhat.agogos.cli.commands.adm.install;
 
 import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
-import com.redhat.agogos.k8s.client.AgogosClient;
-import io.fabric8.knative.client.KnativeClient;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Namespace;
@@ -44,18 +42,12 @@ public class CoreInstaller extends Installer {
     public static final String CLUSTER_ROLE_VIEW_NAME = "agogos-view";
     public static final String CLUSTER_ROLE_NAME_EVENTING = "agogos-el";
 
-    private static final Map<String, String> LABELS = Map.of(
+    public static final Map<String, String> LABELS = Map.of(
             "app.kubernetes.io/part-of", "agogos",
             "app.kubernetes.io/component", "core");
 
     @Inject
-    AgogosClient agogosClient;
-
-    @Inject
     BrokerInstaller brokerInstaller;
-
-    @Inject
-    KnativeClient knativeClient;
 
     @Override
     public void install(InstallProfile profile, String namespace) {
