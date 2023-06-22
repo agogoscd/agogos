@@ -12,8 +12,6 @@ import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.ComponentBuilderSpec.BuilderRef;
 import io.fabric8.tekton.client.TektonClient;
-import io.fabric8.tekton.pipeline.v1beta1.ClusterTask;
-import io.fabric8.tekton.pipeline.v1beta1.ClusterTaskBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.ParamSpecBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
 import io.fabric8.tekton.pipeline.v1beta1.Task;
@@ -23,7 +21,6 @@ import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,13 +41,6 @@ public class ComponentControllerTest {
 
     @Inject
     TektonClient tektonClient;
-
-    @BeforeEach
-    void registerInitTask() {
-        ClusterTask task = new ClusterTaskBuilder().withNewMetadata().withName("init").endMetadata().build();
-
-        tektonClient.v1beta1().clusterTasks().resource(task).serverSideApply();
-    }
 
     @Test
     @DisplayName("Should fail handling a Component because the Builder does not exist")

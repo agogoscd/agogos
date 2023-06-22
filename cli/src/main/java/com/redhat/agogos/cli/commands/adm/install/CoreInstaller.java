@@ -3,7 +3,6 @@ package com.redhat.agogos.cli.commands.adm.install;
 import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import com.redhat.agogos.k8s.client.AgogosClient;
-import com.redhat.agogos.v1alpha1.ClusterStage;
 import io.fabric8.knative.client.KnativeClient;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -13,13 +12,8 @@ import io.fabric8.kubernetes.api.model.ServiceAccount;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRole;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBuilder;
 import io.fabric8.kubernetes.api.model.rbac.PolicyRuleBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.ClusterTask;
-import io.fabric8.tekton.pipeline.v1beta1.ClusterTaskBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.CustomRun;
-import io.fabric8.tekton.pipeline.v1beta1.ParamSpecBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
-import io.fabric8.tekton.pipeline.v1beta1.StepBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.WorkspaceDeclarationBuilder;
 import io.fabric8.tekton.triggers.v1alpha1.ClusterInterceptor;
 import io.fabric8.tekton.triggers.v1alpha1.Interceptor;
 import io.fabric8.tekton.triggers.v1beta1.ClusterTriggerBinding;
@@ -30,7 +24,6 @@ import io.fabric8.tekton.triggers.v1beta1.TriggerTemplate;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,16 +46,10 @@ public class CoreInstaller extends Installer {
     public static final String CLUSTER_ROLE_VIEW_NAME = "agogos-view";
     public static final String CLUSTER_ROLE_NAME_EVENTING = "agogos-el";
 
-    private static final String INIT_TEKTON_TASK_NAME = "init";
-    private static final String INIT_STAGE_NAME = "init";
-
     private Map<String, String> labels = Stream.of(new String[][] {
             { "app.kubernetes.io/part-of", "agogos" },
             { "app.kubernetes.io/component", "core" },
     }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
-
-    @ConfigProperty(name = "agogos.container-image.init", defaultValue = "quay.io/agogos/stage-init:v1")
-    String containerImageInit;
 
     @Inject
     AgogosClient agogosClient;
@@ -83,11 +70,9 @@ public class CoreInstaller extends Installer {
                 List.of(
                         namespace(namespace),
                         clusterRoleView(),
-                        clusterRoleEventing(),
-                        initClusterTask()),
+                        clusterRoleEventing()),
                 namespace);
 
-        resources.add(installInitClusterStage());
         resources.addAll(brokerInstaller.install(namespace));
 
         Helper.status(resources);
@@ -148,50 +133,5 @@ public class CoreInstaller extends Installer {
         return new NamespaceBuilder().withNewMetadata().withName(namespace).withLabels(labels)
                 .endMetadata().build();
 
-    }
-
-    private ClusterTask initClusterTask() {
-        ClusterTask ct = new ClusterTaskBuilder()
-                .withNewMetadata()
-                .withName(INIT_TEKTON_TASK_NAME)
-                .endMetadata()
-                .withNewSpec()
-                .withWorkspaces(new WorkspaceDeclarationBuilder().withName("output").build())
-                .withParams(
-                        new ParamSpecBuilder()
-                                .withName("image")
-                                .withType("string")
-                                .withNewDefault()
-                                .withStringVal(containerImageInit)
-                                .endDefault()
-                                .build(),
-                        new ParamSpecBuilder()
-                                .withName("resource")
-                                .withType("string")
-                                .build())
-                .withSteps(
-                        new StepBuilder()
-                                .withName("execute")
-                                .withImage("$(params.image)")
-                                .withCommand("/usr/local/bin/entrypoint")
-                                .withArgs("$(params.resource)", "$(workspaces.output.path)")
-                                .build())
-                .endSpec()
-                .build();
-
-        return ct;
-    }
-
-    private ClusterStage installInitClusterStage() {
-        ClusterStage cs = new ClusterStage();
-
-        cs.getMetadata().setName(INIT_STAGE_NAME);
-        cs.getMetadata().setLabels(labels);
-        cs.getSpec().getTaskRef().setKind(HasMetadata.getKind(ClusterTask.class));
-        cs.getSpec().getTaskRef().setName(INIT_TEKTON_TASK_NAME);
-
-        cs = agogosClient.v1alpha1().clusterstages().resource(cs).serverSideApply();
-
-        return cs;
     }
 }
