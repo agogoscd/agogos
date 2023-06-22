@@ -68,7 +68,8 @@ public class BuildGeneratorController implements Namespaced, Reconciler<CustomRu
                     build.getMetadata().setGenerateName(name + "-");
                     build.getSpec().setComponent(name);
                     build.getMetadata().setLabels(triggerLabels);
-                    build = agogosClient.v1alpha1().builds().inNamespace(agogosClient.namespace()).resource(build).create();
+                    build = agogosClient.v1alpha1().builds().inNamespace(resource.getMetadata().getNamespace()).resource(build)
+                            .create();
                     LOG.debug("Trigger '{}' fired and created Build '{}'",
                             resource.getMetadata().getLabels().get(TEKTON_TRIGGER_LABEL_PREFIX + "trigger"),
                             build.getMetadata().getName());
@@ -77,7 +78,8 @@ public class BuildGeneratorController implements Namespaced, Reconciler<CustomRu
                     Pipeline pipeline = new Pipeline();
                     pipeline.getMetadata().setGenerateName(name + "-");
                     pipeline.getMetadata().setLabels(triggerLabels);
-                    pipeline = agogosClient.v1alpha1().pipelines().inNamespace(agogosClient.namespace()).resource(pipeline)
+                    pipeline = agogosClient.v1alpha1().pipelines().inNamespace(resource.getMetadata().getNamespace())
+                            .resource(pipeline)
                             .create();
                     LOG.debug("Trigger '{}' fired and created Pipeline '{}'",
                             resource.getMetadata().getLabels().get(TEKTON_TRIGGER_LABEL_PREFIX + "trigger"),

@@ -50,11 +50,11 @@ agogos:
   container-image:
     init: "quay.io/agogos/stage-init:v1"
   operator:
-    container-image: "quay.io/agogos/agogos-operator:devel"
-    service-account: "agogos-webhooks"
-  webhooks:
-    container-image: "quay.io/agogos/agogos-webhooks:devel"
+    container-image: "quay.io/agogos/agogos-operator:latest"
     service-account: "agogos-operator"
+  webhooks:
+    container-image: "quay.io/agogos/agogos-webhooks:latest"
+    service-account: "agogos-webhooks"
 
 dependencies:
   knative-eventing:

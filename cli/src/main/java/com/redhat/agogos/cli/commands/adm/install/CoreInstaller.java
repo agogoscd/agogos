@@ -39,8 +39,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Profile(InstallProfile.local)
 @Profile(InstallProfile.dev)
+@Profile(InstallProfile.local)
+@Profile(InstallProfile.prod)
 @Priority(30)
 @ApplicationScoped
 @RegisterForReflection

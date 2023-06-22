@@ -35,7 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Profiles({ @Profile(InstallProfile.local) })
+@Profile(InstallProfile.local)
+@Profile(InstallProfile.prod)
 @Priority(99)
 @ApplicationScoped
 @RegisterForReflection
@@ -50,7 +51,6 @@ public class OperatorInstaller extends Installer {
     private String ServiceAccountName;
 
     private static final Map<String, String> LABELS = Map.of(
-            "app.kubernetes.io/instance", "default",
             "app.kubernetes.io/part-of", "agogos",
             "app.kubernetes.io/component", "operator");
 
@@ -60,11 +60,11 @@ public class OperatorInstaller extends Installer {
 
         List<HasMetadata> resources = resourceLoader.installKubernetesResources(
                 List.of(
-                        serviceAccount(),
+                        serviceAccount(namespace),
                         clusterRole(),
                         clusterRoleBinding(namespace),
-                        service(),
-                        deployment()),
+                        service(namespace),
+                        deployment(namespace)),
                 namespace);
 
         Helper.status(resources);
@@ -72,9 +72,13 @@ public class OperatorInstaller extends Installer {
         LOG.info("✅ Agogos Operator installed");
     }
 
-    private ServiceAccount serviceAccount() {
-        ServiceAccount sa = new ServiceAccountBuilder().withNewMetadata().withName(ServiceAccountName)
-                .withLabels(LABELS).endMetadata()
+    private ServiceAccount serviceAccount(String namespace) {
+        ServiceAccount sa = new ServiceAccountBuilder()
+                .withNewMetadata()
+                .withName(ServiceAccountName)
+                .withNamespace(namespace)
+                .withLabels(LABELS)
+                .endMetadata()
                 .build();
 
         return sa;
@@ -116,7 +120,7 @@ public class OperatorInstaller extends Installer {
         return crb;
     }
 
-    private Deployment deployment() {
+    private Deployment deployment(String namespace) {
         Probe livenessProbe = new ProbeBuilder()
                 .withHttpGet(new HTTPGetActionBuilder().withPath("/").withPort(new IntOrString(7070)).build())
                 .withInitialDelaySeconds(3).withPeriodSeconds(3).build();
@@ -130,7 +134,9 @@ public class OperatorInstaller extends Installer {
         limits.put("cpu", Quantity.parse("1000m"));
 
         Container container = new ContainerBuilder()
-                .withName("operator").withImage(ContainerImage).withImagePullPolicy("Always")
+                .withName("operator")
+                .withImage(ContainerImage)
+                .withImagePullPolicy("Always")
                 .withPorts(
                         new ContainerPortBuilder().withName("http").withContainerPort(7070).withProtocol("TCP").build())
                 .withLivenessProbe(livenessProbe)
@@ -139,23 +145,50 @@ public class OperatorInstaller extends Installer {
                 .endResources()
                 .build();
 
-        Deployment deployment = new DeploymentBuilder().withNewMetadata().withName(ServiceAccountName)
+        Deployment deployment = new DeploymentBuilder()
+                .withNewMetadata()
+                .withName(ServiceAccountName)
+                .withNamespace(namespace)
                 .withLabels(LABELS)
-                .endMetadata().withNewSpec().withReplicas(1).withNewSelector().withMatchLabels(LABELS).endSelector()
-                .withNewTemplate().withNewMetadata().withLabels(LABELS).endMetadata().withNewSpec()
+                .endMetadata()
+                .withNewSpec()
+                .withReplicas(1)
+                .withNewSelector()
+                .withMatchLabels(LABELS)
+                .endSelector()
+                .withNewTemplate()
+                .withNewMetadata()
+                .withLabels(LABELS)
+                .endMetadata()
+                .withNewSpec()
                 .withContainers(container)
                 .withServiceAccount(ServiceAccountName)
-                .endSpec().endTemplate().endSpec().build();
+                .endSpec()
+                .endTemplate()
+                .endSpec()
+                .build();
 
         return deployment;
     }
 
-    private Service service() {
-        ServicePort httpPort = new ServicePortBuilder().withName("http").withPort(80).withProtocol("TCP")
-                .withTargetPort(new IntOrString(7070)).build();
+    private Service service(String namespace) {
+        ServicePort httpPort = new ServicePortBuilder()
+                .withName("http")
+                .withPort(80)
+                .withProtocol("TCP")
+                .withTargetPort(new IntOrString(7070))
+                .build();
 
-        Service service = new ServiceBuilder().withNewMetadata().withName(ServiceAccountName).withLabels(LABELS)
-                .endMetadata().withNewSpec().withPorts(httpPort).withType("ClusterIP").withSelector(LABELS)
+        Service service = new ServiceBuilder()
+                .withNewMetadata()
+                .withName(ServiceAccountName)
+                .withNamespace(namespace)
+                .withLabels(LABELS)
+                .endMetadata()
+                .withNewSpec()
+                .withPorts(httpPort)
+                .withType("ClusterIP")
+                .withSelector(LABELS)
                 .endSpec()
                 .build();
 
