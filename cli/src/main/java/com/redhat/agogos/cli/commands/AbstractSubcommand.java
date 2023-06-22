@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
+import com.redhat.agogos.KubernetesFacade;
 import com.redhat.agogos.ResultableResourceStatus;
 import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.cli.CLI.Output;
@@ -40,6 +41,9 @@ public abstract class AbstractSubcommand<T extends AgogosResource<?, ? extends A
 
     @Inject
     protected KubernetesClient kubernetesClient;
+
+    @Inject
+    protected KubernetesFacade kubernetesFacade;
 
     protected void show(MixedOperation<T, ? extends DefaultKubernetesResourceList<T>, Resource<T>> resourceClient) {
     }

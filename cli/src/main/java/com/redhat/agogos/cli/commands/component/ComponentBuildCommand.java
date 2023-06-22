@@ -15,11 +15,11 @@ public class ComponentBuildCommand extends AbstractSubcommand<Component> {
     @Override
     public void run() {
         Build build = new Build();
-
         build.getMetadata().setGenerateName(name + "-");
+        build.getMetadata().setNamespace(kubernetesFacade.getNamespace());
         build.getSpec().setComponent(name);
 
-        build = agogosClient.v1alpha1().builds().inNamespace(agogosClient.namespace()).resource(build).create();
+        build = kubernetesFacade.create(build);
 
         cli.run(BuildDescribeCommand.class, build.getMetadata().getName());
     }

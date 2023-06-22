@@ -17,11 +17,10 @@ public class PipelineRunCommand extends AbstractSubcommand<Pipeline> {
         Run run = new Run();
 
         run.getMetadata().setGenerateName(name + "-");
-        run.getMetadata().setNamespace(kubernetesClient.getNamespace());
+        run.getMetadata().setNamespace(kubernetesFacade.getNamespace());
         run.getSpec().setPipeline(name);
 
-        run = kubernetesClient.resource(run).create();
-
+        run = kubernetesFacade.create(run);
         cli.run(RunDescribeCommand.class, run.getMetadata().getName());
     }
 }
