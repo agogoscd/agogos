@@ -29,8 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Profile(InstallProfile.dev)
 @Profile(InstallProfile.local)
@@ -46,10 +44,9 @@ public class CoreInstaller extends Installer {
     public static final String CLUSTER_ROLE_VIEW_NAME = "agogos-view";
     public static final String CLUSTER_ROLE_NAME_EVENTING = "agogos-el";
 
-    private Map<String, String> labels = Stream.of(new String[][] {
-            { "app.kubernetes.io/part-of", "agogos" },
-            { "app.kubernetes.io/component", "core" },
-    }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
+    private static final Map<String, String> LABELS = Map.of(
+            "app.kubernetes.io/part-of", "agogos",
+            "app.kubernetes.io/component", "core");
 
     @Inject
     AgogosClient agogosClient;
@@ -64,8 +61,6 @@ public class CoreInstaller extends Installer {
     public void install(InstallProfile profile, String namespace) {
         LOG.info("🕞 Installing Agogos core resources...");
 
-        labels.put("app.kubernetes.io/instance", namespace);
-
         List<HasMetadata> resources = resourceLoader.installKubernetesResources(
                 List.of(
                         namespace(namespace),
@@ -73,7 +68,7 @@ public class CoreInstaller extends Installer {
                         clusterRoleEventing()),
                 namespace);
 
-        resources.addAll(brokerInstaller.install(namespace));
+        resources.addAll(brokerInstaller.install(namespace, LABELS));
 
         Helper.status(resources);
 
@@ -88,7 +83,7 @@ public class CoreInstaller extends Installer {
      * @return
      */
     private ClusterRole clusterRoleEventing() {
-        return new ClusterRoleBuilder().withNewMetadata().withName(RESOURCE_NAME_EVENTING).withLabels(labels)
+        return new ClusterRoleBuilder().withNewMetadata().withName(RESOURCE_NAME_EVENTING).withLabels(LABELS)
                 .endMetadata().withRules(
                         // Tekton Triggers
                         new PolicyRuleBuilder()
@@ -117,7 +112,7 @@ public class CoreInstaller extends Installer {
     }
 
     private ClusterRole clusterRoleView() {
-        ClusterRole cr = new ClusterRoleBuilder().withNewMetadata().withName(CLUSTER_ROLE_VIEW_NAME).withLabels(labels)
+        ClusterRole cr = new ClusterRoleBuilder().withNewMetadata().withName(CLUSTER_ROLE_VIEW_NAME).withLabels(LABELS)
                 .withLabels(Map.of("rbac.authorization.k8s.io/aggregate-to-view", "true"))
                 .endMetadata().withRules(
                         new PolicyRuleBuilder().withApiGroups("agogos.redhat.com")
@@ -130,7 +125,7 @@ public class CoreInstaller extends Installer {
     }
 
     private Namespace namespace(String namespace) {
-        return new NamespaceBuilder().withNewMetadata().withName(namespace).withLabels(labels)
+        return new NamespaceBuilder().withNewMetadata().withName(namespace).withLabels(LABELS)
                 .endMetadata().build();
 
     }

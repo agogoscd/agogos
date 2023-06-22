@@ -35,8 +35,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @ApplicationScoped
 @RegisterForReflection
@@ -46,11 +44,6 @@ public class BrokerInstaller {
 
     private static final String RESOURCE_NAME = "agogos";
     private static final String RESOURCE_NAME_EVENTING = "agogos-eventing";
-
-    private Map<String, String> labels = Stream.of(new String[][] {
-            { "app.kubernetes.io/part-of", "agogos" },
-            { "app.kubernetes.io/component", "core" },
-    }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 
     @ConfigProperty(name = "agogos.cloud-events.base-url", defaultValue = "http://broker-ingress.knative-eventing.svc.cluster.local")
     String baseUrl;
@@ -66,26 +59,16 @@ public class BrokerInstaller {
 
     private List<HasMetadata> resources = new ArrayList<>();
 
-    public List<HasMetadata> install(String namespace) {
-        labels.put("app.kubernetes.io/instance", namespace);
+    public List<HasMetadata> install(String namespace, Map<String, String> labels) {
 
-        ServiceAccount eventingSa = installEventingSa(namespace);
+        ServiceAccount eventingSa = installEventingSa(namespace, labels);
         installEventingRoleBinding(eventingSa, namespace);
         ConfigMap configMap = installBrokerConfig(namespace);
         EventListener el = installTektonEl(eventingSa, namespace);
-        Broker broker = installKnativeBroker(configMap, namespace);
+        Broker broker = installKnativeBroker(configMap, namespace, labels);
         installKnativeTrigger(broker, el, namespace);
 
         return resources;
-    }
-
-    public Broker getBroker(List<HasMetadata> resources) {
-        for (HasMetadata resource : resources) {
-            if (resource instanceof Broker) {
-                return (Broker) resource;
-            }
-        }
-        return null;
     }
 
     private ConfigMap installBrokerConfig(String namespace) {
@@ -103,7 +86,7 @@ public class BrokerInstaller {
         return configMap;
     }
 
-    private Broker installKnativeBroker(ConfigMap configuration, String namespace) {
+    private Broker installKnativeBroker(ConfigMap configuration, String namespace, Map<String, String> labels) {
         Broker broker = new BrokerBuilder()
                 .withNewMetadata()
                 .withName(RESOURCE_NAME)
@@ -249,7 +232,7 @@ public class BrokerInstaller {
         return roleBinding;
     }
 
-    private ServiceAccount installEventingSa(String namespace) {
+    private ServiceAccount installEventingSa(String namespace, Map<String, String> labels) {
         ServiceAccount sa = new ServiceAccountBuilder()
                 .withNewMetadata()
                 .withName(RESOURCE_NAME_EVENTING)

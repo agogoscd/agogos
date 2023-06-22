@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Command(mixinStandardHelpOptions = true, name = "init-namespace", aliases = {
         "init" }, description = "Initialize selected namespace to work with Agogos")
@@ -50,16 +49,14 @@ public class InitNamespaceCommand extends AbstractCommand {
 
     private static final Logger LOG = LoggerFactory.getLogger(InitNamespaceCommand.class);
 
+    private static final String AGOGOS_QUOTA_NAME = "agogos-quota";
+    private static final String AGOGOS_ROLE_BINDING_PREFIX = "agogos-";
     private static final String RESOURCE_NAME = "agogos";
     private static final String RESOURCE_NAME_CONFIG = "agogos-config";
 
-    private static final String AGOGOS_QUOTA_NAME = "agogos-quota";
-    private static final String AGOGOS_ROLE_BINDING_PREFIX = "agogos-";
-
-    private Map<String, String> labels = Stream.of(new String[][] {
-            { "app.kubernetes.io/part-of", "agogos" },
-            { "app.kubernetes.io/component", "core" },
-    }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
+    private static final Map<String, String> LABELS = Map.of(
+            "app.kubernetes.io/part-of", "agogos",
+            "app.kubernetes.io/component", "namespace");
 
     @Option(names = { "--namespace", "-n" }, required = true, description = "Name of the namespace to be initialized")
     String namespace;
@@ -82,15 +79,13 @@ public class InitNamespaceCommand extends AbstractCommand {
     public void run() {
         LOG.info("Initializing '{}' namespace with Agogos resources...", namespace);
 
-        labels.put("app.kubernetes.io/instance", namespace);
-
         installNamespace();
         installConfig();
 
         ServiceAccount sa = installMainSa();
         installMainRoleBinding(sa);
 
-        installedResources.addAll(brokerInstaller.install(namespace));
+        installedResources.addAll(brokerInstaller.install(namespace, LABELS));
 
         List<Map.Entry<String, Set<String>>> bindings = Arrays.asList(
                 new AbstractMap.SimpleEntry<String, Set<String>>("admin", admin),
@@ -143,7 +138,7 @@ public class InitNamespaceCommand extends AbstractCommand {
         Namespace ns = new NamespaceBuilder()
                 .withNewMetadata()
                 .withName(namespace)
-                .withLabels(labels)
+                .withLabels(LABELS)
                 .endMetadata()
                 .build();
 
@@ -181,7 +176,7 @@ public class InitNamespaceCommand extends AbstractCommand {
         ServiceAccount sa = new ServiceAccountBuilder()
                 .withNewMetadata()
                 .withName(RESOURCE_NAME)
-                .withLabels(labels)
+                .withLabels(LABELS)
                 .endMetadata()
                 .build();
 
@@ -225,7 +220,7 @@ public class InitNamespaceCommand extends AbstractCommand {
                     .withNewMetadata()
                     .withName(rolebindingName)
                     .withNamespace(namespace)
-                    .withLabels(labels)
+                    .withLabels(LABELS)
                     .endMetadata()
                     .withSubjects(subjects)
                     .withNewRoleRef()
