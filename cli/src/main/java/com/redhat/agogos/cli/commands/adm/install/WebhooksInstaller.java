@@ -311,6 +311,7 @@ public class WebhooksInstaller extends Installer {
                         .withUrl("https://192.168.39.1:8443/webhooks/mutate")
                         .withCaBundle(certProvider.caBundle())
                         .endClientConfig();
+                break;
             case local:
             case prod:
                 mutatingWebhookBuilder
