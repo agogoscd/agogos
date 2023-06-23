@@ -1,3 +1,14 @@
 = Agogos
 
-Welcome to the Agogos documentation, browse the left sidebar to find content.
+Agogos is a platform created by the CPaaS team and other contributors within
+Red{nbsp}Hat. Agogos is offered to Red{nbsp}Hat product teams to
+automate their productization processes.
+
+Agogos is a build and delivery orchestrator for Red{nbsp}Hat products. It
+automates tasks for many Red Hat internal services. Some of the systems Agogos
+uses are: Brew (building), Jira (bug tracking), Bugzilla (bug tracking), Errata
+Tool (delivery), Index Image Builder (delivery), and Dist-Git (source code).​
+Agogos does not build, test, or release Red{nbsp}Hat products directly, it uses
+these services instead.
+
+Browse the left sidebar to find more content.
