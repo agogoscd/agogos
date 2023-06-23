@@ -13,20 +13,22 @@ verify:
       junit:
         - ./**/target/surefire-reports/TEST-*.xml
         - ./**/target/failsafe-reports/TEST-*.xml
-  only: [merge_requests]
   tags: [docker]
-
-docs:
-  image: antora/antora:2.3.4
-  stage: test
-  script:
-    - npm i
-    - GIT_CREDENTIALS=$GIT_CREDENTIALS NODE_TLS_REJECT_UNAUTHORIZED=0 antora --fetch --to-dir public antora-playbook.yml
-  artifacts:
-    paths:
-      - public
-  only: [merge_requests]
-  tags: [docker]
+  rules:
+    # Run on changes to everything except the documentation
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - ./*.xml
+          - ./*.json
+          - cli/**/*
+          - core/**/*
+          - operator/**/*
+          - relays/**/*
+          - test/**/*
+          - webhooks/**/*
+      allow_failure: true
 
 cli:
   image:
@@ -42,8 +44,44 @@ cli:
   artifacts:
     paths:
       - cli/target/agogosctl
-  only: [main]
   tags: [docker]
+  rules:
+    # Run on changes to everything except the documentation
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
+          - .gitlab-ci.yml
+          - ./*.xml
+          - ./*.json
+          - cli/**/*
+          - core/**/*
+          - node_modules/**/*
+          - operator/**/*
+          - relays/**/*
+          - test/**/*
+          - webhooks/**/*
+      allow_failure: true
+
+docs:
+  image: antora/antora:2.3.4
+  stage: test
+  script:
+    - npm i
+    - GIT_CREDENTIALS=$GIT_CREDENTIALS NODE_TLS_REJECT_UNAUTHORIZED=0 antora --fetch --to-dir public antora-playbook.yml
+  artifacts:
+    paths:
+      - public
+  tags: [docker]
+  rules:
+    # Only run on changes to the documentation
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - gulpfile.js
+          - antora*.yml
+          - docs/*.yml
+          - docs/**/*
+      allow_failure: true
 
 pages:
   image: antora/antora:2.3.4
@@ -54,5 +92,14 @@ pages:
   artifacts:
     paths:
       - public
-  only: [main]
   tags: [docker]
+  rules:
+    # Only run on changes to the documentation
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
+          - gulpfile.js
+          - antora*.yml
+          - docs/*.yml
+          - docs/**/*
+      allow_failure: true
