@@ -12,7 +12,7 @@ public class ComponentDescribeCommand extends AbstractSubcommand<Component> {
 
     @Override
     public void run() {
-        Component component = agogosClient.v1alpha1().components().withName(name).get();
+        Component component = kubernetesFacade.get(Component.class, name);
         showResource(component);
     }
 }
