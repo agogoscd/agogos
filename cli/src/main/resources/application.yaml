@@ -2,6 +2,7 @@ quarkus:
   banner:
     enabled: false
   native:
+    additional-build-args: "--initialize-at-run-time=org.springframework.core.io.VfsUtils"
     resources:
       includes: "deployment/crds.yaml,dependencies/*.yaml"
   security:
