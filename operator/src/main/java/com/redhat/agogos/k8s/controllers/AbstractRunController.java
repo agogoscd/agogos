@@ -1,6 +1,5 @@
 package com.redhat.agogos.k8s.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.redhat.agogos.PipelineRunStatus;
 import com.redhat.agogos.ResultableResourceStatus;
 import com.redhat.agogos.v1alpha1.AgogosResource;
@@ -60,19 +59,14 @@ public abstract class AbstractRunController<T extends AgogosResource<?, Resultab
             case SUCCEEDED:
                 message = String.format("%s finished", resource.getKind());
 
-                String resultJson = null;
                 List<PipelineRunResult> results = pipelinerun.getStatus().getPipelineResults().stream()
                         .filter(r -> r.getName().equals("data")).collect(Collectors.toUnmodifiableList());
 
                 if (!results.isEmpty()) {
-                    resultJson = results.get(0).getValue().getStringVal();
-                }
-
-                if (resultJson != null) {
+                    String resultJson = results.get(0).getValue().getStringVal();
                     try {
-                        result = getObjectMapper(context).readValue(resultJson, Map.class);
-                    } catch (JsonProcessingException e) {
-                        // ceType = CloudEventType.BUILD_FAILURE; TODO ?!?!?!?
+                        result = getKubernetesSerialization(context).convertValue(resultJson, Map.class);
+                    } catch (Exception e) {
                         status = ResultableResourceStatus.Failed;
                         message = "Build finished successfully, but returned metadata is not a valid JSON content";
                     }

@@ -4,8 +4,8 @@ import com.redhat.agogos.KubernetesFacade;
 import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.cli.commands.CommandTest;
 import com.redhat.agogos.v1alpha1.Run;
+import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -15,7 +15,7 @@ import picocli.CommandLine;
 @QuarkusTest
 public class PipelineRunCommandTest extends CommandTest {
 
-    @InjectMock()
+    @InjectMock
     KubernetesFacade kubernetesFacadeMock;
 
     @InjectMock
