@@ -79,8 +79,7 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
         pipelineRun = new PipelineRunBuilder(pipelineRun)
                 .withNewMetadata()
                 .withLabels(labels)
-                .withGenerateName(resource.getSpec().getComponent() + "-")
-                .withName(pipelineRun.getMetadata() != null ? pipelineRun.getMetadata().getName() : null)
+                .withName(resource.getMetadata().getName()) // Name should match Build name.
                 .withNamespace(resource.getMetadata().getNamespace())
                 .endMetadata()
                 .withNewSpec()
