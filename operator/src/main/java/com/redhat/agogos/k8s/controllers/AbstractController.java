@@ -4,7 +4,6 @@ import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.eventing.CloudEventPublisher;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.AgogosResource;
-import com.redhat.agogos.v1alpha1.ResultableStatus;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
 import io.fabric8.tekton.client.TektonClient;
@@ -29,6 +28,9 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
     protected CloudEventPublisher cloudEventPublisher;
 
     @Inject
+    protected KubernetesSerialization objectMapper;
+
+    @Inject
     protected TektonClient tektonClient;
 
     @Override
@@ -41,17 +43,6 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
     public DeleteControl cleanup(T resource, Context<T> context) {
         LOG.info("Removing {} '{}'", resource.getKind(), resource.getFullName());
         return DeleteControl.defaultDelete();
-    }
-
-    protected KubernetesSerialization getKubernetesSerialization(Context<T> context) {
-        return context.getControllerConfiguration()
-                .getConfigurationService()
-                .getKubernetesClient()
-                .getKubernetesSerialization();
-    }
-
-    protected ResultableStatus deepCopy(ResultableStatus status, Context<T> context) {
-        return getKubernetesSerialization(context).clone(status);
     }
 
     protected AgogosResource<?, ?> parentResource(T resource, Context<T> context) {
