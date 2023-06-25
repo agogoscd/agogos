@@ -81,7 +81,7 @@ public class InitNamespaceCommand extends AbstractCommand {
     @Override
     public void run() {
         if (isAgogosCoreNamespace()) {
-            LOG.error("Unable to initialize namespace '{}' as it is an Agogos core namespace.", namespace);
+            LOG.error("⛔ Unable to initialize namespace '{}' as it is an Agogos core namespace.", namespace);
             System.exit(picocli.CommandLine.ExitCode.USAGE);
         }
         LOG.info("Initializing '{}' namespace with Agogos resources...", namespace);

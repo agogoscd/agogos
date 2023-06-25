@@ -15,7 +15,7 @@ public class ExceptionHandler implements IExecutionExceptionHandler {
         PrintWriter err = cmd.getErr();
 
         StringBuilder msg = new StringBuilder()
-                .append("🛑 Oops, an error occurred!")
+                .append("⛔ Oops, an error occurred!")
                 .append(System.getProperty("line.separator"));
 
         if (ex instanceof KubernetesClientException && ((KubernetesClientException) ex).getStatus() != null) {

@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Optional;
 
 @ApplicationScoped
 @ControllerConfiguration(generationAwareEventProcessing = false, dependents = {
@@ -50,21 +49,15 @@ public class TriggerController extends AbstractController<Trigger> {
 
     @Override
     public UpdateControl<Trigger> reconcile(Trigger agogos, Context<Trigger> context) {
-        Optional<io.fabric8.tekton.triggers.v1beta1.Trigger> optional = context
-                .getSecondaryResource(io.fabric8.tekton.triggers.v1beta1.Trigger.class);
-
         Status agogosStatus = agogos.getStatus();
-        if (optional.isPresent()) {
+        if (!String.valueOf(ResourceStatus.Ready).equals(agogosStatus.getStatus())) {
             agogosStatus.setStatus(String.valueOf(ResourceStatus.Ready));
             agogosStatus.setReason("Agogos Trigger is ready");
-        } else {
-            agogosStatus.setStatus(String.valueOf(ResourceStatus.Failed));
-            agogosStatus.setReason("Could not create Agogos Trigger");
+            agogosStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
+            LOG.info("Set status for Trigger '{}' to {}", agogos.getFullName(), agogos.getStatus().getStatus());
+            return UpdateControl.updateStatus(agogos);
         }
-        agogosStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
 
-        LOG.info("Set status for Trigger '{}' to {}", agogos.getFullName(), agogos.getStatus().getStatus());
-
-        return UpdateControl.updateStatus(agogos);
+        return UpdateControl.noUpdate();
     }
 }

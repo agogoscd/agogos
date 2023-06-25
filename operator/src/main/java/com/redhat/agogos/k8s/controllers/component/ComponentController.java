@@ -4,7 +4,6 @@ import com.redhat.agogos.ResourceStatus;
 import com.redhat.agogos.k8s.controllers.AbstractController;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.Status;
-import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
@@ -15,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Optional;
 
 @ApplicationScoped
 @ControllerConfiguration(generationAwareEventProcessing = false, dependents = {
@@ -36,19 +34,15 @@ public class ComponentController extends AbstractController<Component> {
      */
     @Override
     public UpdateControl<Component> reconcile(Component component, Context<Component> context) {
-        Optional<Pipeline> optional = context.getSecondaryResource(Pipeline.class);
         Status componentStatus = component.getStatus();
-        if (optional.isPresent()) {
+        if (!String.valueOf(ResourceStatus.Ready).equals(componentStatus.getStatus())) {
             componentStatus.setStatus(String.valueOf(ResourceStatus.Ready));
             componentStatus.setReason("Component is ready");
-        } else {
-            componentStatus.setStatus(String.valueOf(ResourceStatus.Failed));
-            componentStatus.setReason("Could not create Component");
+            componentStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
+            LOG.info("Set status for Component '{}' to {}", component.getFullName(), component.getStatus().getStatus());
+            return UpdateControl.updateStatus(component);
         }
-        componentStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
 
-        LOG.info("Set status for Component '{}' to {}", component.getFullName(), component.getStatus().getStatus());
-
-        return UpdateControl.updateStatus(component);
+        return UpdateControl.noUpdate();
     }
 }
