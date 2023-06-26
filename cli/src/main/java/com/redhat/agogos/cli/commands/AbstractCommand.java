@@ -1,5 +1,6 @@
 package com.redhat.agogos.cli.commands;
 
+import com.redhat.agogos.KubernetesFacade;
 import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import io.fabric8.knative.client.KnativeClient;
@@ -28,6 +29,9 @@ public abstract class AbstractCommand implements Runnable {
 
     @Inject
     protected KnativeClient knativeClient;
+
+    @Inject
+    protected KubernetesFacade kubernetesFacade;
 
     @Override
     public void run() {
