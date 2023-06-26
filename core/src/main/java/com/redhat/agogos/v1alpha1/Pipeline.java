@@ -35,7 +35,7 @@ public class Pipeline extends AgogosResource<PipelineSpec, Status> implements Na
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
-    public static class PipelineSpec implements KubernetesResource {
+    public static class PipelineSpec {
 
         @ToString
         @JsonDeserialize(using = JsonDeserializer.None.class)
@@ -90,23 +90,13 @@ public class Pipeline extends AgogosResource<PipelineSpec, Status> implements Na
 
     }
 
-    /**
-     * <p>
-     * Returns object name together with namespace. Useful for logging.
-     * </p>
-     * 
-     * @return String in format: <code>[NAMESPACE]/[NAME]</code>
-     */
-    @JsonIgnore
-    public String getNamespacedName() {
-        return this.getMetadata().getNamespace() + "/" + this.getMetadata().getName();
+    @Override
+    protected PipelineSpec initSpec() {
+        return new PipelineSpec();
     }
 
-    @Getter
-    @Setter
-    private PipelineSpec spec = new PipelineSpec();
-
-    @Setter
-    @Getter
-    private Status status = new Status();
+    @Override
+    protected Status initStatus() {
+        return new Status();
+    }
 }

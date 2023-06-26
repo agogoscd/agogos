@@ -87,11 +87,11 @@ public class TriggerDependentResource
 
         if (!triggerSpecBuilder.hasInterceptors()) {
             LOG.warn("No interceptors found for Tekton Trigger '{}', Agogos Trigger will not be created",
-                    agogos.getNamespacedName());
+                    agogos.getFullName());
             return null;
         }
 
-        LOG.info("Updating '{}' Tekton Trigger", agogos.getNamespacedName());
+        LOG.info("Updating '{}' Tekton Trigger", agogos.getFullName());
 
         // Set the owner for Tekton Trigger to Agogos Trigger
         OwnerReference ownerReference = new OwnerReferenceBuilder()
@@ -165,7 +165,7 @@ public class TriggerDependentResource
         } catch (IllegalArgumentException e) {
             throw new ApplicationException(
                     "Cron expression '{}' defined in '{}' trigger is not a valid UNIX Cron expression", timed.getCron(),
-                    agogos.getNamespacedName());
+                    agogos.getFullName());
         }
 
         CronMapper cronMapper = CronMapper.fromUnixToQuartz();
@@ -174,7 +174,7 @@ public class TriggerDependentResource
             scheduler.scheduleTimedTriggerEvent(agogos, cronMapper.map(cron).asString());
         } catch (SchedulerException e) {
             throw new ApplicationException("Could not schedule timed event trigger '{}' for '{}' trigger",
-                    timed.getCron(), agogos.getNamespacedName(), e);
+                    timed.getCron(), agogos.getFullName(), e);
         }
     }
 }

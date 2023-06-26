@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.ResourceStatus;
 import com.redhat.agogos.v1alpha1.Component.ComponentSpec;
-import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.model.annotation.Group;
 import io.fabric8.kubernetes.model.annotation.Kind;
@@ -31,7 +30,7 @@ public class Component extends AgogosResource<ComponentSpec, Status> implements 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
-    public static class ComponentSpec implements KubernetesResource {
+    public static class ComponentSpec {
         private static final long serialVersionUID = -2068477162805635444L;
 
         @Getter
@@ -66,9 +65,10 @@ public class Component extends AgogosResource<ComponentSpec, Status> implements 
         return false;
     }
 
-    @Getter
-    @Setter
-    private ComponentSpec spec = new ComponentSpec();
+    @Override
+    protected ComponentSpec initSpec() {
+        return new ComponentSpec();
+    }
 
     @Override
     protected Status initStatus() {

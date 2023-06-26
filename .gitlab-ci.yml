@@ -1,5 +1,5 @@
 verify:
-  image: maven:3.8-openjdk-11
+  image: maven:3.8-openjdk-17
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
     MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
@@ -32,7 +32,7 @@ verify:
 
 cli:
   image:
-    name: quay.io/quarkus/ubi-quarkus-native-image:22.3-java11
+    name: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java17
     entrypoint: ["/bin/sh", "-c"]
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"

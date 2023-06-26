@@ -34,7 +34,8 @@ public class ResultableStatus extends AgogosResourceStatus {
 
     @Getter
     @Setter
-    private Map<?, ?> result;
+    // explicit parameters are needed to avoid crashing, see https://github.com/sundrio/sundrio/issues/398
+    private Map<Object, Object> result;
 
     @JsonIgnore
     public ZonedDateTime startTime() {

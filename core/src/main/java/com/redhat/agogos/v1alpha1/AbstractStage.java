@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.AbstractStage.StageSpec;
-import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +23,7 @@ public abstract class AbstractStage extends AgogosResource<StageSpec, Status> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
-    public static class StageSchema implements KubernetesResource {
+    public static class StageSchema {
         private static final long serialVersionUID = 5507683698215774978L;
 
         @Getter
@@ -36,7 +35,7 @@ public abstract class AbstractStage extends AgogosResource<StageSpec, Status> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
-    public static class StageSpec implements KubernetesResource {
+    public static class StageSpec {
 
         private static final long serialVersionUID = 3644066384389447653L;
 
@@ -55,7 +54,8 @@ public abstract class AbstractStage extends AgogosResource<StageSpec, Status> {
         return new Status();
     }
 
-    @Getter
-    @Setter
-    private StageSpec spec = new StageSpec();
+    @Override
+    protected StageSpec initSpec() {
+        return new StageSpec();
+    }
 }
