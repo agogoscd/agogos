@@ -10,7 +10,9 @@ import io.quarkus.test.InjectMock;
 import io.quarkus.test.kubernetes.client.KubernetesTestServer;
 import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import jakarta.inject.Inject;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.MockitoAnnotations;
 
 @WithKubernetesTestServer(setup = KubernetesTestServerSetup.class)
 public abstract class AbstractCommandTest {
@@ -32,5 +34,17 @@ public abstract class AbstractCommandTest {
     @BeforeEach
     protected void setup() {
         catcher.reset();
+    }
+
+    AutoCloseable mocks;
+
+    @BeforeEach
+    void openMocks() {
+        mocks = MockitoAnnotations.openMocks(this);
+    }
+
+    @AfterEach
+    void closeMocks() throws Exception {
+        mocks.close();
     }
 }

@@ -1,6 +1,6 @@
 package com.redhat.agogos.cli.commands.info;
 
-import com.redhat.agogos.cli.commands.CommandTest;
+import com.redhat.agogos.cli.commands.AbstractCommandTest;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.VersionInfo;
 import io.quarkus.test.junit.QuarkusTest;
@@ -16,7 +16,7 @@ import java.io.StringWriter;
 import java.net.URL;
 
 @QuarkusTest
-public class InfoCommandTest extends CommandTest {
+public class InfoCommandTest extends AbstractCommandTest {
 
     @InjectMock(convertScopes = true)
     KubernetesClient kubernetesClientMock;
