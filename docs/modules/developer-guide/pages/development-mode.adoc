@@ -67,11 +67,11 @@ In the root of the repository, run:
 ./mvnw clean package -D skipTests
 ----
 
-This command compiles all the Agogos packages. To install the Agogos, run:
+This command compiles all the Agogos packages. To install the Agogos Operator, run:
 
 [source,bash]
 ----
-java -jar cli/target/quarkus-app/quarkus-run.jar adm install --profile dev --namespace default
+java -Dagogos.cli-profile=admin -jar cli/target/quarkus-app/quarkus-run.jar adm install --profile dev
 ----
 
 This command install Tekton, Knative Eventing and the Agogos CustomResourceDefinitions,
@@ -79,11 +79,11 @@ as well as the Agogos webhooks. It also creates a self-signed certificate
 ([filename]`key.pem` and [filename]`webhooks.crt`) to encrypt the Agogos
 webhooks endpoint.
 
-Configure the namespace where Agogos runs. Execute:
+Configure the namespace to use Agogos. Execute:
 
 [source,bash]
 ----
-java -jar cli/target/quarkus-app/quarkus-run.jar adm init --namespace default
+java -Dagogos.cli-profile=admin -jar cli/target/quarkus-app/quarkus-run.jar adm init --namespace default
 ----
 
 This command creates service accounts, rolebindings, configuration maps...
