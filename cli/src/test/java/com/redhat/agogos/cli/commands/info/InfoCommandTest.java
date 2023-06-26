@@ -1,5 +1,6 @@
 package com.redhat.agogos.cli.commands.info;
 
+import com.redhat.agogos.KubernetesFacade;
 import com.redhat.agogos.cli.commands.AbstractCommandTest;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.VersionInfo;
@@ -21,6 +22,9 @@ public class InfoCommandTest extends AbstractCommandTest {
     @InjectMock(convertScopes = true)
     KubernetesClient kubernetesClientMock;
 
+    @InjectMock
+    KubernetesFacade kubernetesFacadeMock;
+
     @InjectMocks
     InfoCommand infoCommand = new InfoCommand();
 
@@ -28,19 +32,10 @@ public class InfoCommandTest extends AbstractCommandTest {
     public void ensureDataIsPrinted() throws Exception {
         StringWriter sw = new StringWriter();
 
-        Mockito
-                .when(kubernetesClientMock.getMasterUrl())
-                .thenReturn(new URL("https://localhost:6443"));
-        Mockito
-                .when(kubernetesClientMock.getNamespace())
-                .thenReturn("default");
-        VersionInfo versionInfo = new VersionInfo.Builder()
-                .withMajor("x")
-                .withMinor("y")
-                .build();
-        Mockito
-                .when(kubernetesClientMock.getKubernetesVersion())
-                .thenReturn(versionInfo);
+        VersionInfo versionInfo = new VersionInfo.Builder().withMajor("x").withMinor("y").build();
+        Mockito.when(kubernetesFacadeMock.getMasterUrl()).thenReturn(new URL("https://localhost:6443"));
+        Mockito.when(kubernetesFacadeMock.getNamespace()).thenReturn("default");
+        Mockito.when(kubernetesFacadeMock.getKubernetesVersion()).thenReturn(versionInfo);
 
         CommandLine cmd = new CommandLine(infoCommand);
         cmd.setOut(new PrintWriter(sw));

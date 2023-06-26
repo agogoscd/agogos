@@ -2,8 +2,11 @@ package com.redhat.agogos;
 
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.VersionInfo;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+
+import java.net.URL;
 
 @ApplicationScoped
 public class KubernetesFacade {
@@ -11,8 +14,16 @@ public class KubernetesFacade {
     @Inject
     KubernetesClient kubernetesClient;
 
+    public URL getMasterUrl() {
+        return kubernetesClient.getMasterUrl();
+    }
+
     public String getNamespace() {
         return kubernetesClient.getNamespace();
+    }
+
+    public VersionInfo getKubernetesVersion() {
+        return kubernetesClient.getKubernetesVersion();
     }
 
     public <T extends HasMetadata> T create(T resource) {

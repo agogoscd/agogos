@@ -16,17 +16,17 @@ public class InfoCommand extends AbstractCommand {
 
         sb.append(
                 Ansi.AUTO.string(String.format("@|bold Cluster URL|@:\t\t%s",
-                        kubernetesClient.getMasterUrl())))
+                        kubernetesFacade.getMasterUrl())))
                 .append(nl);
         sb.append(
                 Ansi.AUTO.string(String.format("@|bold Namespace|@:\t\t%s",
-                        kubernetesClient.getNamespace())))
+                        kubernetesFacade.getNamespace())))
                 .append(nl);
         sb.append(
                 Ansi.AUTO.string(String.format("@|bold Kubernetes version|@:\t%s",
                         String.format("%s.%s",
-                                kubernetesClient.getKubernetesVersion().getMajor(),
-                                kubernetesClient.getKubernetesVersion().getMinor()))))
+                                kubernetesFacade.getKubernetesVersion().getMajor(),
+                                kubernetesFacade.getKubernetesVersion().getMinor()))))
                 .append(nl);
 
         spec.commandLine().getOut().println(sb.toString());
