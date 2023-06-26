@@ -6,3 +6,7 @@ productization processes.
 
 This section of the documentation contains the details about the Agogos offering
 that CPaaS does. See the sidebar for details on different topics.
+
+== Builders
+* link:https://gitlab.cee.redhat.com/agogos/extensions-internal/-/tree/main/builders/dummy[Dummy Builder]
+* link:https://gitlab.cee.redhat.com/agogos/extensions-internal/-/tree/main/builders/brew[Brew Builder]
