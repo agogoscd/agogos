@@ -12,7 +12,7 @@ After running the tests, aggregate the code coverage reports run:
 
 [source,bash]
 ----
-$ ./mvnw --non-recusive verify
+$ ./mvnw --non-recursive verify
 ----
 
 Open the [filename]`target/site/jacoco/index.html` to see the report.
