@@ -10,7 +10,7 @@ This tutorial shows you how to run a simple component build on Agogos using Mini
 
 == Before you begin
 This tutorial assumes you have already setup `minikube`, `kubectl` and, at
-least, OpenJDK 11 . See
+least, OpenJDK 17. See
 link:https://minikube.sigs.k8s.io/docs/start/[minikube start],
 link:https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/[kubectl] and
 link:https://openjdk.org/[OpenJDK]
