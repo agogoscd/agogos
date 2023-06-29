@@ -17,7 +17,6 @@ import io.fabric8.kubernetes.api.model.rbac.RoleBinding;
 import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.Subject;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
-import io.fabric8.kubernetes.client.utils.Serialization;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
@@ -253,7 +252,8 @@ public class InitNamespaceCommand extends AbstractCommand {
         }
 
         try {
-            ResourceQuota resourceQuota = Serialization.unmarshal(new FileInputStream(quotaFile), ResourceQuota.class);
+            ResourceQuota resourceQuota = kubernetesClient.getKubernetesSerialization()
+                    .unmarshal(new FileInputStream(quotaFile), ResourceQuota.class);
 
             resourceQuota.getMetadata().setNamespace(namespace);
             resourceQuota.getMetadata().setName(AGOGOS_QUOTA_NAME);

@@ -6,18 +6,8 @@ import com.redhat.agogos.k8s.controllers.AbstractDependentResource;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Component;
 import com.redhat.agogos.v1alpha1.WorkspaceMapping;
-import io.fabric8.kubernetes.api.model.EmptyDirVolumeSource;
-import io.fabric8.kubernetes.api.model.OwnerReference;
-import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
-import io.fabric8.kubernetes.api.model.PodSecurityContext;
-import io.fabric8.kubernetes.api.model.PodSecurityContextBuilder;
-import io.fabric8.kubernetes.client.utils.Serialization;
-import io.fabric8.tekton.pipeline.v1beta1.Param;
-import io.fabric8.tekton.pipeline.v1beta1.ParamBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineRunBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBinding;
-import io.fabric8.tekton.pipeline.v1beta1.WorkspaceBindingBuilder;
+import io.fabric8.kubernetes.api.model.*;
+import io.fabric8.tekton.pipeline.v1beta1.*;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
@@ -73,7 +63,7 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
         Component component = context.getSecondaryResource(Component.class).get();
         Param param = new ParamBuilder()
                 .withName("component")
-                .withNewValue(Serialization.asYaml(component))
+                .withNewValue(context.getClient().getKubernetesSerialization().asYaml(component))
                 .build();
 
         pipelineRun = new PipelineRunBuilder(pipelineRun)
