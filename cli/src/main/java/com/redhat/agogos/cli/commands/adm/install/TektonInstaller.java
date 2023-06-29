@@ -37,6 +37,8 @@ public class TektonInstaller extends DependencyInstaller {
 
         // configureForCloudEvents(namespace);
 
+        waitForAllPodsRunning(tekton.namespace());
+
         LOG.info("✅ Tekton {} installed", tekton.version());
     }
 

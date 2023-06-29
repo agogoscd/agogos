@@ -26,6 +26,8 @@ public class TektonTriggersInstaller extends DependencyInstaller {
 
         install(triggers, profile, namespace);
 
+        waitForAllPodsRunning(triggers.namespace());
+
         LOG.info("✅ Tekton Triggers {} installed", triggers.version());
     }
 }
