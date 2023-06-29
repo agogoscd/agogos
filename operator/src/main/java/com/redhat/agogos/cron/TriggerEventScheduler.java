@@ -72,13 +72,13 @@ public class TriggerEventScheduler {
                 .build();
 
         LOG.info("Scheduling timed job for '{}' trigger and '{}' schedule, next scheduled run around {}",
-                trigger.getNamespacedName(), cron, quartzTrigger.getFireTimeAfter(new Date()));
+                trigger.getFullName(), cron, quartzTrigger.getFireTimeAfter(new Date()));
 
         quartz.scheduleJob(quartzJob, Set.of(quartzTrigger), true);
     }
 
     public void removeTimedTriggerEvent(Trigger trigger) throws SchedulerException {
-        LOG.info("Removing timed job '{}'", trigger.getNamespacedName());
+        LOG.info("Removing timed job '{}'", trigger.getFullName());
 
         quartz.deleteJob(new JobKey(trigger.getMetadata().getName(), trigger.getMetadata().getNamespace()));
     }

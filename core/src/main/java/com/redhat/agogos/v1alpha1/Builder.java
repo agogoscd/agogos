@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.Builder.BuilderSpec;
-import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.model.annotation.Group;
 import io.fabric8.kubernetes.model.annotation.Kind;
 import io.fabric8.kubernetes.model.annotation.Version;
@@ -30,7 +29,7 @@ public class Builder extends AgogosResource<BuilderSpec, Status> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
-    public static class BuilderSchema implements KubernetesResource {
+    public static class BuilderSchema {
         private static final long serialVersionUID = 5507683698215774978L;
 
         @Getter
@@ -42,7 +41,7 @@ public class Builder extends AgogosResource<BuilderSpec, Status> {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
-    public static class BuilderSpec implements KubernetesResource {
+    public static class BuilderSpec {
 
         private static final long serialVersionUID = 3644066384389447653L;
 
@@ -73,8 +72,8 @@ public class Builder extends AgogosResource<BuilderSpec, Status> {
         return new Status();
     }
 
-    @Getter
-    @Setter
-    private BuilderSpec spec = new BuilderSpec();
-
+    @Override
+    protected BuilderSpec initSpec() {
+        return new BuilderSpec();
+    }
 }

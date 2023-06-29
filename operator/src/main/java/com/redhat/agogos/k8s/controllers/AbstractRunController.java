@@ -44,7 +44,7 @@ public abstract class AbstractRunController<T extends AgogosResource<?, Resultab
         final ResultableStatus originalResourceStatus = deepCopy(resourceStatus, context);
 
         String message = null;
-        Map<?, ?> result = null;
+        Map<Object, Object> result = null;
 
         switch (runStatus) {
             case STARTED:

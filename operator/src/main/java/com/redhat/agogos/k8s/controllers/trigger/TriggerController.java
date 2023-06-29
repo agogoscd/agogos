@@ -39,7 +39,7 @@ public class TriggerController extends AbstractController<Trigger> {
                 try {
                     scheduler.removeTimedTriggerEvent(trigger);
                 } catch (SchedulerException e) {
-                    LOG.error("Could not remove timed event trigger '{}'", trigger.getNamespacedName(), e);
+                    LOG.error("Could not remove timed event trigger '{}'", trigger.getFullName(), e);
                 }
             }
         });

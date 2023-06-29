@@ -1,11 +1,9 @@
 package com.redhat.agogos.v1alpha1;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.Run.RunSpec;
-import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.model.annotation.Group;
 import io.fabric8.kubernetes.model.annotation.Kind;
@@ -28,30 +26,20 @@ public class Run extends AgogosResource<RunSpec, ResultableStatus> implements Na
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
-    public static class RunSpec implements KubernetesResource {
+    public static class RunSpec {
         private static final long serialVersionUID = -8979203850878721124L;
         @Getter
         @Setter
         private String pipeline;
     }
 
-    /**
-     * <p>
-     * Returns object name together with namespace. Useful for logging.
-     * </p>
-     * 
-     * @return String in format: <code>[NAMESPACE]/[NAME]</code>
-     */
-    @JsonIgnore
-    public String getNamespacedName() {
-        return this.getMetadata().getNamespace() + "/" + this.getMetadata().getName();
+    @Override
+    protected RunSpec initSpec() {
+        return new RunSpec();
     }
 
-    @Getter
-    @Setter
-    private RunSpec spec = new RunSpec();
-
-    @Getter
-    @Setter
-    private ResultableStatus status = new ResultableStatus();
+    @Override
+    protected ResultableStatus initStatus() {
+        return new ResultableStatus();
+    }
 }

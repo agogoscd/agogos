@@ -1,13 +1,11 @@
 package com.redhat.agogos.v1alpha1.triggers;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.Status;
 import com.redhat.agogos.v1alpha1.triggers.Trigger.TriggerSpec;
-import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.model.annotation.Group;
 import io.fabric8.kubernetes.model.annotation.Kind;
@@ -36,7 +34,7 @@ public class Trigger extends AgogosResource<TriggerSpec, Status> implements Name
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
-    public static class TriggerSpec implements KubernetesResource {
+    public static class TriggerSpec {
 
         private static final long serialVersionUID = 6338334242266044209L;
 
@@ -47,23 +45,13 @@ public class Trigger extends AgogosResource<TriggerSpec, Status> implements Name
 
     private static final long serialVersionUID = 127976417696596732L;
 
-    @Getter
-    @Setter
-    private TriggerSpec spec = new TriggerSpec();
+    @Override
+    protected TriggerSpec initSpec() {
+        return new TriggerSpec();
+    }
 
-    @Getter
-    @Setter
-    private Status status = new Status();
-
-    /**
-     * <p>
-     * Returns object name together with namespace. Useful for logging.
-     * </p>
-     * 
-     * @return String in format: <code>[NAMESPACE]/[NAME]</code>
-     */
-    @JsonIgnore
-    public String getNamespacedName() {
-        return this.getMetadata().getNamespace() + "/" + this.getMetadata().getName();
+    @Override
+    protected Status initStatus() {
+        return new Status();
     }
 }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.Group.ComponentGroupResourceSpec;
-import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.model.annotation.Kind;
 import io.fabric8.kubernetes.model.annotation.Version;
@@ -27,7 +26,7 @@ public class Group extends AgogosResource<ComponentGroupResourceSpec, Void> impl
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
-    public static class ComponentGroupResourceSpec implements KubernetesResource {
+    public static class ComponentGroupResourceSpec {
         private static final long serialVersionUID = 4609282852879403086L;
 
         @Getter
@@ -37,7 +36,8 @@ public class Group extends AgogosResource<ComponentGroupResourceSpec, Void> impl
 
     private static final long serialVersionUID = -7092342726608099745L;
 
-    @Getter
-    @Setter
-    private ComponentGroupResourceSpec spec = new ComponentGroupResourceSpec();
+    @Override
+    protected ComponentGroupResourceSpec initSpec() {
+        return new ComponentGroupResourceSpec();
+    }
 }

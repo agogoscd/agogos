@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.v1alpha1.Handler.HandlerSpec;
-import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.model.annotation.Group;
 import io.fabric8.kubernetes.model.annotation.Kind;
@@ -32,7 +31,7 @@ public class Handler extends AgogosResource<HandlerSpec, Void> implements Namesp
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
-    public static class HandlerSchema implements KubernetesResource {
+    public static class HandlerSchema {
         private static final long serialVersionUID = 5507683698215774978L;
 
         @Getter
@@ -44,7 +43,7 @@ public class Handler extends AgogosResource<HandlerSpec, Void> implements Namesp
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
-    public static class HandlerSpec implements KubernetesResource {
+    public static class HandlerSpec {
         private static final long serialVersionUID = -2068477162805635444L;
 
         /**
@@ -75,8 +74,8 @@ public class Handler extends AgogosResource<HandlerSpec, Void> implements Namesp
         this.getMetadata().setName(name);
     }
 
-    @Getter
-    @Setter
-    private HandlerSpec spec = new HandlerSpec();
-
+    @Override
+    protected HandlerSpec initSpec() {
+        return new HandlerSpec();
+    }
 }
