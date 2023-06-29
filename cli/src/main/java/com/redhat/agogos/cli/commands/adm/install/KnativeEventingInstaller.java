@@ -31,6 +31,9 @@ public class KnativeEventingInstaller extends DependencyInstaller {
                     resource -> resource instanceof Deployment
                             && resource.getMetadata().getName().equals("pingsource-mt-adapter"));
         });
+
+        waitForAllPodsRunning(eventing.namespace());
+
         LOG.info("✅ Knative Eventing {} installed", eventing.version());
     }
 

@@ -5,14 +5,29 @@ import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import com.redhat.agogos.config.DependencyConfig;
 import com.redhat.agogos.errors.ApplicationException;
 import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryConfig;
+import io.github.resilience4j.retry.RetryRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public abstract class DependencyInstaller extends Installer {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DependencyInstaller.class);
+
+    private static final String POD_RUNNING = "Running";
+    private static final Integer MAX_RETRIES = 36;
+    private static final Integer MAX_INTERVAL = 5;
 
     protected void install(DependencyConfig config, InstallProfile profile, String namespace) {
         install(config, profile, namespace, null);
@@ -31,5 +46,42 @@ public abstract class DependencyInstaller extends Installer {
         }
 
         Helper.status(resources);
+    }
+
+    protected void waitForAllPodsRunning(String namespace) {
+        RetryConfig config = RetryConfig.<Set<String>> custom()
+                .maxAttempts(MAX_RETRIES)
+                .waitDuration(Duration.ofSeconds(MAX_INTERVAL))
+                .retryOnResult(phases -> phases.size() != 1 || !phases.contains(POD_RUNNING))
+                .build();
+
+        RetryRegistry registry = RetryRegistry.of(config);
+        Retry retry = registry.retry("pod-phasees");
+        retry.getEventPublisher()
+                .onRetry(e -> LOG.info("⏳ WAIT: Waiting for all pods in the '{}' namespace to be {}", namespace, POD_RUNNING));
+        Function<String, Set<String>> decorated = Retry.decorateFunction(retry, (String n) -> {
+            return getAllPodPhases(n);
+        });
+
+        Set<String> result = (Set<String>) decorated.apply(namespace);
+        if (allPodsRunning(result)) {
+            LOG.info("👉 OK: All pods in the '{}' namespace are {}", namespace, POD_RUNNING);
+        } else {
+            LOG.info("⚠️ WARN: All pods in the '{}' namespace are net yet {}", namespace, POD_RUNNING);
+        }
+    }
+
+    private Set<String> getAllPodPhases(String namespace) {
+        return kubernetesClient.pods()
+                .inNamespace(namespace)
+                .list()
+                .getItems()
+                .stream()
+                .map(p -> p.getStatus().getPhase())
+                .collect(Collectors.toSet());
+    }
+
+    private boolean allPodsRunning(Set<String> phases) {
+        return phases.size() == 1 && phases.contains(POD_RUNNING);
     }
 }
