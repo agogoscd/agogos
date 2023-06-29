@@ -1,0 +1,42 @@
+= Agogos Documentation
+
+Documentation is key to have a good user and developer experience.
+
+== Goals
+* Have a direct, short documentation, using plain language and a consistent style
+* Have instructions for the users to complete Agogos tasks 
+* Have guidelines to the developers to contribute to Agogos
+* Auto-generate as much as possible from the Agogos code (CLI, Schemas...)
+* Provide in depth explanations of Agogos concepts
+* Keep a record of design decisions
+
+== What/How
+* Agogos documentation is written as AsciiDoc files and kept in the same
+repository as the code. These files are used to generate the HTML site using
+GitLab pages and Antora.
+* Agogos has a documentation guidelines to keep a consistent style (distilled
+from https://www.ibm.com/docs/en/ibm-style)
+* Agogos has a single documentation site
+* Agogos has clear separation between concepts, procedures and references (see
+https://redhat-documentation.github.io/modular-docs/#_creating_modules)
+* Agogos has automatic generation of CLI/Schema references
+* Agogos has a dedicated section for the design decisions. Those documents aim
+to inform future development so the project keeps its vision.
+
+== Consequences
+Benefits:
+* Better user and developer experience
+* Code and documentation are versioned together
+* Design decisions are recorded and are accessible
+
+Drawbacks:
+* Style guide has to be written
+* Contribution threshold is higher due to style and structure requirements
+* Review is more expensive due to style and structure requirements
+
+== Additional references
+
+* These concepts are explored in Red Hat's documentation documentation
+https://redhat-documentation.github.io/modular-docs/#creating-concept-modules
+* Similar concepts are explored in Divio's Documentation system:
+https://documentation.divio.com/
