@@ -2,6 +2,7 @@
 ** xref:development-mode.adoc[]
 ** xref:testing.adoc[]
 ** xref:ide.adoc[]
+** xref:documentation.adoc[]
 ** Stages
 *** xref:stages/builder_tutorial.adoc[]
 *** xref:stages/stage_api.adoc[]
