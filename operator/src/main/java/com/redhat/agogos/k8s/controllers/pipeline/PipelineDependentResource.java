@@ -10,16 +10,7 @@ import com.redhat.agogos.v1alpha1.Pipeline.PipelineSpec.StageReference;
 import com.redhat.agogos.v1alpha1.WorkspaceMapping;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
-import io.fabric8.kubernetes.client.utils.Serialization;
-import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineTask;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineTaskBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineWorkspaceDeclaration;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineWorkspaceDeclarationBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.TaskRefBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBinding;
-import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBindingBuilder;
+import io.fabric8.tekton.pipeline.v1beta1.*;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +31,7 @@ public class PipelineDependentResource
     @Override
     protected Pipeline desired(com.redhat.agogos.v1alpha1.Pipeline agogos,
             Context<com.redhat.agogos.v1alpha1.Pipeline> context) {
-        LOG.error(Serialization.asYaml(agogos));
+        LOG.error(context.getClient().getKubernetesSerialization().asYaml(agogos));
         Pipeline pipeline = new Pipeline();
 
         Optional<Pipeline> optional = context.getSecondaryResource(Pipeline.class);
