@@ -57,7 +57,7 @@ public class Component extends AgogosResource<ComponentSpec, Status> implements 
 
     @JsonIgnore
     public boolean isReady() {
-        if (ResourceStatus.valueOf(getStatus().getStatus()) == ResourceStatus.Ready) {
+        if (getStatus().getStatus() == ResourceStatus.READY) {
             return true;
         }
 

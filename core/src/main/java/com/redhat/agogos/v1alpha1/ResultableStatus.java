@@ -18,9 +18,9 @@ import java.util.Objects;
 @RegisterForReflection
 public class ResultableStatus extends AgogosResourceStatus {
 
-    public ResultableStatus() {
-        status = String.valueOf(ResultableResourceStatus.New);
-    }
+    @Getter
+    @Setter
+    protected ResultableResourceStatus status = ResultableResourceStatus.NEW;
 
     @Getter
     @Setter
@@ -67,9 +67,9 @@ public class ResultableStatus extends AgogosResourceStatus {
 
         ResultableStatus status = (ResultableStatus) obj;
 
-        if (Objects.equals(status.getStatus(), getStatus()) //
-                && Objects.equals(status.getStartTime(), getStartTime())//
-                && Objects.equals(status.getCompletionTime(), getCompletionTime()) //
+        if (Objects.equals(status.getStatus(), getStatus())
+                && Objects.equals(status.getStartTime(), getStartTime())
+                && Objects.equals(status.getCompletionTime(), getCompletionTime())
                 && Objects.equals(status.getResult(), getResult())) {
 
             return true;

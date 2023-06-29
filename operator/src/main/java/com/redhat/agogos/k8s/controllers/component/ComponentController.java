@@ -35,11 +35,11 @@ public class ComponentController extends AbstractController<Component> {
     @Override
     public UpdateControl<Component> reconcile(Component component, Context<Component> context) {
         Status componentStatus = component.getStatus();
-        if (!String.valueOf(ResourceStatus.Ready).equals(componentStatus.getStatus())) {
-            componentStatus.setStatus(String.valueOf(ResourceStatus.Ready));
+        if (componentStatus.getStatus() != ResourceStatus.READY) {
+            componentStatus.setStatus(ResourceStatus.READY);
             componentStatus.setReason("Component is ready");
             componentStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
-            LOG.info("Set status for Component '{}' to {}", component.getFullName(), component.getStatus().getStatus());
+            LOG.info("Set status for Component '{}' to {}", component.getFullName(), componentStatus.getStatus());
             return UpdateControl.updateStatus(component);
         }
 

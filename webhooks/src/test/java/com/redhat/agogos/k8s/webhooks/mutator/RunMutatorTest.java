@@ -22,11 +22,13 @@ import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Base64;
 
+@Disabled("Enable when https://github.com/fabric8io/kubernetes-client/issues/5293 is released")
 @WithKubernetesTestServer(setup = RunMutatorTestServerSetup.class)
 @QuarkusTest
 @TestHTTPEndpoint(WebhookHandler.class)
