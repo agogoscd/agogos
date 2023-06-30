@@ -2,8 +2,6 @@ package com.redhat.agogos.cli.commands;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import com.redhat.agogos.KubernetesFacade;
 import com.redhat.agogos.ResultableResourceStatus;
 import com.redhat.agogos.cli.CLI;
@@ -17,6 +15,8 @@ import io.fabric8.kubernetes.api.model.DefaultKubernetesResourceList;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
+import io.quarkus.kubernetes.client.KubernetesClientObjectMapper;
 import jakarta.inject.Inject;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.Model.CommandSpec;
@@ -44,6 +44,15 @@ public abstract class AbstractSubcommand<T extends AgogosResource<?, ? extends A
 
     @Inject
     protected KubernetesFacade kubernetesFacade;
+
+    // This mapper is *only* included here to allow for pretty printing of JSON. All other
+    // mappers in Agogos should use KubernetesSerialization.
+    @KubernetesClientObjectMapper
+    @Inject
+    ObjectMapper mapper;
+
+    @Inject
+    protected KubernetesSerialization objectMapper;
 
     protected void show(MixedOperation<T, ? extends DefaultKubernetesResourceList<T>, Resource<T>> resourceClient) {
     }
@@ -165,7 +174,7 @@ public abstract class AbstractSubcommand<T extends AgogosResource<?, ? extends A
 
     private String toJson(Object resource) {
         try {
-            return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(resource);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(resource);
         } catch (JsonProcessingException e) {
             throw new ApplicationException("Cannot convert resource to JSON", e);
         }
@@ -176,12 +185,7 @@ public abstract class AbstractSubcommand<T extends AgogosResource<?, ? extends A
     }
 
     private void printYaml(Object resource) {
-        try {
-            spec.commandLine().getOut().println(new ObjectMapper(new YAMLFactory().disable(Feature.WRITE_DOC_START_MARKER))
-                    .writerWithDefaultPrettyPrinter().writeValueAsString(resource));
-        } catch (JsonProcessingException e) {
-            throw new ApplicationException("Cannot convert resource to YAML", e);
-        }
+        spec.commandLine().getOut().println(objectMapper.asYaml(resource));
     }
 
 }

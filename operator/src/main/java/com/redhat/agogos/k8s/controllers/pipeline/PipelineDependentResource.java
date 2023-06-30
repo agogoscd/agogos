@@ -1,6 +1,5 @@
 package com.redhat.agogos.k8s.controllers.pipeline;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.k8s.controllers.AbstractDependentResource;
@@ -91,12 +90,8 @@ public class PipelineDependentResource
             String stageConfig = "{}";
 
             // Convert Component metadata to JSON
-            try {
-                LOG.debug("Converting Stage '{}' configuration to JSON", stageRef.getName());
-                stageConfig = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(stageEntry.getConfig());
-            } catch (JsonProcessingException e) {
-                LOG.warn("Unable to convert Stage '{}' configuration to JSON", stageRef.getName());
-            }
+            LOG.debug("Converting Stage '{}' configuration to JSON", stageRef.getName());
+            stageConfig = objectMapper.asJson(stageEntry.getConfig());
 
             // Prepare workspace for main task to store results
             WorkspacePipelineTaskBinding stageWsBinding = new WorkspacePipelineTaskBindingBuilder()

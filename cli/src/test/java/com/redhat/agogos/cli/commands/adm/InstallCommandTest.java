@@ -3,7 +3,6 @@ package com.redhat.agogos.cli.commands.adm;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.config.KnativeEventingDependency;
 import com.redhat.agogos.config.TektonPipelineDependency;
@@ -36,9 +35,6 @@ public class InstallCommandTest {
 
     @Inject
     CLI cli;
-
-    @Inject
-    ObjectMapper objectMapper;
 
     InMemoryLogHandler handler;
 

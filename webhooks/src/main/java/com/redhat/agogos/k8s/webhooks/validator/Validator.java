@@ -1,6 +1,5 @@
 package com.redhat.agogos.k8s.webhooks.validator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.k8s.webhooks.AdmissionHandler;
@@ -9,6 +8,7 @@ import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReview;
 import io.fabric8.kubernetes.client.CustomResource;
+import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
 import io.fabric8.tekton.client.TektonClient;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -23,7 +23,7 @@ public abstract class Validator<T extends CustomResource<?, ?>> extends Admissio
     private static final Logger LOG = LoggerFactory.getLogger(Validator.class);
 
     @Inject
-    ObjectMapper objectMapper;
+    KubernetesSerialization objectMapper;
 
     @Inject
     AgogosClient agogosClient;
