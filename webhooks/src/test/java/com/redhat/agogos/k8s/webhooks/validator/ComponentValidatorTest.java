@@ -1,6 +1,5 @@
 package com.redhat.agogos.k8s.webhooks.validator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.k8s.webhooks.WebhookHandler;
 import com.redhat.agogos.k8s.webhooks.validator.ComponentValidatorTest.ComponentValidatorTestServerSetup;
 import com.redhat.agogos.test.CRDTestServerSetup;
@@ -24,7 +23,6 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import jakarta.inject.Inject;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -70,9 +68,6 @@ public class ComponentValidatorTest {
             server.getClient().resources(Handler.class).inNamespace("default").resource(handler).create();
         }
     }
-
-    @Inject
-    ObjectMapper objectMapper;
 
     Component component;
 

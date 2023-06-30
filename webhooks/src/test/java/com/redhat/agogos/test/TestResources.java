@@ -1,6 +1,7 @@
 package com.redhat.agogos.test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
+import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,6 +9,10 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 public class TestResources {
+
+    @Inject
+    static KubernetesSerialization mapper;
+
     /**
      * Reads test resource file and returns it as a String.
      */
@@ -20,6 +25,6 @@ public class TestResources {
      */
     @SuppressWarnings("unchecked")
     public static Map<Object, Object> asMap(String path) throws IOException {
-        return new ObjectMapper().readValue(asString(path), Map.class);
+        return mapper.convertValue(asString(path), Map.class);
     }
 }

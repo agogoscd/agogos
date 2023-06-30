@@ -1,6 +1,5 @@
 package com.redhat.agogos.cli;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.errors.ApplicationException;
 import io.fabric8.kubernetes.api.model.DeletionPropagation;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
@@ -13,6 +12,7 @@ import io.fabric8.kubernetes.client.dsl.internal.GenericKubernetesResourceOperat
 import io.fabric8.kubernetes.client.dsl.internal.OperationContext;
 import io.fabric8.kubernetes.client.http.HttpClient;
 import io.fabric8.kubernetes.client.http.HttpResponse;
+import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
 import io.fabric8.kubernetes.client.vertx.VertxHttpClientFactory;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
@@ -62,7 +62,7 @@ public class ResourceLoader {
     KubernetesClient kubernetesClient;
 
     @Inject
-    ObjectMapper objectMapper;
+    KubernetesSerialization objectMapper;
 
     /**
      * <p>

@@ -1,7 +1,5 @@
 package com.redhat.agogos.k8s.controllers.component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.k8s.Resource;
 import com.redhat.agogos.k8s.controllers.AbstractDependentResource;
@@ -259,11 +257,7 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
             } else if (value instanceof String) {
                 pvb.withStringVal(value.toString());
             } else {
-                try {
-                    pvb.withStringVal(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(value));
-                } catch (JsonProcessingException e) {
-                    throw new ApplicationException("Could not convert '{}' parameter to JSON", p.getName(), e);
-                }
+                pvb.withStringVal(objectMapper.asJson(value));
             }
 
             pipelineTaskBuilder.addNewParam().withName(p.getName()).withValue(pvb.build()).endParam();

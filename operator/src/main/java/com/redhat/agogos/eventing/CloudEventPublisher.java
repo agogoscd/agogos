@@ -1,7 +1,5 @@
 package com.redhat.agogos.eventing;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.BrokerRestClient;
 import com.redhat.agogos.CloudEventHelper;
 import com.redhat.agogos.PipelineRunState;
@@ -11,6 +9,7 @@ import io.cloudevents.CloudEvent;
 import io.cloudevents.CloudEventData;
 import io.cloudevents.core.builder.CloudEventBuilder;
 import io.cloudevents.core.data.PojoCloudEventData;
+import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.json.Json;
@@ -42,7 +41,7 @@ public class CloudEventPublisher {
     // BrokerRestClient broker;
 
     @Inject
-    ObjectMapper objectMapper;
+    KubernetesSerialization objectMapper;
 
     @ConfigProperty(name = "agogos.cloud-events.base-url", defaultValue = "http://broker-ingress.knative-eventing.svc.cluster.local")
     String baseurl = "http://broker-ingress.knative-eventing.svc.cluster.local";
@@ -89,13 +88,7 @@ public class CloudEventPublisher {
         JsonObjectBuilder dataBuilder = Json.createObjectBuilder();
 
         payload.forEach((key, o) -> {
-            try {
-                dataBuilder.add(key,
-                        Json.createReader(new StringReader(objectMapper.writeValueAsString(o))).readValue());
-            } catch (JsonProcessingException e) {
-                throw new ApplicationException("Error while preparing CloudEvent data for '{}' key and '{}' object",
-                        key, o, e);
-            }
+            dataBuilder.add(key, Json.createReader(new StringReader(objectMapper.asJson(o))).readValue());
         });
 
         String type = CloudEventHelper.type(resource.getClass(), state);
