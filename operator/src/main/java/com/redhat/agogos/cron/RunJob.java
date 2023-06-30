@@ -1,5 +1,6 @@
 package com.redhat.agogos.cron;
 
+import com.redhat.agogos.Retries;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.Run;
@@ -24,6 +25,9 @@ public class RunJob implements Job {
 
     @Inject
     AgogosClient agogosClient;
+
+    @Inject
+    Retries retries;
 
     /**
      * Function to send a {@link CloudEvent} with as specified by the data available
@@ -55,7 +59,7 @@ public class RunJob implements Job {
         run.getSpec().setPipeline(name);
         run.getMetadata().getOwnerReferences().add(ownerReference);
 
-        run = agogosClient.v1alpha1().runs().inNamespace(namespace).resource(run).serverSideApply();
+        run = (Run) retries.serverSideApply(agogosClient.v1alpha1().runs().inNamespace(namespace).resource(run));
 
         LOG.info("Run '{}' scheduled, next run at {}", run.getFullName(),
                 context.getNextFireTime());
