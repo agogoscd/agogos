@@ -1,7 +1,6 @@
 package com.redhat.agogos.k8s.webhooks.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.errors.MissingResourceException;
 import com.redhat.agogos.errors.ValidationException;
@@ -11,8 +10,8 @@ import com.redhat.agogos.v1alpha1.ComponentHandlerSpec;
 import com.redhat.agogos.v1alpha1.Handler;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
+import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
 import io.fabric8.tekton.pipeline.v1beta1.Task;
-import io.quarkus.kubernetes.client.KubernetesClientObjectMapper;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.openapi4j.core.exception.ResolutionException;
@@ -30,9 +29,8 @@ public class ComponentValidator extends Validator<Component> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ComponentValidator.class);
 
-    @KubernetesClientObjectMapper
     @Inject
-    ObjectMapper mapper;
+    protected KubernetesSerialization objectMapper;
 
     @Override
     protected void validateResource(Component component, AdmissionResponseBuilder responseBuilder) {
