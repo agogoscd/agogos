@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public abstract class DependencyInstaller extends Installer {
@@ -59,11 +59,11 @@ public abstract class DependencyInstaller extends Installer {
         Retry retry = registry.retry("pod-phasees");
         retry.getEventPublisher()
                 .onRetry(e -> LOG.info("⏳ WAIT: Waiting for all pods in the '{}' namespace to be {}", namespace, POD_RUNNING));
-        Function<String, Set<String>> decorated = Retry.decorateFunction(retry, (String n) -> {
-            return getAllPodPhases(n);
+        Supplier<Set<String>> decorated = Retry.decorateSupplier(retry, () -> {
+            return getAllPodPhases(namespace);
         });
 
-        Set<String> result = (Set<String>) decorated.apply(namespace);
+        Set<String> result = (Set<String>) decorated.get();
         if (allPodsRunning(result)) {
             LOG.info("👉 OK: All pods in the '{}' namespace are {}", namespace, POD_RUNNING);
         } else {
