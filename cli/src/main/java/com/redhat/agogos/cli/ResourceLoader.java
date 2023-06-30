@@ -14,6 +14,9 @@ import io.fabric8.kubernetes.client.dsl.internal.OperationContext;
 import io.fabric8.kubernetes.client.http.HttpClient;
 import io.fabric8.kubernetes.client.http.HttpResponse;
 import io.fabric8.kubernetes.client.vertx.VertxHttpClientFactory;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryConfig;
+import io.github.resilience4j.retry.RetryRegistry;
 import io.quarkus.runtime.StartupEvent;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -36,6 +39,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,12 +47,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @RegisterForReflection
 @ApplicationScoped
 public class ResourceLoader {
 
     private static final Logger LOG = LoggerFactory.getLogger(Helper.class);
+
+    private static final Integer MAX_RETRIES = 10;
+    private static final Integer MAX_INTERVAL = 3;
 
     @Inject
     KubernetesClient kubernetesClient;
@@ -355,37 +363,44 @@ public class ResourceLoader {
 
     private GenericKubernetesResource createResource(OperationContext ctx, GenericKubernetesResource resource,
             String namespace) {
-        for (int i = 0; i < 10; i++) {
-            try {
-                GenericKubernetesResourceOperationsImpl op = new GenericKubernetesResourceOperationsImpl(ctx,
-                        namespace != null);
-                if (namespace != null) {
-                    op.inNamespace(namespace);
-                }
-                return op.createOrReplace(resource);
-            } catch (KubernetesClientException kce) {
-                if (i == 9) {
-                    throw kce;
-                }
-            }
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
+        GenericKubernetesResourceOperationsImpl op = new GenericKubernetesResourceOperationsImpl(ctx, namespace != null);
+        if (namespace != null) {
+            op.inNamespace(namespace);
         }
-        return null;
+
+        RetryConfig config = RetryConfig.<Boolean> custom()
+                .maxAttempts(MAX_RETRIES)
+                .waitDuration(Duration.ofSeconds(MAX_INTERVAL))
+                .retryExceptions(KubernetesClientException.class)
+                .build();
+
+        RetryRegistry registry = RetryRegistry.of(config);
+        Retry retry = registry.retry("generic-resources");
+        retry.getEventPublisher()
+                .onRetry(e -> LOG.info("⏳ WAIT: Trying to apply {} again", Helper.getStatusLine(resource)));
+
+        Supplier<GenericKubernetesResource> decorated = Retry.decorateSupplier(retry, () -> {
+            return op.createOrReplace(resource);
+        });
+        return decorated.get();
     }
 
     private ResourceMapping getResourceMapping(String key) {
-        for (int i = 0; i < 10 && !resourceMappings.keySet().contains(key); i++) {
+        RetryConfig config = RetryConfig.<Boolean> custom()
+                .maxAttempts(MAX_RETRIES)
+                .waitDuration(Duration.ofSeconds(MAX_INTERVAL))
+                .retryOnResult(Void -> !resourceMappings.keySet().contains(key))
+                .build();
+
+        RetryRegistry registry = RetryRegistry.of(config);
+        Retry retry = registry.retry("mappings");
+        retry.getEventPublisher()
+                .onRetry(e -> LOG.info("⏳ WAIT: Waiting for the mapping'{}' to be available on the server", key));
+        Runnable decorated = Retry.decorateRunnable(retry, () -> {
             readMappings();
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-        }
+        });
+        decorated.run();
+
         return resourceMappings.get(key);
     }
 }
