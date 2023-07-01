@@ -4,5 +4,4 @@ import io.smallrye.config.ConfigMapping;
 
 @ConfigMapping(prefix = "dependencies.tekton-pipelines")
 public interface TektonPipelineDependency extends DependencyConfig {
-    String configmap();
 }
