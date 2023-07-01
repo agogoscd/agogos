@@ -20,6 +20,9 @@ public class TektonInstaller extends DependencyInstaller {
 
     private static final Logger LOG = LoggerFactory.getLogger(TektonInstaller.class);
 
+    private static final String CONFIGMAP_CONFIG_DEFAULTS = "config-defaults";
+    private static final String CONFIGMAP_FEATURE_FLAGS = "feature-flags";
+
     @ConfigProperty(name = "agogos.cloud-events.base-url", defaultValue = "http://broker-ingress.knative-eventing.svc.cluster.local")
     String baseUrl;
 
@@ -35,22 +38,36 @@ public class TektonInstaller extends DependencyInstaller {
 
         install(tekton, profile, namespace);
 
-        // configureForCloudEvents(namespace);
+        configureConfigDefaults(namespace);
+        configureFeatureFlags(profile, namespace);
 
         waitForAllPodsRunning(tekton.namespace());
 
         LOG.info("✅ Tekton {} installed", tekton.version());
     }
 
-    private void configureForCloudEvents(String namespace) {
+    private void configureConfigDefaults(String namespace) {
         kubernetesClient.configMaps()
                 .inNamespace(tekton.namespace())
-                .withName(tekton.configmap())
+                .withName(CONFIGMAP_CONFIG_DEFAULTS)
                 .edit(c -> new ConfigMapBuilder(c)
-                        .addToData("default-cloud-events-sink", String.format("%s/%s/agogos", baseUrl, namespace))
-                        .addToData("send-cloudevents-for-runs", "true")
+                        // .addToData("default-cloud-events-sink", String.format("%s/%s/agogos", baseUrl, namespace))
                         .build());
 
-        LOG.info("👉 OK: Configured Tekton ConfigMap '{}' for cloud events", tekton.configmap());
+        LOG.info("👉 OK: Configured Tekton ConfigMap '{}'", CONFIGMAP_CONFIG_DEFAULTS);
+    }
+
+    private void configureFeatureFlags(InstallProfile profile, String namespace) {
+        if (profile == InstallProfile.dev || profile == InstallProfile.local) {
+            kubernetesClient.configMaps()
+                    .inNamespace(tekton.namespace())
+                    .withName(CONFIGMAP_FEATURE_FLAGS)
+                    .edit(c -> new ConfigMapBuilder(c)
+                            .addToData("disable-affinity-assistant", "true")
+                            .addToData("send-cloudevents-for-runs", "true")
+                            .build());
+
+            LOG.info("👉 OK: Configured Tekton ConfigMap '{}'", CONFIGMAP_FEATURE_FLAGS);
+        }
     }
 }

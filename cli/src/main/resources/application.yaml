@@ -66,7 +66,6 @@ dependencies:
       - "https://github.com/knative/eventing/releases/download/knative-${dependencies.knative-eventing.version}/in-memory-channel.yaml"
       - "https://github.com/knative/eventing/releases/download/knative-${dependencies.knative-eventing.version}/mt-channel-broker.yaml"
   tekton-pipelines:
-    configmap: "config-defaults"
     namespace: "tekton-pipelines"
     version: "v0.47.2"
     urls: 
