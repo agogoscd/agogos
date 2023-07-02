@@ -1,11 +1,11 @@
 package com.redhat.agogos.cli.commands.stage;
 
-import com.redhat.agogos.cli.commands.AbstractCommand;
+import com.redhat.agogos.cli.commands.AbstractSubcommand;
 import picocli.CommandLine.Command;
 
 @Command(mixinStandardHelpOptions = true, name = "stage", aliases = {
         "stages", "stg" }, description = "Interact with stages", subcommands = { // 
                 StageListCommand.class
         })
-public class StageCommand extends AbstractCommand {
+public class StageCommand extends AbstractSubcommand {
 }

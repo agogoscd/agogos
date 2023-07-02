@@ -1,6 +1,6 @@
 package com.redhat.agogos.cli.commands.component;
 
-import com.redhat.agogos.cli.commands.AbstractCommand;
+import com.redhat.agogos.cli.commands.AbstractSubcommand;
 import picocli.CommandLine.Command;
 
 @Command(mixinStandardHelpOptions = true, name = "components", aliases = {
@@ -9,5 +9,5 @@ import picocli.CommandLine.Command;
                 ComponentListCommand.class,
                 ComponentDescribeCommand.class
         })
-public class ComponentCommand extends AbstractCommand {
+public class ComponentCommand extends AbstractSubcommand {
 }

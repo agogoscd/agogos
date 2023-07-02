@@ -1,7 +1,7 @@
 package com.redhat.agogos.cli.commands.adm;
 
 import com.redhat.agogos.cli.Helper;
-import com.redhat.agogos.cli.commands.AbstractCommand;
+import com.redhat.agogos.cli.commands.AbstractRunnableSubcommand;
 import com.redhat.agogos.cli.commands.adm.install.BrokerInstaller;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller;
 import io.fabric8.kubernetes.api.model.ConfigMap;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 
 @Command(mixinStandardHelpOptions = true, name = "init-namespace", aliases = {
         "init" }, description = "Initialize selected namespace to work with Agogos")
-public class InitNamespaceCommand extends AbstractCommand {
+public class InitNamespaceCommand extends AbstractRunnableSubcommand {
 
     @ConfigProperty(name = "agogos.cloud-events.base-url", defaultValue = "http://broker-ingress.knative-eventing.svc.cluster.local")
     String baseUrl;

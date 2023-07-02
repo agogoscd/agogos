@@ -1,11 +1,11 @@
 package com.redhat.agogos.cli.commands.adm;
 
-import com.redhat.agogos.cli.commands.AbstractCommand;
+import com.redhat.agogos.cli.commands.AbstractSubcommand;
 import picocli.CommandLine.Command;
 
 @Command(mixinStandardHelpOptions = true, name = "adm", description = "Agogos administration commands", subcommands = {
         InstallCommand.class,
         InitNamespaceCommand.class
 })
-public class AdmCommand extends AbstractCommand {
+public class AdmCommand extends AbstractSubcommand {
 }
