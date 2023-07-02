@@ -30,7 +30,6 @@ public class PipelineDependentResource
     @Override
     protected Pipeline desired(com.redhat.agogos.v1alpha1.Pipeline agogos,
             Context<com.redhat.agogos.v1alpha1.Pipeline> context) {
-        LOG.error(context.getClient().getKubernetesSerialization().asYaml(agogos));
         Pipeline pipeline = new Pipeline();
 
         Optional<Pipeline> optional = context.getSecondaryResource(Pipeline.class);

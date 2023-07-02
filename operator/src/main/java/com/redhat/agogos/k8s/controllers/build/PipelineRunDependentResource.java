@@ -63,7 +63,7 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
         Component component = context.getSecondaryResource(Component.class).get();
         Param param = new ParamBuilder()
                 .withName("component")
-                .withNewValue(context.getClient().getKubernetesSerialization().asYaml(component))
+                .withNewValue(objectMapper.asYaml(component))
                 .build();
 
         pipelineRun = new PipelineRunBuilder(pipelineRun)
