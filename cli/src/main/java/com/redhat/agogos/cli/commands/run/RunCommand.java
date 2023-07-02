@@ -1,6 +1,6 @@
 package com.redhat.agogos.cli.commands.run;
 
-import com.redhat.agogos.cli.commands.AbstractCommand;
+import com.redhat.agogos.cli.commands.AbstractSubcommand;
 import picocli.CommandLine.Command;
 
 @Command(mixinStandardHelpOptions = true, name = "runs", aliases = {
@@ -8,5 +8,5 @@ import picocli.CommandLine.Command;
                 RunDescribeCommand.class,
                 RunListCommand.class
         })
-public class RunCommand extends AbstractCommand {
+public class RunCommand extends AbstractSubcommand {
 }

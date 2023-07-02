@@ -1,6 +1,6 @@
 package com.redhat.agogos.cli.commands.pipeline;
 
-import com.redhat.agogos.cli.commands.AbstractCommand;
+import com.redhat.agogos.cli.commands.AbstractSubcommand;
 import picocli.CommandLine.Command;
 
 @Command(mixinStandardHelpOptions = true, name = "pipelines", aliases = {
@@ -8,5 +8,5 @@ import picocli.CommandLine.Command;
                 PipelineListCommand.class,
                 PipelineRunCommand.class
         })
-public class PipelineCommand extends AbstractCommand {
+public class PipelineCommand extends AbstractSubcommand {
 }

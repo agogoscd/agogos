@@ -1,6 +1,6 @@
 package com.redhat.agogos.cli.commands.pipeline;
 
-import com.redhat.agogos.cli.commands.AbstractSubcommand;
+import com.redhat.agogos.cli.commands.AbstractResourceSubcommand;
 import com.redhat.agogos.cli.commands.run.RunDescribeCommand;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import com.redhat.agogos.v1alpha1.Run;
@@ -8,7 +8,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
 @Command(mixinStandardHelpOptions = true, name = "run", description = "run a pipeline")
-public class PipelineRunCommand extends AbstractSubcommand<Pipeline> {
+public class PipelineRunCommand extends AbstractResourceSubcommand<Pipeline> {
     @Parameters(index = "0", description = "Name of the pipeline to run")
     String name;
 

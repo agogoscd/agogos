@@ -1,6 +1,6 @@
 package com.redhat.agogos.cli.commands.adm;
 
-import com.redhat.agogos.cli.commands.AbstractCommand;
+import com.redhat.agogos.cli.commands.AbstractRunnableSubcommand;
 import com.redhat.agogos.cli.commands.adm.install.Installer;
 import com.redhat.agogos.cli.commands.adm.install.Priority;
 import com.redhat.agogos.cli.commands.adm.install.Profile;
@@ -16,7 +16,7 @@ import picocli.CommandLine.Option;
 import java.util.Comparator;
 
 @Command(mixinStandardHelpOptions = true, name = "install", description = "Install Agogos")
-public class InstallCommand extends AbstractCommand {
+public class InstallCommand extends AbstractRunnableSubcommand {
 
     private static final Logger LOG = LoggerFactory.getLogger(InstallCommand.class);
 

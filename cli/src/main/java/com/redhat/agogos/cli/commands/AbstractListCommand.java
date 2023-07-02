@@ -20,7 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends AgogosResourceStatus>>
-        extends AbstractSubcommand<T> {
+        extends AbstractResourceSubcommand<T> {
     @Option(names = "--limit", defaultValue = "0", description = "Number of items to display, if not provided all resources will be returned.", hidden = true)
     Long limit;
 

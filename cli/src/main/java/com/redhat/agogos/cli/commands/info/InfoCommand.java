@@ -1,11 +1,11 @@
 package com.redhat.agogos.cli.commands.info;
 
-import com.redhat.agogos.cli.commands.AbstractCommand;
+import com.redhat.agogos.cli.commands.AbstractRunnableSubcommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Ansi;
 
 @Command(mixinStandardHelpOptions = true, name = "info", aliases = { "i" }, description = "Agogos cluster information")
-public class InfoCommand extends AbstractCommand {
+public class InfoCommand extends AbstractRunnableSubcommand {
 
     @Override
     public void run() {
