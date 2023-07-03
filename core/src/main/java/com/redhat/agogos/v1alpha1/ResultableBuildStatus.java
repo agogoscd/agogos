@@ -12,8 +12,6 @@ import java.util.Objects;
 @RegisterForReflection
 public class ResultableBuildStatus extends ResultableStatus {
 
-    private static final long serialVersionUID = -3677250631346179780L;
-
     @Getter
     @Setter
     ComponentSpec componentSpec;

@@ -31,7 +31,6 @@ public class Component extends AgogosResource<ComponentSpec, Status> implements 
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class ComponentSpec {
-        private static final long serialVersionUID = -2068477162805635444L;
 
         @Getter
         @Setter

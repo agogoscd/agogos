@@ -30,7 +30,6 @@ public class Builder extends AgogosResource<BuilderSpec, Status> {
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class BuilderSchema {
-        private static final long serialVersionUID = 5507683698215774978L;
 
         @Getter
         @Setter
@@ -42,8 +41,6 @@ public class Builder extends AgogosResource<BuilderSpec, Status> {
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class BuilderSpec {
-
-        private static final long serialVersionUID = 3644066384389447653L;
 
         @Getter
         @Setter

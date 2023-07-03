@@ -22,7 +22,7 @@ public class InfoCommandTest extends AbstractCommandTest {
     @InjectMock(convertScopes = true)
     KubernetesClient kubernetesClientMock;
 
-    @InjectMock
+    @io.quarkus.test.InjectMock
     KubernetesFacade kubernetesFacadeMock;
 
     @InjectMocks

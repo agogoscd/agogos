@@ -36,8 +36,6 @@ public class Trigger extends AgogosResource<TriggerSpec, Status> implements Name
     @RegisterForReflection
     public static class TriggerSpec {
 
-        private static final long serialVersionUID = 6338334242266044209L;
-
         private List<TriggerEvent> events = new ArrayList<>();
 
         private TriggerTarget target = new TriggerTarget();
