@@ -25,8 +25,6 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +38,6 @@ import java.util.concurrent.TimeoutException;
 @ApplicationScoped
 @RegisterForReflection
 public class BrokerInstaller {
-
-    private static final Logger LOG = LoggerFactory.getLogger(BrokerInstaller.class);
 
     private static final String RESOURCE_NAME = "agogos";
     private static final String RESOURCE_NAME_EVENTING = "agogos-eventing";

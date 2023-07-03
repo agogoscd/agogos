@@ -24,7 +24,6 @@ public abstract class AbstractStage extends AgogosResource<StageSpec, Status> {
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class StageSchema {
-        private static final long serialVersionUID = 5507683698215774978L;
 
         @Getter
         @Setter
@@ -36,8 +35,6 @@ public abstract class AbstractStage extends AgogosResource<StageSpec, Status> {
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class StageSpec {
-
-        private static final long serialVersionUID = 3644066384389447653L;
 
         @Getter
         @Setter

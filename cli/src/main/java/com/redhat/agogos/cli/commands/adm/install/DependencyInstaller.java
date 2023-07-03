@@ -5,8 +5,6 @@ import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import com.redhat.agogos.config.DependencyConfig;
 import com.redhat.agogos.errors.ApplicationException;
 import io.fabric8.kubernetes.api.model.HasMetadata;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -15,8 +13,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public abstract class DependencyInstaller extends Installer {
-
-    private static final Logger LOG = LoggerFactory.getLogger(DependencyInstaller.class);
 
     protected void install(DependencyConfig config, InstallProfile profile, String namespace) {
         install(config, profile, namespace, null);
