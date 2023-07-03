@@ -1,5 +1,5 @@
 verify:
-  image: maven:3.8-openjdk-17
+  image: registry.access.redhat.com/ubi9/openjdk-17:latest
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
     MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
@@ -63,7 +63,7 @@ cli:
       allow_failure: true
 
 docs:
-  image: antora/antora:2.3.4
+  image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
   stage: test
   script:
     - npm i
@@ -84,7 +84,7 @@ docs:
       allow_failure: true
 
 pages:
-  image: antora/antora:2.3.4
+  image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
   stage: deploy
   script:
     - npm i
