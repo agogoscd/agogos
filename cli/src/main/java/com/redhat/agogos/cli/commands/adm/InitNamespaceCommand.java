@@ -83,7 +83,7 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
             LOG.error("⛔ Unable to initialize namespace '{}' as it is an Agogos core namespace.", namespace);
             System.exit(picocli.CommandLine.ExitCode.USAGE);
         }
-        LOG.info("Initializing '{}' namespace with Agogos resources...", namespace);
+        LOG.info("🕞 Initializing '{}' namespace with Agogos resources...", namespace);
 
         installNamespace();
         installConfig();
@@ -103,7 +103,9 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
 
         Helper.status(installedResources);
 
-        LOG.info("Done, '{}' namespace initialized and ready to use!", namespace);
+        retries.waitForAllPodsRunning(namespace);
+
+        LOG.info("✅ Namespace '{}' initialized and ready to use!", namespace);
     }
 
     /**
@@ -130,7 +132,7 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
                 .withData(data)
                 .build();
 
-        cm = kubernetesClient.configMaps().inNamespace(namespace).resource(cm).serverSideApply();
+        cm = (ConfigMap) retries.serverSideApply(kubernetesClient.configMaps().inNamespace(namespace).resource(cm));
 
         installedResources.add(cm);
     }
@@ -148,7 +150,7 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
                 .endMetadata()
                 .build();
 
-        ns = kubernetesClient.namespaces().resource(ns).serverSideApply();
+        ns = (Namespace) retries.serverSideApply(kubernetesClient.namespaces().resource(ns));
 
         installedResources.add(ns);
     }
@@ -170,7 +172,8 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
                 .endRoleRef()
                 .build();
 
-        roleBinding = kubernetesClient.rbac().roleBindings().inNamespace(namespace).resource(roleBinding).serverSideApply();
+        roleBinding = (RoleBinding) retries
+                .serverSideApply(kubernetesClient.rbac().roleBindings().inNamespace(namespace).resource(roleBinding));
 
         installedResources.add(roleBinding);
     }
@@ -186,7 +189,7 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
                 .endMetadata()
                 .build();
 
-        sa = kubernetesClient.serviceAccounts().inNamespace(namespace).resource(sa).serverSideApply();
+        sa = (ServiceAccount) retries.serverSideApply(kubernetesClient.serviceAccounts().inNamespace(namespace).resource(sa));
 
         installedResources.add(sa);
 
@@ -236,7 +239,8 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
                     .endRoleRef()
                     .build();
 
-            roleBinding = kubernetesClient.rbac().roleBindings().inNamespace(namespace).resource(roleBinding).serverSideApply();
+            roleBinding = (RoleBinding) retries
+                    .serverSideApply(kubernetesClient.rbac().roleBindings().inNamespace(namespace).resource(roleBinding));
 
             installedResources.add(roleBinding);
 
@@ -258,7 +262,8 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
             resourceQuota.getMetadata().setNamespace(namespace);
             resourceQuota.getMetadata().setName(AGOGOS_QUOTA_NAME);
 
-            resourceQuota = kubernetesClient.resourceQuotas().inNamespace(namespace).resource(resourceQuota).serverSideApply();
+            resourceQuota = (ResourceQuota) retries
+                    .serverSideApply(kubernetesClient.resourceQuotas().inNamespace(namespace).resource(resourceQuota));
 
             installedResources.add(resourceQuota);
         } catch (FileNotFoundException e) {
