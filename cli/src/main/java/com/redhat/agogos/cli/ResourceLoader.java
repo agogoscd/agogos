@@ -53,7 +53,7 @@ import java.util.function.Supplier;
 @ApplicationScoped
 public class ResourceLoader {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ResourceLoader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Helper.class);
 
     private static final Integer MAX_RETRIES = 10;
     private static final Integer MAX_INTERVAL = 3;

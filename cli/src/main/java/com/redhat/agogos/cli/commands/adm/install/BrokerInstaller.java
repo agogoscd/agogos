@@ -1,6 +1,5 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
-import com.redhat.agogos.Retries;
 import com.redhat.agogos.errors.ApplicationException;
 import io.fabric8.knative.client.KnativeClient;
 import io.fabric8.knative.eventing.v1.Broker;
@@ -56,9 +55,6 @@ public class BrokerInstaller {
     KubernetesClient kubernetesClient;
 
     @Inject
-    Retries retries;
-
-    @Inject
     TektonClient tektonClient;
 
     private List<HasMetadata> resources = new ArrayList<>();
@@ -83,8 +79,7 @@ public class BrokerInstaller {
                 .withData(Map.of("channelTemplateSpec", "apiVersion: messaging.knative.dev/v1\nkind: InMemoryChannel"))
                 .build();
 
-        configMap = (ConfigMap) retries
-                .serverSideApply(kubernetesClient.configMaps().inNamespace(namespace).resource(configMap));
+        configMap = kubernetesClient.configMaps().inNamespace(namespace).resource(configMap).serverSideApply();
 
         resources.add(configMap);
 
@@ -108,7 +103,7 @@ public class BrokerInstaller {
                 .endSpec()
                 .build();
 
-        broker = (Broker) retries.serverSideApply(knativeClient.brokers().inNamespace(namespace).resource(broker));
+        broker = knativeClient.brokers().inNamespace(namespace).resource(broker).serverSideApply();
 
         resources.add(broker);
 
@@ -134,8 +129,7 @@ public class BrokerInstaller {
                 .endSpec()
                 .build();
 
-        el = (EventListener) retries
-                .serverSideApply(tektonClient.v1beta1().eventListeners().inNamespace(namespace).resource(el));
+        el = tektonClient.v1beta1().eventListeners().inNamespace(namespace).resource(el).serverSideApply();
 
         resources.add(el);
 
@@ -192,7 +186,7 @@ public class BrokerInstaller {
                 .endSpec()
                 .build();
 
-        trigger = (Trigger) retries.serverSideApply(knativeClient.triggers().inNamespace(namespace).resource(trigger));
+        trigger = knativeClient.triggers().inNamespace(namespace).resource(trigger).serverSideApply();
 
         resources.add(trigger);
 
@@ -231,8 +225,7 @@ public class BrokerInstaller {
 
         if (!roleBinding.getSubjects().contains(subject)) {
             roleBinding.getSubjects().add(subject);
-            roleBinding = (ClusterRoleBinding) retries
-                    .serverSideApply(kubernetesClient.rbac().clusterRoleBindings().resource(roleBinding));
+            roleBinding = kubernetesClient.rbac().clusterRoleBindings().resource(roleBinding).serverSideApply();
         }
         resources.add(roleBinding);
 
@@ -247,7 +240,7 @@ public class BrokerInstaller {
                 .endMetadata()
                 .build();
 
-        sa = (ServiceAccount) retries.serverSideApply(kubernetesClient.serviceAccounts().inNamespace(namespace).resource(sa));
+        sa = kubernetesClient.serviceAccounts().inNamespace(namespace).resource(sa).serverSideApply();
 
         resources.add(sa);
 

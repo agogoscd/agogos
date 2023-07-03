@@ -1,6 +1,5 @@
 package com.redhat.agogos.cron;
 
-import com.redhat.agogos.Retries;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.v1alpha1.Build;
 import io.cloudevents.CloudEvent;
@@ -23,9 +22,6 @@ public class BuildJob implements Job {
     @Inject
     AgogosClient agogosClient;
 
-    @Inject
-    Retries retries;
-
     /**
      * Function to send a {@link CloudEvent} with as specified by the data available
      * in the {@link JobExecutionContext}.
@@ -45,7 +41,7 @@ public class BuildJob implements Job {
         build.getMetadata().setNamespace(namespace);
         build.getSpec().setComponent(name);
 
-        build = (Build) retries.serverSideApply(agogosClient.v1alpha1().builds().inNamespace(namespace).resource(build));
+        build = agogosClient.v1alpha1().builds().inNamespace(namespace).resource(build).serverSideApply();
 
         LOG.info("Build '{}' scheduled, next run at {}", build.getFullName(),
                 context.getNextFireTime());

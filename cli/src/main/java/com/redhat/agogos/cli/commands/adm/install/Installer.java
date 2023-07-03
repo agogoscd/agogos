@@ -1,6 +1,5 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
-import com.redhat.agogos.Retries;
 import com.redhat.agogos.cli.ResourceLoader;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -15,9 +14,6 @@ public abstract class Installer {
 
     @Inject
     ResourceLoader resourceLoader;
-
-    @Inject
-    Retries retries;
 
     public abstract void install(InstallProfile profile, String namespace);
 }
