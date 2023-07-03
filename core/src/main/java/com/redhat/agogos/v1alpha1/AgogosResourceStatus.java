@@ -16,6 +16,8 @@ import java.util.Objects;
 @RegisterForReflection
 public abstract class AgogosResourceStatus {
 
+    private static final long serialVersionUID = -3677250631346179789L;
+
     @Getter
     @Setter
     protected String status;

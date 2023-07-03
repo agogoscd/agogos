@@ -32,6 +32,7 @@ public class Handler extends AgogosResource<HandlerSpec, Void> implements Namesp
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class HandlerSchema {
+        private static final long serialVersionUID = 5507683698215774978L;
 
         @Getter
         @Setter
@@ -43,6 +44,7 @@ public class Handler extends AgogosResource<HandlerSpec, Void> implements Namesp
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class HandlerSpec {
+        private static final long serialVersionUID = -2068477162805635444L;
 
         /**
          * <p>

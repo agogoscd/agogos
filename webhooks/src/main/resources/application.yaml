@@ -11,6 +11,9 @@ quarkus:
     dockerfile-jvm-path: "src/main/docker/Dockerfile.fast-jar"
   http:
     port: 7080
+  kubernetes:
+    namespace: "agogos"
+    service-account: "agogos-webhooks"
   log:
     min-level: "TRACE"
     syslog:
