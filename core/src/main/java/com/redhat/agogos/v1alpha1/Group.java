@@ -27,6 +27,7 @@ public class Group extends AgogosResource<ComponentGroupResourceSpec, Void> impl
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class ComponentGroupResourceSpec {
+        private static final long serialVersionUID = 4609282852879403086L;
 
         @Getter
         @Setter

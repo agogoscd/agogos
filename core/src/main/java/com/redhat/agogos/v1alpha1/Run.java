@@ -27,7 +27,7 @@ public class Run extends AgogosResource<RunSpec, ResultableStatus> implements Na
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class RunSpec {
-
+        private static final long serialVersionUID = -8979203850878721124L;
         @Getter
         @Setter
         private String pipeline;

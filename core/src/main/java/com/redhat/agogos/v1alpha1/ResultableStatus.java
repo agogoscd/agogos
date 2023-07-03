@@ -18,6 +18,8 @@ import java.util.Objects;
 @RegisterForReflection
 public class ResultableStatus extends AgogosResourceStatus {
 
+    private static final long serialVersionUID = -3677250631346179789L;
+
     public ResultableStatus() {
         status = String.valueOf(ResultableResourceStatus.New);
     }
