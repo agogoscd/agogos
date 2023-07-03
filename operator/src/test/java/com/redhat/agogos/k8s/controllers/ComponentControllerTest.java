@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import com.redhat.agogos.Retries;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.k8s.controllers.component.ComponentController;
 import com.redhat.agogos.test.CRDTestServerSetup;
@@ -39,9 +38,6 @@ public class ComponentControllerTest {
 
     @Inject
     AgogosClient agogosClient;
-
-    @Inject
-    Retries retries;
 
     @Inject
     TektonClient tektonClient;
@@ -84,7 +80,7 @@ public class ComponentControllerTest {
 
         Task task = new TaskBuilder().withNewMetadata().withName("should-handle-component").endMetadata().withNewSpec()
                 .withParams(new ParamSpecBuilder().withName("param").build()).endSpec().build();
-        retries.serverSideApply(tektonClient.v1beta1().tasks().inNamespace("default").resource(task));
+        tektonClient.v1beta1().tasks().inNamespace("default").resource(task).serverSideApply();
 
         Builder builder = new Builder();
         builder.getMetadata().setName("should-handle-component-builder-name");
