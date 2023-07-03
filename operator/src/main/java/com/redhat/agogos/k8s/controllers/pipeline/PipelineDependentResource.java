@@ -58,8 +58,6 @@ public class PipelineDependentResource
 
         List<PipelineTask> tasks = new ArrayList<>();
 
-        // groupClient.getByName(pipeline.getSpec().getGroup()); TODO
-
         for (StageEntry stageEntry : agogos.getSpec().getStages()) {
             StageReference stageRef = stageEntry.getStageRef();
 

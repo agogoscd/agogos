@@ -29,7 +29,6 @@ public class Build extends AgogosResource<BuildSpec, ResultableBuildStatus> impl
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class BuildSpec {
-        private static final long serialVersionUID = 4609282852879403086L;
 
         @Getter
         @Setter

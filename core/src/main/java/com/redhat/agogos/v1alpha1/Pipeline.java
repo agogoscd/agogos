@@ -78,8 +78,6 @@ public class Pipeline extends AgogosResource<PipelineSpec, Status> implements Na
             public Pipeline pipeline;
         }
 
-        private static final long serialVersionUID = 3644066384389447653L;
-
         @Getter
         @Setter
         private String group;
