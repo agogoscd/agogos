@@ -124,17 +124,18 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
             Task handlerTask = tektonClient.v1beta1().tasks().inNamespace(component.getMetadata().getNamespace())
                     .withName(handler.getSpec().getTaskRef().getName()).get();
 
-            PipelineTask lastTask = tasks.get(tasks.size() - 1);
-
             PipelineTaskBuilder pipelineTaskBuilder = new PipelineTaskBuilder()
                     .withName(handlerName)
-                    .withRunAfter(lastTask.getName())
                     .withTaskRef(
                             new TaskRefBuilder().withName(handlerTask.getMetadata().getName())
                                     .withApiVersion("") // AGOGOS-96
                                     .withKind(handlerTask.getKind())
                                     .build())
                     .withWorkspaces(workspaceBindings(handler.getSpec().getWorkspaces()));
+
+            if (tasks.size() > 1) {
+                pipelineTaskBuilder.withRunAfter(tasks.get(tasks.size() - 1).getName());
+            }
 
             addParams(pipelineTaskBuilder, handlerTask.getSpec().getParams(), handlerSpec.getParams());
 
