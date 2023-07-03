@@ -21,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -36,6 +38,7 @@ public class ComponentValidator extends Validator<Component> {
     protected void validateResource(Component component, AdmissionResponseBuilder responseBuilder) {
         try {
             validateBuilder(component);
+            validateTaskNames(component);
 
             validateHandlerParameters(component.getSpec().getPre(), component);
             validateHandlerParameters(component.getSpec().getPost(), component);
@@ -44,9 +47,9 @@ public class ComponentValidator extends Validator<Component> {
         } catch (ApplicationException e) {
             LOG.error("An error occurred while validating Component", e);
 
-            responseBuilder.withAllowed(false) //
-                    .withStatus(new StatusBuilder() //
-                            .withCode(e.getCode()) //
+            responseBuilder.withAllowed(false)
+                    .withStatus(new StatusBuilder()
+                            .withCode(e.getCode())
                             .withMessage(e.getMessage())
                             .build());
         }
@@ -206,5 +209,21 @@ public class ComponentValidator extends Validator<Component> {
         }
 
         LOG.info("Component's '{}' Builder definition is valid!", component.getFullName());
+    }
+
+    private void validateTaskNames(Component component) throws ApplicationException {
+        List<String> names = component.getSpec().getPre().stream().map(s -> s.getHandlerRef().getName())
+                .collect(Collectors.toList());
+        names.addAll(component.getSpec().getPost().stream().map(s -> s.getHandlerRef().getName()).collect(Collectors.toList()));
+        names.add(component.getSpec().getBuild().getBuilderRef().getName());
+
+        Set<String> duplicates = names.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet().stream().filter(m -> m.getValue() > 1).map(Map.Entry::getKey).collect(Collectors.toSet());
+
+        if (duplicates.size() > 0) {
+            throw new ValidationException("Component definition '{}' contains duplicate handler names: {}",
+                    component.getFullName(),
+                    String.join(", ", duplicates));
+        }
     }
 }
