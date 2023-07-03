@@ -10,6 +10,7 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
 import io.fabric8.kubernetes.api.model.ResourceQuota;
+import io.fabric8.kubernetes.api.model.ResourceQuotaBuilder;
 import io.fabric8.kubernetes.api.model.ServiceAccount;
 import io.fabric8.kubernetes.api.model.ServiceAccountBuilder;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRole;
@@ -83,7 +84,7 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
             LOG.error("⛔ Unable to initialize namespace '{}' as it is an Agogos core namespace.", namespace);
             System.exit(picocli.CommandLine.ExitCode.USAGE);
         }
-        LOG.info("Initializing '{}' namespace with Agogos resources...", namespace);
+        LOG.info("🕞 Initializing '{}' namespace with Agogos resources...", namespace);
 
         installNamespace();
         installConfig();
@@ -103,7 +104,9 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
 
         Helper.status(installedResources);
 
-        LOG.info("Done, '{}' namespace initialized and ready to use!", namespace);
+        kubernetesFacade.waitForAllPodsRunning(namespace);
+
+        LOG.info("✅ Namespace '{}' initialized and ready to use!", namespace);
     }
 
     /**
@@ -255,8 +258,12 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
         try {
             ResourceQuota resourceQuota = kubernetesFacade.unmarshal(ResourceQuota.class, new FileInputStream(quotaFile));
 
-            resourceQuota.getMetadata().setNamespace(namespace);
-            resourceQuota.getMetadata().setName(AGOGOS_QUOTA_NAME);
+            resourceQuota = new ResourceQuotaBuilder(resourceQuota)
+                    .withNewMetadata()
+                    .withName(AGOGOS_QUOTA_NAME)
+                    .withNamespace(namespace)
+                    .endMetadata()
+                    .build();
             resourceQuota = kubernetesFacade.serverSideApply(resourceQuota);
 
             installedResources.add(resourceQuota);

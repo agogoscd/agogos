@@ -87,6 +87,7 @@ public class BrokerInstaller {
         Broker broker = new BrokerBuilder()
                 .withNewMetadata()
                 .withName(RESOURCE_NAME)
+                .withNamespace(namespace)
                 .withLabels(labels)
                 .withAnnotations(Map.of("eventing.knative.dev/broker.class", "MTChannelBasedBroker")) // TODO: Not good for production deployment, fine for now
                 .endMetadata()
@@ -100,7 +101,7 @@ public class BrokerInstaller {
                 .endSpec()
                 .build();
 
-        broker = knativeClient.brokers().inNamespace(namespace).resource(broker).serverSideApply();
+        broker = kubernetesFacade.serverSideApply(broker);
 
         resources.add(broker);
 
@@ -116,6 +117,7 @@ public class BrokerInstaller {
         EventListener el = new EventListenerBuilder()
                 .withNewMetadata()
                 .withName(RESOURCE_NAME)
+                .withNamespace(namespace)
                 .endMetadata()
                 .withNewSpec()
                 // .withCloudEventURI(String.format("%s/%s/%s", baseUrl, namespace, RESOURCE_NAME))
@@ -126,7 +128,7 @@ public class BrokerInstaller {
                 .endSpec()
                 .build();
 
-        el = tektonClient.v1beta1().eventListeners().inNamespace(namespace).resource(el).serverSideApply();
+        el = kubernetesFacade.serverSideApply(el);
 
         resources.add(el);
 
@@ -174,6 +176,7 @@ public class BrokerInstaller {
         Trigger trigger = new TriggerBuilder()
                 .withNewMetadata()
                 .withName(RESOURCE_NAME)
+                .withNamespace(namespace)
                 .endMetadata()
                 .withNewSpec()
                 .withBroker(broker.getMetadata().getName())
@@ -183,7 +186,7 @@ public class BrokerInstaller {
                 .endSpec()
                 .build();
 
-        trigger = knativeClient.triggers().inNamespace(namespace).resource(trigger).serverSideApply();
+        trigger = kubernetesFacade.serverSideApply(trigger);
 
         resources.add(trigger);
 

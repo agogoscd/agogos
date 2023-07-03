@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.k8s.controllers.component.ComponentController;
+import com.redhat.agogos.retries.KubernetesClientRetries;
 import com.redhat.agogos.test.CRDTestServerSetup;
 import com.redhat.agogos.v1alpha1.Builder;
 import com.redhat.agogos.v1alpha1.Component;
@@ -38,6 +39,9 @@ public class ComponentControllerTest {
 
     @Inject
     AgogosClient agogosClient;
+
+    @Inject
+    KubernetesClientRetries retries;
 
     @Inject
     TektonClient tektonClient;
@@ -80,7 +84,7 @@ public class ComponentControllerTest {
 
         Task task = new TaskBuilder().withNewMetadata().withName("should-handle-component").endMetadata().withNewSpec()
                 .withParams(new ParamSpecBuilder().withName("param").build()).endSpec().build();
-        tektonClient.v1beta1().tasks().inNamespace("default").resource(task).serverSideApply();
+        retries.serverSideApply(task);
 
         Builder builder = new Builder();
         builder.getMetadata().setName("should-handle-component-builder-name");

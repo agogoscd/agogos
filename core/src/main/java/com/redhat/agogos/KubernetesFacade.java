@@ -1,5 +1,6 @@
 package com.redhat.agogos;
 
+import com.redhat.agogos.retries.KubernetesClientRetries;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.StatusDetails;
 import io.fabric8.kubernetes.client.Config;
@@ -17,6 +18,9 @@ public class KubernetesFacade {
 
     @Inject
     KubernetesClient kubernetesClient;
+
+    @Inject
+    KubernetesClientRetries retries;
 
     public KubernetesClient getKubernetesClient() {
         return kubernetesClient;
@@ -39,26 +43,22 @@ public class KubernetesFacade {
     }
 
     public <T extends HasMetadata> T create(T resource) {
-        return kubernetesClient.resource(resource).create();
+        return retries.create(resource);
     }
 
     public <T extends HasMetadata> T serverSideApply(T resource) {
-        return kubernetesClient.resource(resource).serverSideApply();
+        return retries.serverSideApply(resource);
     }
 
     public <T extends HasMetadata> T update(T resource) {
-        return kubernetesClient.resource(resource).update();
+        return retries.update(resource);
     }
 
     public <T extends HasMetadata> List<StatusDetails> delete(
             Class<T> clazz,
             String namespace,
             String name) {
-        if (namespace == null) {
-            return kubernetesClient.resources(clazz).withName(name).delete();
-        }
-
-        return kubernetesClient.resources(clazz).inNamespace(namespace).withName(name).delete();
+        return retries.delete(clazz, namespace, name);
     }
 
     public <T extends HasMetadata> List<StatusDetails> delete(Class<T> clazz, String name) {
@@ -73,10 +73,7 @@ public class KubernetesFacade {
     }
 
     public <T extends HasMetadata> T get(Class<T> clazz, String namespace, String name) {
-        if (namespace == null) {
-            return kubernetesClient.resources(clazz).withName(name).get();
-        }
-        return kubernetesClient.resources(clazz).inNamespace(namespace).withName(name).get();
+        return retries.get(clazz, namespace, name);
     }
 
     public <T extends HasMetadata> T get(Class<T> clazz, String name) {
@@ -88,6 +85,10 @@ public class KubernetesFacade {
     }
 
     public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace) {
-        return kubernetesClient.resources(clazz).inNamespace(namespace).list().getItems();
+        return retries.list(clazz, namespace);
+    }
+
+    public void waitForAllPodsRunning(String namespace) {
+        retries.waitForAllPodsRunning(namespace);
     }
 }
