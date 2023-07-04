@@ -5,6 +5,7 @@ import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import com.redhat.agogos.config.DependencyConfig;
 import com.redhat.agogos.errors.ApplicationException;
 import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.Pod;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 import io.github.resilience4j.retry.RetryRegistry;
@@ -72,10 +73,8 @@ public abstract class DependencyInstaller extends Installer {
     }
 
     private Set<String> getAllPodPhases(String namespace) {
-        return kubernetesClient.pods()
-                .inNamespace(namespace)
-                .list()
-                .getItems()
+        return kubernetesFacade
+                .list(Pod.class, namespace)
                 .stream()
                 .map(p -> p.getStatus().getPhase())
                 .collect(Collectors.toSet());

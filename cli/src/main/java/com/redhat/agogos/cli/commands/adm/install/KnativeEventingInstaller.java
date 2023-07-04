@@ -53,12 +53,12 @@ public class KnativeEventingInstaller extends DependencyInstaller {
 
         String releaseLabel = "eventing.knative.dev/release";
 
-        kubernetesClient.admissionRegistration().v1().validatingWebhookConfigurations()
+        kubernetesFacade.getKubernetesClient().admissionRegistration().v1().validatingWebhookConfigurations()
                 .withLabel(releaseLabel).delete();
-        kubernetesClient.admissionRegistration().v1().mutatingWebhookConfigurations()
+        kubernetesFacade.getKubernetesClient().admissionRegistration().v1().mutatingWebhookConfigurations()
                 .withLabel(releaseLabel)
                 .delete();
 
-        kubernetesClient.apps().deployments().inNamespace(eventing.namespace()).withName("eventing-webhook").delete();
+        kubernetesFacade.delete(Deployment.class, eventing.namespace(), "eventing-webhook");
     }
 }

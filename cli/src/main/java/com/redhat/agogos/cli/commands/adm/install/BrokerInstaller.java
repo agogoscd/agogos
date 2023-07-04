@@ -1,5 +1,6 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
+import com.redhat.agogos.KubernetesFacade;
 import com.redhat.agogos.errors.ApplicationException;
 import io.fabric8.knative.client.KnativeClient;
 import io.fabric8.knative.eventing.v1.Broker;
@@ -16,7 +17,6 @@ import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBinding;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.Subject;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.triggers.v1beta1.EventListener;
 import io.fabric8.tekton.triggers.v1beta1.EventListenerBuilder;
@@ -48,7 +48,7 @@ public class BrokerInstaller {
     KnativeClient knativeClient;
 
     @Inject
-    KubernetesClient kubernetesClient;
+    KubernetesFacade kubernetesFacade;
 
     @Inject
     TektonClient tektonClient;
@@ -71,11 +71,12 @@ public class BrokerInstaller {
         ConfigMap configMap = new ConfigMapBuilder()
                 .withNewMetadata()
                 .withName("agogos-broker-config")
+                .withNamespace(namespace)
                 .endMetadata()
                 .withData(Map.of("channelTemplateSpec", "apiVersion: messaging.knative.dev/v1\nkind: InMemoryChannel"))
                 .build();
 
-        configMap = kubernetesClient.configMaps().inNamespace(namespace).resource(configMap).serverSideApply();
+        configMap = kubernetesFacade.serverSideApply(configMap);
 
         resources.add(configMap);
 
@@ -195,11 +196,7 @@ public class BrokerInstaller {
      *
      */
     private ClusterRoleBinding installEventingRoleBinding(ServiceAccount sa, String namespace) {
-        ClusterRoleBinding roleBinding = kubernetesClient.rbac()
-                .clusterRoleBindings()
-                .withName(RESOURCE_NAME_EVENTING)
-                .get();
-
+        ClusterRoleBinding roleBinding = kubernetesFacade.get(ClusterRoleBinding.class, RESOURCE_NAME_EVENTING);
         if (roleBinding == null) {
             roleBinding = new ClusterRoleBindingBuilder()
                     .withNewMetadata()
@@ -221,7 +218,7 @@ public class BrokerInstaller {
 
         if (!roleBinding.getSubjects().contains(subject)) {
             roleBinding.getSubjects().add(subject);
-            roleBinding = kubernetesClient.rbac().clusterRoleBindings().resource(roleBinding).serverSideApply();
+            roleBinding = kubernetesFacade.serverSideApply(roleBinding);
         }
         resources.add(roleBinding);
 
@@ -232,11 +229,12 @@ public class BrokerInstaller {
         ServiceAccount sa = new ServiceAccountBuilder()
                 .withNewMetadata()
                 .withName(RESOURCE_NAME_EVENTING)
+                .withNamespace(namespace)
                 .withLabels(labels)
                 .endMetadata()
                 .build();
 
-        sa = kubernetesClient.serviceAccounts().inNamespace(namespace).resource(sa).serverSideApply();
+        sa = kubernetesFacade.serverSideApply(sa);
 
         resources.add(sa);
 

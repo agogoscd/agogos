@@ -1,5 +1,6 @@
 package com.redhat.agogos.k8s.client;
 
+import com.redhat.agogos.KubernetesFacade;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.BuildList;
 import com.redhat.agogos.v1alpha1.Builder;
@@ -20,7 +21,6 @@ import com.redhat.agogos.v1alpha1.Stage;
 import com.redhat.agogos.v1alpha1.StageList;
 import com.redhat.agogos.v1alpha1.triggers.Trigger;
 import com.redhat.agogos.v1alpha1.triggers.TriggerList;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.quarkus.runtime.annotations.RegisterForReflection;
@@ -33,64 +33,64 @@ import jakarta.inject.Inject;
 public class V1alpha1APIGroupClient implements V1alpha1APIGroup {
 
     @Inject
-    KubernetesClient kubernetesClient;
+    KubernetesFacade kubernetesFacade;
 
     @Override
     @Produces
     public MixedOperation<Build, BuildList, Resource<Build>> builds() {
-        return kubernetesClient.resources(Build.class, BuildList.class);
+        return kubernetesFacade.getKubernetesClient().resources(Build.class, BuildList.class);
     }
 
     @Override
     @Produces
     public MixedOperation<Component, ComponentList, Resource<Component>> components() {
-        return kubernetesClient.resources(Component.class, ComponentList.class);
+        return kubernetesFacade.getKubernetesClient().resources(Component.class, ComponentList.class);
     }
 
     @Override
     @Produces
     public MixedOperation<Pipeline, PipelineList, Resource<Pipeline>> pipelines() {
-        return kubernetesClient.resources(Pipeline.class, PipelineList.class);
+        return kubernetesFacade.getKubernetesClient().resources(Pipeline.class, PipelineList.class);
     }
 
     @Override
     @Produces
     public MixedOperation<Run, RunList, Resource<Run>> runs() {
-        return kubernetesClient.resources(Run.class, RunList.class);
+        return kubernetesFacade.getKubernetesClient().resources(Run.class, RunList.class);
     }
 
     @Override
     @Produces
     public MixedOperation<Trigger, TriggerList, Resource<Trigger>> triggers() {
-        return kubernetesClient.resources(Trigger.class, TriggerList.class);
+        return kubernetesFacade.getKubernetesClient().resources(Trigger.class, TriggerList.class);
     }
 
     @Override
     @Produces
     public MixedOperation<ClusterStage, ClusterStageList, Resource<ClusterStage>> clusterstages() {
-        return kubernetesClient.resources(ClusterStage.class, ClusterStageList.class);
+        return kubernetesFacade.getKubernetesClient().resources(ClusterStage.class, ClusterStageList.class);
     }
 
     @Override
     @Produces
     public MixedOperation<Stage, StageList, Resource<Stage>> stages() {
-        return kubernetesClient.resources(Stage.class, StageList.class);
+        return kubernetesFacade.getKubernetesClient().resources(Stage.class, StageList.class);
     }
 
     @Override
     @Produces
     public MixedOperation<Builder, BuilderList, Resource<Builder>> builders() {
-        return kubernetesClient.resources(Builder.class, BuilderList.class);
+        return kubernetesFacade.getKubernetesClient().resources(Builder.class, BuilderList.class);
     }
 
     @Override
     public MixedOperation<Group, GroupList, Resource<Group>> groups() {
-        return kubernetesClient.resources(Group.class, GroupList.class);
+        return kubernetesFacade.getKubernetesClient().resources(Group.class, GroupList.class);
     }
 
     @Override
     public MixedOperation<Handler, HandlerList, Resource<Handler>> handlers() {
-        return kubernetesClient.resources(Handler.class, HandlerList.class);
+        return kubernetesFacade.getKubernetesClient().resources(Handler.class, HandlerList.class);
     }
 
 }

@@ -1,8 +1,8 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
+import com.redhat.agogos.KubernetesFacade;
 import com.redhat.agogos.cli.ResourceLoader;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -10,7 +10,7 @@ import jakarta.inject.Inject;
 @Priority
 public abstract class Installer {
     @Inject
-    KubernetesClient kubernetesClient;
+    KubernetesFacade kubernetesFacade;
 
     @Inject
     ResourceLoader resourceLoader;

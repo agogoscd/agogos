@@ -2,11 +2,9 @@ package com.redhat.agogos.cli.commands.info;
 
 import com.redhat.agogos.KubernetesFacade;
 import com.redhat.agogos.cli.commands.AbstractCommandTest;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.VersionInfo;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.MockitoConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -19,10 +17,6 @@ import java.net.URL;
 
 @QuarkusTest
 public class InfoCommandTest extends AbstractCommandTest {
-
-    @MockitoConfig(convertScopes = true)
-    @InjectMock
-    KubernetesClient kubernetesClientMock;
 
     @InjectMock
     KubernetesFacade kubernetesFacadeMock;

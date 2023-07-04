@@ -4,7 +4,6 @@ import com.redhat.agogos.KubernetesFacade;
 import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import io.fabric8.knative.client.KnativeClient;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.tekton.client.TektonClient;
 import jakarta.inject.Inject;
 import picocli.CommandLine.Model.CommandSpec;
@@ -20,9 +19,6 @@ public abstract class AbstractSubcommand {
 
     @Inject
     protected AgogosClient agogosClient;
-
-    @Inject
-    protected KubernetesClient kubernetesClient;
 
     @Inject
     protected KnativeClient knativeClient;
