@@ -260,7 +260,7 @@ public class WebhooksInstaller extends Installer {
             case dev:
                 validatingWebhookBuilder
                         .withNewClientConfig()
-                        .withUrl("https://192.168.39.1:8443/webhooks/validate")
+                        .withUrl("https://host.minikube.internal:8443/webhooks/validate")
                         .withCaBundle(certProvider.caBundle())
                         .endClientConfig();
                 break;
@@ -308,7 +308,7 @@ public class WebhooksInstaller extends Installer {
             case dev:
                 mutatingWebhookBuilder
                         .withNewClientConfig()
-                        .withUrl("https://192.168.39.1:8443/webhooks/mutate")
+                        .withUrl("https://host.minikube.internal:8443/webhooks/mutate")
                         .withCaBundle(certProvider.caBundle())
                         .endClientConfig();
                 break;

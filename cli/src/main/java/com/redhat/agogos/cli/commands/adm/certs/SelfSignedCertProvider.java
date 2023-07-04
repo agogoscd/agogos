@@ -168,7 +168,7 @@ public class SelfSignedCertProvider implements CertProvider {
                     new DERSequence(new ASN1Encodable[] {
                             new GeneralName(GeneralName.dNSName, "agogos-webhooks.agogos.svc.cluster.local"),
                             new GeneralName(GeneralName.dNSName, "agogos-webhooks.agogos.svc"),
-                            new GeneralName(GeneralName.iPAddress, "192.168.39.1") }));
+                            new GeneralName(GeneralName.dNSName, "host.minikube.internal") }));
         } catch (CertIOException e) {
             throw new ApplicationException("Error while generating the certificate", e);
         }
