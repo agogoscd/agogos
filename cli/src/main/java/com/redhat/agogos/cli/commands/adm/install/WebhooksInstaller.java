@@ -146,8 +146,8 @@ public class WebhooksInstaller extends Installer {
 
         LOG.info(
                 "\n👋 Webhook configuration in development mode. You can use following environment variables to point the Webhook application to generated certificate:\n");
-        LOG.info("👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE={}", keyPath.toAbsolutePath());
-        LOG.info("👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILE={}", certPath.toAbsolutePath());
+        LOG.info("👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES={}", keyPath.toAbsolutePath());
+        LOG.info("👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES={}", certPath.toAbsolutePath());
     }
 
     private Deployment deployment(String namespace) {
@@ -166,8 +166,8 @@ public class WebhooksInstaller extends Installer {
         Container webhookContainer = new ContainerBuilder()
                 .withName("webhooks").withImage(ContainerImage).withImagePullPolicy("Always")
                 .withEnv(
-                        new EnvVarBuilder().withName("QUARKUS_HTTP_SSL_CERTIFICATE_FILE").withValue("/certs/tls.crt").build(),
-                        new EnvVarBuilder().withName("QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILE").withValue("/certs/tls.key")
+                        new EnvVarBuilder().withName("QUARKUS_HTTP_SSL_CERTIFICATE_FILES").withValue("/certs/tls.crt").build(),
+                        new EnvVarBuilder().withName("QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES").withValue("/certs/tls.key")
                                 .build())
                 .withVolumeMounts(new VolumeMountBuilder().withName("certs").withMountPath("/certs").withReadOnly(true).build())
                 .withPorts(

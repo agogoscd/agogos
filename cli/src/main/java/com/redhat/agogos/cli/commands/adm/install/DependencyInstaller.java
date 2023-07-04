@@ -67,7 +67,7 @@ public abstract class DependencyInstaller extends Installer {
         if (allPodsRunning(result)) {
             LOG.info("👉 OK: All pods in the '{}' namespace are {}", namespace, POD_RUNNING);
         } else {
-            LOG.info("⚠️ WARN: All pods in the '{}' namespace are net yet {}", namespace, POD_RUNNING);
+            LOG.info("⚠️ WARN: All pods in the '{}' namespace are not yet {}", namespace, POD_RUNNING);
         }
     }
 
