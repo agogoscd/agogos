@@ -23,8 +23,8 @@ quarkus:
       generate: false
       apply: false
     fail-on-version-check: false
-  quartz:
-    start-mode: "FORCED"
+  scheduler:
+    start-mode: forced
 
 agogos:
   service-account: agogos
