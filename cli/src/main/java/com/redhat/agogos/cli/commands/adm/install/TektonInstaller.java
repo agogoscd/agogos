@@ -2,8 +2,8 @@ package com.redhat.agogos.cli.commands.adm.install;
 
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import com.redhat.agogos.config.TektonPipelineDependency;
+import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -29,9 +29,6 @@ public class TektonInstaller extends DependencyInstaller {
     @Inject
     TektonPipelineDependency tekton;
 
-    @Inject
-    KubernetesClient kubernetesClient;
-
     @Override
     public void install(InstallProfile profile, String namespace) {
         LOG.info("🕞 Installing Tekton {}...", tekton.version());
@@ -47,25 +44,24 @@ public class TektonInstaller extends DependencyInstaller {
     }
 
     private void configureConfigDefaults(String namespace) {
-        kubernetesClient.configMaps()
-                .inNamespace(tekton.namespace())
-                .withName(CONFIGMAP_CONFIG_DEFAULTS)
-                .edit(c -> new ConfigMapBuilder(c)
-                        // .addToData("default-cloud-events-sink", String.format("%s/%s/agogos", baseUrl, namespace))
-                        .build());
+        ConfigMap configMap = kubernetesFacade.get(ConfigMap.class, tekton.namespace(), CONFIGMAP_CONFIG_DEFAULTS);
+        configMap = new ConfigMapBuilder(configMap)
+                // .addToData("default-cloud-events-sink", String.format("%s/%s/agogos", baseUrl, namespace))
+                .build();
 
+        kubernetesFacade.update(configMap);
         LOG.info("👉 OK: Configured Tekton ConfigMap '{}'", CONFIGMAP_CONFIG_DEFAULTS);
     }
 
     private void configureFeatureFlags(InstallProfile profile, String namespace) {
         if (profile == InstallProfile.dev || profile == InstallProfile.local) {
-            kubernetesClient.configMaps()
-                    .inNamespace(tekton.namespace())
-                    .withName(CONFIGMAP_FEATURE_FLAGS)
-                    .edit(c -> new ConfigMapBuilder(c)
-                            .addToData("disable-affinity-assistant", "true")
-                            .addToData("send-cloudevents-for-runs", "true")
-                            .build());
+            ConfigMap configMap = kubernetesFacade.get(ConfigMap.class, tekton.namespace(), CONFIGMAP_FEATURE_FLAGS);
+            configMap = new ConfigMapBuilder(configMap)
+                    .addToData("disable-affinity-assistant", "true")
+                    .addToData("send-cloudevents-for-runs", "true")
+                    .build();
+
+            kubernetesFacade.update(configMap);
 
             LOG.info("👉 OK: Configured Tekton ConfigMap '{}'", CONFIGMAP_FEATURE_FLAGS);
         }

@@ -1,12 +1,12 @@
 package com.redhat.agogos.k8s.controllers.buildgenerator;
 
+import com.redhat.agogos.KubernetesFacade;
 import com.redhat.agogos.k8s.Resource;
 import com.redhat.agogos.k8s.client.AgogosClient;
 import com.redhat.agogos.k8s.controllers.trigger.TriggerDependentResource;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Pipeline;
 import io.fabric8.kubernetes.api.model.Namespaced;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.tekton.pipeline.v1beta1.CustomRun;
 import io.javaoperatorsdk.operator.api.reconciler.Cleaner;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
@@ -44,7 +44,7 @@ public class BuildGeneratorController implements Namespaced, Reconciler<CustomRu
     AgogosClient agogosClient;
 
     @Inject
-    KubernetesClient kubernetesClient;
+    KubernetesFacade kubernetesFacade;
 
     @Override
     public UpdateControl<CustomRun> reconcile(CustomRun resource, Context<CustomRun> context) {
@@ -89,8 +89,7 @@ public class BuildGeneratorController implements Namespaced, Reconciler<CustomRu
                     break;
             }
 
-            // Delete the CustomRun as it's no longer needed.
-            kubernetesClient.resource(resource).delete();
+            kubernetesFacade.delete(resource);
         }
         return UpdateControl.noUpdate();
     }

@@ -1,12 +1,12 @@
 package com.redhat.agogos.cli;
 
+import com.redhat.agogos.KubernetesFacade;
 import com.redhat.agogos.errors.ApplicationException;
 import io.fabric8.kubernetes.api.model.DeletionPropagation;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServiceBuilder;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.dsl.internal.GenericKubernetesResourceOperationsImpl;
 import io.fabric8.kubernetes.client.dsl.internal.OperationContext;
@@ -59,7 +59,7 @@ public class ResourceLoader {
     private static final Integer MAX_INTERVAL = 3;
 
     @Inject
-    KubernetesClient kubernetesClient;
+    KubernetesFacade kubernetesFacade;
 
     @Inject
     KubernetesSerialization objectMapper;
@@ -95,7 +95,7 @@ public class ResourceLoader {
 
     void init(@Observes StartupEvent ev) {
         // Prepare the http client based on the Kubernetes client configuration
-        httpClient = new VertxHttpClientFactory().newBuilder(kubernetesClient.getConfiguration()).build();
+        httpClient = new VertxHttpClientFactory().newBuilder(kubernetesFacade.getConfiguration()).build();
     }
 
     @SuppressWarnings("unchecked")
@@ -220,7 +220,7 @@ public class ResourceLoader {
     private URL openApiUrl() {
         // 
         try {
-            return new URL(kubernetesClient.getMasterUrl(), "openapi/v2");
+            return new URL(kubernetesFacade.getMasterUrl(), "openapi/v2");
         } catch (MalformedURLException e) {
             throw new ApplicationException(
                     "Could not create temporary file. Unexpected error occurred.", e);
@@ -320,7 +320,7 @@ public class ResourceLoader {
             }
 
             OperationContext ctx = new OperationContext() //
-                    .withClient(kubernetesClient) //
+                    .withClient(kubernetesFacade.getKubernetesClient()) //
                     .withPlural(mapping.getPlural()) //
                     .withPropagationPolicy(DeletionPropagation.FOREGROUND) //
                     .withApiGroupName(mapping.getGroup()) //
@@ -336,18 +336,18 @@ public class ResourceLoader {
                         && HasMetadata.getKind(Service.class).equals(mapping.getKind())) {
 
                     // Find the existing resource
-                    Service orig = kubernetesClient.services().inNamespace(ns).withName(genericResource.getMetadata().getName())
-                            .get();
+                    Service orig = kubernetesFacade.get(Service.class, ns, genericResource.getMetadata().getName());
 
                     Service service = objectMapper.convertValue(genericResource, Service.class);
 
                     if (orig != null) {
-                        service = new ServiceBuilder(service).editSpec()
+                        service = new ServiceBuilder(service)
+                                .editSpec()
                                 .withClusterIP(orig.getSpec().getClusterIP())
                                 .endSpec()
                                 .build();
 
-                        installed.add(kubernetesClient.services().inNamespace(ns).resource(service).update());
+                        installed.add(kubernetesFacade.update(service));
                         return;
                     }
                 }

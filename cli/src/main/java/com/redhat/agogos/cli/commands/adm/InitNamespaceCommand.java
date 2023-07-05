@@ -111,7 +111,7 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
      * A way to provide custom configuration for {@link com.redhat.agogos.v1alpha1.Builder} and
      * {@link com.redhat.agogos.v1alpha1.Stage}.
      * </p>
-     * 
+     *
      * TODO: Rethink this! This should be done differently, maybe.
      */
     private void installConfig() {
@@ -126,11 +126,12 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
         ConfigMap cm = new ConfigMapBuilder()
                 .withNewMetadata()
                 .withName(RESOURCE_NAME_CONFIG)
+                .withNamespace(namespace)
                 .endMetadata()
                 .withData(data)
                 .build();
 
-        cm = kubernetesClient.configMaps().inNamespace(namespace).resource(cm).serverSideApply();
+        cm = kubernetesFacade.serverSideApply(cm);
 
         installedResources.add(cm);
     }
@@ -148,7 +149,7 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
                 .endMetadata()
                 .build();
 
-        ns = kubernetesClient.namespaces().resource(ns).serverSideApply();
+        ns = kubernetesFacade.serverSideApply(ns);
 
         installedResources.add(ns);
     }
@@ -157,6 +158,7 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
         RoleBinding roleBinding = new RoleBindingBuilder()
                 .withNewMetadata()
                 .withName(RESOURCE_NAME)
+                .withNamespace(namespace)
                 .endMetadata()
                 .addNewSubject()
                 .withApiGroup(HasMetadata.getGroup(sa.getClass()))
@@ -170,7 +172,7 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
                 .endRoleRef()
                 .build();
 
-        roleBinding = kubernetesClient.rbac().roleBindings().inNamespace(namespace).resource(roleBinding).serverSideApply();
+        roleBinding = kubernetesFacade.serverSideApply(roleBinding);
 
         installedResources.add(roleBinding);
     }
@@ -182,11 +184,12 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
         ServiceAccount sa = new ServiceAccountBuilder()
                 .withNewMetadata()
                 .withName(RESOURCE_NAME)
+                .withNamespace(namespace)
                 .withLabels(LABELS)
                 .endMetadata()
                 .build();
 
-        sa = kubernetesClient.serviceAccounts().inNamespace(namespace).resource(sa).serverSideApply();
+        sa = kubernetesFacade.serverSideApply(sa);
 
         installedResources.add(sa);
 
@@ -202,7 +205,7 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
 
             if (e.getValue() == null) {
                 // Remove rolebinding if no users specified.
-                kubernetesClient.rbac().roleBindings().inNamespace(namespace).withName(rolebindingName).delete();
+                kubernetesFacade.delete(RoleBinding.class, namespace, rolebindingName);
                 continue;
             }
 
@@ -218,7 +221,7 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
 
             if (subjects.size() == 0) {
                 // Remove rolebinding if no users should be it.
-                kubernetesClient.rbac().roleBindings().inNamespace(namespace).withName(rolebindingName).delete();
+                kubernetesFacade.delete(RoleBinding.class, namespace, rolebindingName);
                 continue;
             }
 
@@ -236,8 +239,7 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
                     .endRoleRef()
                     .build();
 
-            roleBinding = kubernetesClient.rbac().roleBindings().inNamespace(namespace).resource(roleBinding).serverSideApply();
-
+            roleBinding = kubernetesFacade.serverSideApply(roleBinding);
             installedResources.add(roleBinding);
 
             processed.addAll(e.getValue()); // Add all new users as processed.
@@ -246,19 +248,16 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
 
     private void installAgogosQuota() {
         if (quotaFile == null) {
-            // Remove any existing quota.
-            kubernetesClient.resourceQuotas().inNamespace(namespace).withName(AGOGOS_QUOTA_NAME).delete();
+            kubernetesFacade.delete(ResourceQuota.class, namespace, AGOGOS_QUOTA_NAME);
             return;
         }
 
         try {
-            ResourceQuota resourceQuota = kubernetesClient.getKubernetesSerialization()
-                    .unmarshal(new FileInputStream(quotaFile), ResourceQuota.class);
+            ResourceQuota resourceQuota = kubernetesFacade.unmarshal(ResourceQuota.class, new FileInputStream(quotaFile));
 
             resourceQuota.getMetadata().setNamespace(namespace);
             resourceQuota.getMetadata().setName(AGOGOS_QUOTA_NAME);
-
-            resourceQuota = kubernetesClient.resourceQuotas().inNamespace(namespace).resource(resourceQuota).serverSideApply();
+            resourceQuota = kubernetesFacade.serverSideApply(resourceQuota);
 
             installedResources.add(resourceQuota);
         } catch (FileNotFoundException e) {
@@ -267,7 +266,7 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
     }
 
     private boolean isAgogosCoreNamespace() {
-        Namespace ns = kubernetesClient.namespaces().withName(namespace).get();
+        Namespace ns = kubernetesFacade.get(Namespace.class, namespace);
         if (ns != null) {
             for (String label : CoreInstaller.LABELS.keySet()) {
                 if (!CoreInstaller.LABELS.get(label).equals(ns.getMetadata().getLabels().get(label))) {

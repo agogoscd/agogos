@@ -1,6 +1,6 @@
 package com.redhat.agogos.k8s.client;
 
-import io.fabric8.kubernetes.client.KubernetesClient;
+import com.redhat.agogos.KubernetesFacade;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -10,7 +10,7 @@ import jakarta.inject.Inject;
 public class DefaultAgogosClient implements AgogosClient {
 
     @Inject
-    KubernetesClient kubernetesClient;
+    KubernetesFacade kubernetesFacade;
 
     @Inject
     V1alpha1APIGroupClient v1alpha1Client;
@@ -22,6 +22,6 @@ public class DefaultAgogosClient implements AgogosClient {
 
     @Override
     public String namespace() {
-        return kubernetesClient.getNamespace();
+        return kubernetesFacade.getNamespace();
     }
 }

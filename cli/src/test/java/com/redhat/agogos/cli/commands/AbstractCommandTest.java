@@ -4,9 +4,7 @@ import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.cli.ResourceLoader;
 import com.redhat.agogos.test.InMemoryOutputCatcher;
 import com.redhat.agogos.test.KubernetesTestServerSetup;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
-import io.quarkus.test.InjectMock;
 import io.quarkus.test.kubernetes.client.KubernetesTestServer;
 import io.quarkus.test.kubernetes.client.WithKubernetesTestServer;
 import jakarta.inject.Inject;
@@ -22,9 +20,6 @@ public abstract class AbstractCommandTest {
 
     @KubernetesTestServer
     protected KubernetesServer mockServer;
-
-    @InjectMock
-    protected KubernetesClient mockClient;
 
     @Inject
     protected CLI cli;
