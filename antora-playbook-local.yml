@@ -9,8 +9,9 @@ content:
       start_path: docs
       edit_url: false
 ui:
+  supplemental_files: ./docs/ui
   bundle:
-    url: https://gitlab.cee.redhat.com/agogos/antora-ui/-/jobs/artifacts/main/raw/build/ui-bundle.zip?job=bundle-stable
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
     snapshot: true
 
 asciidoc:
