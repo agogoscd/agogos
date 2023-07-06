@@ -5,6 +5,7 @@
 bin/
 
 .mvn
+logs
 
 # IntelliJ
 .idea

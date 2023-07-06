@@ -40,6 +40,9 @@ quarkus:
           level: TRACE
         # "io.javaoperatorsdk":
         #   level: TRACE
+      file:
+        enable: true
+        path: "${PWD}/logs/webhooks.log"
 
 "%prod":
   # TODO: change this
