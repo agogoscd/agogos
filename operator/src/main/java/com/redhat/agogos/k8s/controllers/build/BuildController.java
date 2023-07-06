@@ -102,7 +102,7 @@ public class BuildController extends AbstractController<Build> implements EventS
 
         Component component = parentResource(build, context);
         resourceStatus.setComponentSpec(component.getSpec());
-        resourceStatus.setStatus(String.valueOf(status));
+        resourceStatus.setStatus(status);
         resourceStatus.setReason(message);
         resourceStatus.setResult(result);
         resourceStatus.setStartTime(pipelinerun.getStatus().getStartTime());

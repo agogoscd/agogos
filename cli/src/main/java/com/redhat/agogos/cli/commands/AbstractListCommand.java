@@ -1,7 +1,5 @@
 package com.redhat.agogos.cli.commands;
 
-import com.redhat.agogos.ResourceStatus;
-import com.redhat.agogos.ResultableResourceStatus;
 import com.redhat.agogos.cli.CLI.Output;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.AgogosResourceStatus;
@@ -60,15 +58,15 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
         }
 
         // Find max length of the name and add some more spaces for nicer look
-        final int nameColumnLength = resources.stream() //
-                .mapToInt(res -> res.getMetadata().getName().length()) //
-                .max() //
+        final int nameColumnLength = resources.stream()
+                .mapToInt(res -> res.getMetadata().getName().length())
+                .max()
                 .getAsInt() + 5;
 
         // Find max length of the status and add some more spaces for nicer look
-        final int statusColumnLength = resources.stream() //
-                .mapToInt(res -> res.getStatus().getStatus().length()) //
-                .max() //
+        final int statusColumnLength = resources.stream()
+                .mapToInt(res -> res.getStatus().toString().length())
+                .max()
                 .getAsInt() + 4; // It's 4 instead of 5, because we need to add a space later so that the color formatting can be escaped.
 
         // Header
@@ -84,28 +82,33 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
                     String.format("%-" + nameColumnLength + "." + nameColumnLength + "s",
                             resource.getMetadata().getName()));
 
+            String status = "";
             String color = "white";
 
             if (resource.getStatus() instanceof Status) {
-                switch (ResourceStatus.valueOf(resource.getStatus().getStatus())) {
-                    case Failed:
+                Status s = (Status) resource.getStatus();
+                status = s.toString();
+                switch (s.getStatus()) {
+                    case FAILED:
                         color = "red";
                         break;
-                    case Ready:
+                    case READY:
                         color = "green";
                         break;
                     default:
                         break;
                 }
             } else if (resource.getStatus() instanceof ResultableStatus) {
-                switch (ResultableResourceStatus.valueOf(resource.getStatus().getStatus())) {
-                    case Aborted:
+                ResultableStatus s = (ResultableStatus) resource.getStatus();
+                status = s.toString();
+                switch (s.getStatus()) {
+                    case ABORTED:
                         color = "yellow";
                         break;
-                    case Failed:
+                    case FAILED:
                         color = "red";
                         break;
-                    case Finished:
+                    case FINISHED:
                         color = "green";
                         break;
                     default:
@@ -114,8 +117,7 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
             }
 
             sb.append(String.format("@|bold,%s %-" + statusColumnLength + "." + statusColumnLength + "s |@",
-                    color,
-                    resource.getStatus().getStatus()));
+                    color, status));
 
             sb.append(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(resource.creationTime()));
 

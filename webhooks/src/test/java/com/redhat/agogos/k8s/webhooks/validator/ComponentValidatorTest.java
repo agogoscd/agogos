@@ -25,6 +25,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+@Disabled("Enable when https://github.com/fabric8io/kubernetes-client/issues/5293 is released")
 @WithKubernetesTestServer(setup = ComponentValidatorTestServerSetup.class)
 @QuarkusTest
 @TestHTTPEndpoint(WebhookHandler.class)

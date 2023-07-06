@@ -77,7 +77,7 @@ public class RunController extends AbstractController<Run> {
                     try {
                         result = objectMapper.convertValue(resultJson, Map.class);
                     } catch (Exception e) {
-                        status = ResultableResourceStatus.Failed;
+                        status = ResultableResourceStatus.FAILED;
                         message = "Build finished successfully, but returned metadata is not a valid JSON content";
                     }
                 }
@@ -110,7 +110,7 @@ public class RunController extends AbstractController<Run> {
                 break;
         }
 
-        resourceStatus.setStatus(String.valueOf(status));
+        resourceStatus.setStatus(status);
         resourceStatus.setReason(message);
         resourceStatus.setResult(result);
         resourceStatus.setStartTime(pipelinerun.getStatus().getStartTime());

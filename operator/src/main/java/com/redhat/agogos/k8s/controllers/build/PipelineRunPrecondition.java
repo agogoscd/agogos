@@ -1,6 +1,7 @@
 package com.redhat.agogos.k8s.controllers.build;
 
 import com.redhat.agogos.ResourceStatus;
+import com.redhat.agogos.ResultableResourceStatus;
 import com.redhat.agogos.v1alpha1.Build;
 import com.redhat.agogos.v1alpha1.Component;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
@@ -16,7 +17,7 @@ public class PipelineRunPrecondition implements Condition<PipelineRun, Build> {
         //   2. The dependent PipelineRun resource is deleted when the Build status is Finished.
         //   3. A new PipelineRun is not created when the Build status is Finished.
         var component = context.getSecondaryResource(Component.class);
-        return component.map(c -> ResourceStatus.valueOf(c.getStatus().getStatus()) == ResourceStatus.Ready).orElse(false)
-                && !build.getStatus().getStatus().equals("Finished");
+        return component.map(c -> c.getStatus().getStatus() == ResourceStatus.READY).orElse(false)
+                && build.getStatus().getStatus() != ResultableResourceStatus.FINISHED;
     }
 }

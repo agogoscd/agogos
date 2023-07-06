@@ -8,6 +8,7 @@ import com.redhat.agogos.errors.ApplicationException;
 import com.redhat.agogos.v1alpha1.AgogosResource;
 import com.redhat.agogos.v1alpha1.AgogosResourceStatus;
 import com.redhat.agogos.v1alpha1.ResultableStatus;
+import com.redhat.agogos.v1alpha1.Status;
 import io.fabric8.kubernetes.api.model.DefaultKubernetesResourceList;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
@@ -66,7 +67,7 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
 
                 String buildColor = "green";
 
-                if (String.valueOf(ResultableResourceStatus.Failed).equals(resource.getStatus().getStatus())) {
+                if (status.getStatus() == ResultableResourceStatus.FAILED) {
                     buildColor = "red";
                 }
 
@@ -88,7 +89,7 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
 
                 sb.append(Ansi.AUTO
                         .string(String.format("@|bold Status|@:\t\t@|bold,%s %s |@", buildColor,
-                                resource.getStatus().getStatus())))
+                                status.getStatus())))
                         .append(nl);
                 sb.append(Ansi.AUTO.string(String.format("@|bold Reason|@:\t\t%s",
                         Optional.ofNullable(resource.getStatus().getReason()).orElse("N/A")))).append(nl);
@@ -119,7 +120,8 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
                 }
 
             } else {
-                sb.append(Ansi.AUTO.string(String.format("Status:\t\t @|bold %s |@", resource.getStatus().getStatus())));
+                Status status = (Status) resource.getStatus();
+                sb.append(Ansi.AUTO.string(String.format("Status:\t\t @|bold %s |@", status.getStatus())));
             }
 
         }

@@ -18,10 +18,8 @@ public abstract class AgogosResourceStatus {
 
     @Getter
     @Setter
-    protected String status;
-    @Getter
-    @Setter
     protected String reason;
+
     @Getter
     @Setter
     protected String lastUpdate;
@@ -34,8 +32,7 @@ public abstract class AgogosResourceStatus {
 
         AgogosResourceStatus status = (AgogosResourceStatus) obj;
 
-        if (Objects.equals(status.getStatus(), getStatus()) &&
-                Objects.equals(status.getReason(), getReason()) &&
+        if (Objects.equals(status.getReason(), getReason()) &&
                 Objects.equals(status.getLastUpdate(), getLastUpdate())) {
             return true;
         }
