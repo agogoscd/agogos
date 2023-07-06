@@ -69,7 +69,11 @@ kubernetes:
         "io.fabric8.kubernetes.client.informers.cache":
           level: WARN
         # "io.javaoperatorsdk":
-        #   level: TRACE
+        #  use  level: TRACE
+      file:
+        enable: true
+        path: "${PWD}/logs/operator.log"
+
     kubernetes-client:
       trust-certs: true
 
