@@ -21,7 +21,6 @@ import io.fabric8.tekton.triggers.v1beta1.TriggerBinding;
 import io.fabric8.tekton.triggers.v1beta1.TriggerTemplate;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,9 +45,6 @@ public class CoreInstaller extends Installer {
             "app.kubernetes.io/part-of", "agogos",
             "app.kubernetes.io/component", "core");
 
-    @Inject
-    BrokerInstaller brokerInstaller;
-
     @Override
     public void install(InstallProfile profile, String namespace) {
         LOG.info("🕞 Installing Agogos core resources...");
@@ -59,8 +55,6 @@ public class CoreInstaller extends Installer {
                         clusterRoleView(),
                         clusterRoleEventing()),
                 namespace);
-
-        resources.addAll(brokerInstaller.install(namespace, LABELS));
 
         Helper.status(resources);
 
