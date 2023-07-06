@@ -38,7 +38,7 @@ public class TektonInstaller extends DependencyInstaller {
         configureConfigDefaults(namespace);
         configureFeatureFlags(profile, namespace);
 
-        waitForAllPodsRunning(tekton.namespace());
+        kubernetesFacade.waitForAllPodsRunning(tekton.namespace());
 
         LOG.info("✅ Tekton {} installed", tekton.version());
     }
