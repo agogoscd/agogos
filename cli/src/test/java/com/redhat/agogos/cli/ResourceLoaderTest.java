@@ -2,10 +2,10 @@ package com.redhat.agogos.cli;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.redhat.agogos.errors.ApplicationException;
+import com.redhat.agogos.core.errors.ApplicationException;
+import com.redhat.agogos.core.v1alpha1.Component;
 import com.redhat.agogos.test.KubernetesTestServerSetup;
 import com.redhat.agogos.test.ResourceUtils;
-import com.redhat.agogos.v1alpha1.Component;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
 import io.quarkus.test.junit.QuarkusTest;

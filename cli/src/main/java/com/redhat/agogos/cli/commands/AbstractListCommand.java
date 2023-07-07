@@ -1,10 +1,10 @@
 package com.redhat.agogos.cli.commands;
 
 import com.redhat.agogos.cli.CLI.Output;
-import com.redhat.agogos.v1alpha1.AgogosResource;
-import com.redhat.agogos.v1alpha1.AgogosResourceStatus;
-import com.redhat.agogos.v1alpha1.ResultableStatus;
-import com.redhat.agogos.v1alpha1.Status;
+import com.redhat.agogos.core.v1alpha1.AgogosResource;
+import com.redhat.agogos.core.v1alpha1.AgogosResourceStatus;
+import com.redhat.agogos.core.v1alpha1.ResultableStatus;
+import com.redhat.agogos.core.v1alpha1.Status;
 import io.fabric8.kubernetes.api.model.DefaultKubernetesResourceList;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;

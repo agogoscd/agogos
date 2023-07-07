@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.redhat.agogos.cli.CLI;
-import com.redhat.agogos.config.KnativeEventingDependency;
-import com.redhat.agogos.config.TektonPipelineDependency;
-import com.redhat.agogos.config.TektonTriggersDependency;
+import com.redhat.agogos.cli.config.KnativeEventingDependency;
+import com.redhat.agogos.cli.config.TektonPipelineDependency;
+import com.redhat.agogos.cli.config.TektonTriggersDependency;
 import com.redhat.agogos.test.InMemoryLogHandler;
 import com.redhat.agogos.test.KubernetesTestServerSetup;
 import io.quarkus.test.junit.QuarkusTest;

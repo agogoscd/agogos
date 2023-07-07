@@ -3,7 +3,7 @@ package com.redhat.agogos.cli.commands.adm;
 import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.AbstractRunnableSubcommand;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller;
-import com.redhat.agogos.errors.ApplicationException;
+import com.redhat.agogos.core.errors.ApplicationException;
 import io.fabric8.knative.eventing.v1.Broker;
 import io.fabric8.knative.eventing.v1.BrokerBuilder;
 import io.fabric8.knative.eventing.v1.Trigger;
@@ -126,8 +126,8 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
 
     /**
      * <p>
-     * A way to provide custom configuration for {@link com.redhat.agogos.v1alpha1.Builder} and
-     * {@link com.redhat.agogos.v1alpha1.Stage}.
+     * A way to provide custom configuration for {@link com.com.redhat.agogos.core.v1alpha1.Builder} and
+     * {@link com.com.redhat.agogos.core.v1alpha1.Stage}.
      * </p>
      *
      * TODO: Rethink this! This should be done differently, maybe.

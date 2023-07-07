@@ -1,7 +1,7 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
-import com.redhat.agogos.config.TektonTriggersDependency;
+import com.redhat.agogos.cli.config.TektonTriggersDependency;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

@@ -1,8 +1,8 @@
 package com.redhat.agogos.cli.commands.run;
 
 import com.redhat.agogos.cli.commands.AbstractResourceSubcommand;
-import com.redhat.agogos.k8s.client.AgogosClient;
-import com.redhat.agogos.v1alpha1.Run;
+import com.redhat.agogos.core.k8s.client.AgogosClient;
+import com.redhat.agogos.core.v1alpha1.Run;
 import jakarta.inject.Inject;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;

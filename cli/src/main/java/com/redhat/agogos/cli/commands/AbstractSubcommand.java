@@ -1,8 +1,8 @@
 package com.redhat.agogos.cli.commands;
 
-import com.redhat.agogos.KubernetesFacade;
 import com.redhat.agogos.cli.CLI;
-import com.redhat.agogos.k8s.client.AgogosClient;
+import com.redhat.agogos.core.KubernetesFacade;
+import com.redhat.agogos.core.k8s.client.AgogosClient;
 import io.fabric8.knative.client.KnativeClient;
 import io.fabric8.tekton.client.TektonClient;
 import jakarta.inject.Inject;
