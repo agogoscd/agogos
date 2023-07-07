@@ -1,6 +1,6 @@
 package com.redhat.agogos.cli.commands.adm.certs;
 
-import com.redhat.agogos.errors.ApplicationException;
+import com.redhat.agogos.core.errors.ApplicationException;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DERSequence;

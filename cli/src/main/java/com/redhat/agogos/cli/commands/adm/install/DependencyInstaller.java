@@ -2,8 +2,8 @@ package com.redhat.agogos.cli.commands.adm.install;
 
 import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
-import com.redhat.agogos.config.DependencyConfig;
-import com.redhat.agogos.errors.ApplicationException;
+import com.redhat.agogos.cli.config.DependencyConfig;
+import com.redhat.agogos.core.errors.ApplicationException;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 
 import java.net.MalformedURLException;

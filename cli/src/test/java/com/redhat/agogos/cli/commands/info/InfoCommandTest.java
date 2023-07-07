@@ -1,7 +1,7 @@
 package com.redhat.agogos.cli.commands.info;
 
-import com.redhat.agogos.KubernetesFacade;
 import com.redhat.agogos.cli.commands.AbstractCommandTest;
+import com.redhat.agogos.core.KubernetesFacade;
 import io.fabric8.kubernetes.client.VersionInfo;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;

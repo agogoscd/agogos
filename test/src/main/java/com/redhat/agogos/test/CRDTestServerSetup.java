@@ -1,12 +1,12 @@
 package com.redhat.agogos.test;
 
-import com.redhat.agogos.v1alpha1.Build;
-import com.redhat.agogos.v1alpha1.Component;
-import com.redhat.agogos.v1alpha1.Group;
-import com.redhat.agogos.v1alpha1.Handler;
-import com.redhat.agogos.v1alpha1.Pipeline;
-import com.redhat.agogos.v1alpha1.Run;
-import com.redhat.agogos.v1alpha1.triggers.Trigger;
+import com.redhat.agogos.core.v1alpha1.Build;
+import com.redhat.agogos.core.v1alpha1.Component;
+import com.redhat.agogos.core.v1alpha1.Group;
+import com.redhat.agogos.core.v1alpha1.Handler;
+import com.redhat.agogos.core.v1alpha1.Pipeline;
+import com.redhat.agogos.core.v1alpha1.Run;
+import com.redhat.agogos.core.v1alpha1.triggers.Trigger;
 import io.fabric8.kubernetes.client.CustomResource;
 import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;

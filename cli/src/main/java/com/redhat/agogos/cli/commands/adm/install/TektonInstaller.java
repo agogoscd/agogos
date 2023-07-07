@@ -1,7 +1,7 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
-import com.redhat.agogos.config.TektonPipelineDependency;
+import com.redhat.agogos.cli.config.TektonPipelineDependency;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.quarkus.runtime.annotations.RegisterForReflection;

@@ -1,7 +1,7 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
-import com.redhat.agogos.config.KnativeEventingDependency;
+import com.redhat.agogos.cli.config.KnativeEventingDependency;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;

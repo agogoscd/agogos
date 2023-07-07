@@ -1,7 +1,7 @@
 package com.redhat.agogos.cli.commands.pipeline;
 
 import com.redhat.agogos.cli.commands.AbstractListCommand;
-import com.redhat.agogos.v1alpha1.Pipeline;
+import com.redhat.agogos.core.v1alpha1.Pipeline;
 import picocli.CommandLine.Command;
 
 @Command(mixinStandardHelpOptions = true, name = "list", aliases = { "l" }, description = "list pipelines")

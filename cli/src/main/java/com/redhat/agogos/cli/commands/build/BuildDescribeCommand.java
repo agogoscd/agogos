@@ -1,7 +1,7 @@
 package com.redhat.agogos.cli.commands.build;
 
 import com.redhat.agogos.cli.commands.AbstractResourceSubcommand;
-import com.redhat.agogos.v1alpha1.Build;
+import com.redhat.agogos.core.v1alpha1.Build;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;

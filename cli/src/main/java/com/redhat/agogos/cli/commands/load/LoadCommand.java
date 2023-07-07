@@ -3,7 +3,7 @@ package com.redhat.agogos.cli.commands.load;
 import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.ResourceLoader;
 import com.redhat.agogos.cli.commands.AbstractRunnableSubcommand;
-import com.redhat.agogos.errors.ApplicationException;
+import com.redhat.agogos.core.errors.ApplicationException;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;

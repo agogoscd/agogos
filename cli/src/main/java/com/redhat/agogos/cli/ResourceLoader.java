@@ -1,7 +1,7 @@
 package com.redhat.agogos.cli;
 
-import com.redhat.agogos.KubernetesFacade;
-import com.redhat.agogos.errors.ApplicationException;
+import com.redhat.agogos.core.KubernetesFacade;
+import com.redhat.agogos.core.errors.ApplicationException;
 import io.fabric8.kubernetes.api.model.DeletionPropagation;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.HasMetadata;

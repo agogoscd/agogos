@@ -1,6 +1,6 @@
 package com.redhat.agogos.cli.commands;
 
-import com.redhat.agogos.v1alpha1.Component;
+import com.redhat.agogos.core.v1alpha1.Component;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

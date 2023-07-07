@@ -2,8 +2,8 @@ package com.redhat.agogos.cli.commands.pipeline;
 
 import com.redhat.agogos.cli.commands.AbstractResourceSubcommand;
 import com.redhat.agogos.cli.commands.run.RunDescribeCommand;
-import com.redhat.agogos.v1alpha1.Pipeline;
-import com.redhat.agogos.v1alpha1.Run;
+import com.redhat.agogos.core.v1alpha1.Pipeline;
+import com.redhat.agogos.core.v1alpha1.Run;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 

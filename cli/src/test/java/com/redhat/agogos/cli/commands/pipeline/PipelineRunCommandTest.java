@@ -1,9 +1,9 @@
 package com.redhat.agogos.cli.commands.pipeline;
 
-import com.redhat.agogos.KubernetesFacade;
 import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.cli.commands.AbstractCommandTest;
-import com.redhat.agogos.v1alpha1.Run;
+import com.redhat.agogos.core.KubernetesFacade;
+import com.redhat.agogos.core.v1alpha1.Run;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Assertions;
