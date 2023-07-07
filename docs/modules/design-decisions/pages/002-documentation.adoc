@@ -3,7 +3,7 @@
 Documentation is key to have a good user and developer experience.
 
 == Goals
-* Have a direct, short documentation, using plain language and a consistent style
+* Have simple documentation using plain language and a consistent style
 * Have instructions for the users to complete Agogos tasks 
 * Have guidelines to the developers to contribute to Agogos
 * Auto-generate as much as possible from the Agogos code (CLI, Schemas...)
@@ -14,7 +14,7 @@ Documentation is key to have a good user and developer experience.
 * Agogos documentation is written as AsciiDoc files and kept in the same
 repository as the code. These files are used to generate the HTML site using
 GitLab pages and Antora.
-* Agogos has a documentation guidelines to keep a consistent style (distilled
+* Agogos has documentation guidelines to keep a consistent style (distilled
 from https://www.ibm.com/docs/en/ibm-style)
 * Agogos has a single documentation site
 * Agogos has clear separation between concepts, procedures and references (see
@@ -36,7 +36,7 @@ Drawbacks:
 
 == Additional references
 
-* These concepts are explored in Red Hat's documentation documentation
+* These concepts are explored in Red Hat's documentation
 https://redhat-documentation.github.io/modular-docs/#creating-concept-modules
 * Similar concepts are explored in Divio's Documentation system:
 https://documentation.divio.com/
