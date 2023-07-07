@@ -65,7 +65,8 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
 
         // Find max length of the status and add some more spaces for nicer look
         final int statusColumnLength = resources.stream()
-                .mapToInt(res -> res.getStatus().toString().length())
+                .mapToInt(res -> res.getStatus() instanceof Status ? ((Status) res.getStatus()).getStatus().toString().length()
+                        : ((ResultableStatus) res.getStatus()).getStatus().toString().length())
                 .max()
                 .getAsInt() + 4; // It's 4 instead of 5, because we need to add a space later so that the color formatting can be escaped.
 
@@ -87,7 +88,7 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
 
             if (resource.getStatus() instanceof Status) {
                 Status s = (Status) resource.getStatus();
-                status = s.toString();
+                status = s.getStatus().toString();
                 switch (s.getStatus()) {
                     case FAILED:
                         color = "red";
@@ -100,7 +101,7 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
                 }
             } else if (resource.getStatus() instanceof ResultableStatus) {
                 ResultableStatus s = (ResultableStatus) resource.getStatus();
-                status = s.toString();
+                status = s.getStatus().toString();
                 switch (s.getStatus()) {
                     case ABORTED:
                         color = "yellow";
