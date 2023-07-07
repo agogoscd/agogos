@@ -28,7 +28,6 @@ verify:
           - relays/**/*
           - test/**/*
           - webhooks/**/*
-      allow_failure: true
 
 cli:
   image:
@@ -60,7 +59,6 @@ cli:
           - relays/**/*
           - test/**/*
           - webhooks/**/*
-      allow_failure: true
 
 docs:
   image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
@@ -81,7 +79,6 @@ docs:
           - antora*.yml
           - docs/*.yml
           - docs/**/*
-      allow_failure: true
 
 pages:
   image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
@@ -102,4 +99,3 @@ pages:
           - antora*.yml
           - docs/*.yml
           - docs/**/*
-      allow_failure: true
