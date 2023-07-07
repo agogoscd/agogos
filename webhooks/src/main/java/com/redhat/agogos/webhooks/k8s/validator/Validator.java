@@ -22,10 +22,10 @@ public abstract class Validator<T extends CustomResource<?, ?>> extends Admissio
     private static final Logger LOG = LoggerFactory.getLogger(Validator.class);
 
     @Inject
-    KubernetesSerialization objectMapper;
+    KubernetesFacade kubernetesFacade;
 
     @Inject
-    KubernetesFacade kubernetesFacade;
+    KubernetesSerialization objectMapper;
 
     @SuppressWarnings("unchecked")
     public AdmissionReview validate(AdmissionReview admissionReview) {
@@ -37,10 +37,10 @@ public abstract class Validator<T extends CustomResource<?, ?>> extends Admissio
             } catch (ApplicationException e) {
                 LOG.error("An error occurred while validating", e);
 
-                response.withAllowed(false) //
-                        .withStatus(new StatusBuilder() //
-                                .withCode(e.getCode()) //
-                                .withMessage(e.getMessage()) //
+                response.withAllowed(false)
+                        .withStatus(new StatusBuilder()
+                                .withCode(e.getCode())
+                                .withMessage(e.getMessage())
                                 .build());
             }
         });

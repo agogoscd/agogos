@@ -2,9 +2,14 @@ package com.redhat.agogos.webhooks.k8s.validator;
 
 import com.redhat.agogos.core.errors.ApplicationException;
 import com.redhat.agogos.core.errors.MissingResourceException;
+import com.redhat.agogos.core.k8s.Resource;
+import com.redhat.agogos.core.v1alpha1.AgogosResource;
 import com.redhat.agogos.core.v1alpha1.Component;
+import com.redhat.agogos.core.v1alpha1.Group;
+import com.redhat.agogos.core.v1alpha1.Pipeline;
 import com.redhat.agogos.core.v1alpha1.triggers.ComponentTriggerEvent;
 import com.redhat.agogos.core.v1alpha1.triggers.Trigger;
+import com.redhat.agogos.core.v1alpha1.triggers.TriggerTarget;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -42,14 +47,25 @@ public class TriggerValidator extends Validator<Trigger> {
     private void validateTarget(Trigger trigger) throws ApplicationException {
         LOG.info("Validating target for trigger '{}'", trigger.getFullName());
 
-        Component target = kubernetesFacade.get(
-                Component.class,
-                trigger.getMetadata().getNamespace(),
-                trigger.getSpec().getTarget().getName());
+        TriggerTarget target = trigger.getSpec().getTarget();
+        AgogosResource<?, ?> resource = null;
+        switch (Resource.fromType(target.getKind())) {
+            case COMPONENT:
+                resource = kubernetesFacade.get(Component.class, trigger.getMetadata().getNamespace(), target.getName());
+                break;
+            case GROUP:
+                resource = kubernetesFacade.get(Group.class, trigger.getMetadata().getNamespace(), target.getName());
+                break;
+            case PIPELINE:
+                resource = kubernetesFacade.get(Pipeline.class, trigger.getMetadata().getNamespace(), target.getName());
+                break;
+            default:
+                // Fall through
+        }
 
-        if (target == null) {
-            throw new MissingResourceException("Target Component '{}' does not exist in namespace '{}'",
-                    trigger.getSpec().getTarget().getName(), trigger.getMetadata().getNamespace());
+        if (resource == null) {
+            throw new MissingResourceException("Target {} '{}' does not exist in namespace '{}'",
+                    target.getKind(), target.getName(), trigger.getMetadata().getNamespace());
         }
     }
 }

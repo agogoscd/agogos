@@ -3,6 +3,7 @@ package com.redhat.agogos.core.k8s;
 public enum Resource {
     BUILD,
     COMPONENT,
+    GROUP,
     PIPELINE,
     PIPELINERUN,
     RESOURCE,

@@ -101,7 +101,7 @@ spec:
                   properties:
                     kind:
                       type: string
-                      enum: ["Component", "Pipeline"]
+                      enum: ["Component", "Group", "Pipeline"]
                     name:
                       type: string
                     apiVersion:

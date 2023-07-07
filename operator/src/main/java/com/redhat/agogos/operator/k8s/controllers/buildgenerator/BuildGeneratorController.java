@@ -3,7 +3,8 @@ package com.redhat.agogos.operator.k8s.controllers.buildgenerator;
 import com.redhat.agogos.core.KubernetesFacade;
 import com.redhat.agogos.core.k8s.Resource;
 import com.redhat.agogos.core.v1alpha1.Build;
-import com.redhat.agogos.core.v1alpha1.Pipeline;
+import com.redhat.agogos.core.v1alpha1.Group;
+import com.redhat.agogos.core.v1alpha1.Run;
 import com.redhat.agogos.operator.k8s.controllers.trigger.TriggerDependentResource;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.tekton.pipeline.v1beta1.CustomRun;
@@ -29,7 +30,7 @@ public class BuildGeneratorController implements Namespaced, Reconciler<CustomRu
      * a CustomRun resource that will be handled by this controller. The controller itself does two
      * things during reconciliation:
      * 
-     * 1. Creates the appropriate Agogos resource based on information provided by the CustomRun.
+     * 1. Creates the appropriate Agogos resources based on information provided by the CustomRun.
      * 2. Deletes the CustomRun resource.
      * 
      * The controller only processes CustomRun resources that are labeled appropriately. Other CustomRuns
@@ -49,7 +50,7 @@ public class BuildGeneratorController implements Namespaced, Reconciler<CustomRu
 
         if (process) {
             // Include the Tekton trigger labels on the Build object.
-            Map<String, String> triggerLabels = resource.getMetadata()
+            Map<String, String> labels = resource.getMetadata()
                     .getLabels()
                     .entrySet()
                     .stream()
@@ -60,27 +61,19 @@ public class BuildGeneratorController implements Namespaced, Reconciler<CustomRu
             Resource kind = Resource.fromType(resource.getMetadata().getLabels().get(Resource.RESOURCE.getResourceLabel()));
             switch (kind) {
                 case COMPONENT:
-                    Build build = new Build();
-                    build.getMetadata().setGenerateName(name + "-");
-                    build.getMetadata().setNamespace(resource.getMetadata().getNamespace());
-                    build.getSpec().setComponent(name);
-                    triggerLabels.put(Resource.getInstanceLabel(),
-                            resource.getMetadata().getLabels().get(Resource.getInstanceLabel()));
-                    build.getMetadata().setLabels(triggerLabels);
-                    build = kubernetesFacade.create(build);
-                    LOG.debug("Trigger '{}' fired and created Build '{}'",
-                            resource.getMetadata().getLabels().get(TEKTON_TRIGGER_LABEL_PREFIX + "trigger"),
-                            build.getMetadata().getName());
+                    submitBuild(resource, name, labels);
+                    break;
+                case GROUP:
+                    Group group = kubernetesFacade.get(Group.class, resource.getMetadata().getNamespace(), name);
+                    group.getSpec().getComponents().stream().forEach(component -> {
+                        submitBuild(resource, component, labels);
+                    });
+                    group.getSpec().getPipelines().stream().forEach(pipeline -> {
+                        submitPipeline(resource, pipeline, labels);
+                    });
                     break;
                 case PIPELINE:
-                    Pipeline pipeline = new Pipeline();
-                    pipeline.getMetadata().setGenerateName(name + "-");
-                    pipeline.getMetadata().setName(resource.getMetadata().getNamespace());
-                    pipeline.getMetadata().setLabels(triggerLabels);
-                    pipeline = kubernetesFacade.create(pipeline);
-                    LOG.debug("Trigger '{}' fired and created Pipeline '{}'",
-                            resource.getMetadata().getLabels().get(TEKTON_TRIGGER_LABEL_PREFIX + "trigger"),
-                            pipeline.getMetadata().getName());
+                    submitPipeline(resource, name, labels);
                     break;
                 default:
                     break;
@@ -94,5 +87,33 @@ public class BuildGeneratorController implements Namespaced, Reconciler<CustomRu
     @Override
     public DeleteControl cleanup(CustomRun resource, Context<CustomRun> context) {
         return DeleteControl.defaultDelete();
+    }
+
+    private void submitBuild(CustomRun resource, String name, Map<String, String> labels) {
+        Build build = new Build();
+        build.getMetadata().setGenerateName(name + "-");
+        build.getMetadata().setNamespace(resource.getMetadata().getNamespace());
+        build.getSpec().setComponent(name);
+        labels.put(Resource.getInstanceLabel(),
+                resource.getMetadata().getLabels().get(Resource.getInstanceLabel()));
+        build.getMetadata().setLabels(labels);
+        build = kubernetesFacade.create(build);
+        LOG.debug("Trigger '{}' fired and created Build '{}'",
+                resource.getMetadata().getLabels().get(TEKTON_TRIGGER_LABEL_PREFIX + "trigger"),
+                build.getMetadata().getName());
+    }
+
+    private void submitPipeline(CustomRun resource, String name, Map<String, String> labels) {
+        Run run = new Run();
+        run.getMetadata().setGenerateName(name + "-");
+        run.getMetadata().setNamespace(resource.getMetadata().getNamespace());
+        run.getSpec().setPipeline(name);
+        labels.put(Resource.getInstanceLabel(),
+                resource.getMetadata().getLabels().get(Resource.getInstanceLabel()));
+        run.getMetadata().setLabels(labels);
+        run = kubernetesFacade.create(run);
+        LOG.debug("Trigger '{}' fired and created Run '{}'",
+                resource.getMetadata().getLabels().get(TEKTON_TRIGGER_LABEL_PREFIX + "trigger"),
+                run.getMetadata().getName());
     }
 }
