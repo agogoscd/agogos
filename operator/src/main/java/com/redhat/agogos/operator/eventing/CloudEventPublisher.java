@@ -118,7 +118,7 @@ public class CloudEventPublisher {
         CloudEvent cloudEvent = cloudEventBuilder.build();
 
         LOG.info("Sending '{}' CloudEvent", type);
-        LOG.debug("CloudEvent payload: '{}'", data);
+        LOG.debug("CloudEvent payload: '{}'", objectMapper.asJson(data));
 
         broker.sendEvent(cloudEvent);
     }

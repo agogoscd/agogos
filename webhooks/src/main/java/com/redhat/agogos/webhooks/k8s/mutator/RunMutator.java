@@ -53,7 +53,7 @@ public class RunMutator extends Mutator<Run> {
             labels = new HashMap<>();
         }
 
-        labels.put(Resource.PIPELINE.getLabel(), run.getSpec().getPipeline());
+        labels.put(Resource.PIPELINE.getResourceLabel(), run.getSpec().getPipeline());
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
 

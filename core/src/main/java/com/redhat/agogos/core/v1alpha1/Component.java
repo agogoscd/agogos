@@ -17,6 +17,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -43,6 +44,19 @@ public class Component extends AgogosResource<ComponentSpec, Status> implements 
         @Getter
         @Setter
         private ComponentBuilderSpec build = new ComponentBuilderSpec();
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof ComponentSpec)) {
+                return false;
+            }
+
+            ComponentSpec spec = (ComponentSpec) obj;
+
+            return Objects.equals(spec.getPre(), getPre())
+                    && Objects.equals(spec.getPost(), getPost())
+                    && Objects.equals(spec.getBuild(), getBuild());
+        }
     }
 
     public Component() {

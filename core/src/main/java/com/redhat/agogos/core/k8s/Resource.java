@@ -11,8 +11,12 @@ public enum Resource {
 
     public static String AGOGOS_LABEL_PREFIX = "agogos.redhat.com/";
 
-    public String getLabel() {
+    public String getResourceLabel() {
         return AGOGOS_LABEL_PREFIX + this.toString().toLowerCase();
+    }
+
+    public static String getInstanceLabel() {
+        return AGOGOS_LABEL_PREFIX + "instance";
     }
 
     public static Resource fromType(String type) {

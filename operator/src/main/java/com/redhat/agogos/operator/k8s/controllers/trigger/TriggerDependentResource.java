@@ -22,6 +22,8 @@ import io.fabric8.tekton.pipeline.v1beta1.CustomRunBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.CustomRunSpec;
 import io.fabric8.tekton.pipeline.v1beta1.CustomRunSpecBuilder;
 import io.fabric8.tekton.triggers.v1beta1.TriggerBuilder;
+import io.fabric8.tekton.triggers.v1beta1.TriggerSpecBinding;
+import io.fabric8.tekton.triggers.v1beta1.TriggerSpecBindingBuilder;
 import io.fabric8.tekton.triggers.v1beta1.TriggerSpecBuilder;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import jakarta.inject.Inject;
@@ -62,6 +64,13 @@ public class TriggerDependentResource
         // Depending on the configuration of the Trigger a correct target resource is
         // created and bound with the Tekton Trigger
         TriggerSpecBuilder triggerSpecBuilder = initTriggerSpecBuilder(agogos);
+
+        TriggerSpecBinding binding = new TriggerSpecBindingBuilder()
+                .withName("instance")
+                .withValue("$(body.build.metadata.labels['" + escapeLabel(Resource.getInstanceLabel()) + "'])")
+                .build();
+
+        triggerSpecBuilder.addToBindings(binding);
 
         // Add required filters for events
         agogos.getSpec().getEvents().forEach(event -> {
@@ -139,8 +148,9 @@ public class TriggerDependentResource
                 .withKind(HasMetadata.getKind(CustomRun.class))
                 .withNewMetadata()
                 .withGenerateName(AGOGOS_CUSTOM_RUN_PREFIX)
-                .addToLabels(Resource.RESOURCE.getLabel(), target.getKind().toLowerCase())
+                .addToLabels(Resource.RESOURCE.getResourceLabel(), target.getKind().toLowerCase())
                 .addToLabels(AGOGOS_CUSTOM_RUN_LABEL, Boolean.TRUE.toString().toLowerCase())
+                .addToLabels(Resource.getInstanceLabel(), "$(tt.params.instance)")
                 .endMetadata()
                 .withSpec(customSpec)
                 .build();
@@ -148,6 +158,7 @@ public class TriggerDependentResource
         TriggerSpecBuilder triggerSpecBuilder = new TriggerSpecBuilder()
                 .withNewTemplate()
                 .withNewSpec()
+                .addNewParam("mydefault", "Agogos instance", "instance")
                 .withResourcetemplates(customRun)
                 .endSpec()
                 .endTemplate();
@@ -176,5 +187,10 @@ public class TriggerDependentResource
             throw new ApplicationException("Could not schedule timed event trigger '{}' for '{}' trigger",
                     timed.getCron(), agogos.getFullName(), e);
         }
+    }
+
+    private String escapeLabel(String label) {
+        // Strings in this part of the trigger template need to escape dots and slashes.
+        return label.replaceAll("/", "\\\\/").replaceAll("\\.", "\\\\.");
     }
 }

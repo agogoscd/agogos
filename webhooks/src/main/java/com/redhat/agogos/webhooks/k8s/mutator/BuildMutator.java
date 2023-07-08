@@ -54,7 +54,7 @@ public class BuildMutator extends Mutator<Build> {
             labels = new HashMap<>();
         }
 
-        labels.put(Resource.COMPONENT.getLabel(), componentBuild.getSpec().getComponent());
+        labels.put(Resource.COMPONENT.getResourceLabel(), componentBuild.getSpec().getComponent());
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
 

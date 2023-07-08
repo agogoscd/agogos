@@ -78,7 +78,7 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
 
         // Add any useful/required labels
         Map<String, String> labels = new HashMap<>();
-        labels.put(Resource.COMPONENT.getLabel(), component.getMetadata().getName());
+        labels.put(Resource.COMPONENT.getResourceLabel(), component.getMetadata().getName());
 
         // Make sure the Pipeline is owned by the Component
         OwnerReference ownerReference = new OwnerReferenceBuilder()

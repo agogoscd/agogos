@@ -11,6 +11,7 @@ import lombok.ToString;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -26,6 +27,17 @@ public class ComponentHandlerSpec implements KubernetesResource {
         @Getter
         @Setter
         private String name;
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof HandlerRef)) {
+                return false;
+            }
+
+            HandlerRef ref = (HandlerRef) obj;
+
+            return Objects.equals(ref.getName(), getName());
+        }
     }
 
     @Getter
@@ -39,4 +51,17 @@ public class ComponentHandlerSpec implements KubernetesResource {
     @Getter
     @Setter
     private Map<String, Object> config = new HashMap<>();
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ComponentHandlerSpec)) {
+            return false;
+        }
+
+        ComponentHandlerSpec spec = (ComponentHandlerSpec) obj;
+
+        return Objects.equals(spec.getHandlerRef(), getHandlerRef())
+                && Objects.equals(spec.getParams(), getParams())
+                && Objects.equals(spec.getConfig(), getConfig());
+    }
 }

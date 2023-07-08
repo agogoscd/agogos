@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 public class PipelineRunDependentResource extends AbstractDependentResource<PipelineRun, Build> {
 
@@ -53,7 +54,11 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
                 .build();
 
         Map<String, String> labels = new HashMap<>();
-        labels.put(Resource.RESOURCE.getLabel(), parentResource(resource).getKind().toLowerCase());
+        labels.put(Resource.RESOURCE.getResourceLabel(), parentResource(resource).getKind().toLowerCase());
+
+        // Set the instance label from the resource if not already set, otherwise generate one.
+        String instanceLabel = resource.getMetadata().getLabels().get(Resource.getInstanceLabel());
+        labels.putIfAbsent(Resource.getInstanceLabel(), instanceLabel != null ? instanceLabel : UUID.randomUUID().toString());
 
         PodSecurityContext podSecurityContext = new PodSecurityContextBuilder()
                 .withRunAsNonRoot(runAsNonRoot.orElse(true))

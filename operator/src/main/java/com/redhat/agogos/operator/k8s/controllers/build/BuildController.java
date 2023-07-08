@@ -2,6 +2,7 @@ package com.redhat.agogos.operator.k8s.controllers.build;
 
 import com.redhat.agogos.core.PipelineRunStatus;
 import com.redhat.agogos.core.ResultableResourceStatus;
+import com.redhat.agogos.core.k8s.Resource;
 import com.redhat.agogos.core.v1alpha1.Build;
 import com.redhat.agogos.core.v1alpha1.Component;
 import com.redhat.agogos.core.v1alpha1.ResultableBuildStatus;
@@ -53,8 +54,8 @@ public class BuildController extends AbstractController<Build> implements EventS
             return UpdateControl.noUpdate();
         }
 
-        PipelineRun pipelinerun = optional.get();
-        PipelineRunStatus runStatus = PipelineRunStatus.fromPipelineRun(pipelinerun);
+        PipelineRun pipelineRun = optional.get();
+        PipelineRunStatus runStatus = PipelineRunStatus.fromPipelineRun(pipelineRun);
         ResultableResourceStatus status = runStatus.toStatus();
 
         LOG.debug("PipelineRun status for '{}' is {}", build.getFullName(), runStatus);
@@ -78,7 +79,7 @@ public class BuildController extends AbstractController<Build> implements EventS
             case SUCCEEDED:
                 message = String.format("%s finished", build.getKind());
 
-                List<PipelineRunResult> results = pipelinerun.getStatus().getPipelineResults().stream()
+                List<PipelineRunResult> results = pipelineRun.getStatus().getPipelineResults().stream()
                         .filter(r -> r.getName().equals("data")).collect(Collectors.toUnmodifiableList());
 
                 if (!results.isEmpty()) {
@@ -105,8 +106,8 @@ public class BuildController extends AbstractController<Build> implements EventS
         resourceStatus.setStatus(status);
         resourceStatus.setReason(message);
         resourceStatus.setResult(result);
-        resourceStatus.setStartTime(pipelinerun.getStatus().getStartTime());
-        resourceStatus.setCompletionTime(pipelinerun.getStatus().getCompletionTime());
+        resourceStatus.setStartTime(pipelineRun.getStatus().getStartTime());
+        resourceStatus.setCompletionTime(pipelineRun.getStatus().getCompletionTime());
 
         // Check whether the resource status was modified
         // If this is not the case, we are done here
@@ -114,6 +115,10 @@ public class BuildController extends AbstractController<Build> implements EventS
             LOG.debug("No change to {} status of '{}', returning noUpdate", build.getKind(), build.getFullName());
             return UpdateControl.noUpdate();
         }
+
+        // Set the instance label from the PipelineRun.
+        build.getMetadata().getLabels().put(Resource.getInstanceLabel(),
+                pipelineRun.getMetadata().getLabels().get(Resource.getInstanceLabel()));
 
         // Update the last update field
         resourceStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
@@ -128,7 +133,7 @@ public class BuildController extends AbstractController<Build> implements EventS
         LOG.debug("Updating {} '{}' with status '{}' (PipelineRun state '{}')",
                 build.getKind(), build.getFullName(), status, runStatus);
 
-        return UpdateControl.updateStatus(build);
+        return UpdateControl.updateResourceAndStatus(build);
     }
 
     @Override

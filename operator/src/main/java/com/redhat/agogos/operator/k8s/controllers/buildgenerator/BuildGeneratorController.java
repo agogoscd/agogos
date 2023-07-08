@@ -57,13 +57,15 @@ public class BuildGeneratorController implements Namespaced, Reconciler<CustomRu
                     .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
 
             String name = resource.getSpec().getCustomSpec().getSpec().get("name").toString();
-            Resource kind = Resource.fromType(resource.getMetadata().getLabels().get(Resource.RESOURCE.getLabel()));
+            Resource kind = Resource.fromType(resource.getMetadata().getLabels().get(Resource.RESOURCE.getResourceLabel()));
             switch (kind) {
                 case COMPONENT:
                     Build build = new Build();
                     build.getMetadata().setGenerateName(name + "-");
                     build.getMetadata().setNamespace(resource.getMetadata().getNamespace());
                     build.getSpec().setComponent(name);
+                    triggerLabels.put(Resource.getInstanceLabel(),
+                            resource.getMetadata().getLabels().get(Resource.getInstanceLabel()));
                     build.getMetadata().setLabels(triggerLabels);
                     build = kubernetesFacade.create(build);
                     LOG.debug("Trigger '{}' fired and created Build '{}'",
