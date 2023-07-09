@@ -85,7 +85,7 @@ public class WebhooksInstaller extends Installer {
 
     @Override
     public void install(InstallProfile profile, String namespace) {
-        LOG.info("🕞 Installing Agogos Webhook component...");
+        LOG.info("🕞 Installing Agogos Webhooks component...");
 
         certProvider.init();
 
@@ -121,7 +121,7 @@ public class WebhooksInstaller extends Installer {
 
         Helper.status(resources);
 
-        LOG.info("✅ Agogos Webhook installed");
+        LOG.info("✅ Agogos Webhooks installed");
 
         if (profile == InstallProfile.dev) {
             writeCerts();
@@ -129,7 +129,7 @@ public class WebhooksInstaller extends Installer {
     }
 
     private void writeCerts() {
-        Path keyPath = Paths.get("key.pem");
+        Path keyPath = Paths.get("webhooks.pem");
         Path certPath = Paths.get("webhooks.crt");
 
         try {
@@ -153,7 +153,7 @@ public class WebhooksInstaller extends Installer {
     private Deployment deployment(String namespace) {
         Probe livenessProbe = new ProbeBuilder()
                 .withHttpGet(new HTTPGetActionBuilder().withPath("/").withPort(new IntOrString(7080)).build())
-                .withInitialDelaySeconds(3).withPeriodSeconds(3).build();
+                .withInitialDelaySeconds(30).withPeriodSeconds(3).build();
 
         Map<String, Quantity> requests = new HashMap<>();
         requests.put("memory", Quantity.parse("256Mi"));

@@ -1,0 +1,61 @@
+quarkus:
+  banner:
+    enabled: true
+    path: "banner.txt"
+  container-image:
+    group: "agogos"
+    name: "agogos-interceptors"
+    registry: "quay.io"
+    tag: "latest"
+  docker:
+    dockerfile-jvm-path: "src/main/docker/Dockerfile.fast-jar"
+  http:
+    port: 7090
+    ssl-port: 8444
+  log:
+    min-level: "TRACE"
+    syslog:
+      truncate: false
+
+"%test":
+  quarkus:
+    log:
+      category:
+        "com.redhat.agogos":
+          level: TRACE
+
+"%dev":
+  quarkus:
+    http:
+      host: 0.0.0.0
+      ssl:
+        certificate:
+          files: ["${PWD}/interceptors.crt"]
+          key-files: ["${PWD}/key.pem"]
+      access-log:
+        enabled: true
+        pattern: combined
+    log:
+      category:
+        "com.redhat.agogos":
+          level: TRACE
+        # "io.javaoperatorsdk":
+        #   level: TRACE
+      file:
+        enable: true
+        path: "${PWD}/logs/interceptors.log"
+
+"%prod":
+  # TODO: change this
+  kubernetes-client:
+    trust-certs: true
+
+  quarkus:
+    http:
+      access-log:
+        enabled: true
+        pattern: combined
+    log:
+      category:
+        "com.redhat.agogos":
+          level: DEBUG

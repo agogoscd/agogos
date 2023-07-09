@@ -88,7 +88,7 @@ spec:
                             description: "Event filter using the CEL language: https://tekton.dev/docs/triggers/cel_expressions/"
                             example: "0 15 2 * *"
                         required: ["cron"]
-                    oneOf:
+                    anyOf:
                       - required: ["component"]
                       - required: ["group"]
                       - required: ["cel"]

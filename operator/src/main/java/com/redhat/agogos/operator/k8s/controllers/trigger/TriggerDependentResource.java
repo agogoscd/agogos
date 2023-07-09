@@ -152,7 +152,7 @@ public class TriggerDependentResource
         TriggerSpecBuilder triggerSpecBuilder = new TriggerSpecBuilder()
                 .withNewTemplate()
                 .withNewSpec()
-                .addNewParam("mydefault", "Agogos instance", "instance")
+                .addNewParam("$(tt.params.instance)", "", "instance")
                 .withResourcetemplates(customRun)
                 .endSpec()
                 .endTemplate();

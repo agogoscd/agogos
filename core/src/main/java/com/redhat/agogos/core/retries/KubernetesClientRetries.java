@@ -159,6 +159,25 @@ public class KubernetesClientRetries {
         return decorated.get();
     }
 
+    public List<HasMetadata> list(String namespace, ListOptions options) {
+        RetryConfig config = RetryConfig.<List<HasMetadata>> custom()
+                .maxAttempts(DEFAULT_MAX_RETRIES)
+                .waitDuration(Duration.ofSeconds(DEFAULT_MAX_INTERVAL))
+                .retryExceptions(KubernetesClientException.class)
+                .build();
+
+        RetryRegistry registry = RetryRegistry.of(config);
+        Retry retry = registry.retry("get");
+        retry.getEventPublisher()
+                .onRetry(e -> LOG.warn("⚠️ WARN: Retrying list for {}", namespace));
+
+        Supplier<List<HasMetadata>> decorated = Retry.decorateSupplier(retry, () -> {
+            return kubernetesClient.resources(HasMetadata.class).inNamespace(namespace).list(options).getItems();
+        });
+
+        return decorated.get();
+    }
+
     public void waitForAllPodsRunning(String namespace) {
         RetryConfig config = RetryConfig.<Set<String>> custom()
                 .maxAttempts(ALL_PODS_RUNNING_MAX_RETRIES)

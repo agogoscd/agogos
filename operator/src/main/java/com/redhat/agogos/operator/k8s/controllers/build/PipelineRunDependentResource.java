@@ -37,15 +37,15 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
     Optional<String> serviceAccount;
 
     @Override
-    protected PipelineRun desired(Build resource, Context<Build> context) {
+    protected PipelineRun desired(Build build, Context<Build> context) {
         PipelineRun pipelineRun = new PipelineRun();
         Optional<PipelineRun> optional = context.getSecondaryResource(PipelineRun.class);
         if (!optional.isEmpty()) {
             pipelineRun = optional.get();
-            LOG.debug("{} '{}', using existing PipelineRun '{}'", resource.getKind(),
-                    resource.getFullName(), fullPipelineRunName(pipelineRun));
+            LOG.debug("{} '{}', using existing PipelineRun '{}'", build.getKind(),
+                    build.getFullName(), fullPipelineRunName(pipelineRun));
         } else {
-            LOG.debug("{} '{}', creating new PipelineRun", resource.getKind(), resource.getFullName());
+            LOG.debug("{} '{}', creating new PipelineRun", build.getKind(), build.getFullName());
         }
 
         WorkspaceBinding workspace = new WorkspaceBindingBuilder()
@@ -54,10 +54,10 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
                 .build();
 
         Map<String, String> labels = new HashMap<>();
-        labels.put(Resource.RESOURCE.getResourceLabel(), parentResource(resource).getKind().toLowerCase());
+        labels.put(Resource.RESOURCE.getResourceLabel(), parentResource(build).getKind().toLowerCase());
 
         // Set the instance label from the resource if not already set, otherwise generate one.
-        String instanceLabel = resource.getMetadata().getLabels().get(Resource.getInstanceLabel());
+        String instanceLabel = build.getMetadata().getLabels().get(Resource.getInstanceLabel());
         labels.putIfAbsent(Resource.getInstanceLabel(), instanceLabel != null ? instanceLabel : UUID.randomUUID().toString());
 
         PodSecurityContext podSecurityContext = new PodSecurityContextBuilder()
@@ -74,11 +74,11 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
         pipelineRun = new PipelineRunBuilder(pipelineRun)
                 .withNewMetadata()
                 .withLabels(labels)
-                .withName(resource.getMetadata().getName()) // Name should match Build name.
-                .withNamespace(resource.getMetadata().getNamespace())
+                .withName(build.getMetadata().getName()) // Name should match Build name.
+                .withNamespace(build.getMetadata().getNamespace())
                 .endMetadata()
                 .withNewSpec()
-                .withNewPipelineRef().withName(resource.getSpec().getComponent()).endPipelineRef()
+                .withNewPipelineRef().withName(build.getSpec().getComponent()).endPipelineRef()
                 .withWorkspaces(workspace)
                 .withParams(param)
                 .withNewPodTemplate()
@@ -87,12 +87,12 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
                 .endSpec()
                 .build();
 
-        if (resource != null) {
+        if (build != null) {
             OwnerReference ownerReference = new OwnerReferenceBuilder()
-                    .withApiVersion(resource.getApiVersion())
-                    .withKind(resource.getKind())
-                    .withName(resource.getMetadata().getName())
-                    .withUid(resource.getMetadata().getUid())
+                    .withApiVersion(build.getApiVersion())
+                    .withKind(build.getKind())
+                    .withName(build.getMetadata().getName())
+                    .withUid(build.getMetadata().getUid())
                     .withBlockOwnerDeletion(true)
                     .withController(true)
                     .build();
@@ -104,7 +104,7 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
             pipelineRun.getSpec().setServiceAccountName(serviceAccount.get());
         }
 
-        LOG.debug("PipelineRun '{}' created for '{}'", fullPipelineRunName(pipelineRun), resource.getFullName());
+        LOG.debug("PipelineRun '{}' created for '{}'", fullPipelineRunName(pipelineRun), build.getFullName());
         return pipelineRun;
     }
 

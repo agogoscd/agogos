@@ -18,6 +18,8 @@ import java.util.Objects;
 @RegisterForReflection
 public class ResultableStatus extends AgogosResourceStatus {
 
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+
     @Getter
     @Setter
     protected ResultableResourceStatus status = ResultableResourceStatus.NEW;
@@ -41,8 +43,7 @@ public class ResultableStatus extends AgogosResourceStatus {
             return null;
         }
 
-        return LocalDateTime.parse(this.startTime,
-                DateTimeFormatter.ISO_ZONED_DATE_TIME).atZone(ZoneId.of("UTC"));
+        return LocalDateTime.parse(this.startTime, FORMATTER).atZone(ZoneId.of("UTC"));
     }
 
     @JsonIgnore
@@ -51,8 +52,12 @@ public class ResultableStatus extends AgogosResourceStatus {
             return null;
         }
 
-        return LocalDateTime.parse(this.completionTime,
-                DateTimeFormatter.ISO_ZONED_DATE_TIME).atZone(ZoneId.of("UTC"));
+        return LocalDateTime.parse(this.completionTime, FORMATTER).atZone(ZoneId.of("UTC"));
+    }
+
+    @JsonIgnore
+    public static String getFormattedNow() {
+        return ZonedDateTime.now(ZoneId.of("UTC")).format(FORMATTER);
     }
 
     @Override

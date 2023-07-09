@@ -64,6 +64,7 @@ public class BuildGeneratorController implements Namespaced, Reconciler<CustomRu
                     submitBuild(resource, name, labels);
                     break;
                 case GROUP:
+                    labels.put(Resource.GROUP.getResourceLabel(), name);
                     Group group = kubernetesFacade.get(Group.class, resource.getMetadata().getNamespace(), name);
                     group.getSpec().getComponents().stream().forEach(component -> {
                         submitBuild(resource, component, labels);

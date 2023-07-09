@@ -21,6 +21,7 @@
         <module>cli</module>
         <module>operator</module>
         <module>webhooks</module>
+        <module>interceptors</module>
         <!-- <module>relays</module> -->
     </modules>
 

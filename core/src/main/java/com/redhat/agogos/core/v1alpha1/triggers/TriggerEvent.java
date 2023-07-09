@@ -40,7 +40,7 @@ public interface TriggerEvent extends KubernetesResource {
                 .withName("cel")
                 .endRef()
                 .withParams()
-                .addNewParam("filter", String.join("\n&& ", expressions))
+                .addNewParam("filter", String.join(" && ", expressions))
                 .build();
     }
 

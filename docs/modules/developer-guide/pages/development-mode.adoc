@@ -83,7 +83,7 @@ java -Dagogos.cli-profile=admin -jar cli/target/quarkus-app/quarkus-run.jar adm 
 
 This command install Tekton, Knative Eventing and the Agogos CustomResourceDefinitions,
 as well as the Agogos webhooks. It also creates a self-signed certificate
-([filename]`key.pem` and [filename]`webhooks.crt`) to encrypt the Agogos
+([filename]`webhooks.pem` and [filename]`webhooks.crt`) to encrypt the Agogos
 webhooks endpoint.
 
 Configure the namespace to use Agogos. Execute:
@@ -124,7 +124,13 @@ separate shells:
 ./mvnw quarkus:dev -pl webhooks -am
 ----
 
-Quarkus runs a debug port by default. Since we are running two instances of
+[source,bash]
+.Running the Interceptors
+----
+./mvnw quarkus:dev -pl interceptors -am
+----
+
+Quarkus runs a debug port by default. Since we are running three instances of
 Quarkus, an error is printed:
 
 [source,text]

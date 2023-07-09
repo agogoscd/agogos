@@ -71,6 +71,29 @@ link:https://code.visualstudio.com/docs/editor/tasks[official documentation].
       ]
     },
     {
+      "label": "interceptors",
+      "type": "shell",
+      "command": "./mvnw quarkus:dev -Ddebug=5025 -pl interceptors -am",
+      "isBackground": true,
+      "problemMatcher": [
+        {
+          "pattern": [
+            {
+              "regexp": "\\b\\B",
+              "file": 1,
+              "location": 2,
+              "message": 3
+            }
+          ],
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": "^.*Scanning for projects...*",
+            "endsPattern": "^.*Quarkus .* started in .*\\. Listening on:*"
+          }
+        }
+      ]
+    },
+    {
       "label": "operator",
       "type": "shell",
       "command": "./mvnw quarkus:dev -Ddebug=5015 -pl operator -am",
@@ -148,20 +171,28 @@ To be able to launch debug tasks in the IDE you can add following content to the
   "version": "0.2.0",
   "configurations": [
     {
-      "preLaunchTask": "operator",
-      "type": "java",
-      "request": "attach",
-      "hostName": "localhost",
-      "name": "Debug Operator",
-      "port": 5015
-    },
-    {
       "preLaunchTask": "cli",
       "type": "java",
       "request": "attach",
       "hostName": "localhost",
       "name": "Debug CLI",
       "port": 5010
+    },
+    {
+      "preLaunchTask": "interceptors",
+      "type": "java",
+      "request": "attach",
+      "hostName": "localhost",
+      "name": "Debug Interceptors",
+      "port": 5025
+    },
+    {
+      "preLaunchTask": "operator",
+      "type": "java",
+      "request": "attach",
+      "hostName": "localhost",
+      "name": "Debug Operator",
+      "port": 5015
     },
     {
       "preLaunchTask": "webhooks",

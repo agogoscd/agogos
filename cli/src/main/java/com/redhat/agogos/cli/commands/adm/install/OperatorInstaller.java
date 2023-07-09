@@ -123,7 +123,7 @@ public class OperatorInstaller extends Installer {
     private Deployment deployment(String namespace) {
         Probe livenessProbe = new ProbeBuilder()
                 .withHttpGet(new HTTPGetActionBuilder().withPath("/").withPort(new IntOrString(7070)).build())
-                .withInitialDelaySeconds(3).withPeriodSeconds(3).build();
+                .withInitialDelaySeconds(30).withPeriodSeconds(3).build();
 
         Map<String, Quantity> requests = new HashMap<>();
         requests.put("memory", Quantity.parse("512Mi"));

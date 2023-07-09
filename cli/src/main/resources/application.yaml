@@ -43,6 +43,8 @@ quarkus:
           level: "OFF"
   agogos:
     cli-profile: user
+    interceptors:
+      url: "http://host.minikube.internal:7090/interceptors"
 
 
 agogos:
@@ -53,6 +55,13 @@ agogos:
   operator:
     container-image: "quay.io/agogos/agogos-operator:latest"
     service-account: "agogos-operator"
+  interceptors:
+    container-image: "quay.io/agogos/agogos-interceptors:latest"
+    endpoints:
+      - "group-execute"
+    port: 8443
+    service-account: "agogos-interceptors"
+    url: "http://only-needed-for-tests"
   webhooks:
     container-image: "quay.io/agogos/agogos-webhooks:latest"
     service-account: "agogos-webhooks"

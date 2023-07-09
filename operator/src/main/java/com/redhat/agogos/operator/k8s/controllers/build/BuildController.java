@@ -6,6 +6,7 @@ import com.redhat.agogos.core.k8s.Resource;
 import com.redhat.agogos.core.v1alpha1.Build;
 import com.redhat.agogos.core.v1alpha1.Component;
 import com.redhat.agogos.core.v1alpha1.ResultableBuildStatus;
+import com.redhat.agogos.core.v1alpha1.ResultableStatus;
 import com.redhat.agogos.operator.k8s.controllers.AbstractController;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRunResult;
@@ -24,8 +25,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -106,8 +105,12 @@ public class BuildController extends AbstractController<Build> implements EventS
         resourceStatus.setStatus(status);
         resourceStatus.setReason(message);
         resourceStatus.setResult(result);
-        resourceStatus.setStartTime(pipelineRun.getStatus().getStartTime());
-        resourceStatus.setCompletionTime(pipelineRun.getStatus().getCompletionTime());
+        if (resourceStatus.getStartTime() == null) {
+            resourceStatus.setStartTime(ResultableStatus.getFormattedNow());
+        }
+        if (pipelineRun.getStatus().getCompletionTime() != null && resourceStatus.getCompletionTime() == null) {
+            resourceStatus.setCompletionTime(ResultableStatus.getFormattedNow());
+        }
 
         // Check whether the resource status was modified
         // If this is not the case, we are done here
@@ -121,7 +124,10 @@ public class BuildController extends AbstractController<Build> implements EventS
                 pipelineRun.getMetadata().getLabels().get(Resource.getInstanceLabel()));
 
         // Update the last update field
-        resourceStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
+        resourceStatus.setLastUpdate(ResultableStatus.getFormattedNow());
+
+        // Update now, BEFORE sending the cloud event. Otherwise we are in a race condition for any interceptors.
+        UpdateControl<Build> ctrl = UpdateControl.updateResourceAndStatus(build);
 
         try {
             cloudEventPublisher.publish(runStatus.toEvent(), build, component);
@@ -133,7 +139,7 @@ public class BuildController extends AbstractController<Build> implements EventS
         LOG.debug("Updating {} '{}' with status '{}' (PipelineRun state '{}')",
                 build.getKind(), build.getFullName(), status, runStatus);
 
-        return UpdateControl.updateResourceAndStatus(build);
+        return ctrl;
     }
 
     @Override

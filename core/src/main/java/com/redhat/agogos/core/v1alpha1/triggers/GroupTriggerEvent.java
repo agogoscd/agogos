@@ -8,6 +8,7 @@ import com.redhat.agogos.core.PipelineRunState;
 import com.redhat.agogos.core.errors.ApplicationException;
 import com.redhat.agogos.core.v1alpha1.Build;
 import com.redhat.agogos.core.v1alpha1.Group;
+import com.redhat.agogos.core.v1alpha1.Run;
 import io.fabric8.tekton.triggers.v1beta1.TriggerInterceptor;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.inject.spi.CDI;
@@ -16,6 +17,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -30,26 +32,40 @@ public class GroupTriggerEvent implements TriggerEvent {
 
     @Override
     public List<TriggerInterceptor> interceptors(Trigger trigger) {
+        List<String> expressions = List.of(
+                String.format("(header.match('ce-type', '%s') || header.match('ce-type', '%s'))",
+                        CloudEventHelper.type(Build.class, PipelineRunState.SUCCEEDED),
+                        CloudEventHelper.type(Run.class, PipelineRunState.SUCCEEDED)),
+                generateItemsCelExpression(trigger));
 
+        TriggerInterceptor groupExecuteInterceptor = builder
+                .withNewRef()
+                .withName("group-execute")
+                .endRef()
+                .withParams()
+                .addNewParam("namespace", trigger.getMetadata().getNamespace())
+                .build();
+        return List.of(toCel(expressions), groupExecuteInterceptor);
+    }
+
+    private String generateItemsCelExpression(Trigger trigger) {
         KubernetesFacade kubernetesFacade = CDI.current().select(KubernetesFacade.class).get();
-
-        // Fetch the Group information
-        Group componentGroup = kubernetesFacade.get(Group.class, trigger.getMetadata().getNamespace(), name);
-        if (componentGroup == null) {
-            throw new ApplicationException("ComponentGroup '{}' could not be found", name);
+        Group group = kubernetesFacade.get(Group.class, trigger.getMetadata().getNamespace(), name);
+        if (group == null) {
+            throw new ApplicationException("Group '{}' could not be found", name);
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("\n&&\n");
-        sb.append("sets.contains([\n'");
-        sb.append(String.join("',\n'", componentGroup.getSpec().getComponents()));
-        sb.append("'],\n[ body.component.metadata.name ]\n)");
+        sb.append("(");
+        List<String> items = group.getSpec().getComponents().stream()
+                .map(c -> String.format("body.component.metadata.name == '%s'", c))
+                .collect(Collectors.toList());
+        items.addAll(group.getSpec().getPipelines().stream()
+                .map(c -> String.format("body.pipeline.metadata.name == '%s'", c))
+                .collect(Collectors.toList()));
 
-        List<String> expressions = List.of(
-                String.format("header.match('ce-type', '%s')",
-                        CloudEventHelper.type(Build.class, PipelineRunState.SUCCEEDED)),
-                sb.toString());
-        return List.of(toCel(expressions));
+        sb.append(String.join(" || ", items));
+        sb.append(")");
+        return sb.toString();
     }
-
 }
