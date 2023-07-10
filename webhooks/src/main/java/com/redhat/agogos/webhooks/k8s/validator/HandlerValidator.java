@@ -91,9 +91,8 @@ public class HandlerValidator extends Validator<Handler> {
     private Task validateTaskRef(Handler handler) throws ApplicationException {
         LOG.info("Validating Handler '{}' Tekton Task reference", handler.getFullName());
 
-        Task task = tektonClient.v1beta1().tasks().inNamespace(handler.getMetadata().getNamespace())
-                .withName(handler.getSpec().getTaskRef().getName()).get();
-
+        Task task = kubernetesFacade.get(Task.class, handler.getMetadata().getNamespace(),
+                handler.getSpec().getTaskRef().getName());
         if (task == null) {
             throw new ApplicationException("Tekton Task '{}' could not be found", handler.getSpec().getTaskRef().getName());
         }

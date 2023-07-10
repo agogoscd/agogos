@@ -79,9 +79,8 @@ public class ComponentValidator extends Validator<Component> {
                         component.getFullName(), handlerSpec.getHandlerRef().getName());
             }
 
-            Task task = tektonClient.v1beta1().tasks().inNamespace(component.getMetadata().getNamespace())
-                    .withName(handler.getSpec().getTaskRef().getName()).get();
-
+            Task task = kubernetesFacade.get(Task.class, component.getMetadata().getNamespace(),
+                    handler.getSpec().getTaskRef().getName());
             Set<String> declaredParams = handlerSpec.getParams().keySet();
 
             // Parameters declared in Tekton Task

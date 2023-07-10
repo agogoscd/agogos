@@ -11,7 +11,6 @@ import com.redhat.agogos.core.v1alpha1.Builder;
 import com.redhat.agogos.core.v1alpha1.Component;
 import com.redhat.agogos.core.v1alpha1.ComponentBuilderSpec.BuilderRef;
 import com.redhat.agogos.test.CRDTestServerSetup;
-import io.fabric8.tekton.client.TektonClient;
 import io.fabric8.tekton.pipeline.v1beta1.ParamSpecBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
 import io.fabric8.tekton.pipeline.v1beta1.Task;
@@ -41,9 +40,6 @@ public class ComponentControllerTest {
 
     @Inject
     KubernetesClientRetries retries;
-
-    @Inject
-    TektonClient tektonClient;
 
     @Test
     @DisplayName("Should fail handling a Component because the Builder does not exist")

@@ -286,8 +286,10 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
         Callable<String> callable = () -> {
             while (true) {
                 try {
-                    EventListener elInfo = tektonClient.v1beta1().eventListeners().inNamespace(el.getMetadata().getNamespace())
-                            .withName(el.getMetadata().getName()).get();
+                    EventListener elInfo = kubernetesFacade.get(
+                            EventListener.class,
+                            el.getMetadata().getNamespace(),
+                            el.getMetadata().getName());
 
                     String url = elInfo.getStatus().getAddress().getUrl();
 

@@ -121,9 +121,8 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
             Handler handler = agogosClient.v1alpha1().handlers().inNamespace(component.getMetadata().getNamespace())
                     .withName(handlerName).get();
 
-            Task handlerTask = tektonClient.v1beta1().tasks().inNamespace(component.getMetadata().getNamespace())
-                    .withName(handler.getSpec().getTaskRef().getName()).get();
-
+            Task handlerTask = kubernetesFacade.get(Task.class, component.getMetadata().getNamespace(),
+                    handler.getSpec().getTaskRef().getName());
             PipelineTaskBuilder pipelineTaskBuilder = new PipelineTaskBuilder()
                     .withName(handlerName)
                     .withTaskRef(
@@ -159,11 +158,10 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         List<ParamSpec> params = null;
         com.redhat.agogos.core.v1alpha1.TaskRef taskRef = builder.getSpec().getTaskRef();
         if ("ClusterTask".equals(taskRef.getKind())) {
-            ClusterTask clusterTask = tektonClient.v1beta1().clusterTasks().withName(taskRef.getName()).get();
+            ClusterTask clusterTask = kubernetesFacade.get(ClusterTask.class, taskRef.getName());
             params = clusterTask.getSpec().getParams();
         } else {
-            Task task = tektonClient.v1beta1().tasks().inNamespace(component.getMetadata().getNamespace())
-                    .withName(taskRef.getName()).get();
+            Task task = kubernetesFacade.get(Task.class, component.getMetadata().getNamespace(), taskRef.getName());
             params = task.getSpec().getParams();
         }
 
