@@ -10,11 +10,18 @@ This tutorial shows you how to run a simple component build on Agogos using Mini
 
 == Before you begin
 This tutorial assumes you have already setup `minikube`, `kubectl` and, at
-least, OpenJDK 17. See
-link:https://minikube.sigs.k8s.io/docs/start/[minikube start],
-link:https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/[kubectl] and
-link:https://openjdk.org/[OpenJDK]
-for installation instructions.
+least, OpenJDK 17. See the following for installation instructions:
+
+* link:https://minikube.sigs.k8s.io/docs/start/[minikube start]
+* link:https://minikube.sigs.k8s.io/docs/drivers/kvm2/[kvm2 driver for minikube]
+* link:https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/[kubectl]
+* link:https://openjdk.org/[OpenJDK]
+
+[TIP]
+====
+The `minikube` guide for the kvm2 driver contains a useful 
+link:https://minikube.sigs.k8s.io/docs/drivers/kvm2/#troubleshooting[troubleshooting guide.]
+====
 
 == Untrusted Certificates
 We need Minikube to trust the Red{nbsp}Hat root certificates as Agogos interacts
