@@ -91,9 +91,7 @@ public class RunController extends AbstractController<Run> {
                 // // This may or may not remove the Tekton PipelineRun
                 // // In case it is not successful (for any reason) it will be hanging there.
                 // // It is the ops duty to find out why these were not removed and clean them up.
-                // tektonClient.v1beta1().pipelineRuns()
-                //         .inNamespace(pipelinerun.getMetadata().getNamespace())
-                //         .withName(pipelinerun.getMetadata().getName()).delete();
+                // kubernetesFacade.delete(pipelinerun);
 
                 break;
             case FAILED:

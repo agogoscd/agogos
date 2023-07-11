@@ -6,7 +6,6 @@ import com.redhat.agogos.core.v1alpha1.AgogosResource;
 import com.redhat.agogos.operator.eventing.CloudEventPublisher;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
-import io.fabric8.tekton.client.TektonClient;
 import io.javaoperatorsdk.operator.api.reconciler.Cleaner;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
@@ -29,9 +28,6 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
 
     @Inject
     protected KubernetesSerialization objectMapper;
-
-    @Inject
-    protected TektonClient tektonClient;
 
     @Override
     public UpdateControl<T> reconcile(T resource, Context<T> context) {
