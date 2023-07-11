@@ -25,11 +25,13 @@ to inform future development so the project keeps its vision.
 
 == Consequences
 Benefits:
+
 * Better user and developer experience
 * Code and documentation are versioned together
 * Design decisions are recorded and are accessible
 
 Drawbacks:
+
 * Style guide has to be written
 * Contribution threshold is higher due to style and structure requirements
 * Review is more expensive due to style and structure requirements
