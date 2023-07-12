@@ -1,8 +1,8 @@
 package com.redhat.agogos.webhooks.k8s.mutator;
 
+import com.redhat.agogos.core.KubernetesFacade;
 import com.redhat.agogos.core.errors.MissingResourceException;
 import com.redhat.agogos.core.k8s.Resource;
-import com.redhat.agogos.core.k8s.client.AgogosClient;
 import com.redhat.agogos.core.v1alpha1.Pipeline;
 import com.redhat.agogos.core.v1alpha1.Run;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -21,7 +21,7 @@ import java.util.Map;
 @ApplicationScoped
 public class RunMutator extends Mutator<Run> {
     @Inject
-    AgogosClient agogosClient;
+    KubernetesFacade kubernetesFacade;
 
     @Override
     protected void mutateResource(Run run, AdmissionRequest request,
@@ -71,9 +71,7 @@ public class RunMutator extends Mutator<Run> {
      * @return Json array with one entry with Pipeline
      */
     private JsonArray generateOwner(Run run, String namespace) {
-        Pipeline pipeline = agogosClient.v1alpha1().pipelines().inNamespace(namespace).withName(run.getSpec().getPipeline())
-                .get();
-
+        Pipeline pipeline = kubernetesFacade.get(Pipeline.class, namespace, run.getSpec().getPipeline());
         if (pipeline == null) {
             throw new MissingResourceException(
                     "Pipeline '{}' does not exist in namespace '{}'",

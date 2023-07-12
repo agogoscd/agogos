@@ -3,6 +3,7 @@ package com.redhat.agogos.operator.k8s.controllers.pipeline;
 import com.redhat.agogos.core.errors.ApplicationException;
 import com.redhat.agogos.core.errors.MissingResourceException;
 import com.redhat.agogos.core.v1alpha1.AbstractStage;
+import com.redhat.agogos.core.v1alpha1.ClusterStage;
 import com.redhat.agogos.core.v1alpha1.Pipeline.PipelineSpec.StageEntry;
 import com.redhat.agogos.core.v1alpha1.Pipeline.PipelineSpec.StageReference;
 import com.redhat.agogos.core.v1alpha1.WorkspaceMapping;
@@ -68,11 +69,10 @@ public class PipelineDependentResource
 
             switch (stageRef.getKind()) {
                 case "Stage":
-                    stage = agogosClient.v1alpha1().stages().inNamespace(agogos.getMetadata().getNamespace())
-                            .withName(stageRef.getName()).get();
+                    stage = kubernetesFacade.get(AbstractStage.class, agogos.getMetadata().getNamespace(), stageRef.getName());
                     break;
                 case "ClusterStage":
-                    stage = agogosClient.v1alpha1().clusterstages().withName(stageRef.getName()).get();
+                    stage = kubernetesFacade.get(ClusterStage.class, stageRef.getName());
                     taskType = "ClusterTask";
                     break;
                 default:

@@ -42,8 +42,10 @@ public class TriggerValidator extends Validator<Trigger> {
     private void validateTarget(Trigger trigger) throws ApplicationException {
         LOG.info("Validating target for trigger '{}'", trigger.getFullName());
 
-        Component target = agogosClient.v1alpha1().components().inNamespace(trigger.getMetadata().getNamespace())
-                .withName(trigger.getSpec().getTarget().getName()).get();
+        Component target = kubernetesFacade.get(
+                Component.class,
+                trigger.getMetadata().getNamespace(),
+                trigger.getSpec().getTarget().getName());
 
         if (target == null) {
             throw new MissingResourceException("Target Component '{}' does not exist in namespace '{}'",

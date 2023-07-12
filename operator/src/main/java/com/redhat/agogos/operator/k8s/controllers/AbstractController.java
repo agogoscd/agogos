@@ -1,7 +1,7 @@
 package com.redhat.agogos.operator.k8s.controllers;
 
+import com.redhat.agogos.core.KubernetesFacade;
 import com.redhat.agogos.core.errors.ApplicationException;
-import com.redhat.agogos.core.k8s.client.AgogosClient;
 import com.redhat.agogos.core.v1alpha1.AgogosResource;
 import com.redhat.agogos.operator.eventing.CloudEventPublisher;
 import io.fabric8.kubernetes.api.model.Namespaced;
@@ -21,13 +21,13 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
     private static final Logger LOG = LoggerFactory.getLogger(AbstractController.class);
 
     @Inject
-    protected AgogosClient agogosClient;
-
-    @Inject
     protected CloudEventPublisher cloudEventPublisher;
 
     @Inject
     protected KubernetesSerialization objectMapper;
+
+    @Inject
+    protected KubernetesFacade kubernetesFacade;
 
     @Override
     public UpdateControl<T> reconcile(T resource, Context<T> context) {

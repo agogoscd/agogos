@@ -9,9 +9,6 @@ import com.redhat.agogos.core.v1alpha1.AgogosResource;
 import com.redhat.agogos.core.v1alpha1.AgogosResourceStatus;
 import com.redhat.agogos.core.v1alpha1.ResultableStatus;
 import com.redhat.agogos.core.v1alpha1.Status;
-import io.fabric8.kubernetes.api.model.DefaultKubernetesResourceList;
-import io.fabric8.kubernetes.client.dsl.MixedOperation;
-import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
 import io.quarkus.kubernetes.client.KubernetesClientObjectMapper;
 import jakarta.inject.Inject;
@@ -34,9 +31,6 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
 
     @Inject
     protected KubernetesSerialization objectMapper;
-
-    protected void show(MixedOperation<T, ? extends DefaultKubernetesResourceList<T>, Resource<T>> resourceClient) {
-    }
 
     protected void showResource(T resource) {
         if (resource == null) {
@@ -140,7 +134,7 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
         return dateTimeFormatter.format(time);
     }
 
-    void printResource(Object resource, Output output) {
+    protected void printResource(Object resource, Output output) {
 
         switch (output) {
             case json:

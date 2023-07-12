@@ -5,11 +5,6 @@ import com.redhat.agogos.core.v1alpha1.AgogosResource;
 import com.redhat.agogos.core.v1alpha1.AgogosResourceStatus;
 import com.redhat.agogos.core.v1alpha1.ResultableStatus;
 import com.redhat.agogos.core.v1alpha1.Status;
-import io.fabric8.kubernetes.api.model.DefaultKubernetesResourceList;
-import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
-import io.fabric8.kubernetes.client.dsl.MixedOperation;
-import io.fabric8.kubernetes.client.dsl.Resource;
-import jakarta.inject.Inject;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.Option;
 
@@ -20,18 +15,15 @@ import java.util.List;
 public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends AgogosResourceStatus>>
         extends AbstractResourceSubcommand<T> {
     @Option(names = "--limit", defaultValue = "0", description = "Number of items to display, if not provided all resources will be returned.", hidden = true)
-    Long limit;
+    protected Long limit;
 
-    @Inject
-    MixedOperation<T, ? extends DefaultKubernetesResourceList<T>, Resource<T>> client;
+    public List<T> getResources() {
+        return List.of();
+    }
 
     @Override
     public void run() {
-        List<T> resources = client
-                .list(new ListOptionsBuilder().withLimit(limit)
-                        .build())
-                .getItems();
-
+        List<T> resources = getResources();
         if (cli.getOutput() != null && cli.getOutput() != Output.plain) {
             printResource(resources, cli.getOutput());
             return;

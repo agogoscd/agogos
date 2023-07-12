@@ -2,7 +2,6 @@ package com.redhat.agogos.operator.k8s.controllers.buildgenerator;
 
 import com.redhat.agogos.core.KubernetesFacade;
 import com.redhat.agogos.core.k8s.Resource;
-import com.redhat.agogos.core.k8s.client.AgogosClient;
 import com.redhat.agogos.core.v1alpha1.Build;
 import com.redhat.agogos.core.v1alpha1.Pipeline;
 import com.redhat.agogos.operator.k8s.controllers.trigger.TriggerDependentResource;
@@ -41,9 +40,6 @@ public class BuildGeneratorController implements Namespaced, Reconciler<CustomRu
     private final static String TEKTON_TRIGGER_LABEL_PREFIX = "triggers.tekton.dev/";
 
     @Inject
-    AgogosClient agogosClient;
-
-    @Inject
     KubernetesFacade kubernetesFacade;
 
     @Override
@@ -66,10 +62,10 @@ public class BuildGeneratorController implements Namespaced, Reconciler<CustomRu
                 case COMPONENT:
                     Build build = new Build();
                     build.getMetadata().setGenerateName(name + "-");
+                    build.getMetadata().setNamespace(resource.getMetadata().getNamespace());
                     build.getSpec().setComponent(name);
                     build.getMetadata().setLabels(triggerLabels);
-                    build = agogosClient.v1alpha1().builds().inNamespace(resource.getMetadata().getNamespace()).resource(build)
-                            .create();
+                    build = kubernetesFacade.create(build);
                     LOG.debug("Trigger '{}' fired and created Build '{}'",
                             resource.getMetadata().getLabels().get(TEKTON_TRIGGER_LABEL_PREFIX + "trigger"),
                             build.getMetadata().getName());
@@ -77,10 +73,9 @@ public class BuildGeneratorController implements Namespaced, Reconciler<CustomRu
                 case PIPELINE:
                     Pipeline pipeline = new Pipeline();
                     pipeline.getMetadata().setGenerateName(name + "-");
+                    pipeline.getMetadata().setName(resource.getMetadata().getNamespace());
                     pipeline.getMetadata().setLabels(triggerLabels);
-                    pipeline = agogosClient.v1alpha1().pipelines().inNamespace(resource.getMetadata().getNamespace())
-                            .resource(pipeline)
-                            .create();
+                    pipeline = kubernetesFacade.create(pipeline);
                     LOG.debug("Trigger '{}' fired and created Pipeline '{}'",
                             resource.getMetadata().getLabels().get(TEKTON_TRIGGER_LABEL_PREFIX + "trigger"),
                             pipeline.getMetadata().getName());

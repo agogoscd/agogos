@@ -1,7 +1,6 @@
 package com.redhat.agogos.operator.cron;
 
 import com.redhat.agogos.core.KubernetesFacade;
-import com.redhat.agogos.core.k8s.client.AgogosClient;
 import com.redhat.agogos.core.v1alpha1.Build;
 import io.cloudevents.CloudEvent;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -19,9 +18,6 @@ public class BuildJob implements Job {
 
     public static final String COMPONENT_NAME = "component";
     public static final String COMPONENT_NAMESPACE = "namespace";
-
-    @Inject
-    AgogosClient agogosClient;
 
     @Inject
     KubernetesFacade kubernetesFacade;

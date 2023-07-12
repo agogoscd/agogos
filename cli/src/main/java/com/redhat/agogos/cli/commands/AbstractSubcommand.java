@@ -2,7 +2,6 @@ package com.redhat.agogos.cli.commands;
 
 import com.redhat.agogos.cli.CLI;
 import com.redhat.agogos.core.KubernetesFacade;
-import com.redhat.agogos.core.k8s.client.AgogosClient;
 import jakarta.inject.Inject;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Spec;
@@ -14,9 +13,6 @@ public abstract class AbstractSubcommand {
 
     @Inject
     protected CLI cli;
-
-    @Inject
-    protected AgogosClient agogosClient;
 
     @Inject
     protected KubernetesFacade kubernetesFacade;
