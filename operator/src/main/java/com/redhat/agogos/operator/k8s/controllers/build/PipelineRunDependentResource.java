@@ -111,9 +111,8 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
     protected Component parentResource(Build build) {
         LOG.debug("Finding parent Component for Build '{}'", build.getFullName());
 
-        Component component = agogosClient.v1alpha1().components().inNamespace(build.getMetadata().getNamespace())
-                .withName(build.getSpec().getComponent()).get();
-
+        Component component = kubernetesFacade.get(Component.class, build.getMetadata().getNamespace(),
+                build.getSpec().getComponent());
         if (component == null) {
             throw new ApplicationException("Could not find Component '{}' in namespace '{}'",
                     build.getSpec().getComponent(), build.getMetadata().getNamespace());

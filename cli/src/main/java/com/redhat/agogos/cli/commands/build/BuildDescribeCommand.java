@@ -23,12 +23,10 @@ public class BuildDescribeCommand extends AbstractResourceSubcommand<Build> {
         Build build;
 
         if (last) {
-            List<Build> resources = agogosClient.v1alpha1().builds().inNamespace(agogosClient.namespace()).list()
-                    .getItems();
-
+            List<Build> resources = kubernetesFacade.list(Build.class, kubernetesFacade.getNamespace());
             build = resources.stream().sorted(byCreationTime()).findFirst().get();
         } else {
-            build = agogosClient.v1alpha1().builds().inNamespace(agogosClient.namespace()).withName(name).get();
+            build = kubernetesFacade.get(Build.class, kubernetesFacade.getNamespace(), name);
         }
 
         showResource(build);

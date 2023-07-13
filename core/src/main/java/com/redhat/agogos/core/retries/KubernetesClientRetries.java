@@ -2,6 +2,7 @@ package com.redhat.agogos.core.retries;
 
 import com.redhat.agogos.core.errors.ApplicationException;
 import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.StatusDetails;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
@@ -139,7 +140,7 @@ public class KubernetesClientRetries {
         return decorated.get();
     }
 
-    public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace) {
+    public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace, ListOptions options) {
         RetryConfig config = RetryConfig.<List<T>> custom()
                 .maxAttempts(DEFAULT_MAX_RETRIES)
                 .waitDuration(Duration.ofSeconds(DEFAULT_MAX_INTERVAL))
@@ -152,7 +153,7 @@ public class KubernetesClientRetries {
                 .onRetry(e -> LOG.warn("⚠️ WARN: Retrying list for {}", namespace));
 
         Supplier<List<T>> decorated = Retry.decorateSupplier(retry, () -> {
-            return kubernetesClient.resources(clazz).inNamespace(namespace).list().getItems();
+            return kubernetesClient.resources(clazz).inNamespace(namespace).list(options).getItems();
         });
 
         return decorated.get();

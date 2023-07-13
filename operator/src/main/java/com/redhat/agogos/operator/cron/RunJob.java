@@ -1,7 +1,6 @@
 package com.redhat.agogos.operator.cron;
 
 import com.redhat.agogos.core.KubernetesFacade;
-import com.redhat.agogos.core.k8s.client.AgogosClient;
 import com.redhat.agogos.core.v1alpha1.Pipeline;
 import com.redhat.agogos.core.v1alpha1.Run;
 import io.cloudevents.CloudEvent;
@@ -24,9 +23,6 @@ public class RunJob implements Job {
     public static final String PIPELINE_NAMESPACE = "namespace";
 
     @Inject
-    AgogosClient agogosClient;
-
-    @Inject
     KubernetesFacade kubernetesFacade;
 
     /**
@@ -43,7 +39,7 @@ public class RunJob implements Job {
 
         LOG.info("Scheduling a new Run for '{}' Pipeline from '{}' namespace", name, namespace);
 
-        Pipeline pipeline = agogosClient.v1alpha1().pipelines().inNamespace(namespace).withName(name).get();
+        Pipeline pipeline = kubernetesFacade.get(Pipeline.class, namespace, name);
 
         OwnerReference ownerReference = new OwnerReferenceBuilder() //
                 .withApiVersion(pipeline.getApiVersion()) //

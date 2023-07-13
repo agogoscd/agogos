@@ -70,9 +70,10 @@ public class ComponentValidator extends Validator<Component> {
             LOG.info("Component '{}' validation: validating parameters for Handler '{}'",
                     component.getFullName(), handlerSpec.getHandlerRef().getName());
 
-            Handler handler = agogosClient.v1alpha1().handlers().inNamespace(component.getMetadata().getNamespace())
-                    .withName(handlerSpec.getHandlerRef().getName()).get();
-
+            Handler handler = kubernetesFacade.get(
+                    Handler.class,
+                    component.getMetadata().getNamespace(),
+                    handlerSpec.getHandlerRef().getName());
             if (handler == null) {
                 throw new ApplicationException(
                         "Component definition '{}' is not valid: specified Handler '{}' does not exist in the system",
@@ -168,9 +169,7 @@ public class ComponentValidator extends Validator<Component> {
     private void validateBuilder(Component component) throws ApplicationException {
         LOG.info("Validating Component's '{}' Builder definition", component.getFullName());
 
-        Builder builder = agogosClient.v1alpha1().builders().withName(component.getSpec().getBuild().getBuilderRef().getName())
-                .get();
-
+        Builder builder = kubernetesFacade.get(Builder.class, component.getSpec().getBuild().getBuilderRef().getName());
         if (builder == null) {
             throw new MissingResourceException("Selected builder '{}' is not registered in the system",
                     component.getSpec().getBuild().getBuilderRef().getName());

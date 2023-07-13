@@ -2,6 +2,8 @@ package com.redhat.agogos.core;
 
 import com.redhat.agogos.core.retries.KubernetesClientRetries;
 import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.ListOptions;
+import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.api.model.StatusDetails;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -85,7 +87,11 @@ public class KubernetesFacade {
     }
 
     public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace) {
-        return retries.list(clazz, namespace);
+        return list(clazz, namespace, new ListOptionsBuilder().build());
+    }
+
+    public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace, ListOptions options) {
+        return retries.list(clazz, namespace, options);
     }
 
     public void waitForAllPodsRunning(String namespace) {

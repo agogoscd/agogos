@@ -139,9 +139,10 @@ public class RunController extends AbstractController<Run> {
 
     @Override
     protected Pipeline parentResource(Run run, Context<Run> context) {
-        Pipeline pipeline = agogosClient.v1alpha1().pipelines().inNamespace(run.getMetadata().getNamespace())
-                .withName(run.getSpec().getPipeline()).get();
-
+        Pipeline pipeline = kubernetesFacade.get(
+                Pipeline.class,
+                run.getMetadata().getNamespace(),
+                run.getSpec().getPipeline());
         if (pipeline == null) {
             throw new ApplicationException("Could not find Pipeline '{}' in namespace '{}'",
                     run.getSpec().getPipeline(), run.getMetadata().getNamespace());

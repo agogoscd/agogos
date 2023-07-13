@@ -3,9 +3,9 @@ package com.redhat.agogos.core.v1alpha1.triggers;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.redhat.agogos.core.CloudEventHelper;
+import com.redhat.agogos.core.KubernetesFacade;
 import com.redhat.agogos.core.PipelineRunState;
 import com.redhat.agogos.core.errors.ApplicationException;
-import com.redhat.agogos.core.k8s.client.AgogosClient;
 import com.redhat.agogos.core.v1alpha1.Build;
 import com.redhat.agogos.core.v1alpha1.Group;
 import io.quarkus.runtime.annotations.RegisterForReflection;
@@ -33,11 +33,10 @@ public class GroupTriggerEvent implements TriggerEvent {
     public List<String> toCel(Trigger trigger) {
         // Obtain component group client so we can get information about
         // the referenced Group
-        AgogosClient agogosClient = CDI.current().select(AgogosClient.class).get();
+        KubernetesFacade kubernetesFacade = CDI.current().select(KubernetesFacade.class).get();
 
         // Fetch the Group information
-        Group componentGroup = agogosClient.v1alpha1().groups().inNamespace(trigger.getMetadata().getNamespace()).withName(name)
-                .get();
+        Group componentGroup = kubernetesFacade.get(Group.class, trigger.getMetadata().getNamespace(), name);
 
         // TODO: This should be part of the validation webhook
         // But it doesn't hurt to have it here as well

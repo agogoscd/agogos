@@ -2,7 +2,6 @@ package com.redhat.agogos.operator.k8s.controllers;
 
 import com.redhat.agogos.core.KubernetesFacade;
 import com.redhat.agogos.core.errors.ApplicationException;
-import com.redhat.agogos.core.k8s.client.AgogosClient;
 import com.redhat.agogos.core.v1alpha1.AgogosResource;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
@@ -20,9 +19,6 @@ public abstract class AbstractDependentResource<R extends HasMetadata, P extends
 
     @Inject
     protected KubernetesFacade kubernetesFacade;
-
-    @Inject
-    protected AgogosClient agogosClient;
 
     @Inject
     protected KubernetesSerialization objectMapper;

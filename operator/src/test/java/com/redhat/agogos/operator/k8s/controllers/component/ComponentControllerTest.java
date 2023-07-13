@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import com.redhat.agogos.core.k8s.client.AgogosClient;
+import com.redhat.agogos.core.KubernetesFacade;
 import com.redhat.agogos.core.retries.KubernetesClientRetries;
 import com.redhat.agogos.core.v1alpha1.Builder;
 import com.redhat.agogos.core.v1alpha1.Component;
@@ -36,7 +36,7 @@ public class ComponentControllerTest {
     ComponentController componentController;
 
     @Inject
-    AgogosClient agogosClient;
+    KubernetesFacade kubernetesFacade;
 
     @Inject
     KubernetesClientRetries retries;
@@ -86,7 +86,7 @@ public class ComponentControllerTest {
         builder.getSpec().getTaskRef().setName("should-handle-component");
 
         // Create the builder, we will need it later
-        agogosClient.v1alpha1().builders().resource(builder).create();
+        kubernetesFacade.create(builder);
 
         UpdateControl<Component> control = componentController.reconcile(component, context);
 
