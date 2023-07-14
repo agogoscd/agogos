@@ -81,16 +81,10 @@ public class TriggerDependentResource
                 return;
             }
 
-            event.toCel(agogos).forEach(expression -> {
-                LOG.debug("Adding CEL interceptor: '{}' to trigger '{}'", expression, agogos.getMetadata().getName());
+            event.interceptors(agogos).forEach(interceptor -> {
+                LOG.debug("Adding interceptor: '{}' to trigger '{}'", interceptor.getName(), agogos.getMetadata().getName());
 
-                triggerSpecBuilder.addNewInterceptor()
-                        .withNewRef()
-                        .withName("cel")
-                        .endRef()
-                        .withParams()
-                        .addNewParam("filter", expression)
-                        .endInterceptor();
+                triggerSpecBuilder.addToInterceptors(interceptor);
             });
         });
 

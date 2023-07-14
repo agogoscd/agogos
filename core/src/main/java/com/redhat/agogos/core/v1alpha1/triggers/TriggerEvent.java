@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
+import io.fabric8.tekton.triggers.v1beta1.TriggerInterceptor;
+import io.fabric8.tekton.triggers.v1beta1.TriggerInterceptorBuilder;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 
 import java.util.List;
@@ -25,14 +27,28 @@ import java.util.List;
 @JsonDeserialize(using = JsonDeserializer.None.class)
 public interface TriggerEvent extends KubernetesResource {
 
+    TriggerInterceptorBuilder builder = new TriggerInterceptorBuilder();
+
     /**
-     * Converts the event definition into CEL expression list.
+     * Converts the CEL expression list into a CEL interceptor by anding ("&&") the expressions.
      *
-     * Returns CEL representation of the {@link TriggerEvent} as a list. It can
-     * contain one or more expressions.
-     * 
-     * @return List of CEL expressions
+     * @return a CEL interceptor
      */
     @JsonIgnore
-    public List<String> toCel(Trigger trigger);
+    public default TriggerInterceptor toCel(List<String> expressions) {
+        return builder.withNewRef()
+                .withName("cel")
+                .endRef()
+                .withParams()
+                .addNewParam("filter", String.join("\n&& ", expressions))
+                .build();
+    }
+
+    /**
+     * Converts the event definition into a list of interceptors.
+     *
+     * @return List of interceptors
+     */
+    @JsonIgnore
+    public List<TriggerInterceptor> interceptors(Trigger trigger);
 }

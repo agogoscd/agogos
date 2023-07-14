@@ -8,14 +8,13 @@ import com.redhat.agogos.core.PipelineRunState;
 import com.redhat.agogos.core.errors.ApplicationException;
 import com.redhat.agogos.core.v1alpha1.Build;
 import com.redhat.agogos.core.v1alpha1.Group;
+import io.fabric8.tekton.triggers.v1beta1.TriggerInterceptor;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.inject.spi.CDI;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 @Getter
@@ -30,36 +29,27 @@ public class GroupTriggerEvent implements TriggerEvent {
     private String name;
 
     @Override
-    public List<String> toCel(Trigger trigger) {
-        // Obtain component group client so we can get information about
-        // the referenced Group
+    public List<TriggerInterceptor> interceptors(Trigger trigger) {
+
         KubernetesFacade kubernetesFacade = CDI.current().select(KubernetesFacade.class).get();
 
         // Fetch the Group information
         Group componentGroup = kubernetesFacade.get(Group.class, trigger.getMetadata().getNamespace(), name);
-
-        // TODO: This should be part of the validation webhook
-        // But it doesn't hurt to have it here as well
         if (componentGroup == null) {
             throw new ApplicationException("ComponentGroup '{}' could not be found", name);
         }
 
-        StringBuilder builder = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n&&\n");
+        sb.append("sets.contains([\n'");
+        sb.append(String.join("',\n'", componentGroup.getSpec().getComponents()));
+        sb.append("'],\n[ body.component.metadata.name ]\n)");
 
-        // Build the CEL expression that compares the component
-        for (Iterator<String> iter = componentGroup.getSpec().getComponents().iterator(); iter.hasNext();) {
-            builder.append(String.format("body.component.metadata.name == '%s'", iter.next()));
-
-            if (iter.hasNext()) {
-                builder.append(String.format(" || "));
-            }
-        }
-
-        return Arrays.asList( //
+        List<String> expressions = List.of(
                 String.format("header.match('ce-type', '%s')",
-                        CloudEventHelper.type(Build.class, PipelineRunState.SUCCEEDED)), //
-                builder.toString()//
-        );
+                        CloudEventHelper.type(Build.class, PipelineRunState.SUCCEEDED)),
+                sb.toString());
+        return List.of(toCel(expressions));
     }
 
 }

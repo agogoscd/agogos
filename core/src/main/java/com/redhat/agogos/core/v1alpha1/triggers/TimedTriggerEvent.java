@@ -2,12 +2,12 @@ package com.redhat.agogos.core.v1alpha1.triggers;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import io.fabric8.tekton.triggers.v1beta1.TriggerInterceptor;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Getter
@@ -22,7 +22,7 @@ public class TimedTriggerEvent implements TriggerEvent {
     private String cron;
 
     @Override
-    public List<String> toCel(Trigger trigger) {
-        return Arrays.asList();
+    public List<TriggerInterceptor> interceptors(Trigger trigger) {
+        return List.of();
     }
 }
