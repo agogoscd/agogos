@@ -58,7 +58,7 @@ public class TektonInstaller extends DependencyInstaller {
             ConfigMap configMap = kubernetesFacade.get(ConfigMap.class, tekton.namespace(), CONFIGMAP_FEATURE_FLAGS);
             configMap = new ConfigMapBuilder(configMap)
                     .addToData("disable-affinity-assistant", "true")
-                    .addToData("send-cloudevents-for-runs", "true")
+                    .addToData("send-cloudevents-for-runs", "false")
                     .build();
 
             kubernetesFacade.update(configMap);
