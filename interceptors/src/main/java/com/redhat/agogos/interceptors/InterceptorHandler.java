@@ -10,6 +10,7 @@ import com.redhat.agogos.core.v1alpha1.Group;
 import com.redhat.agogos.core.v1alpha1.Run;
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
+import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -42,6 +43,9 @@ public class InterceptorHandler {
             + "']";
 
     @Inject
+    KubernetesSerialization objectMapper;
+
+    @Inject
     KubernetesFacade kubernetesFacade;
 
     @POST
@@ -63,15 +67,19 @@ public class InterceptorHandler {
             if (components.size() > 0) {
                 List<Build> builds = getBuilds(namespace, name, instance);
                 if (components.size() == builds.size()) {
-                    String myName = (String) ctx.read(PATH_NAME, List.class).get(0);
+                    String nf = getNotFinishedBuilds(builds);
+                    if (nf != null) {
+                        setFailedResponse(response, Code.FAILED_PRECONDITION, nf);
+                        LOG.info(nf);
+                    } else {
+                        String myName = (String) ctx.read(PATH_NAME, List.class).get(0);
 
-                    // Check completion time and only succeed if this is the last build.
-                    Build last = getLastBuild(builds);
-                    if (!myName.equals(last.getMetadata().getName())) {
-                        String nf = getNotFinishedBuilds(builds);
-                        if (nf != null) {
-                            setFailedResponse(response, Code.FAILED_PRECONDITION, nf);
-                            LOG.info(nf);
+                        // Check completion time and only succeed if this is the last build.
+                        Build last = getLastBuild(builds);
+                        if (!myName.equals(last.getMetadata().getName())) {
+                            String msg = String.format("%s is not the last build.", myName);
+                            setFailedResponse(response, Code.FAILED_PRECONDITION, msg);
+                            LOG.info(msg);
                         }
                     }
                 } else {
@@ -86,15 +94,19 @@ public class InterceptorHandler {
             if (response.isContinueFlag() && pipelines.size() > 0) {
                 List<Run> runs = getRuns(namespace, name, instance);
                 if (pipelines.size() == runs.size()) {
-                    String myName = (String) ctx.read(PATH_NAME, List.class).get(0);
+                    String nf = getNotFinishedRuns(runs);
+                    if (nf != null) {
+                        setFailedResponse(response, Code.FAILED_PRECONDITION, nf);
+                        LOG.info(nf);
+                    } else {
+                        String myName = (String) ctx.read(PATH_NAME, List.class).get(0);
 
-                    // Check completion time and only succeed if this is the last build.
-                    Run last = getLastRun(runs);
-                    if (!myName.equals(last.getMetadata().getName())) {
-                        String nf = getNotFinishedRuns(runs);
-                        if (nf != null) {
-                            setFailedResponse(response, Code.FAILED_PRECONDITION, nf);
-                            LOG.info(nf);
+                        // Check completion time and only succeed if this is the last build.
+                        Run last = getLastRun(runs);
+                        if (!myName.equals(last.getMetadata().getName())) {
+                            String msg = String.format("%s is not the last run.", myName);
+                            setFailedResponse(response, Code.FAILED_PRECONDITION, msg);
+                            LOG.info(msg);
                         }
                     }
                 } else {

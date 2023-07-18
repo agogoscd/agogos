@@ -48,9 +48,42 @@ spec:
                   description: List of the Pipelines
                   items:
                     type: string
-                    description: Name of the Pipelines
-              required:
-                - "components"
+                    description: Name of the Pipeline
+              anyOf:
+                - required: ["components"]
+                - required: ["pipelines"]
+            status:
+              description: Status defines the observed state of Group
+              properties:
+                lastUpdate:
+                  format: date-time
+                  type: string
+                reason:
+                  type: string
+                status:
+                  default: New
+                  enum:
+                  - New
+                  - Initializing
+                  - Ready
+                  - Failed
+                  type: string
+              type: object
           type: object
       served: true
       storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Status
+          jsonPath: .status.status
+          type: string
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

@@ -3,6 +3,7 @@ package com.redhat.agogos.cli.commands;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redhat.agogos.cli.CLI.Output;
+import com.redhat.agogos.core.ResourceStatus;
 import com.redhat.agogos.core.ResultableResourceStatus;
 import com.redhat.agogos.core.errors.ApplicationException;
 import com.redhat.agogos.core.v1alpha1.AgogosResource;
@@ -59,10 +60,10 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
 
                 sb.append(nl).append(Ansi.AUTO.string("🎉 @|bold Status|@")).append(nl).append(nl);
 
-                String buildColor = "green";
+                String color = "green";
 
                 if (status.getStatus() == ResultableResourceStatus.FAILED) {
-                    buildColor = "red";
+                    color = "red";
                 }
 
                 ZonedDateTime startTime = status.startTime();
@@ -82,7 +83,7 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
                 }
 
                 sb.append(Ansi.AUTO
-                        .string(String.format("@|bold Status|@:\t\t@|bold,%s %s |@", buildColor,
+                        .string(String.format("@|bold Status|@:\t\t@|bold,%s %s |@", color,
                                 status.getStatus())))
                         .append(nl);
                 sb.append(Ansi.AUTO.string(String.format("@|bold Reason|@:\t\t%s",
@@ -115,7 +116,19 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
 
             } else {
                 Status status = (Status) resource.getStatus();
-                sb.append(Ansi.AUTO.string(String.format("Status:\t\t @|bold %s |@", status.getStatus())));
+                if (status != null) {
+                    String color = "";
+                    if (status.getStatus() == ResourceStatus.READY) {
+                        color = "green";
+                    }
+                    sb.append(
+                            Ansi.AUTO.string(String.format("@|bold Status|@:\t\t@|bold,%s %s |@", color, status.getStatus())))
+                            .append(nl);
+                }
+                sb.append(Ansi.AUTO
+                        .string(String.format("@|bold Created|@:\t%s",
+                                formatDate(resource.creationTime()))))
+                        .append(nl);
             }
 
         }
