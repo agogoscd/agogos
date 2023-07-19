@@ -1,4 +1,5 @@
 * Developer Guide
+** xref:contribution_guide.adoc[]
 ** xref:development-mode.adoc[]
 ** xref:testing.adoc[]
 ** xref:ide.adoc[]

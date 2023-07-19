@@ -1,0 +1,148 @@
+= Contributing
+
+== Scope
+This page provides an overview of contributing to Agogos
+(Continuous Productization as a Service) as a software developer.
+
+== Git Repository
+For active maintenance and development of the Agogos software and documentation,
+create a fork of the
+link:https://gitlab.cee.redhat.com/agogos/agogos[Agogos repository].
+After creating a fork, make sure it has public visibility.
+
+Updates are performed in the forked repository and, when changes are ready for
+review, submitted as merge requests to the upstream repository. Merge requests
+should always target the `main` branch of the upstream Agogos repository.
+
+=== Fork the Repository
+Fork the Agogos repository using the
+link:https://gitlab.cee.redhat.com/agogos/agogos/-/forks/new[Fork project]
+option of the
+link:https://gitlab.cee.redhat.com/agogos/agogos[Agogos repository].
+After creating the fork, open the forked repository's web page and
+select menu:Settings[General].
+Expand the *Visibility, project features, permissions* section.
+Make sure the `Project visibility` is set to *Public*.
+If you have to update it, don't forget to scroll down and click the
+btn:[Save changes] button.
+
+After a fork has been created, clone the repository to your local system.
+
+----
+$ git clone git@gitlab.cee.redhat.com:<ID>/agogos.git
+$ cd agogos
+$ git checkout main
+----
+
+== Secure Access to GitLab
+
+=== SSH Authentication
+To use SSH authentication to manage your GitLab access, you will need to
+create and install
+link:https://docs.gitlab.com/ee/user/ssh.html[SSH Keys].
+
+[NOTE]
+====
+Setup of SSH is only necessary once for a GitLab instance. You should only
+need to do this once regardless of the number of repositories you use.
+====
+
+If you don't have an SSH key pair, follow the
+link:https://docs.gitlab.com/ee/user/ssh.html#generate-an-ssh-key-pair[Generate an SSH key pair]
+instructions to generate them. Per the
+link:https://docs.gitlab.com/ee/user/ssh.html#supported-ssh-key-types[GitLab Supported SSH Key Types]
+information, create a key pair using the ED25519, ED25519_SK, or ECDSA_SK keys.
+
+Once you have an SSH key, follow the
+link:https://docs.gitlab.com/ee/user/ssh.html#add-an-ssh-key-to-your-gitlab-account[Add an SSH key to your GitLab account]
+instructions to add the public key to your account.
+
+=== HTTPS Authentication
+To use HTTPS authentication to manage your GitLab access, you will need to use
+link:https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html[Personal Access Tokens].
+
+[NOTE]
+====
+Access tokens need to be set up for each instance of a repository, so
+SSH authentication is the preferred method. These instructions are provided
+for cases where SSH authentication isn't viable.
+====
+
+To link your personal repository to the Agogos repository, you need to
+create an Access Token in the Agogos repository and use it to link the
+two repositories.
+
+Open the
+link:https://gitlab.cee.redhat.com/agogos/agogos/-/settings/access_tokens[Access Tokens section]
+of the Agogos repository.
+. Enter a name for the Token
+  (something like "<UserID> Link Token" should be fine).
+. Click the "x" to remove the Expiration date. This will set the expiration
+  date to the maximum length.
+. Under `Select a Role`, pick "Maintainer".
+. Under `Select scopes`, select all of them.
+. Click the btn:[Create project access token] button.
+. When the token is created, click the clipboard icon next to the text in the
+  "Your new project access token". You will need this when authenticating the
+  first time you run [command]`git fetch`.
+
+----
+$ git config --global credential.helper store
+$ git fetch agogos
+Username for ...  <- Provide your user name
+Password for ...  <- Provide the token you copied above
+----
+
+The [command]`git config` command will enable token caching, so you only need to
+provide it this one time.
+
+== Maintaining the Git Fork
+
+=== Link the Fork to the Main Repository
+Linking your repository to the Agogos repository allows you to keep your
+fork up-to-date.
+
+.Using SSH Authentication
+----
+$ git remote add agogos git@gitlab.cee.redhat.com:agogos/agogos.git
+$ git checkout main
+$ git branch --set-upstream-to=origin/main
+----
+
+.Using HTTPS Authentication
+----
+$ git remote add agogos https://gitlab.cee.redhat.com/agogos/agogos.git
+$ git checkout main
+$ git branch --set-upstream-to=origin/main
+----
+
+When you add `agogos` as a remote, your repository now has two upstream
+repositories:
+
+* origin - which points to your personal repository in GitLab.
+* agogos - which points to the Agogos repository in GitLab.
+
+The [command]`git branch --set-upstream-to=origin/main` command sets the
+default upstream repository for your branch to `origin`, so any subsequent
+[command]`git push` commands update your personal GitLab repository.
+
+=== Update the Git Fork
+You will need to regularly fetch updates from the Agogos repository,
+merge them into your personal local repository, and push the changes to
+your personal GitLab repository. The following steps show the commands:
+
+----
+$ git checkout main
+$ git fetch agogos
+$ git merge agogos/main
+$ git push
+$ git checkout <developers-branch>
+$ git rebase main
+$ git push
+----
+
+[IMPORTANT]
+====
+Do not [command]`git push` to the Agogos repository from your personal
+repository. Make any changes to the Agogos repository through a merge request.
+====
