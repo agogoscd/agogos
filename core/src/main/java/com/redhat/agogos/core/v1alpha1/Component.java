@@ -45,6 +45,10 @@ public class Component extends AgogosResource<ComponentSpec, Status> implements 
         @Setter
         private ComponentBuilderSpec build = new ComponentBuilderSpec();
 
+        @Getter
+        @Setter
+        private Dependents dependents = new Dependents();
+
         @Override
         public boolean equals(Object obj) {
             if (!(obj instanceof ComponentSpec)) {
@@ -55,7 +59,8 @@ public class Component extends AgogosResource<ComponentSpec, Status> implements 
 
             return Objects.equals(spec.getPre(), getPre())
                     && Objects.equals(spec.getPost(), getPost())
-                    && Objects.equals(spec.getBuild(), getBuild());
+                    && Objects.equals(spec.getBuild(), getBuild())
+                    && Objects.equals(spec.getDependents(), getDependents());
         }
     }
 

@@ -1,7 +1,7 @@
 package com.redhat.agogos.operator.k8s.controllers.run;
 
 import com.redhat.agogos.core.errors.ApplicationException;
-import com.redhat.agogos.core.k8s.Resource;
+import com.redhat.agogos.core.k8s.Label;
 import com.redhat.agogos.core.v1alpha1.Pipeline;
 import com.redhat.agogos.core.v1alpha1.Run;
 import com.redhat.agogos.core.v1alpha1.WorkspaceMapping;
@@ -76,7 +76,7 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
                 .build();
 
         Map<String, String> labels = new HashMap<>();
-        labels.put(Resource.RESOURCE.getResourceLabel(), parentResource(resource).getKind().toLowerCase());
+        labels.put(Label.RESOURCE.toString(), parentResource(resource).getKind().toLowerCase());
 
         PodSecurityContext podSecurityContext = new PodSecurityContextBuilder()
                 .withRunAsNonRoot(runAsNonRoot.orElse(true))

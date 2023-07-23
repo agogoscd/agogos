@@ -4,6 +4,7 @@ import com.redhat.agogos.cli.commands.adm.AdmCommand;
 import com.redhat.agogos.cli.commands.build.BuildCommand;
 import com.redhat.agogos.cli.commands.builder.BuilderCommand;
 import com.redhat.agogos.cli.commands.component.ComponentCommand;
+import com.redhat.agogos.cli.commands.execution.ExecutionCommand;
 import com.redhat.agogos.cli.commands.group.GroupCommand;
 import com.redhat.agogos.cli.commands.info.InfoCommand;
 import com.redhat.agogos.cli.commands.load.LoadCommand;
@@ -100,6 +101,7 @@ public class CLI implements QuarkusApplication {
         commandLine.addSubcommand(BuildCommand.class)
                 .addSubcommand(BuilderCommand.class)
                 .addSubcommand(ComponentCommand.class)
+                .addSubcommand(ExecutionCommand.class)
                 .addSubcommand(GroupCommand.class)
                 .addSubcommand(InfoCommand.class)
                 .addSubcommand(LoadCommand.class)

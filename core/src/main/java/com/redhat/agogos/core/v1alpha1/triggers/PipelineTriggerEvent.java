@@ -2,8 +2,8 @@ package com.redhat.agogos.core.v1alpha1.triggers;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.redhat.agogos.core.CloudEventHelper;
 import com.redhat.agogos.core.PipelineRunState;
+import com.redhat.agogos.core.eventing.CloudEventHelper;
 import com.redhat.agogos.core.v1alpha1.Run;
 import io.fabric8.tekton.triggers.v1beta1.TriggerInterceptor;
 import io.quarkus.runtime.annotations.RegisterForReflection;

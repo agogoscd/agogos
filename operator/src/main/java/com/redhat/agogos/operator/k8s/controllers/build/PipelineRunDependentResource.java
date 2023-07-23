@@ -1,7 +1,7 @@
 package com.redhat.agogos.operator.k8s.controllers.build;
 
 import com.redhat.agogos.core.errors.ApplicationException;
-import com.redhat.agogos.core.k8s.Resource;
+import com.redhat.agogos.core.k8s.Label;
 import com.redhat.agogos.core.v1alpha1.Build;
 import com.redhat.agogos.core.v1alpha1.Component;
 import com.redhat.agogos.core.v1alpha1.WorkspaceMapping;
@@ -54,11 +54,12 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
                 .build();
 
         Map<String, String> labels = new HashMap<>();
-        labels.put(Resource.RESOURCE.getResourceLabel(), parentResource(build).getKind().toLowerCase());
+        labels.put(Label.RESOURCE.toString(), parentResource(build).getKind().toLowerCase());
+        labels.put(Label.NAME.toString(), parentResource(build).getMetadata().getName());
 
         // Set the instance label from the resource if not already set, otherwise generate one.
-        String instanceLabel = build.getMetadata().getLabels().get(Resource.getInstanceLabel());
-        labels.putIfAbsent(Resource.getInstanceLabel(), instanceLabel != null ? instanceLabel : UUID.randomUUID().toString());
+        String instanceLabel = build.getMetadata().getLabels().get(Label.INSTANCE.toString());
+        labels.putIfAbsent(Label.INSTANCE.toString(), instanceLabel != null ? instanceLabel : UUID.randomUUID().toString());
 
         PodSecurityContext podSecurityContext = new PodSecurityContextBuilder()
                 .withRunAsNonRoot(runAsNonRoot.orElse(true))

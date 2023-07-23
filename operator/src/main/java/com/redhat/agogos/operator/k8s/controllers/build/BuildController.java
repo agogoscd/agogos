@@ -2,12 +2,17 @@ package com.redhat.agogos.operator.k8s.controllers.build;
 
 import com.redhat.agogos.core.PipelineRunStatus;
 import com.redhat.agogos.core.ResultableResourceStatus;
+import com.redhat.agogos.core.k8s.Label;
 import com.redhat.agogos.core.k8s.Resource;
 import com.redhat.agogos.core.v1alpha1.Build;
 import com.redhat.agogos.core.v1alpha1.Component;
+import com.redhat.agogos.core.v1alpha1.Execution;
+import com.redhat.agogos.core.v1alpha1.Execution.ExecutionInfo;
 import com.redhat.agogos.core.v1alpha1.ResultableBuildStatus;
 import com.redhat.agogos.core.v1alpha1.ResultableStatus;
 import com.redhat.agogos.operator.k8s.controllers.AbstractController;
+import io.fabric8.kubernetes.api.model.ListOptions;
+import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRunResult;
 import io.javaoperatorsdk.operator.api.config.informer.InformerConfiguration;
@@ -120,8 +125,8 @@ public class BuildController extends AbstractController<Build> implements EventS
         }
 
         // Set the instance label from the PipelineRun.
-        build.getMetadata().getLabels().put(Resource.getInstanceLabel(),
-                pipelineRun.getMetadata().getLabels().get(Resource.getInstanceLabel()));
+        build.getMetadata().getLabels().put(Label.INSTANCE.toString(),
+                pipelineRun.getMetadata().getLabels().get(Label.INSTANCE.toString()));
 
         // Update the last update field
         resourceStatus.setLastUpdate(ResultableStatus.getFormattedNow());
@@ -139,6 +144,41 @@ public class BuildController extends AbstractController<Build> implements EventS
         LOG.debug("Updating {} '{}' with status '{}' (PipelineRun state '{}')",
                 build.getKind(), build.getFullName(), status, runStatus);
 
+        String group = build.getMetadata().getLabels().get(Label.create(Resource.GROUP));
+        if (group != null) {
+            // Update the Execution with the new build status.
+            String instance = build.getMetadata().getLabels().get(Label.INSTANCE.toString());
+            ListOptions options = new ListOptionsBuilder()
+                    .withLabelSelector(Label.RESOURCE + "=" + Resource.GROUP.toString().toLowerCase() + ","
+                            + Label.NAME + "=" + group + "," + Label.INSTANCE + "=" + instance)
+                    .build();
+            List<Execution> executions = kubernetesFacade.list(Execution.class, options);
+            if (executions.size() > 0) {
+                Execution execution = executions.get(0);
+                ExecutionInfo info = execution.getSpec().getComponents().get(component.getMetadata().getName());
+                if (info != null) {
+                    ResultableStatus s = new ResultableStatus();
+                    s.setCompletionTime(resourceStatus.getCompletionTime());
+                    s.setLastUpdate(resourceStatus.getLastUpdate());
+                    s.setStartTime(resourceStatus.getStartTime());
+                    s.setStatus(resourceStatus.getStatus());
+
+                    info.setStatus(s);
+                    if (kubernetesFacade.update(execution) != null) {
+                        LOG.info("Updated execution info for '{}' to {} in '{}'", build.getFullName(),
+                                resourceStatus.getStatus(), execution.getFullName());
+                    } else {
+                        LOG.error("Unable to update execution info for '{}' to {} in '{}'", build.getFullName(),
+                                resourceStatus.getStatus(), execution.getFullName());
+                    }
+                } else {
+                    LOG.error("Unable to find ExecutionInfo for build '{}' with group '{}' and instance '{}'",
+                            build.getFullName(), group, instance);
+                }
+            } else {
+                LOG.error("Unable to find Execution for build '{}'", build.getFullName());
+            }
+        }
         return ctrl;
     }
 

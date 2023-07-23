@@ -7,7 +7,7 @@ import com.cronutils.model.definition.CronDefinition;
 import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.parser.CronParser;
 import com.redhat.agogos.core.errors.ApplicationException;
-import com.redhat.agogos.core.k8s.Resource;
+import com.redhat.agogos.core.k8s.Label;
 import com.redhat.agogos.core.v1alpha1.Build;
 import com.redhat.agogos.core.v1alpha1.triggers.TimedTriggerEvent;
 import com.redhat.agogos.core.v1alpha1.triggers.Trigger;
@@ -37,7 +37,7 @@ public class TriggerDependentResource
         extends AbstractDependentResource<io.fabric8.tekton.triggers.v1beta1.Trigger, Trigger> {
 
     private static String AGOGOS_CUSTOM_RUN_PREFIX = "agogos-trigger-custom-run-";
-    public static String AGOGOS_CUSTOM_RUN_LABEL = Resource.AGOGOS_LABEL_PREFIX + "triggered-customrun";
+    public static String AGOGOS_CUSTOM_RUN_LABEL = Label.AGOGOS_LABEL_PREFIX + "triggered-customrun";
 
     @Inject
     TriggerEventScheduler scheduler;
@@ -67,7 +67,7 @@ public class TriggerDependentResource
 
         TriggerSpecBinding binding = new TriggerSpecBindingBuilder()
                 .withName("instance")
-                .withValue("$(body.build.metadata.labels['" + escapeLabel(Resource.getInstanceLabel()) + "'])")
+                .withValue("$(body.build.metadata.labels['" + escapeLabel(Label.INSTANCE) + "'])")
                 .build();
 
         triggerSpecBuilder.addToBindings(binding);
@@ -142,9 +142,9 @@ public class TriggerDependentResource
                 .withKind(HasMetadata.getKind(CustomRun.class))
                 .withNewMetadata()
                 .withGenerateName(AGOGOS_CUSTOM_RUN_PREFIX)
-                .addToLabels(Resource.RESOURCE.getResourceLabel(), target.getKind().toLowerCase())
+                .addToLabels(Label.RESOURCE.toString(), target.getKind().toLowerCase())
                 .addToLabels(AGOGOS_CUSTOM_RUN_LABEL, Boolean.TRUE.toString().toLowerCase())
-                .addToLabels(Resource.getInstanceLabel(), "$(tt.params.instance)")
+                .addToLabels(Label.INSTANCE.toString(), "$(tt.params.instance)")
                 .endMetadata()
                 .withSpec(customSpec)
                 .build();
@@ -183,8 +183,8 @@ public class TriggerDependentResource
         }
     }
 
-    private String escapeLabel(String label) {
+    private String escapeLabel(Label label) {
         // Strings in this part of the trigger template need to escape dots and slashes.
-        return label.replaceAll("/", "\\\\/").replaceAll("\\.", "\\\\.");
+        return label.toString().replaceAll("/", "\\\\/").replaceAll("\\.", "\\\\.");
     }
 }

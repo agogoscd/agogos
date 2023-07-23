@@ -4,6 +4,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.redhat.agogos.core.KubernetesFacade;
 import com.redhat.agogos.core.ResultableResourceStatus;
+import com.redhat.agogos.core.k8s.Label;
 import com.redhat.agogos.core.k8s.Resource;
 import com.redhat.agogos.core.v1alpha1.Build;
 import com.redhat.agogos.core.v1alpha1.Group;
@@ -37,9 +38,9 @@ public class InterceptorHandler {
     private static final Logger LOG = LoggerFactory.getLogger(InterceptorHandler.class);
 
     private static final String PATH_NAME = "$.['build', 'run'].metadata.name";
-    private static final String PATH_GROUP_LABEL = "$.['build', 'run'].metadata.labels['" + Resource.GROUP.getResourceLabel()
+    private static final String PATH_GROUP_LABEL = "$.['build', 'run'].metadata.labels['" + Label.create(Resource.GROUP)
             + "']";
-    private static final String PATH_INSTANCE_LABEL = "$.['build', 'run'].metadata.labels['" + Resource.getInstanceLabel()
+    private static final String PATH_INSTANCE_LABEL = "$.['build', 'run'].metadata.labels['" + Label.INSTANCE
             + "']";
 
     @Inject
@@ -53,9 +54,16 @@ public class InterceptorHandler {
     public Response groupBuild(InterceptorRequest request) {
         InterceptorResponse response = new InterceptorResponse();
 
-        String namespace = (String) request.getInterceptorParams().get("namespace");
         DocumentContext ctx = JsonPath.parse(request.getBody());
-        String name = (String) ctx.read(PATH_GROUP_LABEL, List.class).get(0);
+        List<?> label = ctx.read(PATH_GROUP_LABEL, List.class);
+        LOG.error(label.toString());
+        if (label == null || label.size() == 0) {
+            LOG.info("No group resource, aborting interceptor and continuing.");
+            return Response.ok(response).build(); // No group label, continue.
+        }
+
+        String namespace = (String) request.getInterceptorParams().get("namespace");
+        String name = (String) label.get(0);
         String instance = (String) ctx.read(PATH_INSTANCE_LABEL, List.class).get(0);
 
         LOG.info("Processing 'group-execute' interceptor: ns({}), group({}), instance({})", namespace, name, instance);
@@ -200,11 +208,11 @@ public class InterceptorHandler {
 
     private String getLabelSelector(String group, String instance) {
         StringBuffer sb = new StringBuffer();
-        sb.append(Resource.GROUP.getResourceLabel());
+        sb.append(Label.create(Resource.GROUP));
         sb.append("=");
         sb.append(group);
         sb.append(",");
-        sb.append(Resource.getInstanceLabel());
+        sb.append(Label.INSTANCE);
         sb.append("=");
         sb.append(instance);
         return sb.toString();

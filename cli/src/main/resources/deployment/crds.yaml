@@ -405,6 +405,32 @@ spec:
                       x-kubernetes-preserve-unknown-fields: true
                       description: "Parameters that should be passed to the Builder implementation"
                   required: ["builderRef"]
+                dependents:
+                  type: object
+                  description: Dependents of this Component
+                  properties:
+                    components:
+                      type: array
+                      description: List of the Components
+                      items:
+                        type: string
+                        description: Name of the Component
+                    groups:
+                      type: array
+                      description: List of the Groups
+                      items:
+                        type: string
+                        description: Name of the Group
+                    pipelines:
+                      type: array
+                      description: List of the Pipelines
+                      items:
+                        type: string
+                        description: Name of the Pipeline
+                  anyOf:
+                    - required: ["components"]
+                    - required: ["groups"]
+                    - required: ["pipelines"]
               required:
                 - "build"
             status:
@@ -422,6 +448,218 @@ spec:
                     - Initializing
                     - Ready
                     - Failed
+                  type: string
+              type: object
+          type: object
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Status
+          jsonPath: .status.status
+          type: string
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: dependencies.agogos.redhat.com
+spec:
+  group: agogos.redhat.com
+  names:
+    kind: Dependency
+    listKind: DependencyList
+    plural: dependencies
+    singular: dependency
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: Dependency is used to handle dependencies between objects.
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              properties:
+                name:
+                  type: string
+                resource:
+                  enum:
+                    - Component
+                    - Group
+                    - Pipeline
+                  type: string
+                instance:
+                  type: string
+                group:
+                  type: string
+              required:
+                - "name"
+                - "resource"
+                - "instance"
+          type: object
+      served: true
+      storage: true
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: executions.agogos.redhat.com
+spec:
+  group: agogos.redhat.com
+  names:
+    kind: Execution
+    listKind: ExecutionList
+    plural: executions
+    singular: execution
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: Execution is the Schema for the executions API
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              description:
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              description: Defines the desired state of Execution
+              properties:
+                group:
+                  type: string
+                components:
+                  type: object
+                  additionalProperties: 
+                    type: object
+                    properties:
+                      name: 
+                        type: string
+                      status:
+                        description: Status defines the observed state of Build
+                        properties:
+                          startTime:
+                            format: date-time
+                            type: string
+                          completionTime:
+                            format: date-time
+                            type: string
+                          reason:
+                            type: string
+                          lastUpdate:
+                            format: date-time
+                            type: string
+                          status:
+                            default: New
+                            enum:
+                              - New
+                              - Running
+                              - Finished
+                              - Failed
+                              - Aborted
+                            type: string
+                        type: object
+                groups:
+                  type: object
+                  additionalProperties: 
+                    type: object
+                    properties:
+                      name: 
+                        type: string
+                      status:
+                        description: Status defines the observed state of Build
+                        properties:
+                          startTime:
+                            format: date-time
+                            type: string
+                          completionTime:
+                            format: date-time
+                            type: string
+                          lastUpdate:
+                            format: date-time
+                            type: string
+                          status:
+                            default: New
+                            enum:
+                              - New
+                              - Running
+                              - Finished
+                              - Failed
+                              - Aborted
+                            type: string
+                        type: object
+                pipelines:
+                  type: object
+                  additionalProperties: 
+                    type: object
+                    properties:
+                      name: 
+                        type: string
+                      status:
+                        description: Status defines the observed state of Build
+                        properties:
+                          startTime:
+                            format: date-time
+                            type: string
+                          completionTime:
+                            format: date-time
+                            type: string
+                          lastUpdate:
+                            format: date-time
+                            type: string
+                          status:
+                            default: New
+                            enum:
+                              - New
+                              - Running
+                              - Finished
+                              - Failed
+                              - Aborted
+                            type: string
+                        type: object
+              anyOf:
+                - required: ["components"]
+                - required: ["groups"]
+                - required: ["pipelines"]
+            status:
+              description: Status defines the observed state of Build
+              properties:
+                startTime:
+                  format: date-time
+                  type: string
+                completionTime:
+                  format: date-time
+                  type: string
+                lastUpdate:
+                  format: date-time
+                  type: string
+                status:
+                  default: New
+                  enum:
+                    - New
+                    - Running
+                    - Finished
+                    - Failed
+                    - Aborted
                   type: string
               type: object
           type: object
@@ -493,6 +731,32 @@ spec:
                   items:
                     type: string
                     description: Name of the Pipeline
+                dependents:
+                  type: object
+                  description: Dependents of this group
+                  properties:
+                    components:
+                      type: array
+                      description: List of the Components
+                      items:
+                        type: string
+                        description: Name of the Component
+                    groups:
+                      type: array
+                      description: List of the Groups
+                      items:
+                        type: string
+                        description: Name of the Group
+                    pipelines:
+                      type: array
+                      description: List of the Pipelines
+                      items:
+                        type: string
+                        description: Name of the Pipeline
+                  anyOf:
+                    - required: ["components"]
+                    - required: ["groups"]
+                    - required: ["pipelines"]
               anyOf:
                 - required: ["components"]
                 - required: ["pipelines"]
@@ -930,6 +1194,53 @@ status:
     plural: ""
   conditions: []
   storedVersions: []
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: submissions.agogos.redhat.com
+spec:
+  group: agogos.redhat.com
+  names:
+    kind: Submission
+    listKind: SubmissionList
+    plural: submissions
+    singular: submission
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: Submission is used to submit component builds, pipeline runs or groups executions of both
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              properties:
+                name:
+                  type: string
+                resource:
+                  enum:
+                    - Component
+                    - Group
+                    - Pipeline
+                  type: string
+                instance:
+                  type: string
+                group:
+                  type: string
+              required:
+                - "name"
+                - "resource"
+                - "instance"
+          type: object
+      served: true
+      storage: true
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition

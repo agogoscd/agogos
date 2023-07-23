@@ -1,6 +1,7 @@
 package com.redhat.agogos.operator.k8s.controllers.component;
 
 import com.redhat.agogos.core.errors.MissingResourceException;
+import com.redhat.agogos.core.k8s.Label;
 import com.redhat.agogos.core.k8s.Resource;
 import com.redhat.agogos.core.v1alpha1.Builder;
 import com.redhat.agogos.core.v1alpha1.Component;
@@ -78,7 +79,8 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
 
         // Add any useful/required labels
         Map<String, String> labels = new HashMap<>();
-        labels.put(Resource.COMPONENT.getResourceLabel(), component.getMetadata().getName());
+        labels.put(Label.RESOURCE.toString(), Resource.COMPONENT.toString());
+        labels.put(Label.NAME.toString(), component.getMetadata().getName());
 
         // Make sure the Pipeline is owned by the Component
         OwnerReference ownerReference = new OwnerReferenceBuilder()

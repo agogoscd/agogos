@@ -137,7 +137,7 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
 
     }
 
-    private String formatDate(ZonedDateTime time) {
+    protected String formatDate(ZonedDateTime time) {
         if (time == null) {
             return null;
         }
@@ -161,7 +161,7 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
         }
     }
 
-    private String toJson(Object resource) {
+    protected String toJson(Object resource) {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(resource);
         } catch (JsonProcessingException e) {

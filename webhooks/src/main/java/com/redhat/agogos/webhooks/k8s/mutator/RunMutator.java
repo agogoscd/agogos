@@ -2,6 +2,7 @@ package com.redhat.agogos.webhooks.k8s.mutator;
 
 import com.redhat.agogos.core.KubernetesFacade;
 import com.redhat.agogos.core.errors.MissingResourceException;
+import com.redhat.agogos.core.k8s.Label;
 import com.redhat.agogos.core.k8s.Resource;
 import com.redhat.agogos.core.v1alpha1.Pipeline;
 import com.redhat.agogos.core.v1alpha1.Run;
@@ -53,7 +54,8 @@ public class RunMutator extends Mutator<Run> {
             labels = new HashMap<>();
         }
 
-        labels.put(Resource.PIPELINE.getResourceLabel(), run.getSpec().getPipeline());
+        labels.put(Label.RESOURCE.toString(), Resource.PIPELINE.toString());
+        labels.put(Label.NAME.toString(), run.getSpec().getPipeline());
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
 

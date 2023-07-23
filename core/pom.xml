@@ -50,6 +50,10 @@
             <artifactId>quarkus-config-yaml</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-jsonp</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>knative-client</artifactId>
         </dependency>

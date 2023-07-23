@@ -86,8 +86,16 @@ public class KubernetesFacade {
         return kubernetesClient.getKubernetesSerialization().unmarshal(input, clazz);
     }
 
+    public <T extends HasMetadata> List<T> list(Class<T> clazz) {
+        return list(clazz, getNamespace(), new ListOptionsBuilder().build());
+    }
+
     public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace) {
         return list(clazz, namespace, new ListOptionsBuilder().build());
+    }
+
+    public <T extends HasMetadata> List<T> list(Class<T> clazz, ListOptions options) {
+        return list(clazz, getNamespace(), options);
     }
 
     public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace, ListOptions options) {

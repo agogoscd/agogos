@@ -1,0 +1,47 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: dependencies.agogos.redhat.com
+spec:
+  group: agogos.redhat.com
+  names:
+    kind: Dependency
+    listKind: DependencyList
+    plural: dependencies
+    singular: dependency
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: Dependency is used to handle dependencies between objects.
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              type: string
+            metadata:
+              type: object
+            spec:
+              type: object
+              properties:
+                name:
+                  type: string
+                resource:
+                  enum:
+                    - Component
+                    - Group
+                    - Pipeline
+                  type: string
+                instance:
+                  type: string
+                group:
+                  type: string
+              required:
+                - "name"
+                - "resource"
+                - "instance"
+          type: object
+      served: true
+      storage: true

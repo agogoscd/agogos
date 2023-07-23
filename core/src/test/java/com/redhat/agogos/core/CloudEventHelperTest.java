@@ -1,5 +1,6 @@
 package com.redhat.agogos.core;
 
+import com.redhat.agogos.core.eventing.CloudEventHelper;
 import com.redhat.agogos.core.v1alpha1.Build;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Assertions;

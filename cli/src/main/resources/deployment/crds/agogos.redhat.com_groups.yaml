@@ -49,6 +49,32 @@ spec:
                   items:
                     type: string
                     description: Name of the Pipeline
+                dependents:
+                  type: object
+                  description: Dependents of this group
+                  properties:
+                    components:
+                      type: array
+                      description: List of the Components
+                      items:
+                        type: string
+                        description: Name of the Component
+                    groups:
+                      type: array
+                      description: List of the Groups
+                      items:
+                        type: string
+                        description: Name of the Group
+                    pipelines:
+                      type: array
+                      description: List of the Pipelines
+                      items:
+                        type: string
+                        description: Name of the Pipeline
+                  anyOf:
+                    - required: ["components"]
+                    - required: ["groups"]
+                    - required: ["pipelines"]
               anyOf:
                 - required: ["components"]
                 - required: ["pipelines"]

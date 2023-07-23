@@ -24,6 +24,9 @@ quarkus:
         #   level: "OFF"
   agogos:
     cli-profile: admin
+    cloud-events:
+      base-url: "http://localhost:8111"
+      publish: true
 
 "%prod":
   quarkus:
@@ -42,13 +45,14 @@ quarkus:
           level: "OFF"
   agogos:
     cli-profile: user
+    cloud-events:
+      base-url: "http://broker-ingress.knative-eventing.svc.cluster.local"
+      publish: true
     interceptors:
       url: "http://host.minikube.internal:7090/interceptors"
 
 
 agogos:
-  cloud-events:
-    base-url: "http://broker-ingress.knative-eventing.svc.cluster.local"
   container-image:
     init: "quay.io/agogos/stage-init:v1"
   operator:

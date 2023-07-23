@@ -105,6 +105,32 @@ spec:
                       x-kubernetes-preserve-unknown-fields: true
                       description: "Parameters that should be passed to the Builder implementation"
                   required: ["builderRef"]
+                dependents:
+                  type: object
+                  description: Dependents of this Component
+                  properties:
+                    components:
+                      type: array
+                      description: List of the Components
+                      items:
+                        type: string
+                        description: Name of the Component
+                    groups:
+                      type: array
+                      description: List of the Groups
+                      items:
+                        type: string
+                        description: Name of the Group
+                    pipelines:
+                      type: array
+                      description: List of the Pipelines
+                      items:
+                        type: string
+                        description: Name of the Pipeline
+                  anyOf:
+                    - required: ["components"]
+                    - required: ["groups"]
+                    - required: ["pipelines"]
               required:
                 - "build"
             status:

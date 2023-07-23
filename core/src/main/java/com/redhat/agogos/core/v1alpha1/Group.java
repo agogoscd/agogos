@@ -38,7 +38,15 @@ public class Group extends AgogosResource<GroupSpec, Status> implements Namespac
 
         @Getter
         @Setter
+        private List<String> groups = new ArrayList<>();
+
+        @Getter
+        @Setter
         private List<String> pipelines = new ArrayList<>();
+
+        @Getter
+        @Setter
+        private Dependents dependents = new Dependents();
 
         @Override
         public boolean equals(Object obj) {
@@ -49,7 +57,9 @@ public class Group extends AgogosResource<GroupSpec, Status> implements Namespac
             GroupSpec spec = (GroupSpec) obj;
 
             return Objects.equals(spec.getComponents(), getComponents())
-                    && Objects.equals(spec.getPipelines(), getPipelines());
+                    && Objects.equals(spec.getGroups(), getGroups())
+                    && Objects.equals(spec.getPipelines(), getPipelines())
+                    && Objects.equals(spec.getDependents(), getDependents());
         }
     }
 

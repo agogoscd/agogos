@@ -5,7 +5,7 @@ import picocli.CommandLine.Command;
 
 @Command(mixinStandardHelpOptions = true, name = "groups", aliases = {
         "group", "g" }, description = "Interact with groups", subcommands = {
-                GroupBuildCommand.class,
+                GroupExecuteCommand.class,
                 GroupListCommand.class,
                 GroupDescribeCommand.class
         })

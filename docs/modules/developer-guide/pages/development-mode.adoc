@@ -78,7 +78,7 @@ This command compiles all the Agogos packages. To install the Agogos Operator, r
 
 [source,bash]
 ----
-java -Dagogos.cli-profile=admin -jar cli/target/quarkus-app/quarkus-run.jar adm install --profile dev
+java -Dquarkus.profile=dev -Dagogos.cli-profile=admin -jar cli/target/quarkus-app/quarkus-run.jar adm install --profile dev
 ----
 
 This command install Tekton, Knative Eventing and the Agogos CustomResourceDefinitions,
@@ -90,7 +90,7 @@ Configure the namespace to use Agogos. Execute:
 
 [source,bash]
 ----
-java -Dagogos.cli-profile=admin -jar cli/target/quarkus-app/quarkus-run.jar adm init --namespace default
+java -Dquarkus.profile=dev -Dagogos.cli-profile=admin -jar cli/target/quarkus-app/quarkus-run.jar adm init --namespace default
 ----
 
 This command creates service accounts, rolebindings, configuration maps...
@@ -163,7 +163,7 @@ ClusterTask. Retrieve the builder using:
 ----
 kubectl get builders
 # or
-java -jar cli/target/quarkus-app/quarkus-run.jar -v builders list
+java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v builders list
 ----
 
 Next, create a component called `dummy` with `kubectl`:
@@ -187,11 +187,11 @@ And then run your first build using the Agogos CLI:
 
 [source,bash]
 ----
-$ java -jar cli/target/quarkus-app/quarkus-run.jar -v components list
+$ java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v components list
 NAME      STATUS    CREATED
 dummy     Ready     2023-04-05 08:51:13
 
-$ java -jar cli/target/quarkus-app/quarkus-run.jar -v components build dummy
+$ java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v components build dummy
 💖 About
 
 Name:           dummy-xv5jx
@@ -209,7 +209,7 @@ You can check its result running:
 
 [source,bash]
 ----
-java -jar cli/target/quarkus-app/quarkus-run.jar -v builds list
+java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v builds list
 NAME            STATUS       CREATED
 dummy-xv5jx     Finished     2023-04-05 08:55:49
 ----

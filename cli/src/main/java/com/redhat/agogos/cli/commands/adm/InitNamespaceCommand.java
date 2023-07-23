@@ -4,6 +4,8 @@ import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.AbstractRunnableSubcommand;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller;
 import com.redhat.agogos.core.errors.ApplicationException;
+import com.redhat.agogos.core.v1alpha1.Dependency;
+import com.redhat.agogos.core.v1alpha1.Submission;
 import io.fabric8.knative.eventing.v1.Broker;
 import io.fabric8.knative.eventing.v1.BrokerBuilder;
 import io.fabric8.knative.eventing.v1.Trigger;
@@ -24,8 +26,23 @@ import io.fabric8.kubernetes.api.model.rbac.RoleBinding;
 import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.Subject;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
+import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
+import io.fabric8.tekton.pipeline.v1beta1.CustomRun;
+import io.fabric8.tekton.pipeline.v1beta1.CustomRunBuilder;
+import io.fabric8.tekton.triggers.v1alpha1.ClusterInterceptor;
 import io.fabric8.tekton.triggers.v1beta1.EventListener;
 import io.fabric8.tekton.triggers.v1beta1.EventListenerBuilder;
+import io.fabric8.tekton.triggers.v1beta1.InterceptorParams;
+import io.fabric8.tekton.triggers.v1beta1.InterceptorParamsBuilder;
+import io.fabric8.tekton.triggers.v1beta1.ParamSpecBuilder;
+import io.fabric8.tekton.triggers.v1beta1.TriggerInterceptor;
+import io.fabric8.tekton.triggers.v1beta1.TriggerInterceptorBuilder;
+import io.fabric8.tekton.triggers.v1beta1.TriggerSpecBinding;
+import io.fabric8.tekton.triggers.v1beta1.TriggerSpecBindingBuilder;
+import io.fabric8.tekton.triggers.v1beta1.TriggerSpecTemplateBuilder;
+import io.fabric8.tekton.triggers.v1beta1.TriggerTemplateSpec;
+import io.fabric8.tekton.triggers.v1beta1.TriggerTemplateSpecBuilder;
+import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,13 +70,34 @@ import java.util.stream.Collectors;
         "init" }, description = "Initialize selected namespace to work with Agogos")
 public class InitNamespaceCommand extends AbstractRunnableSubcommand {
 
-    @ConfigProperty(name = "agogos.cloud-events.base-url", defaultValue = "http://broker-ingress.knative-eventing.svc.cluster.local")
-    String baseUrl;
+    @Inject
+    KubernetesSerialization objectMapper;
 
     private static final Logger LOG = LoggerFactory.getLogger(InitNamespaceCommand.class);
 
     private static final String AGOGOS_QUOTA_NAME = "agogos-quota";
     private static final String AGOGOS_ROLE_BINDING_PREFIX = "agogos-";
+    private static final String DEPENDENCY_CEL_INTERCEPTOR_FILTER = String.join(" || ", List.of(
+            "header.match('ce-type', 'com.redhat.agogos.event.build.succeeded.v1alpha1')",
+            "header.match('ce-type', 'com.redhat.agogos.event.execution.succeeded.v1alpha1')",
+            "header.match('ce-type', 'com.redhat.agogos.event.run.succeeded.v1alpha1')"));
+    private static final String DEPENDENCY_CEL_INTERCEPTOR_NAME_OVERLAY = "has(body.build) ? body.build.metadata.labels['agogos.redhat.com/name'] "
+            +
+            ": has(body.execution) ? body.execution.metadata.labels['agogos.redhat.com/name'] " +
+            ": has(body.run) ? body.run.metadata.labels['agogos.redhat.com/name'] : ''";
+    private static final String DEPENDENCY_CEL_INTERCEPTOR_INSTANCE_OVERLAY = "has(body.build) ? body.build.metadata.labels['agogos.redhat.com/instance'] "
+            +
+            ": has(body.execution) ? body.execution.metadata.labels['agogos.redhat.com/instance'] " +
+            ": has(body.run) ? body.run.metadata.labels['agogos.redhat.com/instance'] : ''";
+    private static final String DEPENDENCY_CEL_INTERCEPTOR_RESOURCE_OVERLAY = "has(body.build) ? body.build.metadata.labels['agogos.redhat.com/resource'] "
+            +
+            ": has(body.execution) ? body.execution.metadata.labels['agogos.redhat.com/resource'] " +
+            ": has(body.run) ? body.run.metadata.labels['agogos.redhat.com/resource'] : ''";
+    private static final String SUBMISSION_CEL_INTERCEPTOR_FILTER = String.join(" || ", List.of(
+            "header.match('ce-type', 'com.redhat.agogos.event.component.build.v1alpha1')",
+            "header.match('ce-type', 'com.redhat.agogos.event.group.execution.v1alpha1')",
+            "header.match('ce-type', 'com.redhat.agogos.event.pipeline.run.v1alpha1')"));
+    private static final String SUBMISSION_CEL_INTERCEPTOR_GROUP_OVERLAY = "has(body.group) ? body.group : ''";
     private static final String RESOURCE_NAME = "agogos";
     private static final String RESOURCE_NAME_CONFIG = "agogos-config";
     private static final String RESOURCE_NAME_EVENTING = "agogos-eventing";
@@ -108,6 +146,8 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
         EventListener el = installTektonEl(eventingSa, namespace);
         Broker broker = installKnativeBroker(configMap, namespace, LABELS);
         installKnativeTrigger(broker, el, namespace);
+        installSubmissionTrigger(namespace);
+        installDependencyTrigger(namespace);
 
         List<Map.Entry<String, Set<String>>> bindings = Arrays.asList(
                 new AbstractMap.SimpleEntry<String, Set<String>>("admin", admin),
@@ -267,7 +307,6 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
                 .withNamespace(namespace)
                 .endMetadata()
                 .withNewSpec()
-                // .withCloudEventURI(String.format("%s/%s/%s", baseUrl, namespace, RESOURCE_NAME))
                 .withServiceAccountName(sa.getMetadata().getName())
                 .withNewNamespaceSelector()
                 .withMatchNames(namespace)
@@ -477,5 +516,157 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
             return true;
         }
         return false;
+    }
+
+    private void installSubmissionTrigger(String namespace) {
+        InterceptorParams filter = new InterceptorParamsBuilder()
+                .withName("filter")
+                .withValue(SUBMISSION_CEL_INTERCEPTOR_FILTER)
+                .build();
+        InterceptorParams overlays = new InterceptorParamsBuilder()
+                .withName("overlays")
+                .withValue(List.of(
+                        Map.of("key", "group", "expression", SUBMISSION_CEL_INTERCEPTOR_GROUP_OVERLAY)))
+                .build();
+
+        TriggerInterceptor interceptor = new TriggerInterceptorBuilder()
+                .withNewRef()
+                .withName("cel")
+                .withKind(HasMetadata.getKind(ClusterInterceptor.class))
+                .endRef()
+                .withParams(filter, overlays)
+                .build();
+
+        TriggerSpecBinding nameBinding = new TriggerSpecBindingBuilder()
+                .withName("name")
+                .withValue("$(body.name)")
+                .build();
+        TriggerSpecBinding resourceBinding = new TriggerSpecBindingBuilder()
+                .withName("resource")
+                .withValue("$(body.resource)")
+                .build();
+        TriggerSpecBinding instanceBinding = new TriggerSpecBindingBuilder()
+                .withName("instance")
+                .withValue("$(body.instance)")
+                .build();
+        TriggerSpecBinding groupBinding = new TriggerSpecBindingBuilder()
+                .withName("group")
+                .withValue("$(extensions.group)")
+                .build();
+
+        CustomRun run = new CustomRunBuilder()
+                .withNewMetadata()
+                .withGenerateName("agogos-submission-trigger-custom-run-")
+                .endMetadata()
+                .withNewSpec()
+                .withNewCustomSpec()
+                .withApiVersion(HasMetadata.getApiVersion(Submission.class))
+                .withKind(HasMetadata.getKind(Submission.class))
+                .addToSpec("name", "$(tt.params.name)")
+                .addToSpec("resource", "$(tt.params.resource)")
+                .addToSpec("instance", "$(tt.params.instance)")
+                .addToSpec("group", "$(tt.params.group)")
+                .endCustomSpec()
+                .endSpec()
+                .build();
+        TriggerTemplateSpec template = new TriggerTemplateSpecBuilder()
+                .addToParams(new ParamSpecBuilder().withName("name").withDefault("$(tt.params.name)").build())
+                .addToParams(new ParamSpecBuilder().withName("resource").withDefault("$(tt.params.resource)").build())
+                .addToParams(new ParamSpecBuilder().withName("instance").withDefault("$(tt.params.instance)").build())
+                .addToParams(new ParamSpecBuilder().withName("group").withDefault("$(tt.params.group)").build())
+                .withResourcetemplates(run)
+                .build();
+        io.fabric8.tekton.triggers.v1beta1.TriggerBuilder builder = new io.fabric8.tekton.triggers.v1beta1.TriggerBuilder();
+        builder.withNewMetadata()
+                .withName("agogos-submission")
+                .withNamespace(namespace)
+                .endMetadata()
+                .withNewSpec()
+                .withBindings(nameBinding, resourceBinding, instanceBinding, groupBinding)
+                .withInterceptors(interceptor)
+                .withTemplate(new TriggerSpecTemplateBuilder().withSpec(template).build())
+                .withNewTemplate()
+                .withSpec(template)
+                .endTemplate()
+                .endSpec();
+
+        io.fabric8.tekton.triggers.v1beta1.Trigger trigger = kubernetesFacade.serverSideApply(builder.build());
+        installedResources.add(trigger);
+    }
+
+    private void installDependencyTrigger(String namespace) {
+        InterceptorParams filter = new InterceptorParamsBuilder()
+                .withName("filter")
+                .withValue(DEPENDENCY_CEL_INTERCEPTOR_FILTER)
+                .build();
+        InterceptorParams overlays = new InterceptorParamsBuilder()
+                .withName("overlays")
+                .withValue(List.of(
+                        Map.of("key", "name", "expression", DEPENDENCY_CEL_INTERCEPTOR_NAME_OVERLAY),
+                        Map.of("key", "instance", "expression", DEPENDENCY_CEL_INTERCEPTOR_INSTANCE_OVERLAY),
+                        Map.of("key", "resource", "expression", DEPENDENCY_CEL_INTERCEPTOR_RESOURCE_OVERLAY)))
+                .build();
+
+        TriggerInterceptor celInterceptor = new TriggerInterceptorBuilder()
+                .withNewRef()
+                .withName("cel")
+                .withKind(HasMetadata.getKind(ClusterInterceptor.class))
+                .endRef()
+                .withParams(filter, overlays)
+                .build();
+
+        TriggerSpecBinding nameBinding = new TriggerSpecBindingBuilder()
+                .withName("name")
+                .withValue("$(extensions.name)")
+                .build();
+
+        TriggerSpecBinding instanceBinding = new TriggerSpecBindingBuilder()
+                .withName("instance")
+                .withValue("$(extensions.instance)")
+                .build();
+
+        TriggerSpecBinding resourceBinding = new TriggerSpecBindingBuilder()
+                .withName("resource")
+                .withValue("$(extensions.resource)")
+                .build();
+
+        CustomRun run = new CustomRunBuilder()
+                .withNewMetadata()
+                .withGenerateName("agogos-dependency-trigger-custom-run-")
+                .endMetadata()
+                .withNewSpec()
+                .withNewCustomSpec()
+                .withApiVersion(HasMetadata.getApiVersion(Dependency.class))
+                .withKind(HasMetadata.getKind(Dependency.class))
+                .addToSpec("name", "$(tt.params.name)")
+                .addToSpec("instance", "$(tt.params.instance)")
+                .addToSpec("resource", "$(tt.params.resource)")
+                .endCustomSpec()
+                .endSpec()
+                .build();
+
+        TriggerTemplateSpec template = new TriggerTemplateSpecBuilder()
+                .addToParams(new ParamSpecBuilder().withName("name").withDefault("$(tt.params.name)").build())
+                .addToParams(new ParamSpecBuilder().withName("instance").withDefault("$(tt.params.instance)").build())
+                .addToParams(new ParamSpecBuilder().withName("resource").withDefault("$(tt.params.resource)").build())
+                .withResourcetemplates(run)
+                .build();
+
+        io.fabric8.tekton.triggers.v1beta1.TriggerBuilder builder = new io.fabric8.tekton.triggers.v1beta1.TriggerBuilder();
+        builder.withNewMetadata()
+                .withName("agogos-dependency")
+                .withNamespace(namespace)
+                .endMetadata()
+                .withNewSpec()
+                .withBindings(nameBinding, instanceBinding, resourceBinding)
+                .withInterceptors(celInterceptor)
+                .withTemplate(new TriggerSpecTemplateBuilder().withSpec(template).build())
+                .withNewTemplate()
+                .withSpec(template)
+                .endTemplate()
+                .endSpec();
+
+        io.fabric8.tekton.triggers.v1beta1.Trigger trigger = kubernetesFacade.serverSideApply(builder.build());
+        installedResources.add(trigger);
     }
 }

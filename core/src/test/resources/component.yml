@@ -12,5 +12,9 @@ spec:
       kind: "Builder"
       version: "v1alpha1"
     params: {}
+  dependents:
+    components: []
+    groups: []
+    pipelines: []
 status:
   status: "New"

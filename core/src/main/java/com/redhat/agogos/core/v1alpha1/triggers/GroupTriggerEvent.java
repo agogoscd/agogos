@@ -2,10 +2,10 @@ package com.redhat.agogos.core.v1alpha1.triggers;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.redhat.agogos.core.CloudEventHelper;
 import com.redhat.agogos.core.KubernetesFacade;
 import com.redhat.agogos.core.PipelineRunState;
 import com.redhat.agogos.core.errors.ApplicationException;
+import com.redhat.agogos.core.eventing.CloudEventHelper;
 import com.redhat.agogos.core.v1alpha1.Build;
 import com.redhat.agogos.core.v1alpha1.Group;
 import com.redhat.agogos.core.v1alpha1.Run;
