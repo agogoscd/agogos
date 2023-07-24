@@ -16,18 +16,6 @@ public enum ResourceStatus {
         this.printable = printable;
     }
 
-    public static int maxLength() {
-        int length = 0;
-
-        for (ResourceStatus status : ResourceStatus.values()) {
-            if (status.toString().length() > length) {
-                length = status.toString().length();
-            }
-        }
-
-        return length;
-    }
-
     @Override
     public String toString() {
         return printable;
