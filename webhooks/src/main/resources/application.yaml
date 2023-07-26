@@ -30,7 +30,7 @@ quarkus:
       ssl:
         certificate:
           files: ["${PWD}/webhooks.crt"]
-          key-files: ["${PWD}/key.pem"]
+          key-files: ["${PWD}/webhooks.pem"]
       access-log:
         enabled: true
         pattern: combined
