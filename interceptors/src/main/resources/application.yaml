@@ -31,7 +31,7 @@ quarkus:
       ssl:
         certificate:
           files: ["${PWD}/interceptors.crt"]
-          key-files: ["${PWD}/key.pem"]
+          key-files: ["${PWD}/interceptors.pem"]
       access-log:
         enabled: true
         pattern: combined
