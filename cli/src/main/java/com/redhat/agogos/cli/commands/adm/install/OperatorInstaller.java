@@ -31,6 +31,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,14 +59,17 @@ public class OperatorInstaller extends Installer {
     public void install(InstallProfile profile, String namespace) {
         LOG.info("🕞 Installing Agogos Operator component...");
 
-        List<HasMetadata> resources = resourceLoader.installKubernetesResources(
-                List.of(
-                        serviceAccount(namespace),
-                        clusterRole(),
-                        clusterRoleBinding(namespace),
-                        service(namespace),
-                        deployment(namespace)),
-                namespace);
+        List<HasMetadata> resources = List.of(
+                serviceAccount(namespace),
+                clusterRole(),
+                clusterRoleBinding(namespace),
+                service(namespace),
+                deployment(namespace));
+
+        List<HasMetadata> installed = new ArrayList<>();
+        for (HasMetadata r : resources) {
+            installed.add(kubernetesFacade.serverSideApply(r));
+        }
 
         Helper.status(resources);
 

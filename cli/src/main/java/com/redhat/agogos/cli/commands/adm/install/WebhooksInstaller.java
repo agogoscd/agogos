@@ -110,7 +110,10 @@ public class WebhooksInstaller extends Installer {
         }
 
         Service webhooksService = kubernetesFacade.get(Service.class, namespace, ServiceAccountName);
-        resources = resourceLoader.installKubernetesResources(resources, namespace);
+        List<HasMetadata> installed = new ArrayList<>();
+        for (HasMetadata r : resources) {
+            installed.add(kubernetesFacade.serverSideApply(r));
+        }
 
         if (webhooksService != null && (profile == InstallProfile.local || profile == InstallProfile.prod)) {
             LOG.info("🕞 Restarting Webhooks service after updating certificates...");
@@ -119,7 +122,7 @@ public class WebhooksInstaller extends Installer {
                     .rolling().restart();
         }
 
-        Helper.status(resources);
+        Helper.status(installed);
 
         LOG.info("✅ Agogos Webhooks installed");
 

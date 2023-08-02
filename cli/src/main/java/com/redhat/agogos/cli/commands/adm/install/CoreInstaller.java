@@ -24,6 +24,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -49,14 +50,13 @@ public class CoreInstaller extends Installer {
     public void install(InstallProfile profile, String namespace) {
         LOG.info("🕞 Installing Agogos core resources...");
 
-        List<HasMetadata> resources = resourceLoader.installKubernetesResources(
-                List.of(
-                        namespace(namespace),
-                        clusterRoleView(),
-                        clusterRoleEventing()),
-                namespace);
+        List<HasMetadata> resources = List.of(namespace(namespace), clusterRoleView(), clusterRoleEventing());
+        List<HasMetadata> installed = new ArrayList<>();
+        for (HasMetadata r : resources) {
+            installed.add(kubernetesFacade.serverSideApply(r));
+        }
 
-        Helper.status(resources);
+        Helper.status(installed);
 
         LOG.info("✅ Agogos core resources installed");
     }

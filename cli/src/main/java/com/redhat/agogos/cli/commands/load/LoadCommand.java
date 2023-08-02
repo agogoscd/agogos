@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 @Command(mixinStandardHelpOptions = true, name = "load", aliases = {
@@ -40,12 +41,21 @@ public class LoadCommand extends AbstractRunnableSubcommand {
 
             byte[] content = readFile(path);
 
-            List<HasMetadata> resources = resourceLoader.installKubernetesResources(new ByteArrayInputStream(content),
-                    namespace);
+            List<HasMetadata> resources = resourceLoader.loadResources(new ByteArrayInputStream(content));
+            // We want everything to be installed in the namespace, if you set a namespace to a
+            // cluster-wide resource there are no problems, so we do filter them out.
+            for (HasMetadata r : resources) {
+                r.getMetadata().setNamespace(namespace);
+            }
 
-            Helper.status(resources);
+            List<HasMetadata> installed = new ArrayList<>();
+            for (HasMetadata r : resources) {
+                installed.add(kubernetesFacade.create(r));
+            }
 
-            LOG.info("✅ {} resources installed", resources.size());
+            Helper.status(installed);
+
+            LOG.info("✅ {} resources installed", installed.size());
         });
 
     }

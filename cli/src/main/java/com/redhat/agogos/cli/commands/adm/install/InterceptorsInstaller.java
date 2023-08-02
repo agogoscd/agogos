@@ -87,21 +87,24 @@ public class InterceptorsInstaller extends Installer {
         certProvider.init();
 
         List<HasMetadata> resources = new ArrayList<>();
-
         resources.add(serviceAccount(namespace));
         resources.add(secret(namespace));
 
-        // For local and prod profiles we need to add more resources
         if (profile == InstallProfile.dev) {
             resources.addAll(clusterInterceptors());
         } else {
+            // For local and prod profiles we add services and deployments, as interceptors
+            // run in the cluster, not in localhost
             Service service = service(namespace);
             resources.add(service);
             resources.addAll(clusterInterceptors(service));
             resources.add(deployment(namespace));
         }
 
-        resources = resourceLoader.installKubernetesResources(resources, namespace);
+        List<HasMetadata> installed = new ArrayList<>();
+        for (HasMetadata r : resources) {
+            installed.add(kubernetesFacade.serverSideApply(r));
+        }
 
         Service interceptorsService = kubernetesFacade.get(Service.class, namespace, ServiceAccountName);
         if (interceptorsService != null && (profile == InstallProfile.local || profile == InstallProfile.prod)) {
@@ -111,7 +114,7 @@ public class InterceptorsInstaller extends Installer {
                     .rolling().restart();
         }
 
-        Helper.status(resources);
+        Helper.status(installed);
 
         LOG.info("✅ Agogos Interceptors installed");
 

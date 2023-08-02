@@ -49,7 +49,7 @@ public class TektonInstaller extends DependencyInstaller {
                 // .addToData("default-cloud-events-sink", String.format("%s/%s/agogos", baseUrl, namespace))
                 .build();
 
-        kubernetesFacade.update(configMap);
+        kubernetesFacade.serverSideApply(configMap);
         LOG.info("👉 OK: Configured Tekton ConfigMap '{}'", CONFIGMAP_CONFIG_DEFAULTS);
     }
 
@@ -61,7 +61,7 @@ public class TektonInstaller extends DependencyInstaller {
                     .addToData("send-cloudevents-for-runs", "false")
                     .build();
 
-            kubernetesFacade.update(configMap);
+            kubernetesFacade.serverSideApply(configMap);
 
             LOG.info("👉 OK: Configured Tekton ConfigMap '{}'", CONFIGMAP_FEATURE_FLAGS);
         }

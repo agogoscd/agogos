@@ -6,7 +6,7 @@ import com.redhat.agogos.cli.config.DependencyConfig;
 import com.redhat.agogos.core.errors.ApplicationException;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,12 +24,20 @@ public abstract class DependencyInstaller extends Installer {
 
         for (String url : config.urls()) {
             try {
-                resources.addAll(resourceLoader.installKubernetesResources(new URL(url), config.namespace(), consumer));
-            } catch (MalformedURLException e) {
-                throw new ApplicationException("Malformed URL for " + config.namespace(), e);
+                resources.addAll(resourceLoader.loadResources(new URL(url).openStream()));
+            } catch (IOException e) {
+                throw new ApplicationException("Exception for URL " + url, e);
             }
         }
 
-        Helper.status(resources);
+        if (consumer != null) {
+            consumer.accept(resources);
+        }
+
+        List<HasMetadata> installed = new ArrayList<>();
+        for (HasMetadata r : resources) {
+            installed.add(kubernetesFacade.serverSideApply(r));
+        }
+        Helper.status(installed);
     }
 }
