@@ -1,19 +1,17 @@
-<?xml version="1.0"?>
-<project
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
-    xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.jboss</groupId>
+        <artifactId>jboss-parent</artifactId>
+        <version>39</version>
+    </parent>
     <groupId>com.redhat.agogos</groupId>
     <artifactId>agogos-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Agogos</name>
-
-    <parent>
-        <artifactId>jboss-parent</artifactId>
-        <groupId>org.jboss</groupId>
-        <version>38</version>
-    </parent>
 
     <modules>
         <module>test</module>
@@ -24,6 +22,13 @@
         <module>interceptors</module>
         <!-- <module>relays</module> -->
     </modules>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>agogos</id>
+            <name>Agogos Release Repository</name>
+            <url>https://repository-basic.engineering.redhat.com/nexus/repository/agogos/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <properties>
         <main.basedir>.</main.basedir>
@@ -48,17 +53,6 @@
         <quarkus-operatorsdk.version>6.2.1</quarkus-operatorsdk.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -78,8 +72,8 @@
             <dependency>
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-jacoco</artifactId>
-                <scope>test</scope>
                 <version>${quarkus.platform.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -87,10 +81,21 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-jacoco</artifactId>
-            <scope>test</scope>
             <version>${quarkus.platform.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
     <build>
         <pluginManagement>
             <plugins>
@@ -105,50 +110,6 @@
                                 <goal>generate-code-tests</goal>
                                 <goal>build</goal>
                             </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>com.diffplug.spotless</groupId>
-                    <artifactId>spotless-maven-plugin</artifactId>
-                    <version>2.36.0</version>
-                    <configuration>
-                        <formats>
-                            <format>
-                                <includes>
-                                    <includes>**/pom.xml</includes>
-                                </includes>
-                                <indent>
-                                    <spaces>true</spaces>
-                                    <spacesPerTab>4</spacesPerTab>
-                                </indent>
-                            </format>
-                        </formats>
-                        <java>
-                            <indent>
-                                <spaces>true</spaces>
-                            </indent>
-                            <includes>
-                                <include>**/src/main/java/**/*.java</include>
-                                <include>**/src/test/java/**/*.java</include>
-                            </includes>
-                            <removeUnusedImports />
-                            <importOrder>
-                                <!-- Everything first, then java|javax -->
-                                <!-- Note the leading comma -->
-                                <order>,java|javax</order>
-                            </importOrder>
-                            <eclipse>
-                                <file>${main.basedir}/eclipse-format.xml</file>
-                            </eclipse>
-                        </java>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>apply</goal>
-                            </goals>
-                            <phase>compile</phase>
                         </execution>
                     </executions>
                 </plugin>
@@ -173,8 +134,7 @@
                             </goals>
                             <configuration>
                                 <systemPropertyVariables>
-                                    <native.image.path>
-                                        ${project.build.directory}/${project.build.finalName}-runner</native.image.path>
+                                    <native.image.path>${project.build.directory}/${project.build.finalName}-runner</native.image.path>
                                     <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
                                     <maven.home>${maven.home}</maven.home>
                                 </systemPropertyVariables>
@@ -182,7 +142,6 @@
                         </execution>
                     </executions>
                 </plugin>
-
             </plugins>
         </pluginManagement>
 
@@ -190,6 +149,45 @@
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.36.0</version>
+                <inherited>false</inherited>
+                <configuration>
+                    <pom>
+                        <includes>
+                            <include>**/pom.xml</include>
+                        </includes>
+
+                        <sortPom>
+                            <nrOfIndentSpace>4</nrOfIndentSpace>
+                        </sortPom>
+                    </pom>
+                    <java>
+                        <indent>
+                            <spaces>true</spaces>
+                        </indent>
+                        <includes>
+                            <include>**/src/main/java/**/*.java</include>
+                            <include>**/src/test/java/**/*.java</include>
+                        </includes>
+                        <removeUnusedImports></removeUnusedImports>
+                        <importOrder>
+                            <!-- Everything first, then java|javax -->
+                            <!-- Note the leading comma -->
+                            <order>,java|javax</order>
+                        </importOrder>
+                        <eclipse>
+                            <file>${main.basedir}/eclipse-format.xml</file>
+                        </eclipse>
+                    </java>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>apply</goal>
+                        </goals>
+                        <phase>compile</phase>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -208,20 +206,20 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <inherited>false</inherited>
                         <id>jacoco-report</id>
                         <goals>
                             <goal>report</goal>
                         </goals>
                         <phase>verify</phase>
+                        <inherited>false</inherited>
                     </execution>
                     <execution>
-                        <inherited>false</inherited>
                         <id>jacoco-merge</id>
                         <goals>
                             <goal>merge</goal>
                         </goals>
                         <phase>verify</phase>
+                        <inherited>false</inherited>
                         <configuration>
                             <fileSets>
                                 <fileSet>
@@ -236,16 +234,16 @@
                 </executions>
             </plugin>
             <plugin>
-                <inherited>false</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
+                <inherited>false</inherited>
                 <executions>
                     <execution>
                         <id>copy-class-files</id>
-                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                        <phase>generate-resources</phase>
                         <configuration>
                             <overwrite>false</overwrite>
                             <resources>
@@ -270,11 +268,4 @@
             </plugin>
         </plugins>
     </build>
-    <distributionManagement>
-        <snapshotRepository>
-            <id>agogos</id>
-            <name>Agogos Release Repository</name>
-            <url>https://repository-basic.engineering.redhat.com/nexus/repository/agogos/</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>
