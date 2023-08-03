@@ -3,7 +3,9 @@
 ** xref:development-mode.adoc[]
 ** xref:testing.adoc[]
 ** xref:ide.adoc[]
-** xref:documentation.adoc[]
+** Policy Guides
+*** xref:policy-guides/documentation.adoc[]
+*** xref:policy-guides/jira.adoc[]
 ** Stages
 *** xref:stages/builder_tutorial.adoc[]
 *** xref:stages/stage_api.adoc[]

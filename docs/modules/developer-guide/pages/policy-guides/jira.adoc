@@ -1,0 +1,313 @@
+= Agogos Jira Policies
+:toc: left
+
+== Scope
+This page provides an overview about how the Agogos development team uses the
+link:https://issues.redhat.com/[Red{nbsp}Hat Jira instance]
+to plan, track, and report on development and support work.
+
+A Jira issue is required to make changes to any of the files in the
+link:https://gitlab.cee.redhat.com/agogos[Agogos GitLab repository].
+The Jira issue ID must be referenced on the commit title. See the
+Agogos Git Commit Policy Guide
+for commit title formatting requirements.
+
+// link to be added after the policy guide has been created.
+
+== Jira Types
+The Agogos team only uses the following Jira types for issues.
+
+Feature Request::
+  Feature request from users.
+
+When a feature request is groomed, one of the following will happen:
+
+. If the feature is not going to be implemented, it will be closed as `Won't Do`.
+. If the feature is going to be implemented and the effort is small enough, 
+  it will be changed into a story.
+. If the feature is going to be implemented and the effort is too large for
+  a single story, it will be changed into an epic.
+
+Epic::
+  Used to aggregate work related with features or changes when they
+  span more than three Jira issues.
+
+Bug::
+  Used to represent a problem that impairs or prevents the function of 
+  the system.
+
+Story::
+  Used to represent functionality to be added or a task to be performed.
+
+Spike::
+  Used to represent research that it does not directly impact the software.
+  It results in new Jira issues to address the findings of the research.
+
+Incident::
+  A tracking Jira issue for documenting and linking to external issues that
+  impact Agogos.
+
+== Priority
+The Agogos Jira issues use the following definitions for priority.
+
+Blocker::
+  Indicates that the user cannot use Agogos to build their product until the 
+  issue is completed and there is no workaround.
+
+Critical::
+  Indicates that the user cannot use Agogos to build their product until
+  the issue is completed but there is a workaround or the user does
+  not use Agogos yet.
+
+Major::
+  Indicates a major loss of functionality, but it does not block users.
+
+Normal::
+  Indicates a minor loss of functionality or a problem with a brief workaround.
+
+Minor::
+  Indicates an issue that involves no loss of functionality.
+
+== Components
+All Jira issues require at least one *component*. A *component* represents 
+a part of the system.
+
+For example, adding a new command to the system has a *component* of `CLI`,
+changing documentation has a *component* of `Documentation`.
+
+[IMPORTANT]
+====
+Users should always select an existing *component*. If an 
+appropriate *component* does not exist, contact the Agogos product owner
+or program manager to have them create one.
+
+Program management has custom dashboards and reports based on the list
+of *components* in the Agogos system, so adding a new *component* is more
+involved then just adding it via the `Components` dialog box.
+====
+
+== Story Points
+The Agogos development team uses points for sizing Agogos Jira issues.
+Points will be assigned before the work starts, either when the Jira issue is
+created or groomed. The sizing will be estimated based on the expected
+amount of work the issue requires of a developer that has worked in the Agogos
+project for about six months.
+
+[IMPORTANT]
+====
+The Agogos development team does not use Jira for time tracking in any way.
+The only time information used is for deadlines on stories or bugs that
+have a due date. Start and end times on Jira issues are not accurate.
+====
+
+.Sizing is used for planning.
+[%collapsible]
+====
+Story points should be considered a rough estimate of
+the work time needed to complete an issue so the developer knows how much
+effort is likely required when selecting an issue from the to-do list.
+While sizing is estimated in terms of hours, hours should be used for
+estimating the amount of work time, not calendar time.
+The estimated work time should include the entire team's effort, not just
+an individual's effort. Stories that require design decisions may require
+input from multiple team members. Changes to the software and documentation
+require at least two reviews from other team members. All of that effort
+should be included in the number of points assigned to an issue.
+====
+
+.Why Agogos uses hours of work to estimate story points.
+[%collapsible]
+====
+Most agile best practices suggest not using time to determine story points.
+The Agogos team uses hours of work for two reasons:
+
+. Every example the author has seen for estimating effort is either too vague
+  to be useful or ignores this suggestion. Descriptions such as "very little
+  effort" or "takes some time" are common for the smaller points. Larger points
+  are almost always described in terms of how much of a sprint it takes to
+  complete a story (sprints are always a fixed amount of time).
+. link:https://source.redhat.com/groups/public/softwareproduction[The Software Production (SP) organization],
+  of which the Agogos development team is a part, uses story points for
+  quarterly planning and retrospectives. SP quarterly planning specifically
+  uses the average number of points completed per Engineer every quarter
+  to measure the velocity of the teams. Thus, for story points to be useful
+  the SP organization depends on story points measuring the amount of work
+  completed in a specific amount of time.
+
+So in Agogos, we use "hours of work" as a general measure to determine the
+effort required to complete a Jira issue and assign points based on that.
+====
+
+[width="99%",cols="^1m,5a,10a",options="header"]
+|===
+|Points|Effort by the Team|Examples
+
+|1
+|Less than three hours of work (half a work day).<<hours_per_day_footnote,^[1]^>>
+|* Executing a script.
+* Configuration changes outside of the code.
+* Open an issue to another team.
+* No changes to Agogos code or documentation.
+
+|2
+|At least three hours of work, but less than six hours (one work day).<<hours_per_day_footnote,^[1]^>>
+|* Small code changes with no impact on already written tests.
+* Small documentation changes that update already existing information.
+* Review of a merge request requires less then five minutes.
+
+|3
+|At least six hours of work, but less than 18 hours (three work days).<<hours_per_day_footnote,^[1]^>>
+|* Code changes with impact on unit tests.
+* Documentation changes that add new information.
+* Merge request requires at least two reviewers.
+
+|5
+|At least 18 hours of work, but less then 30 hours (five work days).<<hours_per_day_footnote,^[1]^>>
+|* Code changes that require local testing or testing using the test-product.
+* Bugs that may require extra effort to reproduce.
+* Code or documentation changes impacting more than five files.
+
+|8
+|At least 30 hours of work, but less than 60 hours (ten work days).<<hours_per_day_footnote,^[1]^>>
+|* Code changes that require changes to the test-product.
+* Bugs that require user product configurations to reproduce.
+* Documentation changes introducing new pages to the site that require
+formal reviews.
+
+|13
+|At least 60 hours of work (ten work days).<<hours_per_day_footnote,^[1]^>>
+|Issues that are larger then eight points should be made into an epic and
+the work broken down into smaller stories, each 8 points or smaller.
+13 story points are only used in special cases.<<issues_with_13_points,^[2]^>>
+
+|21
+|Not used.
+|The Agogos team does not assign 21 story points to Jira issues.
+
+|===
+
+If the final amount of work is significantly different from the estimate,
+the developer should change the points when the Jira issue is complete.
+The initial value should be added to the "Original Story Points" field
+in Jira while the "Story Points" field is updated with the actual value.
+This helps with reporting and future estimates.
+
+== Workflow
+The Agogos Jira workflow has set up to support
+link:https://www.atlassian.com/software/jira/features/kanban-boards[Kanban]
+style tracking and reporting.
+
+=== Workflow Status
+
+NEW::
+  The starting status for all Jira issues. Jira issues remain in this state
+  until they have been groomed by a developer or the Agogos development team.
+
+TO DO::
+  This status indicates that the story has been groomed and is ready for
+  developers to start working on it.
+
+IN PROGRESS::
+  This status indicates that the story is currently being worked on.
+
+REVIEW::
+  This status indicates that the work is complete and has been submitted for
+  review. Typically this indicates the work is being reviewed as a GitLab Merge
+  Request (MR). In cases of a GitLab MR, when a developer updates the status of
+  a Jira issue to `REVIEW` a comment is added to the Jira automatically with a
+  link to the MR.
+
+CLOSED::
+  The ending status for all stories. Stories are moved into this state when
+  all work is complete.
+
+=== Blocked Definitions
+There are two types of "blocked" conditions in the Agogos Jira,
+each with a distinct meaning and response by the team.
+
+Blocked Customer (Blocker)::
+  When an issue is a "blocker", indicated by the priority of the issue being
+  set to `Blocker`, the issue is blocking the customers from using Agogos to
+  deliver their product. This priority is also used when the issue blocks
+  developers from submitting or testing code, such as when GitLab CI cannot
+  complete successfully.
+
+A blocked customer is the most critical for the Agogos team and
+indicates that someone from the Agogos development team should immediately
+take ownership of the issue and work on a resolution regardless of other
+issueing. During the daily stand-up by the Agogos team, blocker issues are
+always discussed first and are treated as the most critical items for
+discussion.
+
+[[blocked_agogos_developer]]
+Blocked Agogos Developer (Blocked)::
+  When an issue is "blocked", indicated by the `Blocked` flag being set to
+  `true`, the Agogos developer is blocked from making progress on the issue.
+
+A blocked Agogos developer is the second highest priority for the Agogos team.
+During the daily stand-up by the Agogos team, these issues are always
+discussed second (after "blockers") and are treated as important items for
+discussion.
+
+=== Blocked Workflow
+The treatment of an issue that is blocked changes based on the status of
+the issue.
+
+Blocked NEW::
+  An issue with a `NEW` status that is blocked indicates that:
+  - The description is incomplete and the issue cannot be marked `TO DO`.
+  - Work on the issue cannot be started because it depends on another Jira that
+    has not been closed. The associated Jira should be linked as a blocker in
+    the issue.
+
+`NEW` issues should only be marked `blocked` if they have been
+assigned and are actively being monitored by a Agogos developer.
+When the issue is unblocked, it should transition to the `TO DO` status.
+
+[NOTE]
+====
+Blocked `NEW` issues are not reviewed as part of daily stand-up.
+====
+
+Blocked TO DO::
+  "Blocked TO DO" is not a valid status. Issues should not be moved out of
+  the `NEW` status until they are ready to be worked on. Issues that are
+  in progress should remain in the `IN PROGRESS` status even when blocked.
+
+Blocked IN PROGRESS::
+  An issue with an `IN PROGRESS` status that is blocked indicates that work
+  cannot continue. This is typically due to external factors, such as cases
+  where a developer is waiting on information or actions from an external team.
+  It can also indicate that the developer can no longer make forward
+  progress on an issue. For example, an issue can be blocked because a
+  developer has been unable to determine the root-cause of a bug or needs
+  architecture team decision on a feature.
+
+Blocked REVIEW::
+  An issue with a `REVIEW` status that is blocked indicates that work
+  cannot continue. This is typically due to external factors, such as system
+  outages that are preventing the Agogos continuous integration checks from
+  completing. It can also indicate that the MR is being held up due to internal
+  issues. For example, when the Agogos development team has differing opinions
+  on whether the solution proposed in a MR is appropriate, the Jira can be
+  marked as `blocked` to indicate that additional team input is required to
+  resolve the differing opinions.
+
+== Footnotes
+
+[horizontal]
+[[hours_per_day_footnote]]^1^::
+  Typically, an engineer working on a Red{nbsp}Hat project like Agogos
+  has around two hours of meetings every day not directly related
+  to Jira tasking. There is also time spent supporting users via chat channels
+  and email that don't result in Jira issues. Assuming an eight hour work day,
+  an engineer has about six hours per day to actually work on Jira issues.
+
+[[issues_with_13_points]]^2^::
+  There are two special cases when the Agogos team uses 13 story points:
+  * A large story that has a single deliverable. That is, a story is
+    assigned 13 story points when it is expected to take more then 60 hours
+    of work but it cannot be broken down into smaller stories.
+  * The effort required more than 60 hours of work by the team.
+    In this case, the developer can change the story points to 13 when
+    closing the Jira issue.
