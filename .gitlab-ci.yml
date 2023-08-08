@@ -70,7 +70,8 @@ webhooks:
   stage: build
   script:
     - ./mvnw install -pl webhooks -am -Pnative -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true
-  tags: [native-images]
+  tags:
+    - native-images
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
