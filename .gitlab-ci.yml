@@ -60,6 +60,24 @@ cli:
           - test/**/*
           - webhooks/**/*
 
+webhooks:
+  image:
+    name: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java17
+    entrypoint: ["/bin/sh", "-c"]
+  variables:
+    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+    MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
+  stage: build
+  script:
+    - ./mvnw install -pl webhooks -am -Pnative -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true
+  tags: [native-images]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
+          - core/**/*
+          - webhooks/**/*
+
 docs:
   image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
   stage: test
