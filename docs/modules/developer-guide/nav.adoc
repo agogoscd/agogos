@@ -4,13 +4,14 @@
 ** xref:testing.adoc[]
 ** xref:ide.adoc[]
 ** Policy Guides
-*** xref:policy-guides/documentation.adoc[]
-*** xref:policy-guides/jira.adoc[]
+*** xref:policy-guides/documentation.adoc[Documentation]
+*** xref:policy-guides/jira.adoc[Jira]
+*** xref:policy-guides/commit_message_format.adoc[Commit Message Format]
 ** Stages
 *** xref:stages/builder_tutorial.adoc[]
 *** xref:stages/stage_api.adoc[]
 ** Webhooks
-*** xref:webhooks/deployment.adoc[]
-*** xref:webhooks/ssl_certificates.adoc[]
 ** xref:security/index.adoc[]
 ** xref:operator/index.adoc[]
+*** xref:webhooks/deployment.adoc[]
+*** xref:webhooks/ssl_certificates.adoc[]

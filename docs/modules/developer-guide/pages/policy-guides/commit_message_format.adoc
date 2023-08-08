@@ -1,0 +1,115 @@
+= Agogos Commit Message Format Policies
+
+== Scope
+This page provides details on the commit message formatting requirements
+for Agogos.
+
+== Message Format
+Agogos has a specific commit message format requirement based on the
+link:https://github.com/angular/angular/blob/master/CONTRIBUTING.md#-commit-message-format[Angular Commit Message Conventions].
+
+Each commit message consists of a *header*, a *body*, and a *footer*.
+The header has a special format that includes a *type*, a *issue-id*, and
+a *subject*.
+
+.Agogos Commit Message Format
+----
+<type>(<issue-id>): <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
+----
+
+=== Header
+----
+<type>(<issue-id>): <subject>
+  │       │             │
+  │       │             └─⫸ Summary in present tense. Not capitalized. No period at the end.
+  │       │
+  │       └─⫸ Commit Issue ID: Jira issue reference
+  │
+  └─⫸ Commit Type: feat|fix|docs|style|refactor|perf|test|chore|revert
+----
+
+The *type*, *issue-id*, and *subject* are mandatory.
+The maximum line length for text in the commit message is 100 characters.
+
+==== Type
+The type must be one of the following:
+
+[horizontal]
+.Commit Message Type
+feat::     A new feature
+fix::      A bug fix
+docs::     A change that adds missing or corrects existing documentation
+style::    A change that does not affect the meaning of the code
+           (white-space or formatting)
+refactor:: A change that neither fixes a bug nor adds a feature
+perf::     A change that improves performance
+test::     A change that adds missing or corrects existing tests
+chore::    A change that should not appear in the change log
+           (used for MRs that are generated automatically by the system)
+
+==== Issue ID
+The issue ID specifies the Jira issue associated with this merge request.
+This should be the Jira key value, for example "AGOGOS-1234".
+Every merge request must be associated with a Jira issue.
+
+==== Subject
+The subject contains a brief description of the change:
+
+* Use the imperative, present tense: "change" not "changed" nor "changes".
+* Don't capitalize first letter.
+* No period (.) at the end.
+
+The total line length, including *type* and *issue-id* must be less than 100
+characters.
+
+=== Body
+Use proper capitalization and full sentences. Just as in the subject,
+use the imperative, present tense: "change" not "changed" nor "changes".
+The body should include the motivation for the change and contrast this
+with previous behavior.
+
+=== Footer
+The footer is optional and should contain any information about
+*breaking changes*. Breaking changes should start with the string
+"BREAKING CHANGE:" followed by a space and a description of the change.
+The description can continue onto additional lines if necessary.
+
+== Reverting a Commit
+If the commit reverts a previous commit, the header line should
+begin with "revert:", followed by the *header text of the reverted commit*.
+In the body it should say: `This reverts commit <hash>.`, where the
+hash is the SHA of the commit being reverted.
+
+== Tooling
+There are many ways to verify that messages are formatted correctly, 
+link:https://www.npmjs.com/package/semantic-git-commit-cli[semantic-git-commit-cli]
+is the recommended tool.
+
+Installation:
+----
+$ npm -g install semantic-git-commit-cli
+----
+
+Usage:
+----
+$ semantic-git-commit
+----
+
+[NOTE]
+====
+Our repositories contain a [filename]`.sgcrc` configuration file for the 
+semantic-git-commit-cli tool.
+====
+
+=== NodeJS Issues
+Installation of this tool requires `nodejs`. After installing `nodejs`, if you
+have an issue with write permissions for the /usr/lib/node_modules directory
+when attempting to install,
+link:https://stackoverflow.com/questions/33725639/npm-install-g-less-does-not-work-eacces-permission-denied/40905762#40905762[these steps from StackOverflow]
+are helpful. Using
+link:https://github.com/nvm-sh/nvm[Node Version Manager (nvm)]
+to install `nodejs` also eliminates any permission issues.

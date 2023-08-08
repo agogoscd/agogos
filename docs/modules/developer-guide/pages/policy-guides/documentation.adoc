@@ -1,4 +1,4 @@
-= Documentation
+= Agogos Documentation Policies
 
 This page provides an overview for creating documentation for Agogos.
 
