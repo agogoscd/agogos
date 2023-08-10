@@ -120,7 +120,8 @@ public class ExecutionDescribeCommand extends AbstractResourceSubcommand<Executi
         if (dependents.size() > 0) {
             String nl = System.getProperty("line.separator");
             sb.append(Ansi.AUTO.string(
-                    String.format("@|bold %s|@:\t%-30.30s  %-8s  %-19s  %-19s  %-15s", kind, "Name", "Status", "Started",
+                    String.format("@|bold %s|@:@|bold \t%-30.30s  %-8s  %-19s  %-19s  %-15s|@", kind, "Name", "Status",
+                            "Started",
                             "Completed", "Duration")))
                     .append(nl);
             dependents.entrySet().stream().forEach(e -> {
