@@ -147,7 +147,7 @@ public class InterceptorsInstaller extends Installer {
 
     private Deployment deployment(String namespace) {
         Probe livenessProbe = new ProbeBuilder()
-                .withHttpGet(new HTTPGetActionBuilder().withPath("/").withPort(new IntOrString(7080)).build())
+                .withHttpGet(new HTTPGetActionBuilder().withPath("/").withPort(new IntOrString(7090)).build())
                 .withInitialDelaySeconds(30).withPeriodSeconds(3).build();
 
         Map<String, Quantity> requests = new HashMap<>();
@@ -166,7 +166,7 @@ public class InterceptorsInstaller extends Installer {
                                 .build())
                 .withVolumeMounts(new VolumeMountBuilder().withName("certs").withMountPath("/certs").withReadOnly(true).build())
                 .withPorts(
-                        new ContainerPortBuilder().withName("http").withContainerPort(7080).withProtocol("TCP").build(),
+                        new ContainerPortBuilder().withName("http").withContainerPort(7090).withProtocol("TCP").build(),
                         new ContainerPortBuilder().withName("https").withContainerPort(8443).withProtocol("TCP").build())
                 .withLivenessProbe(livenessProbe)
                 .withNewResources()
@@ -208,7 +208,7 @@ public class InterceptorsInstaller extends Installer {
                 .withName("http")
                 .withPort(80)
                 .withProtocol("TCP")
-                .withTargetPort(new IntOrString(7080))
+                .withTargetPort(new IntOrString(7090))
                 .build();
 
         ServicePort httpsPort = new ServicePortBuilder()
