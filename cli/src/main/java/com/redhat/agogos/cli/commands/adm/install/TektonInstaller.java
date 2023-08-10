@@ -19,7 +19,6 @@ public class TektonInstaller extends DependencyInstaller {
 
     private static final Logger LOG = LoggerFactory.getLogger(TektonInstaller.class);
 
-    private static final String CONFIGMAP_CONFIG_DEFAULTS = "config-defaults";
     private static final String CONFIGMAP_FEATURE_FLAGS = "feature-flags";
 
     @Inject

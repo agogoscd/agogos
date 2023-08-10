@@ -64,6 +64,7 @@ public class SubmissionController extends AbstractController<Submission> {
         if (submission.getSpec().getGroup() != null && !submission.getSpec().getGroup().isEmpty()) {
             labels.put(Label.create(Resource.GROUP), submission.getSpec().getGroup());
         }
+        LOG.error(objectMapper.asYaml(labels));
         switch (submission.getSpec().getResource()) {
             case COMPONENT:
                 submitBuild(submission, labels);
@@ -90,8 +91,9 @@ public class SubmissionController extends AbstractController<Submission> {
         build.getSpec().setComponent(submission.getSpec().getName());
         build.getMetadata().setLabels(labels);
         build = kubernetesFacade.create(build);
-        LOG.debug("Trigger '{}' fired and created Build '{}'",
-                submission.getMetadata().getLabels().get(TEKTON_TRIGGER_LABEL_PREFIX + "trigger"),
+
+        String tLabel = submission.getMetadata().getLabels().get(TEKTON_TRIGGER_LABEL_PREFIX + "trigger");
+        LOG.debug((tLabel == null ? "CLI" : "Trigger " + tLabel + " fired and") + " created Build '{}'",
                 build.getMetadata().getName());
     }
 
@@ -117,6 +119,7 @@ public class SubmissionController extends AbstractController<Submission> {
         Execution execution = new Execution();
         execution.getMetadata().setLabels(labels);
         execution.getMetadata().setGenerateName(submission.getSpec().getName() + "-");
+        execution.getMetadata().setNamespace(submission.getMetadata().getNamespace());
         execution.getSpec().setGroup(submission.getSpec().getName());
         addExecutionInfo(group.getSpec().getComponents(), execution.getSpec().getComponents());
         addExecutionInfo(group.getSpec().getGroups(), execution.getSpec().getGroups());

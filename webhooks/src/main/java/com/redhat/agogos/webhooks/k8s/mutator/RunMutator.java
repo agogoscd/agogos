@@ -54,7 +54,7 @@ public class RunMutator extends Mutator<Run> {
             labels = new HashMap<>();
         }
 
-        labels.put(Label.RESOURCE.toString(), Resource.PIPELINE.toString());
+        labels.put(Label.RESOURCE.toString(), Resource.PIPELINE.toString().toLowerCase());
         labels.put(Label.NAME.toString(), run.getSpec().getPipeline());
 
         JsonObjectBuilder builder = Json.createObjectBuilder();

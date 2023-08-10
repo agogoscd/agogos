@@ -8,6 +8,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
+import io.github.resilience4j.retry.RetryConfig.Builder;
 import io.github.resilience4j.retry.RetryRegistry;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -140,17 +141,26 @@ public class KubernetesClientRetries {
         return decorated.get();
     }
 
-    public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace, ListOptions options) {
-        RetryConfig config = RetryConfig.<List<T>> custom()
+    public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace, ListOptions options,
+            boolean retryOnEmptyList) {
+        Builder<List<T>> builder = RetryConfig.<List<T>> custom()
                 .maxAttempts(DEFAULT_MAX_RETRIES)
                 .waitDuration(Duration.ofSeconds(DEFAULT_MAX_INTERVAL))
-                .retryExceptions(KubernetesClientException.class)
-                .build();
+                .retryExceptions(KubernetesClientException.class);
+
+        if (retryOnEmptyList) {
+            builder.retryOnResult(response -> response.size() == 0);
+        }
+        RetryConfig config = builder.build();
 
         RetryRegistry registry = RetryRegistry.of(config);
         Retry retry = registry.retry("get");
         retry.getEventPublisher()
-                .onRetry(e -> LOG.warn("⚠️ WARN: Retrying list for {}", namespace));
+                .onRetry(e -> {
+                    if (retryOnEmptyList) {
+                        LOG.warn("⚠️ WARN: Retrying list for {}", namespace);
+                    }
+                });
 
         Supplier<List<T>> decorated = Retry.decorateSupplier(retry, () -> {
             return kubernetesClient.resources(clazz).inNamespace(namespace).list(options).getItems();

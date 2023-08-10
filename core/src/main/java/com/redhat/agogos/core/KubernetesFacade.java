@@ -99,7 +99,12 @@ public class KubernetesFacade {
     }
 
     public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace, ListOptions options) {
-        return retries.list(clazz, namespace, options);
+        return list(clazz, namespace, options, false);
+    }
+
+    public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace, ListOptions options,
+            boolean retryOnEmptyList) {
+        return retries.list(clazz, namespace, options, retryOnEmptyList);
     }
 
     public void waitForAllPodsRunning(String namespace) {

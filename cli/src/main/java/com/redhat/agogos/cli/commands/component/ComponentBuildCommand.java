@@ -40,7 +40,7 @@ public class ComponentBuildCommand extends AbstractResourceSubcommand<Component>
                 .withLabelSelector(Label.NAME + "=" + name + "," + Label.INSTANCE + "=" + uuid + "," +
                         Label.RESOURCE + "=" + Resource.COMPONENT.toString().toLowerCase())
                 .build();
-        List<Build> builds = kubernetesFacade.list(Build.class, options);
+        List<Build> builds = kubernetesFacade.list(Build.class, kubernetesFacade.getNamespace(), options, true);
         if (builds.size() > 0) {
             cli.run(BuildDescribeCommand.class, builds.get(0).getMetadata().getName());
         } else {

@@ -29,7 +29,7 @@ public class ExecutionController extends AbstractController<Execution> {
 
         ExecutionSpec spec = execution.getSpec();
 
-        Group group = kubernetesFacade.get(Group.class, spec.getGroup());
+        Group group = kubernetesFacade.get(Group.class, execution.getMetadata().getNamespace(), spec.getGroup());
         if (group == null) {
             LOG.error("Unable to find group '{}'", spec.getGroup());
             return UpdateControl.noUpdate();

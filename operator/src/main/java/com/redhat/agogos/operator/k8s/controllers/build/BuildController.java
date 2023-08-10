@@ -152,7 +152,7 @@ public class BuildController extends AbstractController<Build> implements EventS
                     .withLabelSelector(Label.RESOURCE + "=" + Resource.GROUP.toString().toLowerCase() + ","
                             + Label.NAME + "=" + group + "," + Label.INSTANCE + "=" + instance)
                     .build();
-            List<Execution> executions = kubernetesFacade.list(Execution.class, options);
+            List<Execution> executions = kubernetesFacade.list(Execution.class, build.getMetadata().getNamespace(), options);
             if (executions.size() > 0) {
                 Execution execution = executions.get(0);
                 ExecutionInfo info = execution.getSpec().getComponents().get(component.getMetadata().getName());

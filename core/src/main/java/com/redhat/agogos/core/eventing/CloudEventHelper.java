@@ -40,6 +40,7 @@ public class CloudEventHelper {
                 break;
             case FINISHED:
                 state = "succeeded";
+                break;
             default:
                 LOG.error("Unrecognized status '{}', setting state to 'unknown'", execution.getStatus().getStatus());
                 state = "unknown";

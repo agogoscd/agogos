@@ -41,7 +41,7 @@ public class GroupExecuteCommand extends AbstractResourceSubcommand<Group> {
                 .withLabelSelector(Label.NAME + "=" + name + "," + Label.INSTANCE + "=" + uuid + "," +
                         Label.RESOURCE + "=" + Resource.GROUP.toString().toLowerCase())
                 .build();
-        List<Execution> executions = kubernetesFacade.list(Execution.class, options);
+        List<Execution> executions = kubernetesFacade.list(Execution.class, kubernetesFacade.getNamespace(), options, true);
         if (executions.size() > 0) {
             cli.run(ExecutionDescribeCommand.class, executions.get(0).getMetadata().getName());
         } else {

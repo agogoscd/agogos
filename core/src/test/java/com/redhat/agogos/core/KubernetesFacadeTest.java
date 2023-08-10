@@ -203,7 +203,7 @@ public class KubernetesFacadeTest {
         Mockito.verify(
                 kubernetesClientRetries,
                 Mockito.times(1)).list(
-                        resource.getClass(), "default", new ListOptionsBuilder().build());
+                        resource.getClass(), "default", new ListOptionsBuilder().build(), false);
     }
 
     @Test
@@ -216,7 +216,7 @@ public class KubernetesFacadeTest {
         Mockito.verify(
                 kubernetesClientRetries,
                 Mockito.times(1)).list(
-                        resource.getClass(), "default", options);
+                        resource.getClass(), "default", options, false);
     }
 
     @Test

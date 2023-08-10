@@ -41,6 +41,7 @@ public class CustomRunController implements Namespaced, Reconciler<CustomRun>, C
                 case SUBMISSION:
                     Submission e = new Submission();
                     e.getMetadata().setGenerateName("execution-");
+                    e.getMetadata().setNamespace(customRun.getMetadata().getNamespace());
                     e.setSpec(objectMapper.unmarshal(objectMapper.asJson(customRun.getSpec().getCustomSpec().getSpec()),
                             Submission.SubmissionSpec.class));
                     kubernetesFacade.create(e);
@@ -49,6 +50,7 @@ public class CustomRunController implements Namespaced, Reconciler<CustomRun>, C
                 case DEPENDENCY:
                     Dependency d = new Dependency();
                     d.getMetadata().setGenerateName("dependency-");
+                    d.getMetadata().setNamespace(customRun.getMetadata().getNamespace());
                     d.setSpec(objectMapper.unmarshal(objectMapper.asJson(customRun.getSpec().getCustomSpec().getSpec()),
                             Dependency.DependencySpec.class));
                     kubernetesFacade.create(d);

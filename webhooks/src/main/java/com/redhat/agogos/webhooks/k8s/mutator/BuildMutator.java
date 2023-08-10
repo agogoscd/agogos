@@ -56,7 +56,7 @@ public class BuildMutator extends Mutator<Build> {
         }
 
         labels.put(Label.NAME.toString(), componentBuild.getSpec().getComponent());
-        labels.put(Label.RESOURCE.toString(), Resource.COMPONENT.toString());
+        labels.put(Label.RESOURCE.toString(), Resource.COMPONENT.toString().toLowerCase());
 
         JsonObjectBuilder builder = Json.createObjectBuilder();
 
