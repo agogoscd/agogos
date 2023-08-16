@@ -17,6 +17,8 @@ import io.fabric8.tekton.pipeline.v1beta1.ParamSpecBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.ParamValueBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineBuilder;
+import io.fabric8.tekton.pipeline.v1beta1.PipelineResult;
+import io.fabric8.tekton.pipeline.v1beta1.PipelineResultBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineTask;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineTaskBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineWorkspaceDeclaration;
@@ -97,6 +99,12 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
                 .withType("string")
                 .build();
 
+        PipelineResult result = new PipelineResultBuilder()
+                .withDescription("Builder results")
+                .withName("output")
+                .withNewValue("$(tasks.build.results.data)")
+                .build();
+
         // Define the Pipeline itself
         pipeline = new PipelineBuilder(pipeline)
                 .withNewMetadata()
@@ -109,6 +117,7 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
                 .withParams(param)
                 .withWorkspaces(workspaceMain)
                 .addAllToTasks(tasks)
+                .withResults(result)
                 .endSpec()
                 .build();
 

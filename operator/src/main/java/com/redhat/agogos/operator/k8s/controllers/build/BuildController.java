@@ -128,6 +128,9 @@ public class BuildController extends AbstractController<Build> implements EventS
         build.getMetadata().getLabels().put(Label.INSTANCE.toString(),
                 pipelineRun.getMetadata().getLabels().get(Label.INSTANCE.toString()));
 
+        // Save any builder output.
+        resourceStatus.setOutput(getBuilderOutput(pipelineRun));
+
         // Update the last update field
         resourceStatus.setLastUpdate(ResultableStatus.getFormattedNow());
 
@@ -204,5 +207,13 @@ public class BuildController extends AbstractController<Build> implements EventS
 
     private String indexKey(String name, String namespace) {
         return name + "#" + namespace;
+    }
+
+    private String getBuilderOutput(PipelineRun pipelineRun) {
+        PipelineRunResult result = pipelineRun.getStatus().getPipelineResults().stream()
+                .filter(r -> r.getName().equals("output"))
+                .findFirst()
+                .orElse(null);
+        return result != null ? result.getValue().getStringVal() : "";
     }
 }

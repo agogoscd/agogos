@@ -166,6 +166,8 @@ spec:
                 componentSpec:
                   type: object
                   x-kubernetes-preserve-unknown-fields: true
+                output:
+                  type: string
                 startTime:
                   format: date-time
                   type: string

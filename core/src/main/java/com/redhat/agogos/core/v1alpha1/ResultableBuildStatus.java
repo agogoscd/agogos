@@ -16,6 +16,10 @@ public class ResultableBuildStatus extends ResultableStatus {
     @Setter
     ComponentSpec componentSpec;
 
+    @Getter
+    @Setter
+    String output;
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof ResultableBuildStatus)) {
@@ -28,6 +32,7 @@ public class ResultableBuildStatus extends ResultableStatus {
 
         ResultableBuildStatus status = (ResultableBuildStatus) obj;
 
-        return Objects.equals(status.getComponentSpec(), getComponentSpec());
+        return Objects.equals(status.getComponentSpec(), getComponentSpec())
+                && Objects.equals(status.getOutput(), getOutput());
     }
 }
