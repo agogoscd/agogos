@@ -1,0 +1,116 @@
+= Developing Builders
+
+This document provides a guide to start coding your own Builder for Agogos.
+
+== Schema and ClusterTask
+Builders in its minimal expression are built of a `Builder` Agogos resource and
+a `ClusterTask` Tekton resource. Start with the following file:
+
+[source,yaml]
+----
+include::example$builders/builder.yaml[]
+----
+
+[IMPORTANT]
+====
+The `output` workspace, the `data` results and the parameter `component` are
+required. The execution fails if the `ClusterTask` do not implement these three.
+====
+
+Apply the builder definition and then create the following `Component`:
+
+[source,yaml]
+----
+include::example$builders/component.yaml[]
+----
+
+On apply, Agogos returns the following error:
+
+[source,text]
+----
+Component definition 'default/my-component' is not valid: [Field 'property' is required]
+----
+
+The `Builder` definition is working as expected. Add the required `property` to
+the `params` section:
+
+[source,yaml]
+----
+include::example$builders/component-params.yaml[]
+----
+
+== Container and Logs
+With the `Builder`, `ClusterTask` and its related `Component` we can execute a
+build:
+
+[source,bash]
+----
+agogosctl component build my-component
+----
+
+With the starter `ClusterTask` provided here, the build prints the relevant
+parameters passed by Agogos and fails.
+
+[IMPORTANT]
+====
+The starter `ClusterTask` fails because that keeps the pod around. After a
+successful build execution the build pod gets deleted.
+====
+
+To see the logs, use `kubectl logs`:
+
+[source,bash]
+----
+$ kubect logs my-component-<id>-build-pod
+Defaulted container "step-execute" out of: step-execute, prepare (init), place-scripts (init)
+/workspace/output
+/tekton/results/data
+---
+apiVersion: "agogos.redhat.com/v1alpha1"
+kind: "Component"
+metadata:
+  // omitted content
+  name: "my-component"
+  namespace: "default"
+spec:
+  pre: []
+  post: []
+  build:
+    builderRef:
+      name: "my-builder"
+      kind: "Builder"
+      version: "v1alpha1"
+    params:
+      property: "an-arbitrary-property"
+status:
+  reason: "Component is ready"
+  status: "Ready"
+
+Exiting with an error for teaching purposes
+----
+
+== Modify the Builder
+Continue modifying the files to add properties to the `Builder` definition,
+so your users can provide more information. In addition, modify the container
+script, or replace it completely, to support your builder.
+
+The following file is a more refined example using Python:
+
+[source,yaml]
+----
+include::example$builders/builder-python.yaml[]
+----
+
+== Accept User Configuration Using `agogos-config`
+Agogos provides a ConfigMap called `agogos-config` in all namespaces.
+This ConfigMap is intended to be *edited* by users to provide configuration that
+Builders read. Mount the ConfigMap in your ClusterTask container at
+[filename]`/agogos-config/` and then read it in your container's code. See
+link:https://kubernetes.io/docs/concepts/configuration/configmap/#using-configmaps-as-files-from-a-pod[Using ConfigMaps as Files]
+for more information about using ConfigMaps.
+
+[TIP]
+====
+The ClusterTask starter definition provided here mounts `agogos-config` into
+`/agogos-config/`.
+====

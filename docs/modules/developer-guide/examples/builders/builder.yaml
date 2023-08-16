@@ -1,0 +1,60 @@
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Builder
+metadata:
+  name: my-builder
+  labels:
+    agogos.redhat.com/phase: build
+    app.kubernetes.io/part-of: agogos
+    app.kubernetes.io/component: builder
+    app.kubernetes.io/instance: my-builder
+spec:
+  taskRef:
+    name: my-builder-task
+    kind: ClusterTask
+  schema:
+    openAPIV3Schema:
+      required: [property]
+      properties:
+        property:
+          type: string
+---
+apiVersion: tekton.dev/v1beta1
+kind: ClusterTask
+metadata:
+  name: my-builder-task
+  labels:
+    agogos.redhat.com/phase: build
+    app.kubernetes.io/part-of: agogos
+    app.kubernetes.io/component: builder
+    app.kubernetes.io/instance: my-builder
+spec:
+  workspaces:
+  - name: output
+  params:
+  - name: component
+    type: string
+  results:
+  - name: data
+    description: JSON formatted string
+  volumes:
+  - name: agogos-config
+    configMap:
+      name: agogos-config
+  steps:
+  - name: execute
+    image: registry.access.redhat.com/ubi9-minimal:9.2
+    imagePullPolicy: Always
+    script: |
+      #!/bin/sh -e
+      echo "$1"
+      echo "$2"
+      echo "$3"
+      echo "Exiting with an error for teaching purposes"
+      exit 1
+    args:
+    - "$(workspaces.output.path)"
+    - "$(results.data.path)"
+    - "$(params.component)"
+    volumeMounts:
+    - name: agogos-config
+      mountPath: /agogos-config

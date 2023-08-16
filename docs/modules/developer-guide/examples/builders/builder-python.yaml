@@ -1,0 +1,68 @@
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Builder
+metadata:
+  name: my-builder
+  labels:
+    agogos.redhat.com/phase: build
+    app.kubernetes.io/part-of: agogos
+    app.kubernetes.io/component: builder
+    app.kubernetes.io/instance: my-builder
+spec:
+  taskRef:
+    name: my-builder-task
+    kind: ClusterTask
+  schema:
+    openAPIV3Schema:
+      required: [property]
+      properties:
+        property:
+          type: string
+---
+apiVersion: tekton.dev/v1beta1
+kind: ClusterTask
+metadata:
+  name: my-builder-task
+  labels:
+    agogos.redhat.com/phase: build
+    app.kubernetes.io/part-of: agogos
+    app.kubernetes.io/component: builder
+    app.kubernetes.io/instance: my-builder
+spec:
+  workspaces:
+  - name: output
+  params:
+  - name: component
+    type: string
+  results:
+  - name: data
+    description: JSON formatted string
+  volumes:
+  - name: agogos-config
+    configMap:
+      name: agogos-config
+  steps:
+  - name: execute
+    image: registry.access.redhat.com/ubi9/python-39:1
+    imagePullPolicy: Always
+    script: |
+      #!/bin/python3
+      import argparse
+
+      parser = argparse.ArgumentParser()
+      parser.add_argument("--component")
+      parser.add_argument("--results-path")
+      parser.add_argument("--output-path")
+      args = parser.parse_args()
+
+      print(args.output_path)
+      print(args.results_path)
+      print(args.component)
+
+      raise Exception("Learning purposes")
+    args:
+    - "--output-path=$(workspaces.output.path)"
+    - "--results-path=$(results.data.path)"
+    - "--component=$(params.component)"
+    volumeMounts:
+    - name: agogos-config
+      mountPath: /agogos-config
