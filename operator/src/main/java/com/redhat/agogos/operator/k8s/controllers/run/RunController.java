@@ -9,10 +9,17 @@ import com.redhat.agogos.core.v1alpha1.Run;
 import com.redhat.agogos.operator.k8s.controllers.AbstractController;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRunResult;
+import io.javaoperatorsdk.operator.api.config.informer.InformerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
+import io.javaoperatorsdk.operator.api.reconciler.EventSourceContext;
+import io.javaoperatorsdk.operator.api.reconciler.EventSourceInitializer;
 import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
+import io.javaoperatorsdk.operator.processing.event.ResourceID;
+import io.javaoperatorsdk.operator.processing.event.source.EventSource;
+import io.javaoperatorsdk.operator.processing.event.source.PrimaryToSecondaryMapper;
+import io.javaoperatorsdk.operator.processing.event.source.informer.InformerEventSource;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,14 +29,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
 @ControllerConfiguration(generationAwareEventProcessing = false, dependents = {
-        @Dependent(type = PipelineRunDependentResource.class) })
-public class RunController extends AbstractController<Run> {
+        @Dependent(type = PipelineRunDependentResource.class, reconcilePrecondition = PipelineRunPrecondition.class)
+})
+public class RunController extends AbstractController<Run> implements EventSourceInitializer<Run> {
 
     private static final Logger LOG = LoggerFactory.getLogger(RunController.class);
+    public static final String PIPELINE_INDEX = "PipelineIndex";
 
     @SuppressWarnings("unchecked")
     @Override
@@ -81,18 +91,6 @@ public class RunController extends AbstractController<Run> {
                         message = "Build finished successfully, but returned metadata is not a valid JSON content";
                     }
                 }
-
-                // String pipelineRunName = String.format("%s/%s", pipelinerun.getMetadata().getNamespace(),
-                //         pipelinerun.getMetadata().getName());
-
-                // LOG.info("Cleaning up PipelineRun '{}' after a successful {}", pipelineRunName,
-                //         resource.getKind().toLowerCase());
-
-                // // This may or may not remove the Tekton PipelineRun
-                // // In case it is not successful (for any reason) it will be hanging there.
-                // // It is the ops duty to find out why these were not removed and clean them up.
-                // kubernetesFacade.delete(pipelinerun);
-
                 break;
             case FAILED:
                 message = String.format("%s failed", resource.getKind());
@@ -149,5 +147,24 @@ public class RunController extends AbstractController<Run> {
         }
 
         return pipeline;
+    }
+
+    @Override
+    public Map<String, EventSource> prepareEventSources(EventSourceContext<Run> context) {
+        context.getPrimaryCache().addIndexer(PIPELINE_INDEX,
+                b -> List.of(indexKey(b.getSpec().getPipeline(), b.getMetadata().getNamespace())));
+        InformerEventSource<Pipeline, Run> pipelineES = new InformerEventSource<>(InformerConfiguration
+                .from(Pipeline.class, context)
+                .withSecondaryToPrimaryMapper(pipeline -> context.getPrimaryCache().byIndex(PIPELINE_INDEX,
+                        indexKey(pipeline.getMetadata().getName(), pipeline.getMetadata().getNamespace())).stream()
+                        .map(ResourceID::fromResource).collect(Collectors.toSet()))
+                .withPrimaryToSecondaryMapper((PrimaryToSecondaryMapper<Run>) primary -> Set.of(
+                        new ResourceID(primary.getSpec().getPipeline(), primary.getMetadata().getNamespace())))
+                .build(), context);
+        return EventSourceInitializer.nameEventSources(pipelineES);
+    }
+
+    private String indexKey(String name, String namespace) {
+        return name + "#" + namespace;
     }
 }

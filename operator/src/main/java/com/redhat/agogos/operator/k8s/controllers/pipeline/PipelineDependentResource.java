@@ -43,8 +43,8 @@ public class PipelineDependentResource
 
         // Prepare workspace for main task to share content between steps
         WorkspacePipelineTaskBinding pipelineWsBinding = new WorkspacePipelineTaskBindingBuilder()
-                .withName(WorkspaceMapping.MAIN_WORKSPACE_NAME)
-                .withWorkspace("ws")
+                .withName("pipeline")
+                .withWorkspace(WorkspaceMapping.MAIN_WORKSPACE_NAME)
                 .withSubPath("pipeline")
                 .build();
 
@@ -93,7 +93,7 @@ public class PipelineDependentResource
             // Prepare workspace for main task to store results
             WorkspacePipelineTaskBinding stageWsBinding = new WorkspacePipelineTaskBindingBuilder()
                     .withName("stage")
-                    .withWorkspace("ws")
+                    .withWorkspace(WorkspaceMapping.MAIN_WORKSPACE_NAME)
                     .withSubPath(String.format("pipeline/%s", stageRef.getName()))
                     .build();
 
@@ -122,7 +122,7 @@ public class PipelineDependentResource
 
         // Define main workspace
         PipelineWorkspaceDeclaration workspaceMain = new PipelineWorkspaceDeclarationBuilder()
-                .withName("ws")
+                .withName(WorkspaceMapping.MAIN_WORKSPACE_NAME)
                 .withDescription("Main workspace")
                 .build();
 

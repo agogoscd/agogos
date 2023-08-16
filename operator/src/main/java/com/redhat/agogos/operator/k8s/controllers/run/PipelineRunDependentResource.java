@@ -86,8 +86,7 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
         pipelineRun = new PipelineRunBuilder(pipelineRun)
                 .withNewMetadata()
                 .withLabels(labels)
-                .withGenerateName(resource.getSpec().getPipeline() + "-")
-                .withName(pipelineRun.getMetadata() != null ? pipelineRun.getMetadata().getName() : null)
+                .withName(resource.getMetadata().getName()) // Name should match Run name.
                 .withNamespace(resource.getMetadata().getNamespace())
                 .endMetadata()
                 .withNewSpec()
@@ -117,6 +116,7 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
         }
 
         LOG.debug("PipelineRun '{}' created for '{}'", fullPipelineRunName(pipelineRun), resource.getFullName());
+        LOG.error(objectMapper.asYaml(pipelineRun));
         return pipelineRun;
     }
 

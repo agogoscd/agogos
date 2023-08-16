@@ -19,7 +19,7 @@ public class WorkspaceMapping implements KubernetesResource {
     /**
      * Name of the main workspace used in Agogos in generated Tekton Pipelines.
      */
-    public static final String MAIN_WORKSPACE_NAME = "shared";
+    public static final String MAIN_WORKSPACE_NAME = "ws";
 
     /**
      * <p>

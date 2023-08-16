@@ -80,10 +80,6 @@ public class Pipeline extends AgogosResource<PipelineSpec, Status> implements Na
 
         @Getter
         @Setter
-        private String group;
-
-        @Getter
-        @Setter
         private List<StageEntry> stages = new ArrayList<>();
 
         @Getter

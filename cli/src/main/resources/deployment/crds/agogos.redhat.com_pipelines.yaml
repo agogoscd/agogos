@@ -37,9 +37,6 @@ spec:
               type: object
               description: Defines the desired state of the Pipeline
               properties:
-                group:
-                  type: string
-                  description: Name of the Group the Pipeline should run with
                 stages:
                   type: array
                   description: List of stages to run in order
@@ -72,6 +69,32 @@ spec:
                         x-kubernetes-preserve-unknown-fields: true
                     required:
                       - "stageRef"
+                dependents:
+                  type: object
+                  description: Dependents of this Pipeline
+                  properties:
+                    components:
+                      type: array
+                      description: List of the Components
+                      items:
+                        type: string
+                        description: Name of the Component
+                    groups:
+                      type: array
+                      description: List of the Groups
+                      items:
+                        type: string
+                        description: Name of the Group
+                    pipelines:
+                      type: array
+                      description: List of the Pipelines
+                      items:
+                        type: string
+                        description: Name of the Pipeline
+                  anyOf:
+                    - required: ["components"]
+                    - required: ["groups"]
+                    - required: ["pipelines"]
               required:
                 - "stages"
             status:
@@ -97,13 +120,9 @@ spec:
       subresources:
         status: {}
       additionalPrinterColumns:
-        - name: Component Group
-          jsonPath: .spec.group
+        - name: Status
+          jsonPath: .status.status
           type: string
-        ## https://github.com/kubernetes/kubectl/issues/517
-        # - name: Stages
-        #   type: string
-        #   jsonPath: .spec.stages[*].name
         - name: Age
           type: date
           jsonPath: .metadata.creationTimestamp
