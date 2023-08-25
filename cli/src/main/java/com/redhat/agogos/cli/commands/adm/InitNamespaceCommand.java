@@ -3,6 +3,7 @@ package com.redhat.agogos.cli.commands.adm;
 import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.AbstractRunnableSubcommand;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller;
+import com.redhat.agogos.cli.commands.adm.install.CoreInstaller.AgogosRole;
 import com.redhat.agogos.core.errors.ApplicationException;
 import com.redhat.agogos.core.v1alpha1.Dependency;
 import com.redhat.agogos.core.v1alpha1.Submission;
@@ -76,7 +77,6 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
     private static final Logger LOG = LoggerFactory.getLogger(InitNamespaceCommand.class);
 
     private static final String AGOGOS_QUOTA_NAME = "agogos-quota";
-    private static final String AGOGOS_ROLE_BINDING_PREFIX = "agogos-";
     private static final String DEPENDENCY_CEL_INTERCEPTOR_FILTER = String.join(" || ", List.of(
             "header.match('ce-type', 'com.redhat.agogos.event.build.succeeded.v1alpha1')",
             "header.match('ce-type', 'com.redhat.agogos.event.execution.succeeded.v1alpha1')",
@@ -149,10 +149,10 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
         installSubmissionTrigger(namespace);
         installDependencyTrigger(namespace);
 
-        List<Map.Entry<String, Set<String>>> bindings = Arrays.asList(
-                new AbstractMap.SimpleEntry<String, Set<String>>("admin", admin),
-                new AbstractMap.SimpleEntry<String, Set<String>>("edit", editor),
-                new AbstractMap.SimpleEntry<String, Set<String>>("view", viewer));
+        List<Map.Entry<AgogosRole, Set<String>>> bindings = Arrays.asList(
+                new AbstractMap.SimpleEntry<AgogosRole, Set<String>>(AgogosRole.ADMIN, admin),
+                new AbstractMap.SimpleEntry<AgogosRole, Set<String>>(AgogosRole.EDIT, editor),
+                new AbstractMap.SimpleEntry<AgogosRole, Set<String>>(AgogosRole.VIEW, viewer));
         installAgogosRoleBindings(bindings);
 
         installAgogosQuota();
@@ -225,7 +225,7 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
                 .endSubject()
                 .withNewRoleRef()
                 .withKind(HasMetadata.getKind(ClusterRole.class))
-                .withName(CoreInstaller.CLUSTER_ROLE_VIEW_NAME)
+                .withName(AgogosRole.VIEW.name)
                 .withApiGroup(HasMetadata.getGroup(ClusterRole.class))
                 .endRoleRef()
                 .build();
@@ -432,16 +432,14 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
         return sa;
     }
 
-    private void installAgogosRoleBindings(List<Map.Entry<String, Set<String>>> bindings) {
+    private void installAgogosRoleBindings(List<Map.Entry<AgogosRole, Set<String>>> bindings) {
         Set<String> processed = new HashSet<>(); // Used to ensure each user ends up with only one role.
 
-        for (Map.Entry<String, Set<String>> e : bindings) {
-
-            String rolebindingName = AGOGOS_ROLE_BINDING_PREFIX + e.getKey();
+        for (Map.Entry<AgogosRole, Set<String>> e : bindings) {
 
             if (e.getValue() == null) {
                 // Remove rolebinding if no users specified.
-                kubernetesFacade.delete(RoleBinding.class, namespace, rolebindingName);
+                kubernetesFacade.delete(RoleBinding.class, namespace, e.getKey().name);
                 continue;
             }
 
@@ -456,21 +454,21 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
                     .collect(Collectors.toList());
 
             if (subjects.size() == 0) {
-                // Remove rolebinding if no users should be it.
-                kubernetesFacade.delete(RoleBinding.class, namespace, rolebindingName);
+                // Remove rolebinding if no users would be in it.
+                kubernetesFacade.delete(RoleBinding.class, namespace, e.getKey().name);
                 continue;
             }
 
             RoleBinding roleBinding = new RoleBindingBuilder()
                     .withNewMetadata()
-                    .withName(rolebindingName)
+                    .withName(e.getKey().name)
                     .withNamespace(namespace)
                     .withLabels(LABELS)
                     .endMetadata()
                     .withSubjects(subjects)
                     .withNewRoleRef()
                     .withKind(HasMetadata.getKind(ClusterRole.class))
-                    .withName(e.getKey())
+                    .withName(e.getKey().name)
                     .withApiGroup(HasMetadata.getGroup(ClusterRole.class))
                     .endRoleRef()
                     .build();
@@ -484,7 +482,9 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
 
     private void installAgogosQuota() {
         if (quotaFile == null) {
-            kubernetesFacade.delete(ResourceQuota.class, namespace, AGOGOS_QUOTA_NAME);
+            if (kubernetesFacade.get(ResourceQuota.class, namespace, AGOGOS_QUOTA_NAME) != null) {
+                kubernetesFacade.delete(ResourceQuota.class, namespace, AGOGOS_QUOTA_NAME);
+            }
             return;
         }
 

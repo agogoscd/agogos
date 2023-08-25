@@ -49,7 +49,7 @@ public class KubernetesClientRetries {
     private static final Integer ALL_PODS_RUNNING_MAX_INTERVAL = 5;
     private static final Integer ALL_PODS_RUNNING_MAX_RETRIES = 36;
     private static final Integer DEFAULT_MAX_INTERVAL = 2;
-    private static final Integer DEFAULT_MAX_RETRIES = 5;
+    private static final Integer DEFAULT_MAX_RETRIES = 10;
 
     @Inject
     KubernetesClient kubernetesClient;

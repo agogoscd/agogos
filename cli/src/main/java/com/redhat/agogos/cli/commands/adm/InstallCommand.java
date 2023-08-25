@@ -2,9 +2,12 @@ package com.redhat.agogos.cli.commands.adm;
 
 import com.redhat.agogos.cli.commands.AbstractRunnableSubcommand;
 import com.redhat.agogos.cli.commands.adm.install.Installer;
+import com.redhat.agogos.cli.commands.adm.install.KnativeEventingInstaller;
 import com.redhat.agogos.cli.commands.adm.install.Priority;
 import com.redhat.agogos.cli.commands.adm.install.Profile;
 import com.redhat.agogos.cli.commands.adm.install.Profiles;
+import com.redhat.agogos.cli.commands.adm.install.TektonInstaller;
+import com.redhat.agogos.cli.commands.adm.install.TektonTriggersInstaller;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
@@ -37,6 +40,12 @@ public class InstallCommand extends AbstractRunnableSubcommand {
             "-n" }, defaultValue = "agogos", description = "Namespace where Agogos resources should be installed, by default: ${DEFAULT-VALUE}.")
     String namespace;
 
+    @Option(names = { "--skip-tekton", "-st" }, description = "Skip Tekton installation.", defaultValue = "false")
+    public static Boolean skipTekton;
+
+    @Option(names = { "--skip-knative", "-sk" }, description = "Skip Knative Eventing installation.", defaultValue = "false")
+    public static Boolean skipKnative;
+
     /**
      * This flag is useful for testing, where the statuses of resources are not always in the correct state considering the fact
      * that we are using a mocked Kubernetes server.
@@ -58,6 +67,8 @@ public class InstallCommand extends AbstractRunnableSubcommand {
 
         installers.stream()
                 .filter(i -> inProfile(profile, i))
+                .filter(i -> !(skipTekton && (i instanceof TektonInstaller || i instanceof TektonTriggersInstaller)))
+                .filter(i -> !(skipKnative && i instanceof KnativeEventingInstaller))
                 .sorted(Comparator.comparingInt(i -> getPriority(i)))
                 .forEach(installer -> installer.install(profile, namespace));
 

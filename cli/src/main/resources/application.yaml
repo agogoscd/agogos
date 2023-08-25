@@ -53,11 +53,10 @@ quarkus:
 
 
 agogos:
+  agogos:
+    service-account: "agogos"
   container-image:
     init: "quay.io/agogos/stage-init:v1"
-  operator:
-    container-image: "quay.io/agogos/agogos-operator:latest"
-    service-account: "agogos-operator"
   interceptors:
     container-image: "quay.io/agogos/agogos-interceptors:latest"
     endpoints:
@@ -65,6 +64,9 @@ agogos:
     port: 8443
     service-account: "agogos-interceptors"
     url: "http://only-needed-for-tests"
+  operator:
+    container-image: "quay.io/agogos/agogos-operator:latest"
+    service-account: "agogos-operator"
   webhooks:
     container-image: "quay.io/agogos/agogos-webhooks:latest"
     service-account: "agogos-webhooks"
