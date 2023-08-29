@@ -67,6 +67,11 @@ webhooks:
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
     MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
+    KUBERNETES_CPU_REQUEST: "1"
+    KUBERNETES_CPU_LIMIT: "3"
+    KUBERNETES_MEMORY_REQUEST: "3Gi"
+    KUBERNETES_MEMORY_LIMIT: "6Gi"
+
   stage: build
   script:
     - ./mvnw install -pl webhooks -am -Pnative -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true -Dnative-image.xmx=4g
