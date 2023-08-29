@@ -74,7 +74,7 @@ webhooks:
 
   stage: build
   script:
-    - ./mvnw install -pl webhooks -am -Pnative -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true -Dnative-image.xmx=4g
+    - ./mvnw install -pl webhooks -am -Pnative -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true -Dnative-image.xmx=6g
   tags:
     - native-images
   rules:
