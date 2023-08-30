@@ -37,7 +37,7 @@ build and push image:
     # This dockerconfig is for the agogos+extensions_pusher robot account
     # If you add a new image, that robot account needs new permissions
     - mv ${QUAY_IO_DOCKERCONFIG} /kaniko/.docker/config.json
-    - /kaniko/executor --context "webhooks" --destination "quay.io/agogos/webhooks:test"
+    - /kaniko/executor --context "webhooks" --dockerfile "src/main/docker/Dockerfile.native" --destination "quay.io/agogos/webhooks:test"
   stage: build
   tags:
     - docker
