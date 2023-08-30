@@ -1,0 +1,174 @@
+= Agogos Merge Request Policies
+:toc: left
+
+== Scope
+This page provides an overview of the merge request (MR) policies for Agogos.
+
+== Agogos Repositories
+
+[IMPORTANT]
+====
+MRs in the Agogos repositories should target the `main` branch.
+====
+
+=== Core Repository
+The
+link:https://gitlab.cee.redhat.com/agogos/agogos[Agogos core repository]
+contains the main source code for the Agogos system.
+
+=== Extensions Repository
+The
+link:https://gitlab.cee.redhat.com/agogos/extensions-internal[Red Hat Agogos Extensions repository]
+contains the Red{nbsp}Hat Agogos extensions. The extensions are the builders
+and stages used in Agogos as part of the product delivery pipeline.
+
+=== Migration Repository
+The
+link:https://gitlab.cee.redhat.com/agogos/cpaas-to-agogos[CPaaS to Agogos Migration repository]
+contains code that translates
+link:https://cpaas.pages.redhat.com/documentation/[CPaaS (Continuous Productization as a Service)]
+configuration files to Agogos configuration files.
+This repo provides automation for migrating CPaaS users to Agogos.
+
+== Merge Request Conventions
+
+=== Merge Request Title
+The following conventions are used by the development team with regard
+to MR titles in the Agogos repositories:
+
+* The title of an MR should match the first line of the
+  xref:policy-guides/commit_message_format.adoc[Agogos Commit Message Format Policies].
+
+* MRs that are not ready for review should be marked as drafts. The title
+  of the MR should start with the text "Draft: " to indicate that team members
+  should skip the MR when reviewing MRs. The draft title prefix also prevents
+  the Continuous Integration (CI) tests from running.
+
+=== Merge Request Labels
+The following are the suggested use of labels in the MRs:
+
+do-not-merge/hold::
+  The `do-not-merge/hold` label is used on MRs that should not be merged until
+  a blocking issue has been resolved. The MR description should contain an
+  explanation of the reason and a link if the blocking issue is a Jira or
+  another MR.
+
+needs-review::
+  Draft MRs are typically not reviewed by other Agogos team members.
+  When the MR is ready for review, the "Draft: " text should be removed
+  from the title. If the submitter would like to have feedback but doesn't
+  want the CI testing to run, the `needs-review` label can be added to the MR
+  without removing "Draft: " from the title.
+
+ready-to-merge::
+  MRs that have passed the requirements of the review policy but were
+  submitted by a user that does not have merge permissions in the Agogos
+  repository should add the `ready-to-merge` label so an Agogos development
+  team member will know to merge the request.
+
+=== Squashing
+All MRs should be squashed. Squashing combines all the commits into
+a single MR. The resulting squash commit message is the MR title and its
+description. The
+link:https://gitlab.cee.redhat.com/agogos[Agogos GitLab repositories]
+default to squashing MR commits, developers should not disable this without
+prior approval.
+
+== Review Policy
+
+=== Acceptance Criteria
+Before an MR can be merged, the following conditions apply:
+
+* MRs must have a passing result for the CI testing pipeline.
+* All threads on the MR need to be resolved.
+* MRs should have at least 2 positive reactions ("thumbs-up" in GitLab)
+  and no negative reactions ("thumbs-down") before being merged.
+  ** The person submitting the MR should not provide a "thumbs-up".
+  ** At least one of the reviewers to provide a "thumbs-up" should be from
+     the core Agogos team.
+
+=== Thumbs-Down on a Merge Request
+A thumbs-down should only be used when the change:
+
+* Breaks Agogos (introduce a bug).
+* Introduces a change that is inconsistent with Agogos design
+  (for example, include product specific code).
+
+A reviewer adding a thumbs-down should also include a comment explaining
+why the thumbs-down was added and how they feel the problem can be resolved.
+The reviewer adding the thumbs-down is expected to continue following the MR.
+
+==== Process
+The MR author should read the material provided by the reviewer and address
+it if possible. Since the thumbs-down can only be removed by the reviewer
+that added it, the MR author and reviewer must agree with the proposed fix.
+
+If the MR author agrees with the reviewer and needs to make changes to
+address the issue, mark the MR as a draft to prevent additional reviews
+and keep the MR from being closed without merging. Remove the draft label
+when the changes are complete.
+
+If the MR author replaces the MR:
+
+* Add a link to the replaced MR in the description of the new MR.
+* Notify the reviewer that added the thumbs-down to the original MR by
+  adding a comment in the new MR with an “@” tag to the reviewer.
+
+==== Discussions
+If additional information or a discussion is necessary about a thumbs-down
+comment, then:
+
+* If there is code in the MR that “breaks Agogos”, the discussion should
+  be in the comments of the MR.
+* If the change is a design issue that is not based on info in a Jira (that
+  is, the Jira request is not responsible for the design change), the
+  discussion should be in the comments of the MR.
+* If the change is a design issue based on a Jira, the discussion should be
+  in the Jira comments. If this is the case, the comment in the MR by the
+  reviewer that provides the thumbs-down should redirect future discussion
+  on the issue to the Jira.
+
+If the MR author and reviewer prefer to discuss the issue outside the MR or
+Jira, add a summary of the discussion in the MR or Jira.
+
+==== Resolution
+When a thumbs-down is resolved, the MR author should put the resolution in
+the comment that accompanied the thumbs-down. The reviewer indicates that
+they accept the resolution by resolving the comment and removing the thumbs
+down.
+
+==== Escalation
+If the MR author and the reviewer submitting the thumbs-down cannot resolve
+the issue, the issue should be raised to the Agogos leads for discussion:
+mailto:gallen@redhat.com[Greg Allen]
+and
+mailto:cbeer@redhat.com[Chris Beer].
+As leads, they have final say on what should and should not be included in
+the Agogos system.
+
+=== Overdue Merge Requests
+When an MR has not been updated in over two weeks (10 business days),
+the Agogos development team reviews the status of the MR to determine
+if it is ready to be merged. If it can be merged, the team does so.
+If the MR is not ready because of failing CI tests or unresolved threads the
+Agogos development team sends a message to the author asking them to
+update the MR.
+
+Suggested message text:
+[TIP]
+====
+Hey <author>, I see you have an Agogos repository Merge Request (MR)
+that has not been updated in over a week. If you are still working on this,
+please update the MR sometime in the next two business days, at least with
+a comment that you are still working on this.
+
+If the MR is ready but can not be merged due to a blocking dependency, please
+tag it with the "do-not-merge/hold" label. The MR description should contain
+an explanation of the reason the MR should not be merged and a link if the
+blocking issue is a Jira or another MR.
+
+If this MR does not receive an update in the next two business days this MR
+will be closed and you will need to submit a new MR when you are ready to
+resume work. We appreciate all code contributions and hope that you continue
+to contribute to Agogos in the future!
+====

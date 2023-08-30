@@ -9,10 +9,8 @@ to plan, track, and report on development and support work.
 A Jira issue is required to make changes to any of the files in the
 link:https://gitlab.cee.redhat.com/agogos[Agogos GitLab repository].
 The Jira issue ID must be referenced on the commit title. See the
-Agogos Git Commit Policy Guide
-for commit title formatting requirements.
-
-// link to be added after the policy guide has been created.
+xref:policy-guides/commit_message_format.adoc[Agogos Commit Message Format Policies guide]
+for formatting requirements.
 
 == Jira Types
 The Agogos team only uses the following Jira types for issues.
