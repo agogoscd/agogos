@@ -9,7 +9,7 @@ build native executable:
 #        - core/**/*
 #        - webhooks/**/*
   script:
-    - ./mvnw package -pl webooks -am -Pnative -Dquarkus.container-image.build=true -Dquarkus.native.native-image-xmx=4g
+    - ./mvnw package -pl webhooks -am -Pnative -Dquarkus.container-image.build=true -Dquarkus.native.native-image-xmx=4g
   stage: build
   tags:
     - native-images
