@@ -1,0 +1,43 @@
+build native executable:
+  image:
+    name: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java17
+    entrypoint: ["/bin/sh", "-c"]
+#  rules:
+#    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#      changes:
+#        - .gitlab-ci.yml
+#        - core/**/*
+#        - webhooks/**/*
+  script:
+    - ./mvnw package -pl $FOLDER -am -Pnative -Dquarkus.container-image.build=true -Dquarkus.native.native-image-xmx=4g
+  stage: build
+  tags:
+    - native-images
+  variables:
+    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+    MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
+    KUBERNETES_CPU_REQUEST: "1"
+    KUBERNETES_CPU_LIMIT: "2"
+    KUBERNETES_MEMORY_REQUEST: "3Gi"
+    KUBERNETES_MEMORY_LIMIT: "6Gi"
+
+build and push image:
+  image:
+    name: gcr.io/kaniko-project/executor:v1.12.1-debug
+    entrypoint: [""]
+  needs:
+    - build native executable
+#  rules:
+#    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+#      changes:
+#        - .gitlab-ci.yml
+#        - core/**/*
+#        - webhooks/**/*
+  script:
+    # This dockerconfig is for the agogos+extensions_pusher robot account
+    # If you add a new image, that robot account needs new permissions
+    - mv ${QUAY_IO_DOCKERCONFIG} /kaniko/.docker/config.json
+    - /kaniko/executor --context "webhooks" --destination "quay.io/agogos/webhooks:test"
+  stage: build
+  tags:
+    - docker
