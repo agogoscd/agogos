@@ -8,8 +8,8 @@ build native executable:
   parallel:
     matrix:
       - FOLDER:
-          - interceptors
-          - operator
+          #- interceptors
+          #- operator
           - webhooks
   rules:
 #    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -27,8 +27,8 @@ build native executable:
     MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
     KUBERNETES_CPU_REQUEST: "1"
     KUBERNETES_CPU_LIMIT: "2"
-    KUBERNETES_MEMORY_REQUEST: "3Gi"
-    KUBERNETES_MEMORY_LIMIT: "6Gi"
+    KUBERNETES_MEMORY_REQUEST: "2Gi"
+    KUBERNETES_MEMORY_LIMIT: "4Gi"
 
 build and push image:
   image:
@@ -37,8 +37,8 @@ build and push image:
   parallel:
     matrix:
       - FOLDER:
-          - interceptors
-          - operator
+          #- interceptors
+          #- operator
           - webhooks
 #  rules:
 #    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
