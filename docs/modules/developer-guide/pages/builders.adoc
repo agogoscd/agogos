@@ -101,16 +101,22 @@ The following file is a more refined example using Python:
 include::example$builders/builder-python.yaml[]
 ----
 
-== Accept User Configuration Using `agogos-config`
-Agogos provides a ConfigMap called `agogos-config` in all namespaces.
-This ConfigMap is intended to be *edited* by users to provide configuration that
-Builders read. Mount the ConfigMap in your ClusterTask container at
-[filename]`/agogos-config/` and then read it in your container's code. See
+== Accept User Configuration using a ConfigMap
+If your builder is configurable by the users, you need to use a ConfigMap. In
+the examples provided in this page a ConfigMap called `my-builder-config` is
+mounted into [filename]`/config`. If the ConfigMap does not exist, nothing is
+mounted in the filesystem.
+
+Create the following ConfigMap resources and execute a build again. The file
+[filename]`my-builder-config.json` is created at
+[filename]`/config/my-builder-config.json` and its contents printed to the logs.
+
+[source,yaml]
+----
+include::example$builders/configmap.yaml[]
+----
+
+See
 link:https://kubernetes.io/docs/concepts/configuration/configmap/#using-configmaps-as-files-from-a-pod[Using ConfigMaps as Files]
 for more information about using ConfigMaps.
 
-[TIP]
-====
-The ClusterTask starter definition provided here mounts `agogos-config` into
-`/agogos-config/`.
-====

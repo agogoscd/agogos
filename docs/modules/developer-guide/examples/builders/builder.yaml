@@ -37,9 +37,10 @@ spec:
   - name: data
     description: JSON formatted string
   volumes:
-  - name: agogos-config
+  - name: config
     configMap:
-      name: agogos-config
+      name: my-builder-config
+      optional: true
   steps:
   - name: execute
     image: registry.access.redhat.com/ubi9-minimal:9.2
@@ -49,6 +50,7 @@ spec:
       echo "$1"
       echo "$2"
       echo "$3"
+      cat /config/my-builder-config.json
       echo "Exiting with an error for teaching purposes"
       exit 1
     args:
@@ -56,5 +58,5 @@ spec:
     - "$(results.data.path)"
     - "$(params.component)"
     volumeMounts:
-    - name: agogos-config
-      mountPath: /agogos-config
+    - name: config
+      mountPath: /config

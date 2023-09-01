@@ -37,9 +37,10 @@ spec:
   - name: data
     description: JSON formatted string
   volumes:
-  - name: agogos-config
+  - name: config
     configMap:
-      name: agogos-config
+      name: my-builder-config
+      optional: true
   steps:
   - name: execute
     image: registry.access.redhat.com/ubi9/python-39:1
@@ -47,6 +48,8 @@ spec:
     script: |
       #!/bin/python3
       import argparse
+      import json
+      from pathlib import Path
 
       parser = argparse.ArgumentParser()
       parser.add_argument("--component")
@@ -58,11 +61,16 @@ spec:
       print(args.results_path)
       print(args.component)
 
+      config_path = Path("/config/my-builder-config.json")
+      if config_path.exists():
+          config = json.loads(config_path.read_text())
+          print(config)
+
       raise Exception("Learning purposes")
     args:
     - "--output-path=$(workspaces.output.path)"
     - "--results-path=$(results.data.path)"
     - "--component=$(params.component)"
     volumeMounts:
-    - name: agogos-config
-      mountPath: /agogos-config
+    - name: config
+      mountPath: /config
