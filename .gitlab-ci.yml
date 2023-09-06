@@ -123,3 +123,13 @@ pages:
           - antora*.yml
           - docs/*.yml
           - docs/**/*
+
+lint:commit:
+  image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
+  stage: test
+  script:
+    - npm i --loglevel silent
+    - echo "${CI_MERGE_REQUEST_TITLE}" | npx commitlint --config ${CI_PROJECT_DIR}/.commitlintrc.js
+  tags: [docker]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
