@@ -19,7 +19,7 @@ least, OpenJDK 17. See the following for installation instructions:
 
 [TIP]
 ====
-The `minikube` guide for the kvm2 driver contains a useful 
+The `minikube` guide for the kvm2 driver contains a useful
 link:https://minikube.sigs.k8s.io/docs/drivers/kvm2/#troubleshooting[troubleshooting guide.]
 ====
 
@@ -90,10 +90,21 @@ Configure the namespace to use Agogos. Execute:
 
 [source,bash]
 ----
-java -Dquarkus.profile=dev -Dagogos.cli-profile=admin -jar cli/target/quarkus-app/quarkus-run.jar adm init --namespace default
+java -Dquarkus.profile=dev -Dagogos.cli-profile=admin -jar cli/target/quarkus-app/quarkus-run.jar adm init --namespace tests
 ----
 
-This command creates service accounts, rolebindings, configuration maps...
+This command creates service accounts, rolebindings, configuration maps... Then
+change the namespace the `kubectl` uses by default:
+
+[source,bash]
+----
+kubectl config set-context --current --namespace tests
+----
+
+[WARNING]
+====
+The Agogos CLI uses the namespace configured in your current `kubectl` context.
+====
 
 == Forwarding the Knative Eventing Broker Ingress
 Agogos sends events to the Knative Eventing service. In this tutorial, we run
@@ -147,7 +158,7 @@ You can start Agogos directly from Visual Studio Code, see the
 xref:ide.adoc[IDE guide].
 ====
 
-== Creating Agogos Resources
+== Building Components
 When you have Agogos up and running, run:
 
 [source,bash]
@@ -166,50 +177,91 @@ kubectl get builders
 java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v builders list
 ----
 
-Next, create a component called `dummy` with `kubectl`:
+Next, write the following Components to a file and apply them with `kubectl`:
 
-[source,bash]
+[source,yaml]
 ----
-kubectl apply -f - <<EOF
-apiVersion: agogos.redhat.com/v1alpha1
-kind: Component
-metadata:
-  name: dummy
-spec:
-  build:
-    builderRef:
-      kind: Builder
-      name: dummy-v1
-EOF
+include::example$development-mode/components.yaml[]
 ----
 
-And then run your first build using the Agogos CLI:
+And then run a build using the Agogos CLI:
 
 [source,bash]
 ----
 $ java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v components list
-NAME      STATUS    CREATED
-dummy     Ready     2023-04-05 08:51:13
+NAME          STATUS    CREATED
+dummy-1       Ready     YYYY-MM-DD HH:MM:SS
+dummy-2       Ready     YYYY-MM-DD HH:MM:SS
+dummy-3       Ready     YYYY-MM-DD HH:MM:SS
 
-$ java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v components build dummy
+$ java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v components build dummy-1
 💖 About
 
-Name:           dummy-xv5jx
+Name:       dummy-1-cn2rj
 
 🎉 Status
 
-Status:         New
-Reason:         N/A
-Created:        2023-04-05 08:55:49
-Started:        N/A
-Finished:       N/A
+Status:     Running
+Reason:     Build is running
+Created:    YYYY-MM-DD HH:MM:SS
+Started:    YYYY-MM-DD HH:MM:SS
+Finished:   N/A
+Duration:   0 minute(s)
 ----
 
-You can check its result running:
+After a while, `dummy-1` and its dependents should be finished:
 
 [source,bash]
 ----
-java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v builds list
-NAME            STATUS       CREATED
-dummy-xv5jx     Finished     2023-04-05 08:55:49
+$ java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v builds list
+NAME                STATUS       CREATED
+dummy-1-cn2rj       Finished     YYYY-MM-DD HH:MM:SS
+dummy-2-z22dj       Finished     YYYY-MM-DD HH:MM:SS
+dummy-3-mwv9q       Finished     YYYY-MM-DD HH:MM:SS
+----
+
+
+== Building Groups
+Agogos supports Groups to build Components and triggers the builds of their
+dependencies. Create a file with the following content and apply it to your
+namespace with `kubectl`:
+
+[source,yaml]
+----
+include::example$development-mode/components-and-group.yaml[]
+----
+
+Then build the Group `group-1` using the Agogos CLI:
+
+[source,bash]
+----
+$ java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v group execute group-1
+💖 About
+
+Name:       group-1-s95mg
+
+Components: Name                            Status    Started              Completed            Duration
+            dummy-1-a                       New       N/A                  N/A
+            dummy-1-b                       New       N/A                  N/A
+
+🎉 Status
+
+Status:     Running
+Reason:     N/A
+Created:    YYYY-MM-DD HH:MM:SS
+Started:    YYYY-MM-DD HH:MM:SS
+Finished:   N/A
+Duration:   0 minute(s)
+----
+
+After a while, the Group Components and their dependants should be finished:
+
+[source,bash]
+----
+$ java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v builds list
+NAME                STATUS       CREATED
+dummy-1-a-chb7x     Finished     YYYY-MM-DD HH:MM:SS
+dummy-1-b-lfwvr     Finished     YYYY-MM-DD HH:MM:SS
+dummy-2-g7zwz       Finished     YYYY-MM-DD HH:MM:SS
+dummy-3-t89hc       Finished     YYYY-MM-DD HH:MM:SS
 ----

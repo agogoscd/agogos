@@ -1,0 +1,36 @@
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Component
+metadata:
+  name: dummy-1
+spec:
+  dependents:
+    components:
+    - dummy-2
+  build:
+    builderRef:
+      kind: Builder
+      name: dummy-v1
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Component
+metadata:
+  name: dummy-2
+spec:
+  dependents:
+    components:
+    - dummy-3
+  build:
+    builderRef:
+      kind: Builder
+      name: dummy-v1
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Component
+metadata:
+  name: dummy-3
+spec:
+  build:
+    builderRef:
+      kind: Builder
+      name: dummy-v1
