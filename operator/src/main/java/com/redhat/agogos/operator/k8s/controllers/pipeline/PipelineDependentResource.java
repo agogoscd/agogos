@@ -6,6 +6,7 @@ import com.redhat.agogos.core.v1alpha1.AbstractStage;
 import com.redhat.agogos.core.v1alpha1.ClusterStage;
 import com.redhat.agogos.core.v1alpha1.Pipeline.PipelineSpec.StageEntry;
 import com.redhat.agogos.core.v1alpha1.Pipeline.PipelineSpec.StageReference;
+import com.redhat.agogos.core.v1alpha1.Stage;
 import com.redhat.agogos.core.v1alpha1.WorkspaceMapping;
 import com.redhat.agogos.operator.k8s.controllers.AbstractDependentResource;
 import io.fabric8.kubernetes.api.model.OwnerReference;
@@ -69,7 +70,7 @@ public class PipelineDependentResource
 
             switch (stageRef.getKind()) {
                 case "Stage":
-                    stage = kubernetesFacade.get(AbstractStage.class, agogos.getMetadata().getNamespace(), stageRef.getName());
+                    stage = kubernetesFacade.get(Stage.class, agogos.getMetadata().getNamespace(), stageRef.getName());
                     break;
                 case "ClusterStage":
                     stage = kubernetesFacade.get(ClusterStage.class, stageRef.getName());
