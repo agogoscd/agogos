@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 @JsonSerialize(using = ToStringSerializer.class)
 public enum Resource {
     BUILD("Build"),
+    BUILDER("Builder"),
     COMPONENT("Component"),
     DEPENDENCY("Dependency"),
     GROUP("Group"),
