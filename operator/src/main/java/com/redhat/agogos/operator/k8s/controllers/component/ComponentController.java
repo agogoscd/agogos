@@ -6,11 +6,9 @@ import com.redhat.agogos.core.v1alpha1.Status;
 import com.redhat.agogos.operator.k8s.controllers.AbstractController;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
-import io.javaoperatorsdk.operator.api.reconciler.DeleteControl;
 import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import io.javaoperatorsdk.operator.api.reconciler.dependent.Dependent;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +19,6 @@ import java.util.Date;
 @ControllerConfiguration(generationAwareEventProcessing = false, dependents = {
         @Dependent(type = PipelineDependentResource.class) })
 public class ComponentController extends AbstractController<Component> {
-
-    @Inject
-    BuilderResources builderResources;
 
     private static final Logger LOG = LoggerFactory.getLogger(ComponentController.class);
 
@@ -44,23 +39,10 @@ public class ComponentController extends AbstractController<Component> {
             componentStatus.setStatus(ResourceStatus.READY);
             componentStatus.setReason("Component is ready");
             componentStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
-
-            builderResources.sync(component);
-
             LOG.info("Set status for Component '{}' to {}", component.getFullName(), componentStatus.getStatus());
             return UpdateControl.updateStatus(component);
         }
 
         return UpdateControl.noUpdate();
-    }
-
-    @Override
-    public DeleteControl cleanup(Component component, Context<Component> context) {
-        LOG.info("Removing {} '{}'", component.getKind(), component.getFullName());
-        DeleteControl d = DeleteControl.defaultDelete();
-
-        // builderResources.flush(component);
-
-        return d;
     }
 }
