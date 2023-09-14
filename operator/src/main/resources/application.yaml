@@ -27,6 +27,7 @@ quarkus:
     start-mode: forced
 
 agogos:
+  retain-resources: false
   service-account: agogos
   cloud-events:
     publish: true
