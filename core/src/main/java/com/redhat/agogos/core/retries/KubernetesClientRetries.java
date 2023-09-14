@@ -119,11 +119,19 @@ public class KubernetesClientRetries {
     }
 
     public <T extends HasMetadata> T get(Class<T> clazz, String namespace, String name) {
-        RetryConfig config = RetryConfig.<T> custom()
+        return get(clazz, namespace, name, true);
+    }
+
+    public <T extends HasMetadata> T get(Class<T> clazz, String namespace, String name, Boolean retryOnNull) {
+        Builder<T> builder = RetryConfig.<T> custom()
                 .maxAttempts(DEFAULT_MAX_RETRIES)
                 .waitDuration(Duration.ofSeconds(DEFAULT_MAX_INTERVAL))
-                .retryExceptions(KubernetesClientException.class)
-                .build();
+                .retryExceptions(KubernetesClientException.class);
+
+        if (retryOnNull) {
+            builder.retryOnResult(response -> response == null);
+        }
+        RetryConfig config = builder.build();
 
         RetryRegistry registry = RetryRegistry.of(config);
         Retry retry = registry.retry("get");

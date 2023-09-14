@@ -1,6 +1,5 @@
 package com.redhat.agogos.operator.k8s.controllers.submission;
 
-import com.redhat.agogos.core.KubernetesFacade;
 import com.redhat.agogos.core.k8s.Label;
 import com.redhat.agogos.core.k8s.Resource;
 import com.redhat.agogos.core.v1alpha1.Build;
@@ -41,9 +40,6 @@ public class SubmissionController extends AbstractController<Submission> {
     protected CloudEventPublisher cloudEventPublisher;
 
     @Inject
-    KubernetesFacade kubernetesFacade;
-
-    @Inject
     KubernetesSerialization objectMapper;
 
     @Override
@@ -64,7 +60,6 @@ public class SubmissionController extends AbstractController<Submission> {
         if (submission.getSpec().getGroup() != null && !submission.getSpec().getGroup().isEmpty()) {
             labels.put(Label.create(Resource.GROUP), submission.getSpec().getGroup());
         }
-        LOG.error(objectMapper.asYaml(labels));
         switch (submission.getSpec().getResource()) {
             case COMPONENT:
                 submitBuild(submission, labels);
@@ -112,6 +107,13 @@ public class SubmissionController extends AbstractController<Submission> {
     private void submitExecution(Submission submission, Map<String, String> labels) {
         Group group = kubernetesFacade.get(Group.class, submission.getMetadata().getNamespace(),
                 submission.getSpec().getName());
+
+        if (group == null) {
+            LOG.error("Unable to locate group '{}' in namespace '{}', not submitting execution.",
+                    submission.getSpec().getName(),
+                    submission.getMetadata().getNamespace());
+            return;
+        }
 
         // Remove group label.
         labels.remove(Label.create(Resource.GROUP));

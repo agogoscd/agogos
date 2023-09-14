@@ -74,15 +74,19 @@ public class KubernetesFacade {
                 resource.getMetadata().getName());
     }
 
+    public <T extends HasMetadata> T get(Class<T> clazz, String namespace, String name, boolean retryOnNull) {
+        return retries.get(clazz, namespace, name, retryOnNull);
+    }
+
     public <T extends HasMetadata> T get(Class<T> clazz, String namespace, String name) {
-        return retries.get(clazz, namespace, name);
+        return get(clazz, namespace, name, true);
     }
 
     public <T extends HasMetadata> T get(Class<T> clazz, String name) {
         return get(clazz, null, name);
     }
 
-    public <T extends HasMetadata> T unmarshal(Class<T> clazz, InputStream input) {
+    public <T> T unmarshal(Class<T> clazz, InputStream input) {
         return kubernetesClient.getKubernetesSerialization().unmarshal(input, clazz);
     }
 

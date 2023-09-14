@@ -7,8 +7,9 @@ import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
+import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.InjectMock;
+import io.quarkus.test.junit.mockito.MockitoConfig;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,8 @@ public class KubernetesFacadeTest {
 
     KubernetesSerialization kubernetesSerializationMock = Mockito.mock(new KubernetesSerialization().getClass());
 
-    @InjectMock(convertScopes = true)
+    @MockitoConfig(convertScopes = true)
+    @InjectMock
     KubernetesClient kubernetesClientMock;
 
     @Inject
@@ -161,7 +163,8 @@ public class KubernetesFacadeTest {
                 Mockito.times(1)).get(
                         resource.getClass(),
                         "default",
-                        "resource");
+                        "resource",
+                        true);
     }
 
     @Test
@@ -175,7 +178,8 @@ public class KubernetesFacadeTest {
                 Mockito.times(1)).get(
                         resource.getClass(),
                         null,
-                        "resource");
+                        "resource",
+                        true);
     }
 
     @Test
