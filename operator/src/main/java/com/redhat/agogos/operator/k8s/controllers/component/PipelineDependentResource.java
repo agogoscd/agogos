@@ -188,6 +188,8 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
                 .withApiVersion("") // AGOGOS-96
                 .withKind(taskRef.getKind())
                 .withName(taskRef.getName())
+                .withResolver(taskRef.getResolver())
+                .withParams(taskRef.getParams())
                 .build();
 
         // Prepare main task

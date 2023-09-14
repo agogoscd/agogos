@@ -66,7 +66,6 @@ public class PipelineDependentResource
             LOG.debug("Processing {} '{}' ", stageRef.getKind(), stageRef.getName());
 
             AbstractStage stage = null;
-            String taskType = "Task";
 
             switch (stageRef.getKind()) {
                 case "Stage":
@@ -74,7 +73,6 @@ public class PipelineDependentResource
                     break;
                 case "ClusterStage":
                     stage = kubernetesFacade.get(ClusterStage.class, stageRef.getName());
-                    taskType = "ClusterTask";
                     break;
                 default:
                     throw new ApplicationException("Invalid Stage kind: {}", stageRef.getKind());
@@ -103,8 +101,10 @@ public class PipelineDependentResource
                     .withName(stageRef.getName())
                     .withTaskRef(new TaskRefBuilder()
                             .withApiVersion("") // AGOGOS-96
-                            .withKind(taskType)
+                            .withKind(stage.getSpec().getTaskRef().getKind())
                             .withName(stage.getSpec().getTaskRef().getName())
+                            .withResolver(stage.getSpec().getTaskRef().getResolver())
+                            .withParams(stage.getSpec().getTaskRef().getParams())
                             .build())
                     .addNewParam()
                     .withName("config")
