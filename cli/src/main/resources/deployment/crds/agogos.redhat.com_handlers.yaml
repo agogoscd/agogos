@@ -41,6 +41,9 @@ spec:
                   type: object
                   description: Defines the task reference
                   properties:
+                    resolver:
+                      type: string
+                      description: Resolver used for Tekton Task
                     name:
                       type: string
                       description: Name of the Tekton task being the implementation of the Handler.
@@ -48,15 +51,18 @@ spec:
                       type: string
                       description: The Handler Tekton task implementation type. Can be either Task or ClusterTask. By default it is Task.
                       default: Task
-                      enum:
-                        - Task
-                        - ClusterTask
                     url:
                       type: string
                       description: A URL to a Task definition
-                  oneOf:
-                    - required: ["name", "kind"]
-                    - required: ["url"]
+                    params:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          value:
+                            type: string
                 schema:
                   type: object
                   description: Validation definition that should be applied on the Handler configuration passed.

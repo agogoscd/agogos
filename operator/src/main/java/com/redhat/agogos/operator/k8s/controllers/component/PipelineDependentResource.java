@@ -168,7 +168,7 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         }
 
         List<ParamSpec> params = null;
-        com.redhat.agogos.core.v1alpha1.TaskRef taskRef = builder.getSpec().getTaskRef();
+        TaskRef taskRef = builder.getSpec().getTaskRef();
         if ("ClusterTask".equals(taskRef.getKind())) {
             ClusterTask clusterTask = kubernetesFacade.get(ClusterTask.class, taskRef.getName());
             params = clusterTask.getSpec().getParams();

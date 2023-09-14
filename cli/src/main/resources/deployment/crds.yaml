@@ -41,6 +41,9 @@ spec:
                   type: object
                   description: Defines the task reference
                   properties:
+                    resolver:
+                      type: string
+                      description: Resolver used for Tekton Task
                     name:
                       type: string
                       description: Name of the Tekton task being the implementation of the SourceHandler.
@@ -48,15 +51,18 @@ spec:
                       type: string
                       description: The SourceHandler Tekton task implementation type. Can be either Task or ClusterTask. By default it is Task.
                       default: Task
-                      enum:
-                        - Task
-                        - ClusterTask
                     url:
                       type: string
                       description: A URL to a Task definition
-                  oneOf:
-                    - required: ["name", "kind"]
-                    - required: ["url"]
+                    params:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          value:
+                            type: string
                 schema:
                   type: object
                   description: Validation definition that should be applied on the Builder configuration passed.
@@ -840,6 +846,9 @@ spec:
                   type: object
                   description: Defines the task reference
                   properties:
+                    resolver:
+                      type: string
+                      description: Resolver used for Tekton Task
                     name:
                       type: string
                       description: Name of the Tekton task being the implementation of the Handler.
@@ -847,15 +856,18 @@ spec:
                       type: string
                       description: The Handler Tekton task implementation type. Can be either Task or ClusterTask. By default it is Task.
                       default: Task
-                      enum:
-                        - Task
-                        - ClusterTask
                     url:
                       type: string
                       description: A URL to a Task definition
-                  oneOf:
-                    - required: ["name", "kind"]
-                    - required: ["url"]
+                    params:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          value:
+                            type: string
                 schema:
                   type: object
                   description: Validation definition that should be applied on the Handler configuration passed.
@@ -944,9 +956,6 @@ spec:
               type: object
               description: Defines the desired state of the Pipeline
               properties:
-                group:
-                  type: string
-                  description: Name of the Group the Pipeline should run with
                 stages:
                   type: array
                   description: List of stages to run in order
@@ -979,6 +988,32 @@ spec:
                         x-kubernetes-preserve-unknown-fields: true
                     required:
                       - "stageRef"
+                dependents:
+                  type: object
+                  description: Dependents of this Pipeline
+                  properties:
+                    components:
+                      type: array
+                      description: List of the Components
+                      items:
+                        type: string
+                        description: Name of the Component
+                    groups:
+                      type: array
+                      description: List of the Groups
+                      items:
+                        type: string
+                        description: Name of the Group
+                    pipelines:
+                      type: array
+                      description: List of the Pipelines
+                      items:
+                        type: string
+                        description: Name of the Pipeline
+                  anyOf:
+                    - required: ["components"]
+                    - required: ["groups"]
+                    - required: ["pipelines"]
               required:
                 - "stages"
             status:
@@ -1004,13 +1039,9 @@ spec:
       subresources:
         status: {}
       additionalPrinterColumns:
-        - name: Component Group
-          jsonPath: .spec.group
+        - name: Status
+          jsonPath: .status.status
           type: string
-        ## https://github.com/kubernetes/kubectl/issues/517
-        # - name: Stages
-        #   type: string
-        #   jsonPath: .spec.stages[*].name
         - name: Age
           type: date
           jsonPath: .metadata.creationTimestamp
@@ -1146,6 +1177,9 @@ spec:
                   type: object
                   description: Defines the task reference
                   properties:
+                    resolver:
+                      type: string
+                      description: Resolver used for Tekton Task
                     name:
                       type: string
                       description: Name of the Tekton task being the implementation of the SourceHandler.
@@ -1153,15 +1187,18 @@ spec:
                       type: string
                       description: The SourceHandler Tekton task implementation type. Can be either Task or ClusterTask. By default it is Task.
                       default: Task
-                      enum:
-                        - Task
-                        - ClusterTask
                     url:
                       type: string
                       description: A URL to a Task definition
-                  oneOf:
-                    - required: ["name", "kind"]
-                    - required: ["url"]
+                    params:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          value:
+                            type: string
                 schema:
                   type: object
                   description: Validation definition that should be applied on the Stage configuration passed.

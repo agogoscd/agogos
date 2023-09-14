@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.core.v1alpha1.AbstractStage.StageSpec;
+import io.fabric8.tekton.pipeline.v1beta1.TaskRef;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Getter;
 import lombok.Setter;
