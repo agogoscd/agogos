@@ -1,0 +1,277 @@
+= Agogos Documentation Style Guide
+
+== Scope
+This page provides the AsciiDoc documentation style guidelines for Agogos
+developers.
+
+This page describes the formatting conventions used for the AsciiDoc
+text files. For information on AsciiDoc syntax, see the
+link:https://asciidoctor.org/docs/asciidoc-syntax-quick-reference/[AsciiDoc Syntax Quick Reference page].
+
+== Red{nbsp}Hat Style Guidelines
+The Agogos documentation style guide is based on Red{nbsp}Hat and IBM style
+guides. This is a non-exhaustive list of guidelines to follow:
+
+* Use present tense:
++
+✕ When something happens, Agogos _will do_ something.
++
+✓ When something happens, Agogos _does_ something.
+
+* Use English expressions rather then Latin abbreviations:
++
+✕ E.g.
++
+✓ For example
+
+* Use _when_ when talking about events:
++
+✕ _Once_ it finishes, do X.
++
+✓ _When_ it finishes, do X.
+
+* Do not assign human characteristics to inanimate objects:
++
+✕ Agogos  _sees_ X, _decides_ to do X, _asks_ you for X.
++
+✓ Agogos _detects_ X, _does_ X, _promtps_ you for X.
+
+The section
+link:https://www.ibm.com/docs/en/ibm-style?topic=language-grammar["Language and Grammar" from the IBM Style Guide]
+contains more examples.
+
+== AsciiDoc Writer's Guide
+The
+link:https://asciidoctor.org/docs/asciidoc-writers-guide/[AsciiDoc Writer's Guide]
+contains an excellent overview of creating AsciiDoc files and all the syntax
+available for them. While it does not address style directly, it does contain
+some useful conventions, which are included here for easier reference.
+
+=== Admonitions
+An admonition paragraph draws the reader's attention to auxiliary information.
+The five admonition types supported in AsciiDoc are:
+NOTE, TIP, IMPORTANT, WARNING, and CAUTION.
+
+Each has a specific purpose when added to a document:
+
+* Use NOTE or TIP to add additional information that may be useful to
+  the reader.
+* Use IMPORTANT to highlight information that might be easily overlooked and
+  may cause unnecessary frustration for the reader.
+* Use CAUTION to advise the reader to act carefully.
+* Use WARNING to inform the reader of danger, harm, or consequences that exist.
+
+Admonitions that span multiple lines should use _blocks_ with _delimiters_
+to contain the contents. Admonition blocks are defined like so:
+
+----
+[NOTE]
+====
+This is an example of an admonition block.
+Unlike an admonition paragraph, it may contain any AsciiDoc content.
+====
+----
+
+=== Delimiters
+From "Building Blocks in AsciiDoc" in the AsciiDoc Writer's Guide:
+
+[IMPORTANT]
+====
+AsciiDoc allows delimited lines to be longer than 4 characters. *Don’t do it*.
+Maintaining long delimiter lines is a colossal waste of time, not to mention
+arbitrary and error prone. Use the minimum line length required to create a
+delimited block and move on to drafting the content. The reader will never see
+the long delimiters anyway since they are not carried over to the output.
+====
+
+=== Numbered Lists
+Number lists in AsciiDoc can use a list of items prefixed with a number-dot,
+like this:
+
+----
+1. Protons
+2. Electrons
+3. Neutrons
+----
+
+But, since the numbering is obvious, the AsciiDoc processor will insert the
+numbers for you if you omit them:
+
+----
+. Protons
+. Electrons
+. Neutrons
+----
+
+will produce:
+
+. Protons
+. Electrons
+. Neutrons
+
+If you decide to use numbers for your ordered list, *you* have to keep them
+sequential. Thus, it is preferred that the numbers be omitted and the
+actual list numbering be left to the AsciiDoc formatter.
+
+== Red{nbsp}Hat AsciiDoc Mark-up Conventions
+The
+https://redhat-documentation.github.io/asciidoc-markup-conventions/[AsciiDoc Mark-up Quick Reference for Red{nbsp}Hat Documentation]
+contains a set of conventions used in the Agogos documents. Rather than repeat
+them all here, please reference the document directly.
+
+There is one convention included here to be aware of that is buried in the
+Quick Reference Guide - _product names_. The Guide indicates that the company
+name and product names should be separated by a `+{nbsp}+` (non-breaking space)
+to prevent them from line breaking when displayed. So, whenever "Red{nbsp}Hat"
+or a product name is included in the text, it should be written as:
+
+   Red{nbsp}Hat
+
+== Agogos Mark-up Conventions
+Agogos has adopted additional mark-up conventions to standardize the look of the
+files and simplify reviews. The main reason for most of these conventions is
+that the team uses GitLab for reviewing changes. Since reviews on GitLab
+merge requests are designed for code, not documentation, this limits the users
+when providing feedback on AsciiDoc file updates.
+
+=== Line Length and Line Breaks
+Limit the length of text lines in the file to 80 characters.
+This is to make commenting easier when the documentation is reviewed.
+
+*Exceptions*: Links, code blocks, and console contents are not restricted
+to 80 characters.
+
+=== Links
+Links and the link text should be on lines by themselves except for
+trailing punctuation. Periods and commas at the end of links should be on
+the same line as the link. This is because AsciiDoc treats periods or
+commas that are the first character of a line as formatting instructions.
+
+Link URLs tend to be long, so even by themselves links will exceed the 80
+character limit. They also tend to need updating more frequently, so finding
+and reviewing changes is easier if they are on a line by themselves.
+
+Use `xref` to link to other documents:
+
+✕ `++link:../my-other-page{outfilesuffix}[My Other Page]++` +
+✓  `++xref:documentation/my-other-page.adoc[My Other Page]++`
+
+=== Code Samples
+Code samples should include a source highlighting tag. This tag will enable
+source code syntax highlighting. Here is the text of an example of some
+source code with a tag:
+
+----
+ [source,yaml]
+ ----
+ release:
+   pipelines:
+     - name: "my-timed-release-trigger-pipeline"
+       triggers:
+         - type: "timed"
+           cron: "H H(22-23) * * 1"
+ ----
+----
+
+This text will render as:
+
+[source,yaml]
+----
+release:
+  pipelines:
+    - name: "my-timed-release-trigger-pipeline"
+      triggers:
+        - type: "timed"
+          cron: "H H(22-23) * * 1"
+----
+
+The Agogos documentation uses the highlight.js source highlighter. A list of
+the supported syntax codes for highlight.js is available on the
+link:https://highlightjs.org/[highlight.js web site].
+
+=== Admonition Blocks
+Any admonition that contains more than a single line of text should use a
+delimited block. This is to to make the admonitions easier to recognize
+and edit in the text. The blocks also allow any AsciiDoc content, so the
+admonition can contain additional formatting to support the content.
+Here is an example of the text for an admonition in a delimited block:
+
+----
+[NOTE]
+====
+This is an example of an admonition block.
+Unlike an admonition paragraph, it may contain any AsciiDoc content.
+====
+----
+
+This text produces the following admonition:
+
+[NOTE]
+====
+This is an example of an admonition block.
+Unlike an admonition paragraph, it may contain any AsciiDoc content.
+====
+
+=== Tables
+The AsciiDoc approach to tables are explained in a section of the
+link:https://asciidoctor.org/docs/asciidoc-writers-guide/#a-new-perspective-on-tables[AsciiDoc Writers Guide].
+AsciiDoc is pretty flexible when comes to text formatting of tables,
+but the preferred option is to treat them as
+"...a delimited block that contains one or more bulleted lists.
+The list marker is a vertical bar (|).
+Each list represents one row in the table..."
+
+While AsciiDoc supports converting textual tables into render specific
+table syntax, using textual tables makes future editing difficult as
+the spacing of all the other rows may need adjustment when long items of text
+are added.
+
+Here is an example of the preferred text format for a table:
+
+----
+.Project Definition Keys
+[width="99%",cols="3m,^2e,10",options="header"]
+|====
+|Key
+|Required?
+|Description
+
+|name
+|yes
+|The name of the project.
+
+|components
+|yes
+|List of components in this project.
+
+|owners
+|
+|List of owners for the project.
+ _Owners should be listed as Red{nbsp}Hat email addresses._
+
+|====
+----
+
+Which renders like this:
+
+.Project Definition Keys
+[width="99%",cols="3m,^2e,10",options="header"]
+|====
+|Key
+|Required?
+|Description
+
+|name
+|yes
+|The name of the project.
+
+|components
+|yes
+|List of components in this project.
+
+|owners
+|
+|List of owners for the project.
+ _Owners should be listed as Red{nbsp}Hat email addresses._
+
+|====

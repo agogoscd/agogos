@@ -13,7 +13,6 @@ Handlers have full access to a volume shared with other handlers and the
 xref:builders.adoc[Builder]
 itself.
 
-====
 Below you can see an example workflow where the Handler is fetching the source code
 from a repository and providing it to the Builder.
 

@@ -1,0 +1,77 @@
+= Agogos Developer Documentation Overview
+
+== Scope
+This page provides an overview for developers creating documentation for
+the Agogos system.
+
+== References
+* xref:documentation/style_guide.adoc[Documentation Style Guide]
+
+== AsciiDoc
+The Agogos documentation is stored in GitLab as AsciiDoc files.
+AsciiDoc is a lightweight markup language that uses files with
+plain-text syntax designed for humans to read that can be converted
+into HTML or other output formats.
+link:https://antora.org/[Antora]
+is the site generator used to organize and provide structure to the
+documentation.
+link:https://lunrjs.com/[Lunr.js]
+is the search engine used to provide search capabilities to the documentation.
+
+=== References
+* link:https://asciidoctor.org/docs/what-is-asciidoc/[What is AsciiDoc?]
+* link:https://asciidoctor.org/docs/asciidoc-writers-guide/[AsciiDoc Writer's Guide]
+* link:https://asciidoctor.org/docs/asciidoc-syntax-quick-reference/[AsciiDoc Syntax Quick Reference]
+* link:https://redhat-documentation.github.io/asciidoc-markup-conventions/[Red{nbsp}Hat's AsciiDoc Markup Style Sheet]
+* link:https://redhat-documentation.github.io/supplementary-style-guide/[Red{nbsp}Hat Supplementary Style Guide]
+
+=== Rendering Individual Pages
+The [filename]`asciidoctor` software reads and parses text written in the
+AsciiDoc syntax, then produces HTML files or other supported output formats.
+
+[NOTE]
+====
+AsciiDoc content will be rendered as HTML when viewing the files in GitLab.
+Thus, HTML files are not created or stored in the repository. The
+[filename]`asciidoctor` command is for rendering HTML locally for testing.
+====
+
+To install [filename]`asciidoctor` on Fedora or RHEL:
+
+----
+sudo dnf install -y asciidoctor
+----
+
+To create HTML files on your local system:
+
+----
+asciidoctor <name>.adoc
+----
+
+There are also Integrated Development Environments (IDEs) that will render
+AsciiDoc pages while editing. Check the documentation of your specific IDE
+for information on enabling AsciiDoc rendering.
+
+[IMPORTANT]
+====
+Final rendering of the CPaaS documentation is done with Antora,
+which overrides some of the AsciiDoctor formatting. Use the instructions
+below to render the entire site for a final check of any changes to the
+documentation.
+====
+
+=== Rendering the Entire Site
+To locally render the entire site, navigate to the root of the repository
+and run:
+
+----
+npm ci
+npx gulp
+----
+
+Then visit http://localhost:4000.
+
+The commands install the dependencies and generate the site.
+link:https://gulpjs.com/[Gulp.js]
+is configured to serve the site at http://localhost:4000. Gulp monitors
+the files related to the documentation and rebuilds the site when needed.
