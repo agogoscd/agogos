@@ -11,8 +11,8 @@ public class ComponentDescribeCommand extends AbstractResourceSubcommand<Compone
     String name;
 
     @Override
-    public void run() {
+    public Integer call() {
         Component component = kubernetesFacade.get(Component.class, kubernetesFacade.getNamespace(), name);
-        showResource(component);
+        return showResource(component);
     }
 }

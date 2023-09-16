@@ -11,6 +11,7 @@ import com.redhat.agogos.core.v1alpha1.Submission.SubmissionSpec;
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import jakarta.inject.Inject;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
@@ -27,7 +28,7 @@ public class GroupExecuteCommand extends AbstractResourceSubcommand<Group> {
     CloudEventPublisher publisher;
 
     @Override
-    public void run() {
+    public Integer call() {
         String uuid = UUID.randomUUID().toString();
 
         SubmissionSpec spc = new SubmissionSpec();
@@ -43,9 +44,10 @@ public class GroupExecuteCommand extends AbstractResourceSubcommand<Group> {
                 .build();
         List<Execution> executions = kubernetesFacade.list(Execution.class, kubernetesFacade.getNamespace(), options, true);
         if (executions.size() > 0) {
-            cli.run(ExecutionDescribeCommand.class, executions.get(0).getMetadata().getName());
+            return cli.run(ExecutionDescribeCommand.class, executions.get(0).getMetadata().getName());
         } else {
             spec.commandLine().getOut().println("Unable to find execution with submitted UUID " + uuid + ".");
+            return CommandLine.ExitCode.SOFTWARE;
         }
     }
 }

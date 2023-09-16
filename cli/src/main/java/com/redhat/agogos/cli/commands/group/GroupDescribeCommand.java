@@ -11,8 +11,8 @@ public class GroupDescribeCommand extends AbstractResourceSubcommand<Group> {
     String name;
 
     @Override
-    public void run() {
+    public Integer call() {
         Group group = kubernetesFacade.get(Group.class, kubernetesFacade.getNamespace(), name);
-        showResource(group);
+        return showResource(group);
     }
 }

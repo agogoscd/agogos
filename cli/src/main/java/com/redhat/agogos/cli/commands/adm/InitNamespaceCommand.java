@@ -1,7 +1,7 @@
 package com.redhat.agogos.cli.commands.adm;
 
 import com.redhat.agogos.cli.Helper;
-import com.redhat.agogos.cli.commands.AbstractRunnableSubcommand;
+import com.redhat.agogos.cli.commands.AbstractCallableSubcommand;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller.AgogosRole;
 import com.redhat.agogos.core.errors.ApplicationException;
@@ -47,6 +47,7 @@ import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -69,7 +70,7 @@ import java.util.stream.Collectors;
 
 @Command(mixinStandardHelpOptions = true, name = "init-namespace", aliases = {
         "init" }, description = "Initialize selected namespace to work with Agogos")
-public class InitNamespaceCommand extends AbstractRunnableSubcommand {
+public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
     @Inject
     KubernetesSerialization objectMapper;
@@ -127,10 +128,10 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
     private List<HasMetadata> installedResources = new ArrayList<>();
 
     @Override
-    public void run() {
+    public Integer call() {
         if (isAgogosCoreNamespace()) {
             LOG.error("⛔ Unable to initialize namespace '{}' as it is an Agogos core namespace.", namespace);
-            System.exit(picocli.CommandLine.ExitCode.USAGE);
+            return CommandLine.ExitCode.USAGE;
         }
         LOG.info("🕞 Initializing '{}' namespace with Agogos resources...", namespace);
 
@@ -162,6 +163,7 @@ public class InitNamespaceCommand extends AbstractRunnableSubcommand {
         kubernetesFacade.waitForAllPodsRunning(namespace);
 
         LOG.info("✅ Namespace '{}' initialized and ready to use!", namespace);
+        return CommandLine.ExitCode.OK;
     }
 
     /**

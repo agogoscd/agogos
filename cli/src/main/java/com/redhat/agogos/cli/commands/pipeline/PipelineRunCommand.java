@@ -13,7 +13,7 @@ public class PipelineRunCommand extends AbstractResourceSubcommand<Pipeline> {
     String name;
 
     @Override
-    public void run() {
+    public Integer call() {
         Run run = new Run();
 
         run.getMetadata().setGenerateName(name + "-");
@@ -21,6 +21,6 @@ public class PipelineRunCommand extends AbstractResourceSubcommand<Pipeline> {
         run.getSpec().setPipeline(name);
 
         run = kubernetesFacade.create(run);
-        cli.run(RunDescribeCommand.class, run.getMetadata().getName());
+        return cli.run(RunDescribeCommand.class, run.getMetadata().getName());
     }
 }

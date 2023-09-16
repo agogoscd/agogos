@@ -11,8 +11,8 @@ public class RunDescribeCommand extends AbstractResourceSubcommand<Run> {
     String name;
 
     @Override
-    public void run() {
+    public Integer call() {
         Run run = kubernetesFacade.get(Run.class, kubernetesFacade.getNamespace(), name);
-        showResource(run);
+        return showResource(run);
     }
 }

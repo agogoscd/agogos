@@ -19,7 +19,7 @@ public class BuildDescribeCommand extends AbstractResourceSubcommand<Build> {
     String name;
 
     @Override
-    public void run() {
+    public Integer call() {
         Build build;
 
         if (last) {
@@ -29,7 +29,7 @@ public class BuildDescribeCommand extends AbstractResourceSubcommand<Build> {
             build = kubernetesFacade.get(Build.class, kubernetesFacade.getNamespace(), name);
         }
 
-        showResource(build);
+        return showResource(build);
     }
 
     Comparator<Build> byCreationTime() {

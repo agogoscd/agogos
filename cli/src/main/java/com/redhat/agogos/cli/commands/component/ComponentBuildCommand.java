@@ -11,6 +11,7 @@ import com.redhat.agogos.core.v1alpha1.Submission.SubmissionSpec;
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import jakarta.inject.Inject;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
@@ -26,7 +27,7 @@ public class ComponentBuildCommand extends AbstractResourceSubcommand<Component>
     CloudEventPublisher publisher;
 
     @Override
-    public void run() {
+    public Integer call() {
         String uuid = UUID.randomUUID().toString();
 
         SubmissionSpec spc = new SubmissionSpec();
@@ -42,9 +43,10 @@ public class ComponentBuildCommand extends AbstractResourceSubcommand<Component>
                 .build();
         List<Build> builds = kubernetesFacade.list(Build.class, kubernetesFacade.getNamespace(), options, true);
         if (builds.size() > 0) {
-            cli.run(BuildDescribeCommand.class, builds.get(0).getMetadata().getName());
+            return cli.run(BuildDescribeCommand.class, builds.get(0).getMetadata().getName());
         } else {
             spec.commandLine().getOut().println("Unable to find build with submitted UUID " + uuid + ".");
+            return CommandLine.ExitCode.SOFTWARE;
         }
     }
 }

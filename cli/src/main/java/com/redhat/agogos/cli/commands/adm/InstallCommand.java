@@ -1,6 +1,6 @@
 package com.redhat.agogos.cli.commands.adm;
 
-import com.redhat.agogos.cli.commands.AbstractRunnableSubcommand;
+import com.redhat.agogos.cli.commands.AbstractCallableSubcommand;
 import com.redhat.agogos.cli.commands.adm.install.Installer;
 import com.redhat.agogos.cli.commands.adm.install.KnativeEventingInstaller;
 import com.redhat.agogos.cli.commands.adm.install.Priority;
@@ -13,13 +13,14 @@ import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.util.Comparator;
 
 @Command(mixinStandardHelpOptions = true, name = "install", description = "Install Agogos")
-public class InstallCommand extends AbstractRunnableSubcommand {
+public class InstallCommand extends AbstractCallableSubcommand {
 
     private static final Logger LOG = LoggerFactory.getLogger(InstallCommand.class);
 
@@ -62,7 +63,7 @@ public class InstallCommand extends AbstractRunnableSubcommand {
      * Installs Agogos using selected profile.
      */
     @Override
-    public void run() {
+    public Integer call() {
         LOG.info("💻 Selected profile: {}", profile);
 
         installers.stream()
@@ -72,6 +73,7 @@ public class InstallCommand extends AbstractRunnableSubcommand {
                 .sorted(Comparator.comparingInt(i -> getPriority(i)))
                 .forEach(installer -> installer.install(profile, namespace));
 
+        return CommandLine.ExitCode.OK;
     }
 
     /**

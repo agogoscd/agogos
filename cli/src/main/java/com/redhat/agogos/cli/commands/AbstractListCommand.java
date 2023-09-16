@@ -5,6 +5,7 @@ import com.redhat.agogos.core.v1alpha1.AgogosResource;
 import com.redhat.agogos.core.v1alpha1.AgogosResourceStatus;
 import com.redhat.agogos.core.v1alpha1.ResultableStatus;
 import com.redhat.agogos.core.v1alpha1.Status;
+import picocli.CommandLine;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.Option;
 
@@ -22,14 +23,13 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
     }
 
     @Override
-    public void run() {
+    public Integer call() {
         List<T> resources = getResources();
         if (cli.getOutput() != null && cli.getOutput() != Output.plain) {
-            printResource(resources, cli.getOutput());
-            return;
+            return printResource(resources, cli.getOutput());
         }
 
-        printList(resources);
+        return printList(resources);
     }
 
     Comparator<T> byCreationTime() {
@@ -43,10 +43,10 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
         };
     }
 
-    protected void printList(List<T> resources) {
+    protected Integer printList(List<T> resources) {
         if (resources.isEmpty()) {
             spec.commandLine().getOut().println("No resources found");
-            return;
+            return CommandLine.ExitCode.USAGE;
         }
 
         // Find max length of the name and add some more spaces for nicer look
@@ -117,5 +117,7 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
             spec.commandLine().getOut().println(Ansi.AUTO.string(sb.toString()));
 
         });
+
+        return CommandLine.ExitCode.OK;
     }
 }

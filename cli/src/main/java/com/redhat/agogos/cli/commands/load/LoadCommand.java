@@ -2,12 +2,13 @@ package com.redhat.agogos.cli.commands.load;
 
 import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.ResourceLoader;
-import com.redhat.agogos.cli.commands.AbstractRunnableSubcommand;
+import com.redhat.agogos.cli.commands.AbstractCallableSubcommand;
 import com.redhat.agogos.core.errors.ApplicationException;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -20,7 +21,7 @@ import java.util.List;
 
 @Command(mixinStandardHelpOptions = true, name = "load", aliases = {
         "l" }, description = "Load agogos descriptors from files")
-public class LoadCommand extends AbstractRunnableSubcommand {
+public class LoadCommand extends AbstractCallableSubcommand {
 
     private static final Logger LOG = LoggerFactory.getLogger(LoadCommand.class);
 
@@ -35,7 +36,7 @@ public class LoadCommand extends AbstractRunnableSubcommand {
     ResourceLoader resourceLoader;
 
     @Override
-    public void run() {
+    public Integer call() {
         paths.forEach(path -> {
             LOG.info("🕞 Installing resources from '{}' file...", path);
 
@@ -57,7 +58,7 @@ public class LoadCommand extends AbstractRunnableSubcommand {
 
             LOG.info("✅ {} resources installed", installed.size());
         });
-
+        return CommandLine.ExitCode.OK;
     }
 
     private byte[] readFile(Path path) {

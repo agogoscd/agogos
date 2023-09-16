@@ -25,6 +25,7 @@ import picocli.CommandLine.ScopeType;
 import picocli.CommandLine.Spec;
 
 import java.io.PrintWriter;
+import java.util.concurrent.Callable;
 
 @QuarkusMain
 @CommandLine.Command(name = "agogosctl", mixinStandardHelpOptions = true)
@@ -61,8 +62,9 @@ public class CLI implements QuarkusApplication {
     @Getter
     CommandLine commandLine;
 
-    public void usage(Class<? extends Runnable> command) {
+    public Integer usagex(Class<? extends Callable<Integer>> command) {
         initCommandLine(command, factory).usage(spec.commandLine().getOut());
+        return CommandLine.ExitCode.OK;
     }
 
     @Override
@@ -71,7 +73,7 @@ public class CLI implements QuarkusApplication {
         return run(null, null, commandLine, args);
     }
 
-    public int run(Class<? extends Runnable> command, String... args) {
+    public int run(Class<? extends Callable<Integer>> command, String... args) {
         commandLine = initCommandLine(command, factory);
         return run(null, null, commandLine, args);
     }
@@ -91,7 +93,7 @@ public class CLI implements QuarkusApplication {
         return cl.setExecutionExceptionHandler(new ExceptionHandler()).execute(args);
     }
 
-    private CommandLine initCommandLine(Class<? extends Runnable> command, IFactory factory) {
+    private CommandLine initCommandLine(Class<? extends Callable<Integer>> command, IFactory factory) {
         commandLine = new CommandLine(command == null ? this : command, factory);
 
         if (profile == Profile.admin) {

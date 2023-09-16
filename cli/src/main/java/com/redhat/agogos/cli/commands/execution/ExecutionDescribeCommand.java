@@ -5,6 +5,7 @@ import com.redhat.agogos.core.ResultableResourceStatus;
 import com.redhat.agogos.core.v1alpha1.Execution;
 import com.redhat.agogos.core.v1alpha1.Execution.ExecutionInfo;
 import com.redhat.agogos.core.v1alpha1.ResultableStatus;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.Option;
@@ -28,7 +29,7 @@ public class ExecutionDescribeCommand extends AbstractResourceSubcommand<Executi
     String name;
 
     @Override
-    public void run() {
+    public Integer call() {
         Execution execution;
 
         if (last) {
@@ -38,7 +39,7 @@ public class ExecutionDescribeCommand extends AbstractResourceSubcommand<Executi
             execution = kubernetesFacade.get(Execution.class, kubernetesFacade.getNamespace(), name);
         }
 
-        showResource(execution);
+        return showResource(execution);
     }
 
     Comparator<Execution> byCreationTime() {
@@ -48,7 +49,7 @@ public class ExecutionDescribeCommand extends AbstractResourceSubcommand<Executi
     }
 
     @Override
-    protected void print(Execution execution) {
+    protected Integer print(Execution execution) {
         String nl = System.getProperty("line.separator");
         StringBuilder sb = new StringBuilder();
 
@@ -114,6 +115,7 @@ public class ExecutionDescribeCommand extends AbstractResourceSubcommand<Executi
 
         spec.commandLine().getOut().println(sb.toString());
 
+        return CommandLine.ExitCode.OK;
     }
 
     private void addDependentLines(StringBuilder sb, Map<String, ExecutionInfo> dependents, String kind) {

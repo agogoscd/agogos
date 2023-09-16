@@ -13,6 +13,7 @@ import com.redhat.agogos.core.v1alpha1.Status;
 import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
 import io.quarkus.kubernetes.client.KubernetesClientObjectMapper;
 import jakarta.inject.Inject;
+import picocli.CommandLine;
 import picocli.CommandLine.Help.Ansi;
 
 import java.time.Duration;
@@ -22,7 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? extends AgogosResourceStatus>>
-        extends AbstractRunnableSubcommand {
+        extends AbstractCallableSubcommand {
 
     // This mapper is *only* included here to allow for pretty printing of JSON. All other
     // mappers in Agogos should use KubernetesSerialization.
@@ -33,20 +34,20 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
     @Inject
     protected KubernetesSerialization objectMapper;
 
-    protected void showResource(T resource) {
+    protected Integer showResource(T resource) {
         if (resource == null) {
-            throw new ApplicationException("No resource found");
+            spec.commandLine().getErr().println("⛔ No resource found.");
+            return CommandLine.ExitCode.USAGE;
         }
 
         if (cli.getOutput() != null && cli.getOutput() != Output.plain) {
-            printResource(resource, cli.getOutput());
-            return;
+            return printResource(resource, cli.getOutput());
         }
 
-        print(resource);
+        return print(resource);
     }
 
-    protected void print(T resource) {
+    protected Integer print(T resource) {
         String nl = System.getProperty("line.separator");
         StringBuilder sb = new StringBuilder();
 
@@ -134,7 +135,7 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
         }
 
         spec.commandLine().getOut().println(sb.toString());
-
+        return CommandLine.ExitCode.OK;
     }
 
     protected String formatDate(ZonedDateTime time) {
@@ -147,7 +148,7 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
         return dateTimeFormatter.format(time);
     }
 
-    protected void printResource(Object resource, Output output) {
+    protected Integer printResource(Object resource, Output output) {
 
         switch (output) {
             case json:
@@ -159,6 +160,7 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
             default:
                 break;
         }
+        return CommandLine.ExitCode.OK;
     }
 
     protected String toJson(Object resource) {

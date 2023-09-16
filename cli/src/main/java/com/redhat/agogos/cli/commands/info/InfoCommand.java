@@ -1,14 +1,15 @@
 package com.redhat.agogos.cli.commands.info;
 
-import com.redhat.agogos.cli.commands.AbstractRunnableSubcommand;
+import com.redhat.agogos.cli.commands.AbstractCallableSubcommand;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Help.Ansi;
 
 @Command(mixinStandardHelpOptions = true, name = "info", aliases = { "i" }, description = "Agogos cluster information")
-public class InfoCommand extends AbstractRunnableSubcommand {
+public class InfoCommand extends AbstractCallableSubcommand {
 
     @Override
-    public void run() {
+    public Integer call() {
         String nl = System.getProperty("line.separator");
         StringBuilder sb = new StringBuilder();
 
@@ -30,6 +31,6 @@ public class InfoCommand extends AbstractRunnableSubcommand {
                 .append(nl);
 
         spec.commandLine().getOut().println(sb.toString());
-
+        return CommandLine.ExitCode.OK;
     }
 }
