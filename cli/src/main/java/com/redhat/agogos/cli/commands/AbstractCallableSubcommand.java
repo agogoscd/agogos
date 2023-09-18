@@ -6,7 +6,7 @@ public class AbstractCallableSubcommand extends AbstractSubcommand implements Ca
 
     @Override
     public Integer call() throws Exception {
-        return cli.usagex(this.getClass());
+        return cli.usage(this.getClass());
     }
 
 }

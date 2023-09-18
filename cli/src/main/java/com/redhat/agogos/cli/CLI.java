@@ -62,7 +62,7 @@ public class CLI implements QuarkusApplication {
     @Getter
     CommandLine commandLine;
 
-    public Integer usagex(Class<? extends Callable<Integer>> command) {
+    public Integer usage(Class<? extends Callable<Integer>> command) {
         initCommandLine(command, factory).usage(spec.commandLine().getOut());
         return CommandLine.ExitCode.OK;
     }
