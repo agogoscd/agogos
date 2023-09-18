@@ -173,7 +173,16 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
             ClusterTask clusterTask = kubernetesFacade.get(ClusterTask.class, taskRef.getName());
             params = clusterTask.getSpec().getParams();
         } else {
-            Task task = kubernetesFacade.get(Task.class, component.getMetadata().getNamespace(), taskRef.getName());
+            String namespace = taskRef.getResolver() != null && taskRef.getResolver().equals("cluster")
+                    ? taskRef.getParams().stream().filter(
+                            param -> param.getName().equals("namespace"))
+                            .toList().get(0).getValue().getStringVal()
+                    : component.getMetadata().getNamespace();
+            String name = taskRef.getName() != null ? taskRef.getName()
+                    : taskRef.getParams().stream().filter(
+                            param -> param.getName().equals("name"))
+                            .toList().get(0).getValue().getStringVal();
+            Task task = kubernetesFacade.get(Task.class, namespace, name);
             params = task.getSpec().getParams();
         }
 
