@@ -69,7 +69,7 @@ public class Pipeline extends AgogosResource<PipelineSpec, Status> implements Na
 
             @Getter
             @Setter
-            private String kind;
+            private String namespace;
 
             @JsonIgnore // TODO: Double check if this works, added brcause of: Caused by: java.lang.IllegalArgumentException: Found a cyclic reference involving the field stages of type com.redhat.agogos.core.v1alpha1.Pipeline$PipelineSpec.StageEntry
             @JsonBackReference

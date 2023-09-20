@@ -1,9 +1,6 @@
 package com.redhat.agogos.operator.k8s.controllers.pipeline;
 
-import com.redhat.agogos.core.errors.ApplicationException;
 import com.redhat.agogos.core.errors.MissingResourceException;
-import com.redhat.agogos.core.v1alpha1.AbstractStage;
-import com.redhat.agogos.core.v1alpha1.ClusterStage;
 import com.redhat.agogos.core.v1alpha1.Pipeline.PipelineSpec.StageEntry;
 import com.redhat.agogos.core.v1alpha1.Pipeline.PipelineSpec.StageReference;
 import com.redhat.agogos.core.v1alpha1.Stage;
@@ -62,25 +59,17 @@ public class PipelineDependentResource
 
         for (StageEntry stageEntry : agogos.getSpec().getStages()) {
             StageReference stageRef = stageEntry.getStageRef();
-
-            LOG.debug("Processing {} '{}' ", stageRef.getKind(), stageRef.getName());
-
-            AbstractStage stage = null;
-
-            switch (stageRef.getKind()) {
-                case "Stage":
-                    stage = kubernetesFacade.get(Stage.class, agogos.getMetadata().getNamespace(), stageRef.getName());
-                    break;
-                case "ClusterStage":
-                    stage = kubernetesFacade.get(ClusterStage.class, stageRef.getName());
-                    break;
-                default:
-                    throw new ApplicationException("Invalid Stage kind: {}", stageRef.getKind());
+            String namespace = stageRef.getNamespace();
+            if (namespace == null) {
+                namespace = agogos.getMetadata().getNamespace();
             }
 
+            LOG.debug("Processing Stage '{}' from namespace '{}' ", stageRef.getName(), namespace);
+
+            Stage stage = kubernetesFacade.get(Stage.class, namespace, stageRef.getName());
             if (stage == null) {
-                throw new MissingResourceException("Selected {} '{}' is not available in the system",
-                        stageRef.getKind(), stageRef.getName());
+                throw new MissingResourceException("Selected Stage '{}' is not available in namespace '{}'",
+                        stageRef.getName(), namespace);
             }
 
             String stageConfig = "{}";
