@@ -52,9 +52,14 @@ spec:
                             description: Name of the Handler
                         required: ["name"]
                       params:
-                        type: object
-                        x-kubernetes-preserve-unknown-fields: true
-                        description: "Parameters that should be passed to the Handler implementation"
+                        items:
+                          properties:
+                            name:
+                              type: string
+                            value:
+                              type: string
+                          type: object
+                        type: array
                       config:
                         type: object
                         x-kubernetes-preserve-unknown-fields: true
@@ -76,9 +81,14 @@ spec:
                             description: Name of the Handler
                         required: ["name"]
                       params:
-                        type: object
-                        x-kubernetes-preserve-unknown-fields: true
-                        description: "Parameters that should be passed to the Handler implementation"
+                        items:
+                          properties:
+                            name:
+                              type: string
+                            value:
+                              type: string
+                          type: object
+                        type: array
                       config:
                         type: object
                         x-kubernetes-preserve-unknown-fields: true
@@ -95,15 +105,19 @@ spec:
                         name:
                           type: string
                           description: Name of the Builder
-                        kind:
+                        namespace:
                           type: string
-                          description: Type of the Builder
-                          default:
-                      required: ["name", "kind"]
+                          description: Namespace of the Builder, default is the operator namespace
+                      required: ["name"]
                     params:
-                      type: object
-                      x-kubernetes-preserve-unknown-fields: true
-                      description: "Parameters that should be passed to the Builder implementation"
+                      items:
+                        properties:
+                          name:
+                            type: string
+                          value:
+                            type: string
+                        type: object
+                      type: array
                   required: ["builderRef"]
                 dependents:
                   type: object

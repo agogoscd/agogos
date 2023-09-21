@@ -13,8 +13,10 @@ import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReviewBuilder;
 import io.fabric8.kubernetes.api.model.authentication.UserInfo;
 import io.fabric8.kubernetes.api.model.authentication.UserInfoBuilder;
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
+import io.fabric8.tekton.pipeline.v1beta1.Param;
 import io.fabric8.tekton.pipeline.v1beta1.ParamSpec;
 import io.fabric8.tekton.pipeline.v1beta1.ParamSpecBuilder;
+import io.fabric8.tekton.pipeline.v1beta1.ParamValue;
 import io.fabric8.tekton.pipeline.v1beta1.ParamValueBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.Task;
 import io.fabric8.tekton.pipeline.v1beta1.TaskBuilder;
@@ -106,7 +108,7 @@ public class ComponentValidatorTest {
     @Test
     @DisplayName("Validate valid data passed to builder")
     public void validateCorrectBuilderData() throws IOException {
-        component.getSpec().getBuild().getParams().put("someKey", "some allowed content");
+        component.getSpec().getBuild().getParams().add(createParam("someKey", "some allowed content"));
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
                 .then().statusCode(200).body("response.allowed", CoreMatchers.equalTo(true))
@@ -117,7 +119,7 @@ public class ComponentValidatorTest {
     @DisplayName("Validate invalid data passed to builder")
     public void validateIncorrectBuilderData() throws IOException {
         Component component = (Component) admissionReview.getRequest().getObject();
-        component.getSpec().getBuild().getParams().put("invalid", "data");
+        component.getSpec().getBuild().getParams().add(createParam("invalid", "data"));
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
                 .then().statusCode(200).body("response.allowed", CoreMatchers.equalTo(false))
@@ -134,7 +136,7 @@ public class ComponentValidatorTest {
 
         Component component = (Component) admissionReview.getRequest().getObject();
         component.getSpec().getPre().add(handlerSpec);
-        component.getSpec().getBuild().getParams().put("someKey", "some allowed content");
+        component.getSpec().getBuild().getParams().add(createParam("someKey", "some allowed content"));
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
                 .then().statusCode(200).body("response.allowed", CoreMatchers.equalTo(false))
@@ -151,7 +153,7 @@ public class ComponentValidatorTest {
 
         Component component = (Component) admissionReview.getRequest().getObject();
         component.getSpec().getPre().add(handlerSpec);
-        component.getSpec().getBuild().getParams().put("someKey", "some allowed content");
+        component.getSpec().getBuild().getParams().add(createParam("someKey", "some allowed content"));
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
                 .then().statusCode(200).body("response.allowed", CoreMatchers.equalTo(false))
@@ -165,12 +167,12 @@ public class ComponentValidatorTest {
     public void validateUnknownHandlerParams() throws IOException {
         ComponentHandlerSpec handlerSpec = new ComponentHandlerSpec();
         handlerSpec.getHandlerRef().setName("git-v1");
-        handlerSpec.getParams().put("git-clone-param", "some content");
-        handlerSpec.getParams().put("doesnotexist", "some content");
+        handlerSpec.getParams().add(createParam("git-clone-param", "some content"));
+        handlerSpec.getParams().add(createParam("doesnotexist", "some content"));
 
         Component component = (Component) admissionReview.getRequest().getObject();
         component.getSpec().getPre().add(handlerSpec);
-        component.getSpec().getBuild().getParams().put("someKey", "some content");
+        component.getSpec().getBuild().getParams().add(createParam("someKey", "some content"));
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
                 .then().statusCode(200).body("response.allowed", CoreMatchers.equalTo(false))
@@ -184,12 +186,12 @@ public class ComponentValidatorTest {
     public void validateHandlerParamWithSchema() throws IOException {
         ComponentHandlerSpec handlerSpec = new ComponentHandlerSpec();
         handlerSpec.getHandlerRef().setName("git-v1");
-        handlerSpec.getParams().put("git-clone-param", "some content");
-        handlerSpec.getParams().put("git-clone-param-optional", "some content");
+        handlerSpec.getParams().add(createParam("git-clone-param", "some content"));
+        handlerSpec.getParams().add(createParam("git-clone-param-optional", "some content"));
 
         Component component = (Component) admissionReview.getRequest().getObject();
         component.getSpec().getPre().add(handlerSpec);
-        component.getSpec().getBuild().getParams().put("someKey", "some content");
+        component.getSpec().getBuild().getParams().add(createParam("someKey", "some content"));
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
                 .then().statusCode(200).body("response.allowed", CoreMatchers.equalTo(false))
@@ -203,15 +205,19 @@ public class ComponentValidatorTest {
     public void validateHandler() throws IOException {
         ComponentHandlerSpec handlerSpec = new ComponentHandlerSpec();
         handlerSpec.getHandlerRef().setName("git-v1");
-        handlerSpec.getParams().put("git-clone-param", "some content");
-        handlerSpec.getParams().put("git-clone-param-optional", Map.of("id", "asdasd"));
+        handlerSpec.getParams().add(createParam("git-clone-param", "some content"));
+        handlerSpec.getParams().add(createParam("git-clone-param-optional", "some content"));
 
         Component component = (Component) admissionReview.getRequest().getObject();
         component.getSpec().getPre().add(handlerSpec);
-        component.getSpec().getBuild().getParams().put("someKey", "some content");
+        component.getSpec().getBuild().getParams().add(createParam("someKey", "some content"));
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
                 .then().statusCode(200).body("response.allowed", CoreMatchers.equalTo(true))
                 .body("response.uid", CoreMatchers.equalTo("bc1c421c-412c-40ae-86e3-52bc51b961a4"));
+    }
+
+    private Param createParam(String name, String value) {
+        return new Param(name, new ParamValue(value));
     }
 }

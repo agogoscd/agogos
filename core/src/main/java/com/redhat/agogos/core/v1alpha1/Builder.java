@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.redhat.agogos.core.v1alpha1.Builder.BuilderSpec;
+import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.model.annotation.Group;
 import io.fabric8.kubernetes.model.annotation.Kind;
 import io.fabric8.kubernetes.model.annotation.Version;
@@ -20,10 +21,11 @@ import java.util.Map;
 
 @ToString(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@RegisterForReflection
 @Kind("Builder")
 @Group("agogos.redhat.com")
 @Version("v1alpha1")
-public class Builder extends AgogosResource<BuilderSpec, Status> {
+public class Builder extends AgogosResource<BuilderSpec, Status> implements Namespaced {
     private static final long serialVersionUID = 1184222810180288956L;
 
     @ToString

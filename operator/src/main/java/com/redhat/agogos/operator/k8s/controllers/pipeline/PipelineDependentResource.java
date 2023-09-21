@@ -1,5 +1,6 @@
 package com.redhat.agogos.operator.k8s.controllers.pipeline;
 
+import com.redhat.agogos.core.AgogosEnvironment;
 import com.redhat.agogos.core.errors.MissingResourceException;
 import com.redhat.agogos.core.v1alpha1.Pipeline.PipelineSpec.StageEntry;
 import com.redhat.agogos.core.v1alpha1.Pipeline.PipelineSpec.StageReference;
@@ -10,7 +11,7 @@ import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.*;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
-import org.eclipse.microprofile.config.ConfigProvider;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +23,9 @@ public class PipelineDependentResource
         extends AbstractDependentResource<Pipeline, com.redhat.agogos.core.v1alpha1.Pipeline> {
 
     private static final Logger LOG = LoggerFactory.getLogger(PipelineDependentResource.class);
+
+    @Inject
+    AgogosEnvironment agogosEnv;
 
     public PipelineDependentResource() {
         super(Pipeline.class);
@@ -60,32 +64,33 @@ public class PipelineDependentResource
 
         for (StageEntry stageEntry : agogos.getSpec().getStages()) {
             StageReference stageRef = stageEntry.getStageRef();
-            String namespace = getStageNamespace(stageRef);
+            String name = stageRef.getName();
+            String namespace = agogosEnv.getRunningNamespace(stageRef);
 
-            LOG.debug("Processing Stage '{}' from namespace '{}' ", stageRef.getName(), namespace);
+            LOG.debug("Processing Stage '{}' from namespace '{}' ", name, namespace);
 
-            Stage stage = kubernetesFacade.get(Stage.class, namespace, stageRef.getName());
+            Stage stage = kubernetesFacade.get(Stage.class, namespace, name);
             if (stage == null) {
                 throw new MissingResourceException("Selected Stage '{}' is not available in namespace '{}'",
-                        stageRef.getName(), namespace);
+                        name, namespace);
             }
 
             String stageConfig = "{}";
 
             // Convert Component metadata to JSON
-            LOG.debug("Converting Stage '{}' configuration to JSON", stageRef.getName());
+            LOG.debug("Converting Stage '{}' configuration to JSON", name);
             stageConfig = objectMapper.asJson(stageEntry.getConfig());
 
             // Prepare workspace for main task to store results
             WorkspacePipelineTaskBinding stageWsBinding = new WorkspacePipelineTaskBindingBuilder()
                     .withName("stage")
                     .withWorkspace(WorkspaceMapping.MAIN_WORKSPACE_NAME)
-                    .withSubPath(String.format("pipeline/%s", stageRef.getName()))
+                    .withSubPath(String.format("pipeline/%s", name))
                     .build();
 
             // Prepare task
             PipelineTask task = new PipelineTaskBuilder()
-                    .withName(stageRef.getName())
+                    .withName(name)
                     .withTaskRef(new TaskRefBuilder()
                             .withApiVersion("") // AGOGOS-96
                             .withKind(stage.getSpec().getTaskRef().getKind())
@@ -132,16 +137,5 @@ public class PipelineDependentResource
         LOG.debug("New Tekton Pipeline '{}' created for Agogos Pipeline '{}",
                 pipeline.getMetadata().getName(), agogos.getFullName());
         return pipeline;
-    }
-
-    private String getStageNamespace(StageReference stageRef) {
-        String namespace = stageRef.getNamespace();
-        if (namespace == null) {
-            namespace = System.getenv("NAMESPACE");
-            if (namespace == null) {
-                ConfigProvider.getConfig().getValue("quarkus.kubernetes.namespace", String.class);
-            }
-        }
-        return namespace;
     }
 }

@@ -12,6 +12,8 @@ quarkus:
   http:
     port: 7090
     ssl-port: 8444
+  kubernetes:
+    namespace: "agogos"
   log:
     min-level: "TRACE"
     syslog:

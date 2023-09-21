@@ -174,6 +174,7 @@ public class InterceptorsInstaller extends Installer {
                 .withNewResources()
                 .withRequests(requests).withLimits(limits)
                 .endResources()
+                .withEnv(new EnvVarBuilder().withName("NAMESPACE").withValue(namespace).build())
                 .build();
 
         Deployment interceptorDeployment = new DeploymentBuilder()

@@ -1,17 +1,17 @@
 package com.redhat.agogos.webhooks.k8s.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.redhat.agogos.core.AgogosEnvironment;
 import com.redhat.agogos.core.errors.ApplicationException;
 import com.redhat.agogos.core.errors.MissingResourceException;
 import com.redhat.agogos.core.errors.ValidationException;
 import com.redhat.agogos.core.v1alpha1.Builder;
 import com.redhat.agogos.core.v1alpha1.Component;
+import com.redhat.agogos.core.v1alpha1.ComponentBuilderSpec.BuilderRef;
 import com.redhat.agogos.core.v1alpha1.ComponentHandlerSpec;
 import com.redhat.agogos.core.v1alpha1.Handler;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
-import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
-import io.fabric8.tekton.pipeline.v1beta1.Task;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.openapi4j.core.exception.ResolutionException;
@@ -32,7 +32,7 @@ public class ComponentValidator extends Validator<Component> {
     private static final Logger LOG = LoggerFactory.getLogger(ComponentValidator.class);
 
     @Inject
-    protected KubernetesSerialization objectMapper;
+    AgogosEnvironment agogosEnv;
 
     @Override
     protected void validateResource(Component component, AdmissionResponseBuilder responseBuilder) {
@@ -80,42 +80,10 @@ public class ComponentValidator extends Validator<Component> {
                         component.getFullName(), handlerSpec.getHandlerRef().getName());
             }
 
-            Task task = kubernetesFacade.get(Task.class, component.getMetadata().getNamespace(),
-                    handler.getSpec().getTaskRef().getName());
-            Set<String> declaredParams = handlerSpec.getParams().keySet();
-
-            // Parameters declared in Tekton Task
-            List<String> taskParams = task.getSpec().getParams().stream()
-                    .map(w -> w.getName())
-                    .collect(Collectors.toList());
-
-            // Parameters declared Component configuration, but not existing in Tekton Task
-            List<String> mismatchedParams = declaredParams.stream().filter(p -> !taskParams.contains(p))
-                    .collect(Collectors.toList());
-
-            if (mismatchedParams.size() > 0) {
-                throw new ApplicationException(
-                        "Parameter mismatch in Handler '{}': following parameters do not exist in Tekton Task '{}': {}",
-                        handlerSpec.getHandlerRef().getName(), task.getMetadata().getName(), mismatchedParams);
-            }
-
-            // Required parameters in Tekton Task
-            List<String> requiredParams = task.getSpec().getParams().stream()
-                    .filter(p -> p.getDefault() == null)
-                    .map(p -> p.getName())
-                    .collect(Collectors.toList());
-
-            List<String> missedParams = requiredParams.stream().filter(w -> !declaredParams.contains(w))
-                    .collect(Collectors.toList());
-
-            if (missedParams.size() > 0) {
-                throw new ApplicationException(
-                        "Missing parameters in Handler '{}': following parameters are required to be defined:: {}",
-                        handler.getMetadata().getName(), missedParams);
-            }
-
-            declaredParams.forEach(p -> {
-                Object schema = handler.getSpec().getSchema().getOpenAPIV3Schema().get(p);
+            handlerSpec.getParams().stream().forEach(p -> {
+                String name = p.getName();
+                String value = p.getValue().getStringVal();
+                Object schema = handler.getSpec().getSchema().getOpenAPIV3Schema().get(name);
 
                 // No schema provided for the parameter
                 if (schema == null) {
@@ -125,12 +93,12 @@ public class ComponentValidator extends Validator<Component> {
                 ValidationData<Void> validation = new ValidationData<>();
 
                 JsonNode schemaNode = objectMapper.convertValue(schema, JsonNode.class);
-                JsonNode contentNode = objectMapper.convertValue(handlerSpec.getParams().get(p), JsonNode.class);
+                JsonNode contentNode = objectMapper.convertValue(value, JsonNode.class);
 
                 LOG.debug("Component '{}', Handler '{}': validating parameter '{}' with content: '{}' and schema: '{}'",
                         component.getFullName(),
                         handler.getFullName(),
-                        p,
+                        name,
                         contentNode, schemaNode);
 
                 SchemaValidator schemaValidator;
@@ -151,12 +119,12 @@ public class ComponentValidator extends Validator<Component> {
                     errorMessages.forEach(message -> {
                         LOG.error("Component '{}', Handler '{}' parameter '{}' validation error: {}", component.getFullName(),
                                 handler.getFullName(),
-                                p, message);
+                                name, message);
                     });
 
                     throw new ValidationException("Component '{}', Handler '{}' parameter '{}' is not valid: {}",
                             component.getFullName(), handler.getFullName(),
-                            p,
+                            name,
                             errorMessages);
                 }
             });
@@ -169,10 +137,17 @@ public class ComponentValidator extends Validator<Component> {
     private void validateBuilder(Component component) throws ApplicationException {
         LOG.info("Validating Component's '{}' Builder definition", component.getFullName());
 
-        Builder builder = kubernetesFacade.get(Builder.class, component.getSpec().getBuild().getBuilderRef().getName());
+        BuilderRef builderRef = component.getSpec().getBuild().getBuilderRef();
+        String name = builderRef.getName();
+        String namespace = (builderRef.getNamespace() != null ? builderRef.getNamespace() : agogosEnv.getRunningNamespace());
+        if (!namespace.equals(agogosEnv.getRunningNamespace()) && !namespace.equals(component.getMetadata().getNamespace())) {
+            throw new ApplicationException("Invalid namespace '{}' specified for builder '{}'", namespace, name);
+        }
+
+        Builder builder = kubernetesFacade.get(Builder.class, namespace, name, false);
         if (builder == null) {
-            throw new MissingResourceException("Selected builder '{}' is not registered in the system",
-                    component.getSpec().getBuild().getBuilderRef().getName());
+            throw new MissingResourceException("Selected builder '{}' is not registered in the namespace '{}'",
+                    name, namespace);
         }
 
         ValidationData<Void> validation = new ValidationData<>();

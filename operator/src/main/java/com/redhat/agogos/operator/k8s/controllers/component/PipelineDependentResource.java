@@ -1,20 +1,20 @@
 package com.redhat.agogos.operator.k8s.controllers.component;
 
+import com.redhat.agogos.core.AgogosEnvironment;
 import com.redhat.agogos.core.errors.MissingResourceException;
 import com.redhat.agogos.core.k8s.Label;
 import com.redhat.agogos.core.k8s.Resource;
 import com.redhat.agogos.core.v1alpha1.Builder;
 import com.redhat.agogos.core.v1alpha1.Component;
+import com.redhat.agogos.core.v1alpha1.ComponentBuilderSpec.BuilderRef;
 import com.redhat.agogos.core.v1alpha1.ComponentHandlerSpec;
 import com.redhat.agogos.core.v1alpha1.Handler;
 import com.redhat.agogos.core.v1alpha1.WorkspaceMapping;
 import com.redhat.agogos.operator.k8s.controllers.AbstractDependentResource;
 import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.ClusterTask;
 import io.fabric8.tekton.pipeline.v1beta1.ParamSpec;
 import io.fabric8.tekton.pipeline.v1beta1.ParamSpecBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.ParamValueBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.Pipeline;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineResult;
@@ -23,12 +23,10 @@ import io.fabric8.tekton.pipeline.v1beta1.PipelineTask;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineTaskBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineWorkspaceDeclaration;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineWorkspaceDeclarationBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.Task;
-import io.fabric8.tekton.pipeline.v1beta1.TaskRef;
-import io.fabric8.tekton.pipeline.v1beta1.TaskRefBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBinding;
 import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBindingBuilder;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +43,9 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
     private static final String BUILD_PIPELINE_BUILDER_TASK_NAME = "build";
     private static final String BUILD_PIPELINE_DEFAULT_TASK_WORKSPACE_NAME = "output";
     private static final String BUILD_PIPELINE_SOURCE_TASK_WORKSPACE_NAME = "output";
+
+    @Inject
+    AgogosEnvironment agogosEnv;
 
     public PipelineDependentResource() {
         super(Pipeline.class);
@@ -129,28 +130,16 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         handlers.stream().forEach(handlerSpec -> {
             String handlerName = handlerSpec.getHandlerRef().getName();
 
-            Handler handler = kubernetesFacade.get(
-                    Handler.class,
-                    component.getMetadata().getNamespace(),
-                    handlerName);
-            Task handlerTask = kubernetesFacade.get(
-                    Task.class,
-                    component.getMetadata().getNamespace(),
-                    handler.getSpec().getTaskRef().getName());
+            Handler handler = kubernetesFacade.get(Handler.class, component.getMetadata().getNamespace(), handlerName, false);
             PipelineTaskBuilder pipelineTaskBuilder = new PipelineTaskBuilder()
-                    .withName(handlerName)
-                    .withTaskRef(
-                            new TaskRefBuilder().withName(handlerTask.getMetadata().getName())
-                                    .withApiVersion("") // AGOGOS-96
-                                    .withKind(handlerTask.getKind())
-                                    .build())
+                    .withName(handlerSpec.getHandlerRef().getName())
+                    .withTaskRef(handler.getSpec().getTaskRef())
+                    .withParams(handlerSpec.getParams())
                     .withWorkspaces(workspaceBindings(handler.getSpec().getWorkspaces()));
 
             if (tasks.size() > 1) {
                 pipelineTaskBuilder.withRunAfter(tasks.get(tasks.size() - 1).getName());
             }
-
-            addParams(pipelineTaskBuilder, handlerTask.getSpec().getParams(), handlerSpec.getParams());
 
             PipelineTask pipelineTask = pipelineTaskBuilder.build();
 
@@ -159,57 +148,26 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
     }
 
     private void prepareBuilderTask(Component component, List<PipelineTask> tasks) {
-        String builderName = component.getSpec().getBuild().getBuilderRef().getName();
+        BuilderRef builderRef = component.getSpec().getBuild().getBuilderRef();
+        String name = builderRef.getName();
+        String namespace = agogosEnv.getRunningNamespace(builderRef);
 
-        Builder builder = kubernetesFacade.get(Builder.class, builderName);
+        Builder builder = kubernetesFacade.get(Builder.class, namespace, name, false);
         if (builder == null) {
-            throw new MissingResourceException("Selected Builder '{}' is not available in the system",
-                    builderName);
+            throw new MissingResourceException("Selected Builder '{}' is not available in the namespace '{}'",
+                    name, namespace);
         }
 
-        List<ParamSpec> params = null;
-        TaskRef taskRef = builder.getSpec().getTaskRef();
-        if ("ClusterTask".equals(taskRef.getKind())) {
-            ClusterTask clusterTask = kubernetesFacade.get(ClusterTask.class, taskRef.getName());
-            params = clusterTask.getSpec().getParams();
-        } else {
-            String namespace = taskRef.getResolver() != null && taskRef.getResolver().equals("cluster")
-                    ? taskRef.getParams().stream().filter(
-                            param -> param.getName().equals("namespace"))
-                            .toList().get(0).getValue().getStringVal()
-                    : component.getMetadata().getNamespace();
-            String name = taskRef.getName() != null ? taskRef.getName()
-                    : taskRef.getParams().stream().filter(
-                            param -> param.getName().equals("name"))
-                            .toList().get(0).getValue().getStringVal();
-            Task task = kubernetesFacade.get(Task.class, namespace, name);
-            params = task.getSpec().getParams();
-        }
-
-        if (params == null) {
-            throw new MissingResourceException(
-                    "{} '{}' implementation of Builder '{}' requested by Component '{}' is not found",
-                    taskRef.getKind(), taskRef.getName(),
-                    builderName, component.getFullName());
-        }
-
-        TaskRef buildTaskRef = new TaskRefBuilder()
-                .withApiVersion("") // AGOGOS-96
-                .withKind(taskRef.getKind())
-                .withName(taskRef.getName())
-                .withResolver(taskRef.getResolver())
-                .withParams(taskRef.getParams())
-                .build();
-
-        // Prepare main task
-        PipelineTaskBuilder pipelineTaskBuilder = new PipelineTaskBuilder()
+        PipelineTask pipelineTask = new PipelineTaskBuilder()
                 .withName(BUILD_PIPELINE_BUILDER_TASK_NAME)
-                .withTaskRef(buildTaskRef)
-                .withWorkspaces(workspaceBindings(builder.getSpec().getWorkspaces()));
-
-        addParams(pipelineTaskBuilder, params, component.getSpec().getBuild().getParams());
-
-        PipelineTask pipelineTask = pipelineTaskBuilder.build();
+                .withTaskRef(builder.getSpec().getTaskRef())
+                .withParams(component.getSpec().getBuild().getParams())
+                .addNewParam()
+                .withName("component")
+                .withNewValue("$(params.component)")
+                .endParam()
+                .withWorkspaces(workspaceBindings(builder.getSpec().getWorkspaces()))
+                .build();
 
         tasks.add(pipelineTask);
     }
@@ -258,42 +216,5 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         }
 
         return workspaceBindings;
-    }
-
-    @SuppressWarnings("unchecked")
-    private void addParams(PipelineTaskBuilder pipelineTaskBuilder, List<io.fabric8.tekton.pipeline.v1beta1.ParamSpec> list,
-            Map<String, Object> params) {
-        list.forEach(p -> {
-            Object value = params.get(p.getName());
-
-            if (p.getName().equals("component")) {
-                // Pass the component YAML, which came through as a Pipeline parameter.
-                value = "$(params.component)";
-            } else if (value == null) {
-                return;
-            }
-
-            ParamValueBuilder pvb = new ParamValueBuilder();
-            if (value instanceof List && isListOfStrings((List<Object>) value)) {
-                pvb.withArrayVal((List<String>) value);
-            } else if (value instanceof String) {
-                pvb.withStringVal(value.toString());
-            } else {
-                pvb.withStringVal(objectMapper.asJson(value));
-            }
-
-            pipelineTaskBuilder.addNewParam().withName(p.getName()).withValue(pvb.build()).endParam();
-
-        });
-    }
-
-    private boolean isListOfStrings(List<Object> array) {
-        for (Object e : array) {
-            if (!(e instanceof String)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

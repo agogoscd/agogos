@@ -182,6 +182,7 @@ public class WebhooksInstaller extends Installer {
                 .withNewResources()
                 .withRequests(requests).withLimits(limits)
                 .endResources()
+                .withEnv(new EnvVarBuilder().withName("NAMESPACE").withValue(namespace).build())
                 .build();
 
         Deployment webhookDeployment = new DeploymentBuilder()

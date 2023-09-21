@@ -3,15 +3,15 @@ package com.redhat.agogos.core.v1alpha1;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
+import io.fabric8.tekton.pipeline.v1beta1.Param;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @ToString
@@ -30,20 +30,12 @@ public class ComponentBuilderSpec implements KubernetesResource {
         @Getter
         @Setter
         private String name;
-
         /**
-         * Kind of the {@link Builder}.
+         * Namespace of the {@link Builder}.
          */
         @Getter
         @Setter
-        private String kind = HasMetadata.getKind(Builder.class);
-
-        /**
-         * Version of the {@link Builder}.
-         */
-        @Getter
-        @Setter
-        private String version = HasMetadata.getVersion(Builder.class);
+        private String namespace;
 
         public BuilderRef() {
             super();
@@ -63,8 +55,7 @@ public class ComponentBuilderSpec implements KubernetesResource {
             BuilderRef ref = (BuilderRef) obj;
 
             return Objects.equals(ref.getName(), getName())
-                    && Objects.equals(ref.getKind(), getKind())
-                    && Objects.equals(ref.getVersion(), getVersion());
+                    && Objects.equals(ref.getNamespace(), getNamespace());
         }
     }
 
@@ -74,7 +65,7 @@ public class ComponentBuilderSpec implements KubernetesResource {
 
     @Getter
     @Setter
-    private Map<String, Object> params = new HashMap<>();
+    private List<Param> params = new ArrayList<>();
 
     @Override
     public boolean equals(Object obj) {

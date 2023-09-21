@@ -9,9 +9,8 @@ spec:
   build:
     builderRef:
       name: "dummy-v1"
-      kind: "Builder"
-      version: "v1alpha1"
-    params: {}
+      namespace: "agogos"
+    params: []
   dependents:
     components: []
     groups: []
