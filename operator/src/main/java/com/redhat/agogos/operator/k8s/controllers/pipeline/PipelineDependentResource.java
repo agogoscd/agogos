@@ -10,6 +10,7 @@ import io.fabric8.kubernetes.api.model.OwnerReference;
 import io.fabric8.kubernetes.api.model.OwnerReferenceBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.*;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
+import org.eclipse.microprofile.config.ConfigProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,10 +60,7 @@ public class PipelineDependentResource
 
         for (StageEntry stageEntry : agogos.getSpec().getStages()) {
             StageReference stageRef = stageEntry.getStageRef();
-            String namespace = stageRef.getNamespace();
-            if (namespace == null) {
-                namespace = agogos.getMetadata().getNamespace();
-            }
+            String namespace = getStageNamespace(stageRef);
 
             LOG.debug("Processing Stage '{}' from namespace '{}' ", stageRef.getName(), namespace);
 
@@ -134,5 +132,16 @@ public class PipelineDependentResource
         LOG.debug("New Tekton Pipeline '{}' created for Agogos Pipeline '{}",
                 pipeline.getMetadata().getName(), agogos.getFullName());
         return pipeline;
+    }
+
+    private String getStageNamespace(StageReference stageRef) {
+        String namespace = stageRef.getNamespace();
+        if (namespace == null) {
+            namespace = System.getenv("NAMESPACE");
+            if (namespace == null) {
+                ConfigProvider.getConfig().getValue("quarkus.kubernetes.namespace", String.class);
+            }
+        }
+        return namespace;
     }
 }

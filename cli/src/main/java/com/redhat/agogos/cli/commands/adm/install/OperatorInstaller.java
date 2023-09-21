@@ -5,6 +5,7 @@ import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.ContainerPortBuilder;
+import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.HTTPGetActionBuilder;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.IntOrString;
@@ -147,6 +148,7 @@ public class OperatorInstaller extends Installer {
                 .withNewResources()
                 .withRequests(requests).withLimits(limits)
                 .endResources()
+                .withEnv(new EnvVarBuilder().withName("NAMESPACE").withValue(namespace).build())
                 .build();
 
         Deployment deployment = new DeploymentBuilder()

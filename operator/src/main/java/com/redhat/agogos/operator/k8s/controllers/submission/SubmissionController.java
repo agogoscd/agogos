@@ -14,7 +14,6 @@ import com.redhat.agogos.core.v1alpha1.Submission.SubmissionSpec;
 import com.redhat.agogos.operator.eventing.CloudEventPublisher;
 import com.redhat.agogos.operator.k8s.controllers.AbstractController;
 import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
 import io.javaoperatorsdk.operator.api.reconciler.Context;
 import io.javaoperatorsdk.operator.api.reconciler.ControllerConfiguration;
 import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
@@ -38,9 +37,6 @@ public class SubmissionController extends AbstractController<Submission> {
 
     @Inject
     protected CloudEventPublisher cloudEventPublisher;
-
-    @Inject
-    KubernetesSerialization objectMapper;
 
     @Override
     public UpdateControl<Submission> reconcile(Submission submission, Context<Submission> context) {

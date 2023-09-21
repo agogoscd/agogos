@@ -53,7 +53,7 @@ spec:
                             description: Name of the stage to run
                           namespace:
                             type: string
-                            description: Namespace of where the Agogos stage can be found. Defaults to the namespace of the Agogos pipeline resource.
+                            description: Namespace of where the Agogos stage can be found, defaults to the Agogos operator namespace.
                         required:
                           - name
                       runAfter:

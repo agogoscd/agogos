@@ -970,13 +970,11 @@ spec:
                           name:
                             type: string
                             description: Name of the stage to run
-                          kind:
+                          namespace:
                             type: string
-                            description: "The type of the stage, one of: Stage or ClusterStage"
-                            enum: ["Stage", "ClusterStage"]
+                            description: Namespace of where the Agogos stage can be found
                         required:
                           - name
-                          - kind
                       runAfter:
                         type: array
                         items:
