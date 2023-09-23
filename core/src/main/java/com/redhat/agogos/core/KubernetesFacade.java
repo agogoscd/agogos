@@ -8,6 +8,7 @@ import io.fabric8.kubernetes.api.model.StatusDetails;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.VersionInfo;
+import io.fabric8.tekton.triggers.v1beta1.EventListener;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -113,5 +114,9 @@ public class KubernetesFacade {
 
     public void waitForAllPodsRunning(String namespace) {
         retries.waitForAllPodsRunning(namespace);
+    }
+
+    public EventListener waitForEventListenerRunning(String namespace, String name) {
+        return retries.waitForEventListenerRunning(namespace, name);
     }
 }

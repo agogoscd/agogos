@@ -6,6 +6,7 @@ import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.StatusDetails;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import io.fabric8.tekton.triggers.v1beta1.EventListener;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 import io.github.resilience4j.retry.RetryConfig.Builder;
@@ -216,8 +217,33 @@ public class KubernetesClientRetries {
         if (allPodsRunning(result)) {
             LOG.info("👉 OK: All pods in the '{}' namespace are {}", namespace, ALL_PODS_RUNNING_PHASE);
         } else {
-            LOG.info("⚠️ WARN: All pods in the '{}' namespace are not yet {}", namespace, ALL_PODS_RUNNING_PHASE);
+            LOG.warn("⚠️ WARN: All pods in the '{}' namespace are not yet {}", namespace, ALL_PODS_RUNNING_PHASE);
         }
+    }
+
+    public EventListener waitForEventListenerRunning(String namespace, String name) {
+        RetryConfig config = RetryConfig.<EventListener> custom()
+                .maxAttempts(ALL_PODS_RUNNING_MAX_RETRIES)
+                .waitDuration(Duration.ofSeconds(ALL_PODS_RUNNING_MAX_INTERVAL))
+                .retryOnResult(el -> el.getStatus().getAddress().getUrl() == null)
+                .build();
+
+        RetryRegistry registry = RetryRegistry.of(config);
+        Retry retry = registry.retry("el-running");
+        retry.getEventPublisher()
+                .onRetry(e -> LOG.info("⏳ WAIT: Waiting for EventListener '{}' in namespace '{}' to be running",
+                        name, namespace));
+        Supplier<EventListener> decorated = Retry.decorateSupplier(retry, () -> {
+            return kubernetesClient.resources(EventListener.class).inNamespace(namespace).withName(name).get();
+        });
+
+        EventListener result = (EventListener) decorated.get();
+        if (result.getStatus().getAddress().getUrl() != null) {
+            LOG.info("👉 OK: EventListener '{}' in namespace '{}' is running", name, namespace);
+        } else {
+            LOG.warn("⚠️ WARN: EventListener '{}' in namespace '{}' is not running", name, namespace);
+        }
+        return result;
     }
 
     private Set<String> getAllPodPhases(String namespace) {

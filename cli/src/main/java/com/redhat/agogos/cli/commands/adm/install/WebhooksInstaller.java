@@ -109,17 +109,19 @@ public class WebhooksInstaller extends Installer {
                             deployment(namespace)));
         }
 
-        Service webhooksService = kubernetesFacade.get(Service.class, namespace, ServiceAccountName);
         List<HasMetadata> installed = new ArrayList<>();
         for (HasMetadata r : resources) {
             installed.add(kubernetesFacade.serverSideApply(r));
         }
 
-        if (webhooksService != null && (profile == InstallProfile.local || profile == InstallProfile.prod)) {
-            LOG.info("🕞 Restarting Webhooks service after updating certificates...");
+        if (profile == InstallProfile.local || profile == InstallProfile.prod) {
+            Service webhooksService = kubernetesFacade.get(Service.class, namespace, ServiceAccountName);
+            if (webhooksService != null) {
+                LOG.info("🕞 Restarting Webhooks service after updating certificates...");
 
-            kubernetesFacade.getKubernetesClient().apps().deployments().inNamespace(namespace).withName(ServiceAccountName)
-                    .rolling().restart();
+                kubernetesFacade.getKubernetesClient().apps().deployments().inNamespace(namespace).withName(ServiceAccountName)
+                        .rolling().restart();
+            }
         }
 
         Helper.status(installed);

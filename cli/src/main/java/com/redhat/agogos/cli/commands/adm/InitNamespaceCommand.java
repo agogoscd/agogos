@@ -4,7 +4,6 @@ import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.AbstractCallableSubcommand;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller.AgogosRole;
-import com.redhat.agogos.core.errors.ApplicationException;
 import com.redhat.agogos.core.v1alpha1.Dependency;
 import com.redhat.agogos.core.v1alpha1.Submission;
 import io.fabric8.knative.eventing.v1.Broker;
@@ -60,11 +59,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @Command(mixinStandardHelpOptions = true, name = "init-namespace", aliases = {
@@ -313,52 +307,17 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                 .build();
 
         el = kubernetesFacade.serverSideApply(el);
+        el = kubernetesFacade.waitForEventListenerRunning(namespace, el.getMetadata().getName());
 
         Helper.status(el);
 
         return el;
     }
 
-    private String obtainElUri(final EventListener el) {
-        Callable<String> callable = () -> {
-            while (true) {
-                try {
-                    EventListener elInfo = kubernetesFacade.get(
-                            EventListener.class,
-                            el.getMetadata().getNamespace(),
-                            el.getMetadata().getName());
-
-                    String url = elInfo.getStatus().getAddress().getUrl();
-
-                    if (url != null) {
-                        return url;
-                    }
-
-                } catch (NullPointerException | ApplicationException e) {
-                    // Ignored
-                }
-
-                Thread.sleep(2000);
-            }
-        };
-
-        FutureTask<String> future = new FutureTask<>(callable);
-
-        future.run();
-
-        try {
-            return future.get(60, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            throw new ApplicationException("Could not find URL for EventListener", e);
-        }
-    }
-
     /**
      * Install Knative Trigger responsible for routing events from the Broker into Tekton EventListener.
      */
     private Trigger installKnativeTrigger(Broker broker, EventListener el, String namespace) {
-        String uri = obtainElUri(el);
-
         Trigger trigger = new TriggerBuilder()
                 .withNewMetadata()
                 .withName(RESOURCE_NAME)
@@ -367,7 +326,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                 .withNewSpec()
                 .withBroker(broker.getMetadata().getName())
                 .withNewSubscriber()
-                .withUri(uri)
+                .withUri(el.getStatus().getAddress().getUrl())
                 .endSubscriber()
                 .endSpec()
                 .build();
@@ -480,7 +439,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
     private void installAgogosQuota() {
         if (quotaFile == null) {
-            if (kubernetesFacade.get(ResourceQuota.class, namespace, AGOGOS_QUOTA_NAME) != null) {
+            if (kubernetesFacade.get(ResourceQuota.class, namespace, AGOGOS_QUOTA_NAME, false) != null) {
                 kubernetesFacade.delete(ResourceQuota.class, namespace, AGOGOS_QUOTA_NAME);
             }
             return;
