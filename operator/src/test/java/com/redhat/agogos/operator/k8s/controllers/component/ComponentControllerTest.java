@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.redhat.agogos.core.KubernetesFacade;
-import com.redhat.agogos.core.retries.KubernetesClientRetries;
 import com.redhat.agogos.core.v1alpha1.Builder;
 import com.redhat.agogos.core.v1alpha1.Component;
 import com.redhat.agogos.core.v1alpha1.ComponentBuilderSpec.BuilderRef;
@@ -37,9 +36,6 @@ public class ComponentControllerTest {
 
     @Inject
     KubernetesFacade kubernetesFacade;
-
-    @Inject
-    KubernetesClientRetries retries;
 
     @Test
     @DisplayName("Should fail handling a Component because the Builder does not exist")
@@ -79,7 +75,7 @@ public class ComponentControllerTest {
 
         Task task = new TaskBuilder().withNewMetadata().withName("should-handle-component").endMetadata().withNewSpec()
                 .withParams(new ParamSpecBuilder().withName("param").build()).endSpec().build();
-        retries.serverSideApply(task);
+        kubernetesFacade.serverSideApply(task);
 
         Builder builder = new Builder();
         builder.getMetadata().setName("should-handle-component-builder-name");

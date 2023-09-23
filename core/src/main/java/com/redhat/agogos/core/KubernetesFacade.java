@@ -23,7 +23,7 @@ public class KubernetesFacade {
     KubernetesClient kubernetesClient;
 
     @Inject
-    KubernetesClientRetries retries;
+    KubernetesClientRetries retriesClient;
 
     public KubernetesClient getKubernetesClient() {
         return kubernetesClient;
@@ -46,77 +46,195 @@ public class KubernetesFacade {
     }
 
     public <T extends HasMetadata> T create(T resource) {
-        return retries.create(resource);
+        return retriesClient.create(resource);
+    }
+
+    public <T extends HasMetadata> T create(T resource, Integer retries, Integer interval) {
+        return retriesClient.create(resource, retries, interval);
     }
 
     public <T extends HasMetadata> T serverSideApply(T resource) {
-        return retries.serverSideApply(resource);
+        return retriesClient.serverSideApply(resource);
+    }
+
+    public <T extends HasMetadata> T serverSideApply(T resource, Integer retries, Integer interval) {
+        return retriesClient.serverSideApply(resource, retries, interval);
     }
 
     public <T extends HasMetadata> T update(T resource) {
-        return retries.update(resource);
+        return retriesClient.update(resource);
     }
 
-    public <T extends HasMetadata> List<StatusDetails> delete(
-            Class<T> clazz,
-            String namespace,
-            String name) {
-        return retries.delete(clazz, namespace, name);
+    public <T extends HasMetadata> T update(T resource, Integer retries, Integer interval) {
+        return retriesClient.update(resource, retries, interval);
+    }
+
+    public <T extends HasMetadata> List<StatusDetails> delete(Class<T> clazz, String namespace, String name) {
+        return retriesClient.delete(clazz, namespace, name);
+    }
+
+    public <T extends HasMetadata> List<StatusDetails> delete(Class<T> clazz, String namespace, String name,
+            Integer retries, Integer interval) {
+        return retriesClient.delete(clazz, namespace, name, retries, interval);
     }
 
     public <T extends HasMetadata> List<StatusDetails> delete(Class<T> clazz, String name) {
         return delete(clazz, null, name);
     }
 
-    public <T extends HasMetadata> List<StatusDetails> delete(T resource) {
-        return delete(
-                resource.getClass(),
-                resource.getMetadata().getNamespace(),
-                resource.getMetadata().getName());
+    public <T extends HasMetadata> List<StatusDetails> delete(Class<T> clazz, String name, Integer retries, Integer interval) {
+        return delete(clazz, null, name, retries, interval);
     }
 
-    public <T extends HasMetadata> T get(Class<T> clazz, String namespace, String name, boolean retryOnNull) {
-        return retries.get(clazz, namespace, name, retryOnNull);
+    public <T extends HasMetadata> List<StatusDetails> delete(T resource) {
+        return delete(resource.getClass(), resource.getMetadata().getNamespace(), resource.getMetadata().getName());
+    }
+
+    public <T extends HasMetadata> List<StatusDetails> delete(T resource, Integer retries, Integer interval) {
+        return delete(resource.getClass(), resource.getMetadata().getNamespace(), resource.getMetadata().getName(),
+                retries, interval);
     }
 
     public <T extends HasMetadata> T get(Class<T> clazz, String namespace, String name) {
-        return get(clazz, namespace, name, true);
+        return retriesClient.get(clazz, namespace, name, false);
+    }
+
+    public <T extends HasMetadata> T get(Class<T> clazz, String namespace, String name, Integer retries, Integer interval) {
+        return get(clazz, namespace, name, retries, interval, false);
     }
 
     public <T extends HasMetadata> T get(Class<T> clazz, String name) {
         return get(clazz, null, name);
     }
 
-    public <T> T unmarshal(Class<T> clazz, InputStream input) {
-        return kubernetesClient.getKubernetesSerialization().unmarshal(input, clazz);
+    public <T extends HasMetadata> T get(Class<T> clazz, String name, Integer retries, Integer interval) {
+        return get(clazz, null, name, retries, interval);
+    }
+
+    private <T extends HasMetadata> T get(Class<T> clazz, String namespace, String name, boolean retryOnNull) {
+        return retriesClient.get(clazz, namespace, name, retryOnNull);
+    }
+
+    private <T extends HasMetadata> T get(Class<T> clazz, String namespace, String name, Integer retries,
+            Integer interval, boolean retryOnNull) {
+        return retriesClient.get(clazz, namespace, name, retries, interval, retryOnNull);
+    }
+
+    /*
+     * The getNonNull methods will additionally retry if the return value is null. This is
+     * used in cases where we are waiting for a resource to be created.
+     */
+    public <T extends HasMetadata> T getNonNull(Class<T> clazz, String name) {
+        return getNonNull(clazz, null, name);
+    }
+
+    public <T extends HasMetadata> T getNonNull(Class<T> clazz, String name, Integer retries, Integer interval) {
+        return getNonNull(clazz, null, name, retries, interval);
+    }
+
+    public <T extends HasMetadata> T getNonNull(Class<T> clazz, String namespace, String name) {
+        return get(clazz, namespace, name, true);
+    }
+
+    public <T extends HasMetadata> T getNonNull(Class<T> clazz, String namespace, String name, Integer retries,
+            Integer interval) {
+        return get(clazz, namespace, name, retries, interval, true);
     }
 
     public <T extends HasMetadata> List<T> list(Class<T> clazz) {
-        return list(clazz, getNamespace(), new ListOptionsBuilder().build());
+        return list(clazz, getNamespace());
+    }
+
+    public <T extends HasMetadata> List<T> list(Class<T> clazz, Integer retries, Integer interval) {
+        return list(clazz, getNamespace(), new ListOptionsBuilder().build(), retries, interval);
     }
 
     public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace) {
         return list(clazz, namespace, new ListOptionsBuilder().build());
     }
 
+    public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace, Integer retries, Integer interval) {
+        return list(clazz, namespace, new ListOptionsBuilder().build(), retries, interval);
+    }
+
     public <T extends HasMetadata> List<T> list(Class<T> clazz, ListOptions options) {
-        return list(clazz, getNamespace(), options);
+        return list(clazz, getNamespace(), options, false);
+    }
+
+    public <T extends HasMetadata> List<T> list(Class<T> clazz, ListOptions options, Integer retries, Integer interval) {
+        return list(clazz, getNamespace(), options, retries, interval);
     }
 
     public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace, ListOptions options) {
         return list(clazz, namespace, options, false);
     }
 
-    public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace, ListOptions options,
-            boolean retryOnEmptyList) {
-        return retries.list(clazz, namespace, options, retryOnEmptyList);
+    public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace, ListOptions options, Integer retries,
+            Integer interval) {
+        return list(clazz, namespace, options, retries, interval, false);
+    }
+
+    private <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace, ListOptions options,
+            Boolean retryOnEmptyList) {
+        return retriesClient.list(clazz, namespace, options, retryOnEmptyList);
+    }
+
+    private <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace, ListOptions options,
+            Integer retries, Integer interval, Boolean retryOnEmptyList) {
+        return retriesClient.list(clazz, namespace, options, retries, interval, retryOnEmptyList);
+    }
+
+    /*
+     * The listNotEmpty methods will additionally retry if the list returned has a size of 0. This is
+     * used in cases where we are waiting for a resource to be created.
+     */
+    public <T extends HasMetadata> List<T> listNotEmpty(Class<T> clazz) {
+        return listNotEmpty(clazz, getNamespace(), new ListOptionsBuilder().build());
+    }
+
+    public <T extends HasMetadata> List<T> listNotEmpty(Class<T> clazz, Integer retries, Integer interval) {
+        return listNotEmpty(clazz, getNamespace(), new ListOptionsBuilder().build(), retries, interval);
+    }
+
+    public <T extends HasMetadata> List<T> listNotEmpty(Class<T> clazz, String namespace) {
+        return listNotEmpty(clazz, namespace, new ListOptionsBuilder().build());
+    }
+
+    public <T extends HasMetadata> List<T> listNotEmpty(Class<T> clazz, String namespace, Integer retries, Integer interval) {
+        return listNotEmpty(clazz, namespace, new ListOptionsBuilder().build(), retries, interval);
+    }
+
+    public <T extends HasMetadata> List<T> listNotEmpty(Class<T> clazz, ListOptions options) {
+        return listNotEmpty(clazz, getNamespace(), options);
+    }
+
+    public <T extends HasMetadata> List<T> listNotEmpty(Class<T> clazz, ListOptions options, Integer retries,
+            Integer interval) {
+        return listNotEmpty(clazz, getNamespace(), options, retries, interval);
+    }
+
+    public <T extends HasMetadata> List<T> listNotEmpty(Class<T> clazz, String namespace, ListOptions options) {
+        return list(clazz, namespace, options, true);
+    }
+
+    public <T extends HasMetadata> List<T> listNotEmpty(Class<T> clazz, String namespace, ListOptions options, Integer retries,
+            Integer interval) {
+        return list(clazz, namespace, options, retries, interval, true);
     }
 
     public void waitForAllPodsRunning(String namespace) {
-        retries.waitForAllPodsRunning(namespace);
+        retriesClient.waitForAllPodsRunning(namespace);
+    }
+
+    public void waitForAllPodsRunning(String namespace, Integer retries, Integer interval) {
+        retriesClient.waitForAllPodsRunning(namespace, retries, interval);
     }
 
     public EventListener waitForEventListenerRunning(String namespace, String name) {
-        return retries.waitForEventListenerRunning(namespace, name);
+        return retriesClient.waitForEventListenerRunning(namespace, name);
+    }
+
+    public <T> T unmarshal(Class<T> clazz, InputStream input) {
+        return kubernetesClient.getKubernetesSerialization().unmarshal(input, clazz);
     }
 }

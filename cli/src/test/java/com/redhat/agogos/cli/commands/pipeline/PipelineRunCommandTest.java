@@ -7,6 +7,7 @@ import com.redhat.agogos.cli.commands.AbstractCommandTest;
 import com.redhat.agogos.core.KubernetesFacade;
 import com.redhat.agogos.core.v1alpha1.Pipeline;
 import com.redhat.agogos.core.v1alpha1.Run;
+import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
@@ -38,13 +39,16 @@ public class PipelineRunCommandTest extends AbstractCommandTest {
 
     @Test
     public void callsResourceAndAnotherCommand() throws Exception {
-        Mockito.when(kubernetesFacadeMock.get(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(Boolean.class)))
+        Mockito.when(kubernetesFacadeMock.get(Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(new Pipeline());
         Mockito.when(objectMapperMock.asJson(Mockito.any()))
                 .thenReturn("");
         Mockito.when(kubernetesFacadeMock.unmarshal(Mockito.any(), Mockito.any()))
                 .thenReturn(new HashMap<String, Object>());
-        Mockito.when(kubernetesFacadeMock.list(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(Boolean.class)))
+        Mockito.when(kubernetesFacadeMock.getNamespace())
+                .thenReturn("namespace");
+        Mockito.when(
+                kubernetesFacadeMock.listNotEmpty(Mockito.any(), Mockito.any(String.class), Mockito.any(ListOptions.class)))
                 .thenReturn(Arrays.asList(new Run()));
         Mockito.when(cliMock.run(Mockito.any(), Mockito.any())).thenReturn(0);
 
@@ -53,7 +57,8 @@ public class PipelineRunCommandTest extends AbstractCommandTest {
         int returnCode = cmd.execute("pipeline");
 
         Assertions.assertEquals(0, returnCode);
-        Mockito.verify(kubernetesFacadeMock).list(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(Boolean.class));
+        Mockito.verify(kubernetesFacadeMock).listNotEmpty(Mockito.any(), Mockito.any(String.class),
+                Mockito.any(ListOptions.class));
         Mockito.verify(kubernetesFacadeMock, times(2)).getNamespace();
     }
 }

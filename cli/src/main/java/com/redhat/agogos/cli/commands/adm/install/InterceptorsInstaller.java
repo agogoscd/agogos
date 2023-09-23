@@ -107,7 +107,7 @@ public class InterceptorsInstaller extends Installer {
         }
 
         if (profile == InstallProfile.local || profile == InstallProfile.prod) {
-            Service interceptorsService = kubernetesFacade.get(Service.class, namespace, ServiceAccountName, false);
+            Service interceptorsService = kubernetesFacade.get(Service.class, namespace, ServiceAccountName);
             if (interceptorsService != null) {
                 LOG.info("🕞 Restarting Interceptors service after updating certificates...");
 

@@ -29,7 +29,7 @@ public class PipelineRunCommand extends AbstractResourceSubcommand<Pipeline> {
 
     @Override
     public Integer call() {
-        Pipeline pipeline = kubernetesFacade.get(Pipeline.class, kubernetesFacade.getNamespace(), name, false);
+        Pipeline pipeline = kubernetesFacade.get(Pipeline.class, kubernetesFacade.getNamespace(), name);
         if (pipeline == null) {
             spec.commandLine().getOut().println("⛔ Unable to find pipeline '" + name + "'");
             return ExitCode.USAGE;
@@ -66,7 +66,7 @@ public class PipelineRunCommand extends AbstractResourceSubcommand<Pipeline> {
                 .withLabelSelector(Label.NAME + "=" + name + "," + Label.INSTANCE + "=" + uuid + "," +
                         Label.RESOURCE + "=" + Resource.PIPELINE.toString().toLowerCase())
                 .build();
-        List<Run> runs = kubernetesFacade.list(Run.class, kubernetesFacade.getNamespace(), options, true);
+        List<Run> runs = kubernetesFacade.listNotEmpty(Run.class, kubernetesFacade.getNamespace(), options);
         if (runs.size() > 0) {
             return cli.run(RunDescribeCommand.class, runs.get(0).getMetadata().getName());
         } else {

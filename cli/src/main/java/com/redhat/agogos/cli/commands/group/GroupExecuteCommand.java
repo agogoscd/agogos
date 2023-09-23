@@ -29,7 +29,7 @@ public class GroupExecuteCommand extends AbstractResourceSubcommand<Group> {
 
     @Override
     public Integer call() {
-        Group group = kubernetesFacade.get(Group.class, kubernetesFacade.getNamespace(), name, false);
+        Group group = kubernetesFacade.get(Group.class, kubernetesFacade.getNamespace(), name);
         if (group == null) {
             spec.commandLine().getOut().println("⛔ Unable to find group '" + name + "'");
             return ExitCode.USAGE;
@@ -66,7 +66,7 @@ public class GroupExecuteCommand extends AbstractResourceSubcommand<Group> {
                 .withLabelSelector(Label.NAME + "=" + name + "," + Label.INSTANCE + "=" + uuid + "," +
                         Label.RESOURCE + "=" + Resource.GROUP.toString().toLowerCase())
                 .build();
-        List<Execution> executions = kubernetesFacade.list(Execution.class, kubernetesFacade.getNamespace(), options, true);
+        List<Execution> executions = kubernetesFacade.listNotEmpty(Execution.class, kubernetesFacade.getNamespace(), options);
         if (executions.size() > 0) {
             return cli.run(ExecutionDescribeCommand.class, executions.get(0).getMetadata().getName());
         } else {

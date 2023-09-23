@@ -56,26 +56,38 @@ public class KubernetesClientRetries {
     KubernetesClient kubernetesClient;
 
     public <T extends HasMetadata> T create(T resource) {
-        return createOrUpdate(resource, Command.CREATE);
+        return createOrUpdate(resource, Command.CREATE, DEFAULT_MAX_RETRIES, DEFAULT_MAX_INTERVAL);
+    }
+
+    public <T extends HasMetadata> T create(T resource, Integer retries, Integer interval) {
+        return createOrUpdate(resource, Command.CREATE, retries, interval);
     }
 
     public <T extends HasMetadata> T serverSideApply(T resource) {
-        return createOrUpdate(resource, Command.SERVER_SIDE_APPLY);
+        return createOrUpdate(resource, Command.SERVER_SIDE_APPLY, DEFAULT_MAX_RETRIES, DEFAULT_MAX_INTERVAL);
+    }
+
+    public <T extends HasMetadata> T serverSideApply(T resource, Integer retries, Integer interval) {
+        return createOrUpdate(resource, Command.SERVER_SIDE_APPLY, retries, interval);
     }
 
     public <T extends HasMetadata> T update(T resource) {
-        return createOrUpdate(resource, Command.UPDATE);
+        return createOrUpdate(resource, Command.UPDATE, DEFAULT_MAX_RETRIES, DEFAULT_MAX_INTERVAL);
     }
 
-    private <T extends HasMetadata> T createOrUpdate(T resource, Command command) {
+    public <T extends HasMetadata> T update(T resource, Integer retries, Integer interval) {
+        return createOrUpdate(resource, Command.UPDATE, retries, interval);
+    }
+
+    private <T extends HasMetadata> T createOrUpdate(T resource, Command command, Integer retries, Integer interval) {
         RetryConfig config = RetryConfig.<T> custom()
-                .maxAttempts(DEFAULT_MAX_RETRIES)
-                .waitDuration(Duration.ofSeconds(DEFAULT_MAX_INTERVAL))
+                .maxAttempts(retries)
+                .waitDuration(Duration.ofSeconds(interval))
                 .retryOnResult(r -> r == null)
                 .retryExceptions(KubernetesClientException.class)
                 .build();
         RetryRegistry registry = RetryRegistry.of(config);
-        Retry retry = registry.retry(command.toString());
+        Retry retry = registry.retry(getRegistryRetryName(command.toString(), retries, interval));
         retry.getEventPublisher()
                 .onRetry(e -> LOG.warn("⚠️ WARN: Retrying {} for {}", command, resource.getMetadata().getName()));
 
@@ -96,14 +108,19 @@ public class KubernetesClientRetries {
     }
 
     public <T extends HasMetadata> List<StatusDetails> delete(Class<T> clazz, String namespace, String name) {
+        return delete(clazz, namespace, name, DEFAULT_MAX_RETRIES, DEFAULT_MAX_INTERVAL);
+    }
+
+    public <T extends HasMetadata> List<StatusDetails> delete(Class<T> clazz, String namespace, String name,
+            Integer retries, Integer interval) {
         RetryConfig config = RetryConfig.<List<StatusDetails>> custom()
-                .maxAttempts(DEFAULT_MAX_RETRIES)
-                .waitDuration(Duration.ofSeconds(DEFAULT_MAX_INTERVAL))
+                .maxAttempts(retries)
+                .waitDuration(Duration.ofSeconds(interval))
                 .retryExceptions(KubernetesClientException.class)
                 .build();
 
         RetryRegistry registry = RetryRegistry.of(config);
-        Retry retry = registry.retry("delete");
+        Retry retry = registry.retry(getRegistryRetryName("delete", retries, interval));
         retry.getEventPublisher()
                 .onRetry(e -> LOG.warn("⚠️ WARN: Retrying delete for {}",
                         (namespace != null ? namespace + "/" : "") + name));
@@ -119,14 +136,15 @@ public class KubernetesClientRetries {
         return decorated.get();
     }
 
-    public <T extends HasMetadata> T get(Class<T> clazz, String namespace, String name) {
-        return get(clazz, namespace, name, true);
+    public <T extends HasMetadata> T get(Class<T> clazz, String namespace, String name, Boolean retryOnNull) {
+        return get(clazz, namespace, name, DEFAULT_MAX_RETRIES, DEFAULT_MAX_INTERVAL, retryOnNull);
     }
 
-    public <T extends HasMetadata> T get(Class<T> clazz, String namespace, String name, Boolean retryOnNull) {
+    public <T extends HasMetadata> T get(Class<T> clazz, String namespace, String name, Integer retries,
+            Integer interval, Boolean retryOnNull) {
         Builder<T> builder = RetryConfig.<T> custom()
-                .maxAttempts(DEFAULT_MAX_RETRIES)
-                .waitDuration(Duration.ofSeconds(DEFAULT_MAX_INTERVAL))
+                .maxAttempts(retries)
+                .waitDuration(Duration.ofSeconds(interval))
                 .retryExceptions(KubernetesClientException.class);
 
         if (retryOnNull) {
@@ -135,7 +153,7 @@ public class KubernetesClientRetries {
         RetryConfig config = builder.build();
 
         RetryRegistry registry = RetryRegistry.of(config);
-        Retry retry = registry.retry("get");
+        Retry retry = registry.retry(getRegistryRetryName("get", retries, interval, retryOnNull));
         retry.getEventPublisher()
                 .onRetry(e -> LOG.warn("⚠️ WARN: Retrying get for {}",
                         (namespace != null ? namespace + "/" : "") + name));
@@ -152,9 +170,14 @@ public class KubernetesClientRetries {
 
     public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace, ListOptions options,
             boolean retryOnEmptyList) {
+        return list(clazz, namespace, options, DEFAULT_MAX_RETRIES, DEFAULT_MAX_INTERVAL, retryOnEmptyList);
+    }
+
+    public <T extends HasMetadata> List<T> list(Class<T> clazz, String namespace, ListOptions options,
+            Integer retries, Integer interval, boolean retryOnEmptyList) {
         Builder<List<T>> builder = RetryConfig.<List<T>> custom()
-                .maxAttempts(DEFAULT_MAX_RETRIES)
-                .waitDuration(Duration.ofSeconds(DEFAULT_MAX_INTERVAL))
+                .maxAttempts(retries)
+                .waitDuration(Duration.ofSeconds(interval))
                 .retryExceptions(KubernetesClientException.class);
 
         if (retryOnEmptyList) {
@@ -163,7 +186,7 @@ public class KubernetesClientRetries {
         RetryConfig config = builder.build();
 
         RetryRegistry registry = RetryRegistry.of(config);
-        Retry retry = registry.retry("get");
+        Retry retry = registry.retry(getRegistryRetryName("list-resource", retries, interval, retryOnEmptyList));
         retry.getEventPublisher()
                 .onRetry(e -> {
                     if (retryOnEmptyList) {
@@ -179,14 +202,18 @@ public class KubernetesClientRetries {
     }
 
     public List<HasMetadata> list(String namespace, ListOptions options) {
+        return list(namespace, options, DEFAULT_MAX_RETRIES, DEFAULT_MAX_INTERVAL);
+    }
+
+    public List<HasMetadata> list(String namespace, ListOptions options, Integer retries, Integer interval) {
         RetryConfig config = RetryConfig.<List<HasMetadata>> custom()
-                .maxAttempts(DEFAULT_MAX_RETRIES)
-                .waitDuration(Duration.ofSeconds(DEFAULT_MAX_INTERVAL))
+                .maxAttempts(retries)
+                .waitDuration(Duration.ofSeconds(interval))
                 .retryExceptions(KubernetesClientException.class)
                 .build();
 
         RetryRegistry registry = RetryRegistry.of(config);
-        Retry retry = registry.retry("get");
+        Retry retry = registry.retry(getRegistryRetryName("list-namespace", retries, interval));
         retry.getEventPublisher()
                 .onRetry(e -> LOG.warn("⚠️ WARN: Retrying list for {}", namespace));
 
@@ -198,14 +225,19 @@ public class KubernetesClientRetries {
     }
 
     public void waitForAllPodsRunning(String namespace) {
+        waitForAllPodsRunning(namespace, ALL_PODS_RUNNING_MAX_RETRIES, ALL_PODS_RUNNING_MAX_INTERVAL);
+    }
+
+    public void waitForAllPodsRunning(String namespace, Integer retries, Integer interval) {
         RetryConfig config = RetryConfig.<Set<String>> custom()
-                .maxAttempts(ALL_PODS_RUNNING_MAX_RETRIES)
-                .waitDuration(Duration.ofSeconds(ALL_PODS_RUNNING_MAX_INTERVAL))
+                .maxAttempts(retries)
+                .waitDuration(Duration.ofSeconds(interval))
                 .retryOnResult(phases -> phases.size() != 1 || !phases.contains(ALL_PODS_RUNNING_PHASE))
+                .retryExceptions(KubernetesClientException.class)
                 .build();
 
         RetryRegistry registry = RetryRegistry.of(config);
-        Retry retry = registry.retry("pod-phasees");
+        Retry retry = registry.retry(getRegistryRetryName("pod-phasees", retries, interval));
         retry.getEventPublisher()
                 .onRetry(e -> LOG.info("⏳ WAIT: Waiting for all pods in the '{}' namespace to be {}", namespace,
                         ALL_PODS_RUNNING_PHASE));
@@ -258,5 +290,13 @@ public class KubernetesClientRetries {
 
     private boolean allPodsRunning(Set<String> phases) {
         return phases.size() == 1 && phases.contains(ALL_PODS_RUNNING_PHASE);
+    }
+
+    private String getRegistryRetryName(String operation, Integer retries, Integer interval) {
+        return getRegistryRetryName(operation, retries, interval, null);
+    }
+
+    private String getRegistryRetryName(String operation, Integer retries, Integer interval, Boolean check) {
+        return String.format("%s-%d-%d%s", operation, retries, interval, (check != null ? "-" + check : ""));
     }
 }

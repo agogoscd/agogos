@@ -144,7 +144,7 @@ public class ComponentValidator extends Validator<Component> {
             throw new ApplicationException("Invalid namespace '{}' specified for builder '{}'", namespace, name);
         }
 
-        Builder builder = kubernetesFacade.get(Builder.class, namespace, name, false);
+        Builder builder = kubernetesFacade.get(Builder.class, namespace, name);
         if (builder == null) {
             throw new MissingResourceException("Selected builder '{}' is not registered in the namespace '{}'",
                     name, namespace);

@@ -29,7 +29,7 @@ public class ComponentBuildCommand extends AbstractResourceSubcommand<Component>
 
     @Override
     public Integer call() {
-        Component component = kubernetesFacade.get(Component.class, kubernetesFacade.getNamespace(), name, false);
+        Component component = kubernetesFacade.get(Component.class, kubernetesFacade.getNamespace(), name);
         if (component == null) {
             spec.commandLine().getOut().println("⛔ Unable to find component '" + name + "'");
             return ExitCode.USAGE;
@@ -65,7 +65,7 @@ public class ComponentBuildCommand extends AbstractResourceSubcommand<Component>
                 .withLabelSelector(Label.NAME + "=" + name + "," + Label.INSTANCE + "=" + uuid + "," +
                         Label.RESOURCE + "=" + Resource.COMPONENT.toString().toLowerCase())
                 .build();
-        List<Build> builds = kubernetesFacade.list(Build.class, kubernetesFacade.getNamespace(), options, true);
+        List<Build> builds = kubernetesFacade.listNotEmpty(Build.class, kubernetesFacade.getNamespace(), options);
         if (builds.size() > 0) {
             return cli.run(BuildDescribeCommand.class, builds.get(0).getMetadata().getName());
         } else {

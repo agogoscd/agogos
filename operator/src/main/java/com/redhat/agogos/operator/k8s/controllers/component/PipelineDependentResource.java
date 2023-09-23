@@ -130,7 +130,7 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         handlers.stream().forEach(handlerSpec -> {
             String handlerName = handlerSpec.getHandlerRef().getName();
 
-            Handler handler = kubernetesFacade.get(Handler.class, component.getMetadata().getNamespace(), handlerName, false);
+            Handler handler = kubernetesFacade.get(Handler.class, component.getMetadata().getNamespace(), handlerName);
             PipelineTaskBuilder pipelineTaskBuilder = new PipelineTaskBuilder()
                     .withName(handlerSpec.getHandlerRef().getName())
                     .withTaskRef(handler.getSpec().getTaskRef())
@@ -152,7 +152,7 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         String name = builderRef.getName();
         String namespace = agogosEnv.getRunningNamespace(builderRef);
 
-        Builder builder = kubernetesFacade.get(Builder.class, namespace, name, false);
+        Builder builder = kubernetesFacade.get(Builder.class, namespace, name);
         if (builder == null) {
             throw new MissingResourceException("Selected Builder '{}' is not available in the namespace '{}'",
                     name, namespace);

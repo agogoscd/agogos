@@ -439,7 +439,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
     private void installAgogosQuota() {
         if (quotaFile == null) {
-            if (kubernetesFacade.get(ResourceQuota.class, namespace, AGOGOS_QUOTA_NAME, false) != null) {
+            if (kubernetesFacade.get(ResourceQuota.class, namespace, AGOGOS_QUOTA_NAME) != null) {
                 kubernetesFacade.delete(ResourceQuota.class, namespace, AGOGOS_QUOTA_NAME);
             }
             return;
