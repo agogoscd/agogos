@@ -55,7 +55,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -125,15 +124,14 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
     @Option(names = { "--quota-file" }, description = "Resource quota file to be applied to the namespace")
     File quotaFile;
 
-    private List<HasMetadata> installedResources = new ArrayList<>();
-
     @Override
     public Integer call() {
+        LOG.info("🕞 Initializing '{}' namespace with Agogos resources...", namespace);
+
         if (isAgogosCoreNamespace()) {
             LOG.error("⛔ Unable to initialize namespace '{}' as it is an Agogos core namespace.", namespace);
             return CommandLine.ExitCode.USAGE;
         }
-        LOG.info("🕞 Initializing '{}' namespace with Agogos resources...", namespace);
 
         installNamespace();
         installConfig();
@@ -157,8 +155,6 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
         installAgogosRoleBindings(bindings);
 
         installAgogosQuota();
-
-        Helper.status(installedResources);
 
         kubernetesFacade.waitForAllPodsRunning(namespace);
 
@@ -193,7 +189,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         cm = kubernetesFacade.serverSideApply(cm);
 
-        installedResources.add(cm);
+        Helper.status(cm);
     }
 
     /**
@@ -211,7 +207,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         ns = kubernetesFacade.serverSideApply(ns);
 
-        installedResources.add(ns);
+        Helper.status(ns);
     }
 
     private void installMainRoleBinding(ServiceAccount sa) {
@@ -234,7 +230,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         roleBinding = kubernetesFacade.serverSideApply(roleBinding);
 
-        installedResources.add(roleBinding);
+        Helper.status(roleBinding);
     }
 
     /**
@@ -251,7 +247,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         sa = kubernetesFacade.serverSideApply(sa);
 
-        installedResources.add(sa);
+        Helper.status(sa);
 
         return sa;
     }
@@ -267,7 +263,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         configMap = kubernetesFacade.serverSideApply(configMap);
 
-        installedResources.add(configMap);
+        Helper.status(configMap);
 
         return configMap;
     }
@@ -292,7 +288,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         broker = kubernetesFacade.serverSideApply(broker);
 
-        installedResources.add(broker);
+        Helper.status(broker);
 
         return broker;
     }
@@ -318,7 +314,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         el = kubernetesFacade.serverSideApply(el);
 
-        installedResources.add(el);
+        Helper.status(el);
 
         return el;
     }
@@ -378,7 +374,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         trigger = kubernetesFacade.serverSideApply(trigger);
 
-        installedResources.add(trigger);
+        Helper.status(trigger);
 
         return trigger;
     }
@@ -413,7 +409,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
             roleBinding.getSubjects().add(subject);
             roleBinding = kubernetesFacade.serverSideApply(roleBinding);
         }
-        installedResources.add(roleBinding);
+        Helper.status(roleBinding);
 
         return roleBinding;
     }
@@ -429,7 +425,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         sa = kubernetesFacade.serverSideApply(sa);
 
-        installedResources.add(sa);
+        Helper.status(sa);
 
         return sa;
     }
@@ -476,7 +472,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                     .build();
 
             roleBinding = kubernetesFacade.serverSideApply(roleBinding);
-            installedResources.add(roleBinding);
+            Helper.status(roleBinding);
 
             processed.addAll(e.getValue()); // Add all new users as processed.
         }
@@ -501,7 +497,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                     .build();
             resourceQuota = kubernetesFacade.serverSideApply(resourceQuota);
 
-            installedResources.add(resourceQuota);
+            Helper.status(resourceQuota);
         } catch (FileNotFoundException e) {
             LOG.error("File " + quotaFile.getName() + " not found, no resource quota applied", e);
         }
@@ -593,7 +589,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                 .endSpec();
 
         io.fabric8.tekton.triggers.v1beta1.Trigger trigger = kubernetesFacade.serverSideApply(builder.build());
-        installedResources.add(trigger);
+        Helper.status(trigger);
     }
 
     private void installDependencyTrigger(String namespace) {
@@ -669,6 +665,6 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                 .endSpec();
 
         io.fabric8.tekton.triggers.v1beta1.Trigger trigger = kubernetesFacade.serverSideApply(builder.build());
-        installedResources.add(trigger);
+        Helper.status(trigger);
     }
 }
