@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Profile(InstallProfile.dev)
 @Profile(InstallProfile.local)
 @Profile(InstallProfile.prod)
 @Priority(99)
@@ -63,9 +64,14 @@ public class OperatorInstaller extends Installer {
         List<HasMetadata> resources = List.of(
                 serviceAccount(namespace),
                 clusterRole(),
-                clusterRoleBinding(namespace),
-                service(namespace),
-                deployment(namespace));
+                clusterRoleBinding(namespace));
+
+        // For local and prod profiles we need to add more resources
+        if (profile == InstallProfile.local || profile == InstallProfile.prod) {
+            resources.addAll(
+                    List.of(service(namespace),
+                            deployment(namespace)));
+        }
 
         List<HasMetadata> installed = new ArrayList<>();
         for (HasMetadata r : resources) {

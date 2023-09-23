@@ -95,16 +95,16 @@ public class WebhooksInstaller extends Installer {
         resources.addAll(
                 List.of(
                         admissionValidation(profile, namespace),
-                        admissionMutation(profile, namespace)));
+                        admissionMutation(profile, namespace),
+                        serviceAccount(namespace),
+                        clusterRole(),
+                        clusterRoleBinding(namespace),
+                        secret(namespace)));
 
         // For local and prod profiles we need to add more resources
         if (profile == InstallProfile.local || profile == InstallProfile.prod) {
             resources.addAll(
                     List.of(
-                            serviceAccount(namespace),
-                            clusterRole(),
-                            clusterRoleBinding(namespace),
-                            secret(namespace),
                             service(namespace),
                             deployment(namespace)));
         }
