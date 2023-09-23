@@ -1,6 +1,7 @@
 package com.redhat.agogos.test;
 
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
+import jakarta.inject.Inject;
 
 import java.util.function.Consumer;
 
@@ -17,9 +18,12 @@ import java.util.function.Consumer;
  */
 public class KubernetesTestServerSetup implements Consumer<KubernetesServer> {
 
-    final static String MOCKED_RESOURCE_NAME = "openapi.json";
-    final static String PATH = "/openapi/v2";
-    static final String OPENAPI_DATA = ResourceUtils.testResourceAsString(MOCKED_RESOURCE_NAME);
+    @Inject
+    ResourceUtils utils;
+
+    static final String MOCKED_RESOURCE_NAME = "openapi.json";
+    static final String PATH = "/openapi/v2";
+    final String OPENAPI_DATA = utils.testResourceAsString(MOCKED_RESOURCE_NAME);
 
     @Override
     public void accept(KubernetesServer server) {

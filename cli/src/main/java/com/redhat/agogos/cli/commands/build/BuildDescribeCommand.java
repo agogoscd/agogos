@@ -20,12 +20,12 @@ public class BuildDescribeCommand extends AbstractResourceSubcommand<Build> {
 
     @Override
     public Integer call() {
-        Build build;
+        Build build = null;
 
         if (last) {
             List<Build> resources = kubernetesFacade.list(Build.class, kubernetesFacade.getNamespace());
             build = resources.stream().sorted(byCreationTime()).findFirst().get();
-        } else {
+        } else if (name != null) {
             build = kubernetesFacade.get(Build.class, kubernetesFacade.getNamespace(), name);
         }
 
@@ -34,7 +34,7 @@ public class BuildDescribeCommand extends AbstractResourceSubcommand<Build> {
 
     Comparator<Build> byCreationTime() {
         return (r1, r2) -> {
-            return r1.creationTime().compareTo(r2.creationTime());
+            return r2.creationTime().compareTo(r1.creationTime());
         };
     }
 }

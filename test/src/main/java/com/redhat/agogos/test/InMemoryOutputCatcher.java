@@ -1,6 +1,8 @@
 package com.redhat.agogos.test;
 
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -10,6 +12,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class InMemoryOutputCatcher {
+
+    private static final Logger LOG = LoggerFactory.getLogger(InMemoryOutputCatcher.class);
 
     StringWriter sout = new StringWriter(
 
@@ -46,6 +50,26 @@ public class InMemoryOutputCatcher {
 
     public boolean stderrContains(String message) {
         return contains(err, serr, message);
+    }
+
+    public boolean compareToStdout(List<String> data) {
+        return data.equals(stdoutMessages());
+    }
+
+    public boolean compareToStderr(List<String> data) {
+        return data.equals(stderrMessages());
+    }
+
+    public void logStdout() {
+        stdoutMessages().forEach(s -> {
+            LOG.info("STDOUT: " + s);
+        });
+    }
+
+    public void logStderr() {
+        stderrMessages().forEach(s -> {
+            LOG.info("STDERR: " + s);
+        });
     }
 
     private List<String> records(PrintWriter p, StringWriter s) {

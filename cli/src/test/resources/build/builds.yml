@@ -1,0 +1,321 @@
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Build
+metadata:
+  creationTimestamp: "2023-09-27T13:25:48Z"
+  finalizers:
+  - builds.agogos.redhat.com/finalizer
+  generateName: dummy-component-dep-1-
+  generation: 1
+  labels:
+    agogos.redhat.com/instance: 4bd27cd9-9ce5-4433-960d-bdd87cda85fa
+    agogos.redhat.com/name: dummy-component-dep-1
+    agogos.redhat.com/resource: component
+  name: dummy-component-dep-1-62k7v
+  namespace: gallen
+  ownerReferences:
+  - apiVersion: agogos.redhat.com/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Component
+    name: dummy-component-dep-1
+    uid: 6966b023-faf5-476f-943b-e61f84709b56
+  resourceVersion: "3307"
+  uid: d39dea6f-81c7-40f4-a72b-3e811e3643f7
+spec:
+  component: dummy-component-dep-1
+status:
+  completionTime: "2023-09-27T13:26:10.632Z"
+  componentSpec:
+    build:
+      builderRef:
+        name: dummy-v1
+      params: {}
+    dependents:
+      components:
+      - dummy-component-dep-2
+      groups:
+      - dummy-component-group-1
+      pipelines: []
+    post: []
+    pre: []
+  lastUpdate: "2023-09-27T13:26:10.632Z"
+  output: '{"task-id": 33155498, "build-id": 1388246, "some-array": [1, 2, 3, 4,
+    5], "nested": {"thing": "one", "other": "two"}}'
+  reason: Build finished
+  startTime: "2023-09-27T13:25:48.853Z"
+  status: Finished
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Build
+metadata:
+  creationTimestamp: "2023-09-27T13:26:10Z"
+  finalizers:
+  - builds.agogos.redhat.com/finalizer
+  generateName: dummy-component-dep-2-
+  generation: 1
+  labels:
+    agogos.redhat.com/instance: 4bd27cd9-9ce5-4433-960d-bdd87cda85fa
+    agogos.redhat.com/name: dummy-component-dep-2
+    agogos.redhat.com/resource: component
+  name: dummy-component-dep-2-mf82q
+  namespace: gallen
+  ownerReferences:
+  - apiVersion: agogos.redhat.com/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Component
+    name: dummy-component-dep-2
+    uid: e015e158-001c-4b73-903b-4b093a6b3c2d
+  resourceVersion: "3589"
+  uid: a79f4e94-a042-49ea-a46d-1aac760cad4d
+spec:
+  component: dummy-component-dep-2
+status:
+  completionTime: "2023-09-27T13:26:25.515Z"
+  componentSpec:
+    build:
+      builderRef:
+        name: dummy-v1
+      params: {}
+    dependents:
+      components: []
+      groups: []
+      pipelines: []
+    post: []
+    pre: []
+  lastUpdate: "2023-09-27T13:26:25.515Z"
+  output: '{"task-id": 33155498, "build-id": 1388246, "some-array": [1, 2, 3, 4,
+    5], "nested": {"thing": "one", "other": "two"}}'
+  reason: Build finished
+  startTime: "2023-09-27T13:26:11.347Z"
+  status: Finished
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Build
+metadata:
+  creationTimestamp: "2023-09-27T13:26:11Z"
+  finalizers:
+  - builds.agogos.redhat.com/finalizer
+  generateName: dummy-component-group-dep-1-
+  generation: 1
+  labels:
+    agogos.redhat.com/group: dummy-component-group-1
+    agogos.redhat.com/instance: 4bd27cd9-9ce5-4433-960d-bdd87cda85fa
+    agogos.redhat.com/name: dummy-component-group-dep-1
+    agogos.redhat.com/resource: component
+  name: dummy-component-group-dep-1-c7j2k
+  namespace: gallen
+  ownerReferences:
+  - apiVersion: agogos.redhat.com/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Component
+    name: dummy-component-group-dep-1
+    uid: 738807b4-d12b-4317-89f8-7c9c0875a822
+  resourceVersion: "3552"
+  uid: 07d041ab-7a75-44f9-a384-b3118062919f
+spec:
+  component: dummy-component-group-dep-1
+status:
+  completionTime: "2023-09-27T13:26:22.402Z"
+  componentSpec:
+    build:
+      builderRef:
+        name: dummy-v1
+      params: {}
+    dependents:
+      components: []
+      groups: []
+      pipelines: []
+    post: []
+    pre: []
+  lastUpdate: "2023-09-27T13:26:22.402Z"
+  output: '{"task-id": 33155498, "build-id": 1388246, "some-array": [1, 2, 3, 4,
+    5], "nested": {"thing": "one", "other": "two"}}'
+  reason: Build finished
+  startTime: "2023-09-27T13:26:11.564Z"
+  status: Finished
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Build
+metadata:
+  creationTimestamp: "2023-09-27T13:26:11Z"
+  finalizers:
+  - builds.agogos.redhat.com/finalizer
+  generateName: dummy-component-group-dep-2-
+  generation: 1
+  labels:
+    agogos.redhat.com/group: dummy-component-group-1
+    agogos.redhat.com/instance: 4bd27cd9-9ce5-4433-960d-bdd87cda85fa
+    agogos.redhat.com/name: dummy-component-group-dep-2
+    agogos.redhat.com/resource: component
+  name: dummy-component-group-dep-2-wvbnm
+  namespace: gallen
+  ownerReferences:
+  - apiVersion: agogos.redhat.com/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Component
+    name: dummy-component-group-dep-2
+    uid: 65292cc3-8c81-460a-ba7c-d3c5b3aa1a8c
+  resourceVersion: "3633"
+  uid: 7c74f9bb-aa8c-4612-bfe3-0d09119cab77
+spec:
+  component: dummy-component-group-dep-2
+status:
+  completionTime: "2023-09-27T13:26:30.340Z"
+  componentSpec:
+    build:
+      builderRef:
+        name: dummy-v1
+      params: {}
+    dependents:
+      components: []
+      groups: []
+      pipelines: []
+    post: []
+    pre: []
+  lastUpdate: "2023-09-27T13:26:30.340Z"
+  output: '{"task-id": 33155498, "build-id": 1388246, "some-array": [1, 2, 3, 4,
+    5], "nested": {"thing": "one", "other": "two"}}'
+  reason: Build finished
+  startTime: "2023-09-27T13:26:30.340Z"
+  status: Finished
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Build
+metadata:
+  creationTimestamp: "2023-09-27T13:26:30Z"
+  finalizers:
+  - builds.agogos.redhat.com/finalizer
+  generateName: dummy-component-group-dep-3-
+  generation: 1
+  labels:
+    agogos.redhat.com/group: dummy-component-group-2
+    agogos.redhat.com/instance: 4bd27cd9-9ce5-4433-960d-bdd87cda85fa
+    agogos.redhat.com/name: dummy-component-group-dep-3
+    agogos.redhat.com/resource: component
+  name: dummy-component-group-dep-3-h7jmv
+  namespace: gallen
+  ownerReferences:
+  - apiVersion: agogos.redhat.com/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Component
+    name: dummy-component-group-dep-3
+    uid: 6f9d6c04-ef9e-4735-837c-92b3094e2660
+  resourceVersion: "3829"
+  uid: ea5f98be-2a14-4bab-89e2-b40b9f841a00
+spec:
+  component: dummy-component-group-dep-3
+status:
+  completionTime: "2023-09-27T13:26:40.540Z"
+  componentSpec:
+    build:
+      builderRef:
+        name: dummy-v1
+      params: {}
+    dependents:
+      components: []
+      groups: []
+      pipelines: []
+    post: []
+    pre: []
+  lastUpdate: "2023-09-27T13:26:40.540Z"
+  output: '{"task-id": 33155498, "build-id": 1388246, "some-array": [1, 2, 3, 4,
+    5], "nested": {"thing": "one", "other": "two"}}'
+  reason: Build finished
+  startTime: "2023-09-27T13:26:31.178Z"
+  status: Finished
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Build
+metadata:
+  creationTimestamp: "2023-09-27T13:26:30Z"
+  finalizers:
+  - builds.agogos.redhat.com/finalizer
+  generateName: dummy-component-group-dep-4-
+  generation: 1
+  labels:
+    agogos.redhat.com/group: dummy-component-group-2
+    agogos.redhat.com/instance: 4bd27cd9-9ce5-4433-960d-bdd87cda85fa
+    agogos.redhat.com/name: dummy-component-group-dep-4
+    agogos.redhat.com/resource: component
+  name: dummy-component-group-dep-4-rtdz9
+  namespace: gallen
+  ownerReferences:
+  - apiVersion: agogos.redhat.com/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Component
+    name: dummy-component-group-dep-4
+    uid: 01b3fdf6-7089-4b7c-af37-7fef30d70ef3
+  resourceVersion: "3861"
+  uid: 5c1d6659-2055-4324-83aa-be02b9e5d11a
+spec:
+  component: dummy-component-group-dep-4
+status:
+  completionTime: "2023-09-27T13:26:42.673Z"
+  componentSpec:
+    build:
+      builderRef:
+        name: dummy-v1
+      params: {}
+    dependents:
+      components: []
+      groups: []
+      pipelines: []
+    post: []
+    pre: []
+  lastUpdate: "2023-09-27T13:26:42.673Z"
+  output: '{"task-id": 33155498, "build-id": 1388246, "some-array": [1, 2, 3, 4,
+    5], "nested": {"thing": "one", "other": "two"}}'
+  reason: Build finished
+  startTime: "2023-09-27T13:26:31.297Z"
+  status: Finished
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Build
+metadata:
+  creationTimestamp: "2023-09-27T13:26:43Z"
+  finalizers:
+  - builds.agogos.redhat.com/finalizer
+  generateName: dummy-component-main-
+  generation: 1
+  labels:
+    agogos.redhat.com/instance: 4bd27cd9-9ce5-4433-960d-bdd87cda85fa
+    agogos.redhat.com/name: dummy-component-main
+    agogos.redhat.com/resource: component
+  name: dummy-component-main-pt4ps
+  namespace: gallen
+  ownerReferences:
+  - apiVersion: agogos.redhat.com/v1alpha1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Component
+    name: dummy-component-main
+    uid: 338e325b-a988-49c5-ad67-0b6ce03a1116
+  resourceVersion: "3991"
+  uid: 60a1fa41-a249-4b00-b757-52c646815609
+spec:
+  component: dummy-component-main
+status:
+  completionTime: "2023-09-27T13:26:53.084Z"
+  componentSpec:
+    build:
+      builderRef:
+        name: dummy-v1
+      params: {}
+    dependents:
+      components: []
+      groups: []
+      pipelines: []
+    post: []
+    pre: []
+  lastUpdate: "2023-09-27T13:26:53.084Z"
+  output: '{"task-id": 33155498, "build-id": 1388246, "some-array": [1, 2, 3, 4,
+    5], "nested": {"thing": "one", "other": "two"}}'
+  reason: Build finished
+  startTime: "2023-09-27T13:26:43.378Z"
+  status: Finished

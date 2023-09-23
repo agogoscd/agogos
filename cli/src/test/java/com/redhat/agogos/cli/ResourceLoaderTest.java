@@ -19,11 +19,14 @@ public class ResourceLoaderTest {
     @Inject
     ResourceLoader resourceLoader;
 
+    @Inject
+    ResourceUtils utils;
+
     @Test
     @DisplayName("Should handle invalid content")
     void shouldHandleInvalidYaml() throws Exception {
         Exception ex = Assertions.assertThrows(ApplicationException.class, () -> {
-            resourceLoader.loadResources(ResourceUtils.testResourceAsInputStream("loader/invalid.yaml"));
+            resourceLoader.loadResources(utils.testResourceAsInputStream("loader/invalid.yaml"));
         });
 
         assertEquals("Could not load resources", ex.getMessage());
@@ -34,7 +37,7 @@ public class ResourceLoaderTest {
     @DisplayName("Should be able to read arrays of JSON objects")
     void shouldHandleJSONArray() throws Exception {
         List<HasMetadata> installed = resourceLoader.loadResources(
-                ResourceUtils.testResourceAsInputStream("loader/resources.json"));
+                utils.testResourceAsInputStream("loader/resources.json"));
 
         assertEquals(2, installed.size());
     }
@@ -43,7 +46,7 @@ public class ResourceLoaderTest {
     @DisplayName("Should be able to read a single JSON object")
     void shouldHandleJSONObject() throws Exception {
         List<HasMetadata> installed = resourceLoader.loadResources(
-                ResourceUtils.testResourceAsInputStream("loader/single-resource.json"));
+                utils.testResourceAsInputStream("loader/single-resource.json"));
 
         assertEquals(1, installed.size());
     }
@@ -55,7 +58,7 @@ public class ResourceLoaderTest {
     @DisplayName("Should be able to read document with boundary markers")
     void shouldHandleBoundaryMarkers() throws Exception {
         List<HasMetadata> installed = resourceLoader.loadResources(
-                ResourceUtils.testResourceAsInputStream("loader/resources-with-boundary-markers.yaml"));
+                utils.testResourceAsInputStream("loader/resources-with-boundary-markers.yaml"));
 
         assertEquals(2, installed.size());
     }
