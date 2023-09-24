@@ -3,11 +3,14 @@ package com.redhat.agogos.cli.commands.adm.install;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import com.redhat.agogos.cli.config.KnativeEventingDependency;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.rbac.ClusterRole;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 @Profile(InstallProfile.dev)
 @Profile(InstallProfile.local)
@@ -48,6 +51,9 @@ public class KnativeEventingInstaller extends DependencyInstaller {
      * 
      */
     private void cleanup() {
+        // These ClusterRoles get modified by the aggregation controller, and must be deleted before another install occurs.
+        List<String> rolesToDelete = List.of("addressable-resolver", "channelable-manipulator", "podspecable-binding",
+                "source-observer");
 
         LOG.info("🕞 Cleaning up Knative Eventing resources...");
 
@@ -60,5 +66,9 @@ public class KnativeEventingInstaller extends DependencyInstaller {
                 .delete();
 
         kubernetesFacade.delete(Deployment.class, eventing.namespace(), "eventing-webhook");
+
+        rolesToDelete.stream().forEach(role -> {
+            kubernetesFacade.delete(ClusterRole.class, eventing.namespace(), role);
+        });
     }
 }
