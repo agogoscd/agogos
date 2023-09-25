@@ -27,7 +27,7 @@ build native executable:
     MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
     KUBERNETES_CPU_REQUEST: "2"
     KUBERNETES_CPU_LIMIT: "2"
-    KUBERNETES_MEMORY_REQUEST: "2Gi"
+    KUBERNETES_MEMORY_REQUEST: "6Gi"
     KUBERNETES_MEMORY_LIMIT: "6Gi"
 
 build and push image:
