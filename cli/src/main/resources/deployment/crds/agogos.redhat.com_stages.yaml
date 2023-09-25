@@ -46,14 +46,7 @@ spec:
                       description: Resolver used for Tekton Task
                     name:
                       type: string
-                      description: Name of the Tekton task being the implementation of the SourceHandler.
-                    kind:
-                      type: string
-                      description: The SourceHandler Tekton task implementation type. Can be either Task or ClusterTask. By default it is Task.
-                      default: Task
-                    url:
-                      type: string
-                      description: A URL to a Task definition
+                      description: Name of the Tekton task
                     params:
                       type: array
                       items:
@@ -63,6 +56,9 @@ spec:
                             type: string
                           value:
                             type: string
+                  oneOf:
+                    - required: ["resolver", "params"]
+                    - required: ["name"]
                 schema:
                   type: object
                   description: Validation definition that should be applied on the Stage configuration passed.
