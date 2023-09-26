@@ -19,7 +19,7 @@ build native executable:
 #        - core/**/*
 #        - $FOLDER/**/*
   script:
-    - ./mvnw package -pl $FOLDER -am -Pnative -Dquarkus.container-image.build=false -Dquarkus.native.native-image-xmx=6g -s settings.xml
+    - ./mvnw package -pl $FOLDER -am -Pnative -Dquarkus.container-image.build=false -Dquarkus.native.native-image-xmx=8g -s settings.xml
   stage: build
   tags:
     - native-images
@@ -29,7 +29,7 @@ build native executable:
     KUBERNETES_CPU_REQUEST: "2"
     KUBERNETES_CPU_LIMIT: "2"
     KUBERNETES_MEMORY_REQUEST: "2Gi"
-    KUBERNETES_MEMORY_LIMIT: "6Gi"
+    KUBERNETES_MEMORY_LIMIT: "8Gi"
 
 build and push image:
   image:
