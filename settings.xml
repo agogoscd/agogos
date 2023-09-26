@@ -6,7 +6,7 @@
             <id>proxy-squid</id>
             <active>true</active>
             <protocol>https</protocol>
-            <host>proxy2.squi-001.prod.iad2.dc.redhat.com/</host>
+            <host>squid.corp.redhat.com</host>
             <port>3128</port>
         </proxy>
     </proxies>
