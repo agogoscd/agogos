@@ -8,9 +8,9 @@ build native executable:
   parallel:
     matrix:
       - FOLDER:
-          - cli
+          #- cli
           #- interceptors
-          #- operator
+          - operator
           #- webhooks
   rules:
 #    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -39,7 +39,7 @@ build and push image:
     matrix:
       - FOLDER:
           #- interceptors
-          #- operator
+          - operator
           #- webhooks
 #  rules:
 #    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
