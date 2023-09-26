@@ -9,9 +9,9 @@ build native executable:
     matrix:
       - FOLDER:
           - cli
-          - interceptors
-          - operator
-          - webhooks
+          #- interceptors
+          #- operator
+          #- webhooks
   rules:
 #    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 #      changes:
@@ -29,7 +29,7 @@ build native executable:
     KUBERNETES_CPU_REQUEST: "2"
     KUBERNETES_CPU_LIMIT: "2"
     KUBERNETES_MEMORY_REQUEST: "2Gi"
-    KUBERNETES_MEMORY_LIMIT: "5Gi"
+    KUBERNETES_MEMORY_LIMIT: "6Gi"
 
 build and push image:
   image:
@@ -38,9 +38,9 @@ build and push image:
   parallel:
     matrix:
       - FOLDER:
-          - interceptors
-          - operator
-          - webhooks
+          #- interceptors
+          #- operator
+          #- webhooks
 #  rules:
 #    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 #      changes:
