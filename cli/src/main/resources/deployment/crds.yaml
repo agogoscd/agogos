@@ -270,14 +270,8 @@ spec:
                             description: Name of the Handler
                         required: ["name"]
                       params:
-                        items:
-                          properties:
-                            name:
-                              type: string
-                            value:
-                              type: string
-                          type: object
-                        type: array
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
                       config:
                         type: object
                         x-kubernetes-preserve-unknown-fields: true
@@ -299,14 +293,8 @@ spec:
                             description: Name of the Handler
                         required: ["name"]
                       params:
-                        items:
-                          properties:
-                            name:
-                              type: string
-                            value:
-                              type: string
-                          type: object
-                        type: array
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
                       config:
                         type: object
                         x-kubernetes-preserve-unknown-fields: true
@@ -328,14 +316,8 @@ spec:
                           description: Namespace of the Builder, default is the operator namespace
                       required: ["name"]
                     params:
-                      items:
-                        properties:
-                          name:
-                            type: string
-                          value:
-                            type: string
-                        type: object
-                      type: array
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
                   required: ["builderRef"]
                 dependents:
                   type: object

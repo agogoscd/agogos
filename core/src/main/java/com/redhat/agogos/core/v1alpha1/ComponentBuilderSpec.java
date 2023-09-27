@@ -4,14 +4,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
-import io.fabric8.tekton.pipeline.v1beta1.Param;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @ToString
@@ -65,7 +64,7 @@ public class ComponentBuilderSpec implements KubernetesResource {
 
     @Getter
     @Setter
-    private List<Param> params = new ArrayList<>();
+    private Map<String, Object> params = new HashMap<>();
 
     @Override
     public boolean equals(Object obj) {

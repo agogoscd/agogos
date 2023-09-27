@@ -10,7 +10,7 @@ spec:
     builderRef:
       name: "dummy-v1"
       namespace: "agogos"
-    params: []
+    params: {}
   dependents:
     components: []
     groups: []

@@ -130,11 +130,15 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         handlers.stream().forEach(handlerSpec -> {
             String handlerName = handlerSpec.getHandlerRef().getName();
 
+            String jsonParams = objectMapper.asJson(handlerSpec.getParams());
             Handler handler = kubernetesFacade.get(Handler.class, component.getMetadata().getNamespace(), handlerName);
             PipelineTaskBuilder pipelineTaskBuilder = new PipelineTaskBuilder()
                     .withName(handlerSpec.getHandlerRef().getName())
                     .withTaskRef(handler.getSpec().getTaskRef())
-                    .withParams(handlerSpec.getParams())
+                    .addNewParam()
+                    .withName("params")
+                    .withNewValue(jsonParams)
+                    .endParam()
                     .withWorkspaces(workspaceBindings(handler.getSpec().getWorkspaces()));
 
             if (tasks.size() > 1) {
@@ -158,10 +162,14 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
                     name, namespace);
         }
 
+        String jsonParams = objectMapper.asJson(component.getSpec().getBuild().getParams());
         PipelineTask pipelineTask = new PipelineTaskBuilder()
                 .withName(BUILD_PIPELINE_BUILDER_TASK_NAME)
                 .withTaskRef(builder.getSpec().getTaskRef())
-                .withParams(component.getSpec().getBuild().getParams())
+                .addNewParam()
+                .withName("params")
+                .withNewValue(jsonParams)
+                .endParam()
                 .addNewParam()
                 .withName("component")
                 .withNewValue("$(params.component)")

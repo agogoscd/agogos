@@ -80,54 +80,46 @@ public class ComponentValidator extends Validator<Component> {
                         component.getFullName(), handlerSpec.getHandlerRef().getName());
             }
 
-            handlerSpec.getParams().stream().forEach(p -> {
-                String name = p.getName();
-                String value = p.getValue().getStringVal();
-                Object schema = handler.getSpec().getSchema().getOpenAPIV3Schema().get(name);
+            Object schema = handler.getSpec().getSchema().getOpenAPIV3Schema();
 
-                // No schema provided for the parameter
-                if (schema == null) {
-                    return;
-                }
+            // No schema provided for the parameter
+            if (schema == null) {
+                return;
+            }
 
-                ValidationData<Void> validation = new ValidationData<>();
+            ValidationData<Void> validation = new ValidationData<>();
 
-                JsonNode schemaNode = objectMapper.convertValue(schema, JsonNode.class);
-                JsonNode contentNode = objectMapper.convertValue(value, JsonNode.class);
+            JsonNode schemaNode = objectMapper.convertValue(schema, JsonNode.class);
+            JsonNode contentNode = objectMapper.convertValue(handlerSpec.getParams(), JsonNode.class);
 
-                LOG.debug("Component '{}', Handler '{}': validating parameter '{}' with content: '{}' and schema: '{}'",
-                        component.getFullName(),
-                        handler.getFullName(),
-                        name,
-                        contentNode, schemaNode);
+            LOG.debug("Component '{}', Handler '{}': validating content: '{}' and schema: '{}'",
+                    component.getFullName(),
+                    handler.getFullName(),
+                    contentNode, schemaNode);
 
-                SchemaValidator schemaValidator;
+            SchemaValidator schemaValidator;
 
-                try {
-                    schemaValidator = new SchemaValidator(null, schemaNode);
-                } catch (ResolutionException e) {
-                    e.printStackTrace();
-                    throw new ApplicationException("Could not instantiate validator", e);
-                }
+            try {
+                schemaValidator = new SchemaValidator(null, schemaNode);
+            } catch (ResolutionException e) {
+                e.printStackTrace();
+                throw new ApplicationException("Could not instantiate validator", e);
+            }
 
-                schemaValidator.validate(contentNode, validation);
+            schemaValidator.validate(contentNode, validation);
 
-                if (!validation.isValid()) {
-                    List<String> errorMessages = validation.results().items().stream()
-                            .map(item -> item.message().replaceAll("\\.+$", "")).collect(Collectors.toList());
+            if (!validation.isValid()) {
+                List<String> errorMessages = validation.results().items().stream()
+                        .map(item -> item.message().replaceAll("\\.+$", "")).collect(Collectors.toList());
 
-                    errorMessages.forEach(message -> {
-                        LOG.error("Component '{}', Handler '{}' parameter '{}' validation error: {}", component.getFullName(),
-                                handler.getFullName(),
-                                name, message);
-                    });
+                errorMessages.forEach(message -> {
+                    LOG.error("Component '{}', Handler '{}' params validation error: {}", component.getFullName(),
+                            handler.getFullName(), message);
+                });
 
-                    throw new ValidationException("Component '{}', Handler '{}' parameter '{}' is not valid: {}",
-                            component.getFullName(), handler.getFullName(),
-                            name,
-                            errorMessages);
-                }
-            });
+                throw new ValidationException("Component '{}', Handler '{}' params is not valid: {}",
+                        component.getFullName(), handler.getFullName(), errorMessages);
+            }
 
             LOG.info("Component '{}' validation: parameters for Handler '{}' are valid!",
                     component.getFullName(), handlerSpec.getHandlerRef().getName());
