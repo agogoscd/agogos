@@ -7,6 +7,6 @@ spec:
   build:
     builderRef:
       name: my-builder
-      kind: Builder
+      namespace: <current-namespace>
     params:
       property: an-arbitrary-property

@@ -10,7 +10,6 @@ metadata:
 spec:
   taskRef:
     name: my-builder-task
-    kind: ClusterTask
   schema:
     openAPIV3Schema:
       required: [property]
@@ -19,7 +18,7 @@ spec:
           type: string
 ---
 apiVersion: tekton.dev/v1beta1
-kind: ClusterTask
+kind: Task
 metadata:
   name: my-builder-task
   labels:
@@ -31,7 +30,7 @@ spec:
   workspaces:
   - name: output
   params:
-  - name: component
+  - name: params
     type: string
   results:
   - name: data
@@ -52,14 +51,14 @@ spec:
       from pathlib import Path
 
       parser = argparse.ArgumentParser()
-      parser.add_argument("--component")
+      parser.add_argument("--params")
       parser.add_argument("--results-path")
       parser.add_argument("--output-path")
       args = parser.parse_args()
 
       print(args.output_path)
       print(args.results_path)
-      print(args.component)
+      print(args.params)
 
       config_path = Path("/config/my-builder-config.json")
       if config_path.exists():
@@ -70,7 +69,7 @@ spec:
     args:
     - "--output-path=$(workspaces.output.path)"
     - "--results-path=$(results.data.path)"
-    - "--component=$(params.component)"
+    - "--params=$(params.params)"
     volumeMounts:
     - name: config
       mountPath: /config

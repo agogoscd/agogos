@@ -2,9 +2,9 @@
 
 This document provides a guide to start coding your own Builder for Agogos.
 
-== Schema and ClusterTask
+== Schema and Tekton Task
 Builders in its minimal expression are built of a `Builder` Agogos resource and
-a `ClusterTask` Tekton resource. Start with the following file:
+a `Task` Tekton resource. Start with the following file:
 
 [source,yaml]
 ----
@@ -13,8 +13,8 @@ include::example$builders/builder.yaml[]
 
 [IMPORTANT]
 ====
-The `output` workspace, the `data` results and the parameter `component` are
-required. The execution fails if the `ClusterTask` do not implement these three.
+The `output` workspace, the `data` results and the parameter `params` are
+required.
 ====
 
 Apply the builder definition and then create the following `Component`:
@@ -40,7 +40,7 @@ include::example$builders/component-params.yaml[]
 ----
 
 == Container and Logs
-With the `Builder`, `ClusterTask` and its related `Component` we can execute a
+With the `Builder`, `Task` and its related `Component` we can execute a
 build:
 
 [source,bash]
@@ -48,12 +48,12 @@ build:
 agogosctl component build my-component
 ----
 
-With the starter `ClusterTask` provided here, the build prints the relevant
+With the starter `Task` provided here, the build prints the relevant
 parameters passed by Agogos and fails.
 
 [IMPORTANT]
 ====
-The starter `ClusterTask` fails because that keeps the pod around. After a
+The starter `Task` fails because that keeps the pod around. After a
 successful build execution the build pod gets deleted.
 ====
 
@@ -65,26 +65,7 @@ $ kubect logs my-component-<id>-build-pod
 Defaulted container "step-execute" out of: step-execute, prepare (init), place-scripts (init)
 /workspace/output
 /tekton/results/data
----
-apiVersion: "agogos.redhat.com/v1alpha1"
-kind: "Component"
-metadata:
-  // omitted content
-  name: "my-component"
-  namespace: "default"
-spec:
-  pre: []
-  post: []
-  build:
-    builderRef:
-      name: "my-builder"
-      kind: "Builder"
-      version: "v1alpha1"
-    params:
-      property: "an-arbitrary-property"
-status:
-  reason: "Component is ready"
-  status: "Ready"
+'{"property": "an-arbitrary-property"}'
 
 Exiting with an error for teaching purposes
 ----
@@ -115,6 +96,13 @@ Create the following ConfigMap resources and execute a build again. The file
 ----
 include::example$builders/configmap.yaml[]
 ----
+
+[TIP]
+====
+For some languages, deserializing YAML into native structures requires a third
+party library to be installed. If your library supports JSON or INI, use those
+over YAML.
+====
 
 See
 link:https://kubernetes.io/docs/concepts/configuration/configmap/#using-configmaps-as-files-from-a-pod[Using ConfigMaps as Files]

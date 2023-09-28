@@ -10,7 +10,6 @@ metadata:
 spec:
   taskRef:
     name: my-builder-task
-    kind: ClusterTask
   schema:
     openAPIV3Schema:
       required: [property]
@@ -19,7 +18,7 @@ spec:
           type: string
 ---
 apiVersion: tekton.dev/v1beta1
-kind: ClusterTask
+kind: Task
 metadata:
   name: my-builder-task
   labels:
@@ -31,7 +30,7 @@ spec:
   workspaces:
   - name: output
   params:
-  - name: component
+  - name: params
     type: string
   results:
   - name: data
@@ -56,7 +55,7 @@ spec:
     args:
     - "$(workspaces.output.path)"
     - "$(results.data.path)"
-    - "$(params.component)"
+    - "$(params.params)"
     volumeMounts:
     - name: config
       mountPath: /config

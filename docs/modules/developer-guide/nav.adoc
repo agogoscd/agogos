@@ -7,8 +7,7 @@
 *** xref:policy-guides/jira.adoc[Jira]
 *** xref:policy-guides/commit_message_format.adoc[Commit Message Format]
 *** xref:policy-guides/merge_request.adoc[Merge Request]
-** Builders
-*** xref:builders.adoc[]
+** xref:builders.adoc[]
 ** Stages
 *** xref:stages/builder_tutorial.adoc[]
 *** xref:stages/stage_api.adoc[]
