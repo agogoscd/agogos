@@ -104,7 +104,7 @@ There are two main event sources within the system:
 
 Agogos is a CloudEvent emitter as well. Sometimes these messages will be
 processed by the system again to perform certain actions such as
-xref:reference:triggers/index.adoc[triggering]
+xref:reference:triggers/overview.adoc[triggering]
 builds or running pipelines.
 
 Besides this, Agogos handles all other types of CloudEvents that become

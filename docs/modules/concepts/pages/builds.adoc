@@ -1,7 +1,7 @@
 = Builds
 
 Build object is created each time a
-xref:component.adoc[Component]
+xref:components.adoc[Component]
 is built.
 
 Build objects contain references to artifacts produced by the build process.

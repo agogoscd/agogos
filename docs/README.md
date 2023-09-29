@@ -10,9 +10,8 @@ integrated with continuous productization to release Red Hat products.
 
 ## Agogos Documentation Links
 
-* [Getting-Started Guide](https://agogos.pages.redhat.com/agogos/docs/getting-started/overview.html)
-* [User Documentation](https://agogos.pages.redhat.com/agogos/docs/user-guide/overview.html)
-* [Developer Documentation](https://agogos.pages.redhat.com/agogos/docs/developer-guide/index.html)
+* [Agogos Documentation Home Page](https://agogos.pages.redhat.com/agogos/docs/overview.html)
+* [Developer Contributing Guide](https://agogos.pages.redhat.com/agogos/docs/developer-guide/contribution_guide.html)
 
 ## External Links
 
@@ -20,7 +19,6 @@ integrated with continuous productization to release Red Hat products.
 
 ## Agogos Contact Information
 
-* [Agogos Documentation Home Page](https://agogos.pages.redhat.com/agogos/docs/overview.html)
 * [Agogos GitLab Repository](https://gitlab.cee.redhat.com/agogos/agogos)
 * [Email: Continuous Productization Development Team](mailto:cp-devel@redhat.com)
 * [Google chat: Agogos Developers](https://mail.google.com/chat/u/0/#chat/space/AAAA2w955F8)

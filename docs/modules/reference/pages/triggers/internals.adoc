@@ -76,7 +76,7 @@ of the event and forwarded to appropriate EventListener.
 [NOTE]
 ====
 See the
-xref:events/index.adoc#eventing-overview[overview diagram].
+xref:events/overview.adoc#eventing-overview[overview diagram].
 ====
 
 #TODO#

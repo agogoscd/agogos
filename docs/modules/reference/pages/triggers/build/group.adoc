@@ -1,11 +1,5 @@
 = Group Build Trigger
 
-[TIP]
-====
-Read more about the
-xref:concepts:groups.adoc[_Group_ concept].
-====
-
 [NOTE]
 ====
 This Trigger is part of
@@ -14,8 +8,7 @@ xref:reference:triggers/build/index.adoc[Build triggers].
 
 Group triggers are similar to
 xref:reference:triggers/build/component.adoc[Component triggers].
-Group triggers can be used in case there is a
-xref:concepts:groups.adoc[Group]
+Group triggers can be used in case there is a Group
 defined and we want to trigger the pipeline if any of the Components
 referenced in this Group should trigger the pipeline.
 
@@ -45,7 +38,7 @@ or the Component `c2` finishes.
 [WARNING]
 ====
 See the
-xref:reference:triggers/index#multiple-triggers[note about multiple triggers].
+xref:reference:triggers/overview.adoc#multiple-triggers[note about multiple triggers].
 Group name build triggers are implemented as multiple Component
 triggers internally.
 ====

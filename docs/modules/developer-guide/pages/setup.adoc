@@ -11,9 +11,8 @@ Any files referenced in this guide are relative to the root of the main Agogos r
 [NOTE]
 ====
 It is assumed that you are logged in to the cluster and using the the correct
-target namespace. In case of
-xref:environment/local.adoc[local environment]
-this would be a Minikube cluster and `default` namespace.
+target namespace. In case of the local environment
+this would be a Minikube cluster and the `default` namespace.
 ====
 
 == Resource Initialization

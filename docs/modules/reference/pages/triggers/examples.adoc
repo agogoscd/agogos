@@ -1,7 +1,7 @@
 = Examples
 
 This page contains examples of common use cases for a
-xref:reference:triggers/index.adoc[_Trigger_].
+xref:reference:triggers/overview.adoc[_Trigger_].
 
 == Component Resource
 
