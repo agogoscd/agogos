@@ -29,7 +29,7 @@ build native executable:
     KUBERNETES_CPU_REQUEST: "2"
     KUBERNETES_CPU_LIMIT: "2"
     KUBERNETES_MEMORY_REQUEST: "2Gi"
-    KUBERNETES_MEMORY_LIMIT: "9Gi"
+    KUBERNETES_MEMORY_LIMIT: "8Gi"
 
 build and push image:
   image:
