@@ -1,0 +1,6 @@
+💖 Agogos Information
+
+Cluster URL:		https://localhost:6443
+Namespace:		default
+Kubernetes version:	x.y
+
