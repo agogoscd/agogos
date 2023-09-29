@@ -73,6 +73,11 @@ public class CLI implements QuarkusApplication {
         return run(null, null, commandLine, args);
     }
 
+    public int run(PrintWriter out, PrintWriter err, Class<? extends Callable<Integer>> command, String... args) {
+        commandLine = initCommandLine(command, factory);
+        return run(out, err, commandLine, args);
+    }
+
     public int run(Class<? extends Callable<Integer>> command, String... args) {
         commandLine = initCommandLine(command, factory);
         return run(null, null, commandLine, args);

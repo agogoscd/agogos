@@ -67,7 +67,8 @@ public class ComponentBuildCommand extends AbstractResourceSubcommand<Component>
                 .build();
         List<Build> builds = kubernetesFacade.listNotEmpty(Build.class, kubernetesFacade.getNamespace(), options);
         if (builds.size() > 0) {
-            return cli.run(BuildDescribeCommand.class, builds.get(0).getMetadata().getName());
+            return cli.run(spec.commandLine().getOut(), spec.commandLine().getErr(), BuildDescribeCommand.class,
+                    builds.get(0).getMetadata().getName());
         } else {
             spec.commandLine().getOut().println("⛔ Unable to find build with submitted UUID " + uuid + ".");
             return ExitCode.SOFTWARE;

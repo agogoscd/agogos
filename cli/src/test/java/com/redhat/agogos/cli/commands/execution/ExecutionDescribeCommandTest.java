@@ -53,7 +53,7 @@ public class ExecutionDescribeCommandTest extends ExecutionCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStdoutNoDurations(utils.testResourceAsStringList("execution/describe-running-execution.txt")));
+                catcher.compareToStdoutSanitized(utils.testResourceAsStringList("execution/describe-running-execution.txt")));
     }
 
     @Test
@@ -67,7 +67,7 @@ public class ExecutionDescribeCommandTest extends ExecutionCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStdoutNoDurations(utils.testResourceAsStringList("execution/describe-failed-execution.txt")));
+                catcher.compareToStdoutSanitized(utils.testResourceAsStringList("execution/describe-failed-execution.txt")));
     }
 
     @Test

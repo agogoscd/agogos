@@ -1,0 +1,11 @@
+Usage: agogosctl components [-hvV] [-o=<output>] [COMMAND]
+Interact with components
+  -h, --help              Show this help message and exit.
+  -o, --output=<output>   Output format, valid values: plain, yaml, json,
+                            default: plain.
+  -v, --verbose
+  -V, --version           Print version information and exit.
+Commands:
+  build, b           build a component
+  list, l            list components
+  describe, desc, d  describe component

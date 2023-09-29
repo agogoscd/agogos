@@ -15,6 +15,10 @@ public class InMemoryOutputCatcher {
 
     private static final Logger LOG = LoggerFactory.getLogger(InMemoryOutputCatcher.class);
 
+    private static String REGEXP_DURATION = "\\d+ \\w+\\(s\\)\\s*";
+    private static String REGEXP_UUID = "[\\w\\d]{8}(-[\\w\\d]{4}){3}-[\\w\\d]{12}";
+    private static String SANITIZED_UUID = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
+
     StringWriter sout = new StringWriter(
 
     );
@@ -56,10 +60,19 @@ public class InMemoryOutputCatcher {
         return data.equals(stdoutMessages());
     }
 
-    public boolean compareToStdoutNoDurations(List<String> data) {
-        List<String> so = stdoutMessages().stream().map(x -> x.replaceAll("\\d+ \\w+\\(s\\)\\s*", ""))
+    /*
+     * Cleanse both standard output and the data.
+     * 
+     * 1. Remove any duration (represented by "\d+ \w+(s)\s*", e.g. "14 second(s)   ").
+     * 2. Replace any UUID with "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".
+     */
+    public boolean compareToStdoutSanitized(List<String> data) {
+        List<String> so = stdoutMessages().stream()
+                .map(x -> x.replaceAll(REGEXP_DURATION, "").replaceAll(REGEXP_UUID, SANITIZED_UUID))
                 .collect(Collectors.toList());
-        List<String> d = data.stream().map(x -> x.replaceAll("\\d+ \\w+\\(s\\)\\s*", "")).collect(Collectors.toList());
+        List<String> d = data.stream()
+                .map(x -> x.replaceAll(REGEXP_DURATION, "").replaceAll(REGEXP_UUID, SANITIZED_UUID))
+                .collect(Collectors.toList());
         return d.equals(so);
     }
 

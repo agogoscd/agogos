@@ -1,0 +1,212 @@
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Component","metadata":{"annotations":{},"name":"dummy-component-dep-1","namespace":"gallen"},"spec":{"build":{"builderRef":{"name":"dummy-v1"}},"dependents":{"components":["dummy-component-dep-2"],"groups":["dummy-component-group-1"]}}}
+  creationTimestamp: "2023-09-29T12:14:36Z"
+  finalizers:
+  - components.agogos.redhat.com/finalizer
+  generation: 2
+  name: dummy-component-dep-1
+  namespace: gallen
+  resourceVersion: "2022"
+  uid: ce9bfb6d-af98-4161-87a3-d2a03f9a5869
+spec:
+  build:
+    builderRef:
+      name: dummy-v1
+    params: {}
+  dependents:
+    components:
+    - dummy-component-dep-2
+    groups:
+    - dummy-component-group-1
+    pipelines: []
+  post: []
+  pre: []
+status:
+  lastUpdate: "2023-09-29T08:14:37-04:00"
+  reason: Component is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Component","metadata":{"annotations":{},"name":"dummy-component-dep-2","namespace":"gallen"},"spec":{"build":{"builderRef":{"name":"dummy-v1"}}}}
+  creationTimestamp: "2023-09-29T12:14:36Z"
+  finalizers:
+  - components.agogos.redhat.com/finalizer
+  generation: 2
+  name: dummy-component-dep-2
+  namespace: gallen
+  resourceVersion: "2020"
+  uid: b488e427-785d-43bf-946e-e877305b7ebb
+spec:
+  build:
+    builderRef:
+      name: dummy-v1
+    params: {}
+  dependents:
+    components: []
+    groups: []
+    pipelines: []
+  post: []
+  pre: []
+status:
+  lastUpdate: "2023-09-29T08:14:37-04:00"
+  reason: Component is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Component","metadata":{"annotations":{},"name":"dummy-component-group-dep-1","namespace":"gallen"},"spec":{"build":{"builderRef":{"name":"dummy-v1"}}}}
+  creationTimestamp: "2023-09-29T12:14:37Z"
+  finalizers:
+  - components.agogos.redhat.com/finalizer
+  generation: 2
+  name: dummy-component-group-dep-1
+  namespace: gallen
+  resourceVersion: "2019"
+  uid: 1ba66d65-9ade-490b-861c-9e4bcebf5759
+spec:
+  build:
+    builderRef:
+      name: dummy-v1
+    params: {}
+  dependents:
+    components: []
+    groups: []
+    pipelines: []
+  post: []
+  pre: []
+status:
+  lastUpdate: "2023-09-29T08:14:37-04:00"
+  reason: Component is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Component","metadata":{"annotations":{},"name":"dummy-component-group-dep-2","namespace":"gallen"},"spec":{"build":{"builderRef":{"name":"dummy-v1"}}}}
+  creationTimestamp: "2023-09-29T12:14:37Z"
+  finalizers:
+  - components.agogos.redhat.com/finalizer
+  generation: 2
+  name: dummy-component-group-dep-2
+  namespace: gallen
+  resourceVersion: "2030"
+  uid: 3174e177-8e8a-474c-9b15-c56593e1df10
+spec:
+  build:
+    builderRef:
+      name: dummy-v1
+    params: {}
+  dependents:
+    components: []
+    groups: []
+    pipelines: []
+  post: []
+  pre: []
+status:
+  lastUpdate: "2023-09-29T08:14:37-04:00"
+  reason: Component is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Component","metadata":{"annotations":{},"name":"dummy-component-group-dep-3","namespace":"gallen"},"spec":{"build":{"builderRef":{"name":"dummy-v1"}}}}
+  creationTimestamp: "2023-09-29T12:14:37Z"
+  finalizers:
+  - components.agogos.redhat.com/finalizer
+  generation: 2
+  name: dummy-component-group-dep-3
+  namespace: gallen
+  resourceVersion: "2037"
+  uid: 5edd3147-736f-4fc3-b1fc-cef6fdff8399
+spec:
+  build:
+    builderRef:
+      name: dummy-v1
+    params: {}
+  dependents:
+    components: []
+    groups: []
+    pipelines: []
+  post: []
+  pre: []
+status:
+  lastUpdate: "2023-09-29T08:14:37-04:00"
+  reason: Component is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Component","metadata":{"annotations":{},"name":"dummy-component-group-dep-4","namespace":"gallen"},"spec":{"build":{"builderRef":{"name":"dummy-v1"}}}}
+  creationTimestamp: "2023-09-29T12:14:37Z"
+  finalizers:
+  - components.agogos.redhat.com/finalizer
+  generation: 2
+  name: dummy-component-group-dep-4
+  namespace: gallen
+  resourceVersion: "2041"
+  uid: 2c5c641d-53f4-4bdb-bf30-a77c1aa7bebc
+spec:
+  build:
+    builderRef:
+      name: dummy-v1
+    params: {}
+  dependents:
+    components: []
+    groups: []
+    pipelines: []
+  post: []
+  pre: []
+status:
+  lastUpdate: "2023-09-29T08:14:37-04:00"
+  reason: Component is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Component","metadata":{"annotations":{},"name":"dummy-component-main","namespace":"gallen"},"spec":{"build":{"builderRef":{"name":"dummy-v1"}}}}
+  creationTimestamp: "2023-09-29T12:14:36Z"
+  finalizers:
+  - components.agogos.redhat.com/finalizer
+  generation: 2
+  name: dummy-component-main
+  namespace: gallen
+  resourceVersion: "2018"
+  uid: ebd81e4c-1aac-4a72-8120-9f5e6b41738a
+spec:
+  build:
+    builderRef:
+      name: dummy-v1
+    params: {}
+  dependents:
+    components: []
+    groups: []
+    pipelines: []
+  post: []
+  pre: []
+status:
+  lastUpdate: "2023-09-29T08:14:37-04:00"
+  reason: Component is ready
+  status: Ready

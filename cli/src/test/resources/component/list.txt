@@ -1,0 +1,8 @@
+NAME                            STATUS    CREATED
+dummy-component-dep-1           Ready     2023-09-29 12:14:36
+dummy-component-dep-2           Ready     2023-09-29 12:14:36
+dummy-component-main            Ready     2023-09-29 12:14:36
+dummy-component-group-dep-1     Ready     2023-09-29 12:14:37
+dummy-component-group-dep-2     Ready     2023-09-29 12:14:37
+dummy-component-group-dep-3     Ready     2023-09-29 12:14:37
+dummy-component-group-dep-4     Ready     2023-09-29 12:14:37

@@ -1,0 +1,9 @@
+Missing required parameter: '<name>'
+Usage: agogosctl components build [-hvV] [-o=<output>] <name>
+build a component
+      <name>              Name of the component to build.
+  -h, --help              Show this help message and exit.
+  -o, --output=<output>   Output format, valid values: plain, yaml, json,
+                            default: plain.
+  -v, --verbose
+  -V, --version           Print version information and exit.
