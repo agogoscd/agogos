@@ -1,0 +1,153 @@
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Execution
+metadata:
+  creationTimestamp: "2023-09-27T13:26:10Z"
+  finalizers:
+  - executions.agogos.redhat.com/finalizer
+  generateName: dummy-component-group-1-
+  generation: 5
+  labels:
+    agogos.redhat.com/instance: 4bd27cd9-9ce5-4433-960d-bdd87cda85fa
+    agogos.redhat.com/name: dummy-component-group-1
+    agogos.redhat.com/resource: group
+  name: dummy-component-group-1-4dvh6
+  namespace: gallen
+  resourceVersion: "3635"
+  uid: f0effa3d-54da-497c-9f78-9f85e2d7c977
+spec:
+  components:
+    dummy-component-group-dep-1:
+      status:
+        completionTime: "2023-09-27T13:26:22.402Z"
+        lastUpdate: "2023-09-27T13:26:22.402Z"
+        startTime: "2023-09-27T13:26:11.564Z"
+        status: Finished
+    dummy-component-group-dep-2:
+      status:
+        completionTime: "2023-09-27T13:26:30.340Z"
+        lastUpdate: "2023-09-27T13:26:30.340Z"
+        startTime: "2023-09-27T13:26:30.340Z"
+        status: Finished
+  group: dummy-component-group-1
+  groups: {}
+  pipelines: {}
+status:
+  completionTime: "2023-09-27T13:26:30.400Z"
+  lastUpdate: "2023-09-27T13:26:30.400Z"
+  startTime: "2023-09-27T13:26:10.996Z"
+  status: Finished
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Execution
+metadata:
+  creationTimestamp: "2023-09-27T13:26:30Z"
+  finalizers:
+  - executions.agogos.redhat.com/finalizer
+  generateName: dummy-component-group-2-
+  generation: 6
+  labels:
+    agogos.redhat.com/instance: 4bd27cd9-9ce5-4433-960d-bdd87cda85fa
+    agogos.redhat.com/name: dummy-component-group-2
+    agogos.redhat.com/resource: group
+  name: dummy-component-group-2-7jvxk
+  namespace: gallen
+  resourceVersion: "3860"
+  uid: d406176f-98ae-463e-a3c1-47deba3b1fca
+spec:
+  components:
+    dummy-component-group-dep-3:
+      status:
+        completionTime: "2023-09-27T13:26:40.540Z"
+        lastUpdate: "2023-09-27T13:26:40.540Z"
+        startTime: "2023-09-27T13:26:31.178Z"
+        status: Finished
+    dummy-component-group-dep-4:
+      status:
+        completionTime: "2023-09-27T13:26:42.673Z"
+        lastUpdate: "2023-09-27T13:26:42.673Z"
+        startTime: "2023-09-27T13:26:31.297Z"
+        status: Finished
+  group: dummy-component-group-2
+  groups: {}
+  pipelines: {}
+status:
+  completionTime: "2023-09-27T13:26:42.731Z"
+  lastUpdate: "2023-09-27T13:26:42.731Z"
+  startTime: "2023-09-27T13:26:30.727Z"
+  status: Finished
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Execution
+metadata:
+  creationTimestamp: "2023-09-29T13:04:45Z"
+  finalizers:
+  - executions.agogos.redhat.com/finalizer
+  generateName: dummy-component-group-1-
+  generation: 3
+  labels:
+    agogos.redhat.com/instance: 8242cb48-333d-448e-b7f7-fd7238f582df
+    agogos.redhat.com/name: dummy-component-group-1
+    agogos.redhat.com/resource: group
+  name: dummy-component-group-1-xwts6
+  namespace: gallen
+  resourceVersion: "19754"
+  uid: 8d7127e3-5c82-4a7c-a2a1-da7af2a75232
+spec:
+  components:
+    dummy-component-group-dep-1:
+      status:
+        lastUpdate: "2023-09-29T13:04:45.871Z"
+        startTime: "2023-09-29T13:04:45.870Z"
+        status: Running
+    dummy-component-group-dep-2:
+      status:
+        lastUpdate: "2023-09-29T13:04:45.832Z"
+        startTime: "2023-09-29T13:04:45.832Z"
+        status: Running
+  group: dummy-component-group-1
+  groups: {}
+  pipelines: {}
+status:
+  lastUpdate: "2023-09-29T13:04:45.409Z"
+  startTime: "2023-09-29T13:04:45.409Z"
+  status: Running
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Execution
+metadata:
+  creationTimestamp: "2023-09-29T15:45:26Z"
+  finalizers:
+  - executions.agogos.redhat.com/finalizer
+  generateName: dummy-component-group-1-
+  generation: 5
+  labels:
+    agogos.redhat.com/instance: 3b02a77e-ca0d-4da5-9e3b-1393598eb414
+    agogos.redhat.com/name: dummy-component-group-1
+    agogos.redhat.com/resource: group
+  name: dummy-component-group-1-f8n7t
+  namespace: gallen
+  resourceVersion: "75917"
+  uid: 8b3f5818-a053-4ed5-8171-82b700547fbc
+spec:
+  components:
+    dummy-component-group-dep-1:
+      status:
+        completionTime: "2023-09-29T15:45:45.615Z"
+        lastUpdate: "2023-09-29T15:45:45.615Z"
+        startTime: "2023-09-29T15:45:45.615Z"
+        status: Failed
+    dummy-component-group-dep-2:
+      status:
+        completionTime: "2023-09-29T15:45:39.327Z"
+        lastUpdate: "2023-09-29T15:45:39.327Z"
+        startTime: "2023-09-29T15:45:27.300Z"
+        status: Finished
+  group: dummy-component-group-1
+  groups: {}
+  pipelines: {}
+status:
+  completionTime: "2023-09-29T15:45:45.691Z"
+  lastUpdate: "2023-09-29T15:45:45.691Z"
+  startTime: "2023-09-29T15:45:26.791Z"
+  status: Failed

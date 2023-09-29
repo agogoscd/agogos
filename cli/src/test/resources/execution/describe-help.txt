@@ -1,0 +1,9 @@
+Usage: agogosctl executions describe [-hlvV] [-o=<output>] [<name>]
+describe execution
+      [<name>]            Name of the execution
+  -h, --help              Show this help message and exit.
+  -l, --last              Show description for last execution
+  -o, --output=<output>   Output format, valid values: plain, yaml, json,
+                            default: plain.
+  -v, --verbose
+  -V, --version           Print version information and exit.

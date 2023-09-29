@@ -1,0 +1,5 @@
+NAME                              STATUS       CREATED
+dummy-component-group-1-4dvh6     Finished     2023-09-27 13:26:10
+dummy-component-group-2-7jvxk     Finished     2023-09-27 13:26:30
+dummy-component-group-1-xwts6     Running      2023-09-29 13:04:45
+dummy-component-group-1-f8n7t     Failed       2023-09-29 15:45:26

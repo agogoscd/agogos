@@ -56,6 +56,13 @@ public class InMemoryOutputCatcher {
         return data.equals(stdoutMessages());
     }
 
+    public boolean compareToStdoutNoDurations(List<String> data) {
+        List<String> so = stdoutMessages().stream().map(x -> x.replaceAll("\\d+ \\w+\\(s\\)\\s*", ""))
+                .collect(Collectors.toList());
+        List<String> d = data.stream().map(x -> x.replaceAll("\\d+ \\w+\\(s\\)\\s*", "")).collect(Collectors.toList());
+        return d.equals(so);
+    }
+
     public boolean compareToStderr(List<String> data) {
         return data.equals(stderrMessages());
     }

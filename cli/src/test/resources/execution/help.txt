@@ -1,0 +1,10 @@
+Usage: agogosctl executions [-hvV] [-o=<output>] [COMMAND]
+Interact with executions
+  -h, --help              Show this help message and exit.
+  -o, --output=<output>   Output format, valid values: plain, yaml, json,
+                            default: plain.
+  -v, --verbose
+  -V, --version           Print version information and exit.
+Commands:
+  describe, d, desc  describe execution
+  list, l            list executions

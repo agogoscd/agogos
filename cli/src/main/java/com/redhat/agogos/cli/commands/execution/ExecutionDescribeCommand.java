@@ -30,12 +30,12 @@ public class ExecutionDescribeCommand extends AbstractResourceSubcommand<Executi
 
     @Override
     public Integer call() {
-        Execution execution;
+        Execution execution = null;
 
         if (last) {
             List<Execution> resources = kubernetesFacade.list(Execution.class, kubernetesFacade.getNamespace());
             execution = resources.stream().sorted(byCreationTime()).findFirst().get();
-        } else {
+        } else if (name != null) {
             execution = kubernetesFacade.get(Execution.class, kubernetesFacade.getNamespace(), name);
         }
 
@@ -44,7 +44,7 @@ public class ExecutionDescribeCommand extends AbstractResourceSubcommand<Executi
 
     Comparator<Execution> byCreationTime() {
         return (r1, r2) -> {
-            return r1.creationTime().compareTo(r2.creationTime());
+            return r2.creationTime().compareTo(r1.creationTime());
         };
     }
 

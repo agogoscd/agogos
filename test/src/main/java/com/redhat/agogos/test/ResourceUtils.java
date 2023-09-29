@@ -1,7 +1,7 @@
 package com.redhat.agogos.test;
 
 import com.redhat.agogos.core.errors.ApplicationException;
-import com.redhat.agogos.core.v1alpha1.Build;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -50,19 +50,19 @@ public class ResourceUtils {
                 .collect(Collectors.toList());
     }
 
-    public List<Build> loadTestResources(Class<Build> clazz, String path) {
+    public <T extends HasMetadata> List<T> loadTestResources(Class<T> clazz, String path) {
         Iterable<Object> elements = yaml.loadAll(testResourceAsInputStream(path));
 
-        List<Build> resources = new ArrayList<>();
+        List<T> resources = new ArrayList<>();
         try {
             elements.forEach(element -> {
                 if (element != null) {
                     if (element instanceof List) {
                         ((List<?>) element).forEach(entry -> {
-                            resources.add(objectMapper.convertValue(entry, Build.class));
+                            resources.add(objectMapper.convertValue(entry, clazz));
                         });
                     } else {
-                        resources.add(objectMapper.convertValue(element, Build.class));
+                        resources.add(objectMapper.convertValue(element, clazz));
                     }
                 }
             });
