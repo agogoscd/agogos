@@ -59,4 +59,4 @@ build and push image:
     - /kaniko/executor --context "$FOLDER" --dockerfile "src/main/docker/Dockerfile.native" --destination "quay.io/agogos/agogos-$FOLDER:test"
   stage: deploy
   tags:
-    - native-images
+    - docker
