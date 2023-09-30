@@ -21,7 +21,7 @@ build native executable:
   script:
     - |- 
             if [[ $FOLDER != "cli" ]]; then
-                ./mvnw package -pl $FOLDER -am -Pnative -Dquarkus.native.native-image-xmx=9g -Dnexus.username=NEXUS_USER -Dnexus.password=NEXUS_PASSWORD -s settings.xml
+                ./mvnw deploy -pl $FOLDER -am -Pnative -Dquarkus.native.native-image-xmx=9g -Dnexus.username=NEXUS_USER -Dnexus.password=NEXUS_PASSWORD -s settings.xml
             else 
                 ./mvnw package -pl $FOLDER -am -Pnative -Dquarkus.container-image.build=false -Dquarkus.native.native-image-xmx=9g -s settings.xml
             fi
