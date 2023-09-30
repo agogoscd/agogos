@@ -15,7 +15,7 @@ import java.util.List;
 
 public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends AgogosResourceStatus>>
         extends AbstractResourceSubcommand<T> {
-    @Option(names = "--limit", defaultValue = "0", description = "Number of items to display, if not provided all resources will be returned.", hidden = true)
+    @Option(names = "--limit", defaultValue = "0", description = "Number of items to display, if not provided all resources will be returned.")
     protected Long limit;
 
     public List<T> getResources() {

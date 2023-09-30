@@ -68,7 +68,6 @@ public class GroupExecuteCommand extends AbstractResourceSubcommand<Group> {
                 .build();
         List<Execution> executions = kubernetesFacade.listNotEmpty(Execution.class, kubernetesFacade.getNamespace(), options);
         if (executions.size() > 0) {
-            System.out.println("============================= HERE");
             return cli.run(spec.commandLine().getOut(), spec.commandLine().getErr(), ExecutionDescribeCommand.class,
                     executions.get(0).getMetadata().getName());
         } else {

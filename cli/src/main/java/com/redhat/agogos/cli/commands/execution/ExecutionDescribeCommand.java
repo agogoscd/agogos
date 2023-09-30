@@ -36,7 +36,6 @@ public class ExecutionDescribeCommand extends AbstractResourceSubcommand<Executi
             List<Execution> resources = kubernetesFacade.list(Execution.class, kubernetesFacade.getNamespace());
             execution = resources.stream().sorted(byCreationTime()).findFirst().get();
         } else if (name != null) {
-            System.out.println("+++++++++++++++++++++++++++++++++++++ HERE");
             execution = kubernetesFacade.get(Execution.class, kubernetesFacade.getNamespace(), name);
         }
 
