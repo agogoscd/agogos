@@ -1,0 +1,2 @@
+NAME                        STATUS    CREATED
+dummy-component-group-1     Ready     2023-09-29 12:14:37

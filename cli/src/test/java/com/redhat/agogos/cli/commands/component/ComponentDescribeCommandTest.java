@@ -41,4 +41,18 @@ public class ComponentDescribeCommandTest extends ComponentCommandBaseTest {
         Assertions.assertTrue(
                 catcher.compareToStdout(utils.testResourceAsStringList("component/describe-specific-component.txt")));
     }
+
+    @Test
+    public void describeUnknownComponent() throws Exception {
+        Mockito.when(kubernetesFacadeMock.getNamespace())
+                .thenReturn("namespace");
+        Mockito.when(kubernetesFacadeMock.get(Component.class, "namespace", "unknown-component"))
+                .thenReturn(null);
+
+        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "component", "describe", "unknown-component");
+
+        Assertions.assertEquals(ExitCode.USAGE, returnCode);
+        Assertions.assertTrue(
+                catcher.compareToStderr(utils.testResourceAsStringList("component/describe-unknown-component.txt")));
+    }
 }

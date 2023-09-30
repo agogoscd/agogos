@@ -1,0 +1,11 @@
+Usage: agogosctl groups [-hvV] [-o=<output>] [COMMAND]
+Interact with groups
+  -h, --help              Show this help message and exit.
+  -o, --output=<output>   Output format, valid values: plain, yaml, json,
+                            default: plain.
+  -v, --verbose
+  -V, --version           Print version information and exit.
+Commands:
+  execute, ex, e     execute a group
+  list, l            list groups
+  describe, desc, d  describe group

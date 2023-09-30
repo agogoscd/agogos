@@ -1,0 +1,17 @@
+💖 About
+
+Name:		dummy-component-group-1-6q8pp
+
+Components:	Name                            Status    Started              Completed            Duration       
+		dummy-component-group-dep-1     Finished  2023-09-29 15:44:56  2023-09-29 15:45:06  0 minute(s)    
+		dummy-component-group-dep-2     Finished  2023-09-29 15:45:14  2023-09-29 15:45:14  0 minute(s)    
+
+🎉 Status
+
+Status:		Finished 
+Reason:		N/A
+Created:	2023-09-29 15:44:55
+Started:	2023-09-29 15:44:55
+Finished:	2023-09-29 15:45:14
+Duration:	0 minute(s)
+

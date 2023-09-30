@@ -31,7 +31,7 @@ public class ComponentBuildCommand extends AbstractResourceSubcommand<Component>
     public Integer call() {
         Component component = kubernetesFacade.get(Component.class, kubernetesFacade.getNamespace(), name);
         if (component == null) {
-            spec.commandLine().getOut().println("⛔ Unable to find component '" + name + "'");
+            spec.commandLine().getErr().println("⛔ Unable to find component '" + name + "'");
             return ExitCode.USAGE;
         }
         String uuid = UUID.randomUUID().toString();
@@ -70,7 +70,7 @@ public class ComponentBuildCommand extends AbstractResourceSubcommand<Component>
             return cli.run(spec.commandLine().getOut(), spec.commandLine().getErr(), BuildDescribeCommand.class,
                     builds.get(0).getMetadata().getName());
         } else {
-            spec.commandLine().getOut().println("⛔ Unable to find build with submitted UUID " + uuid + ".");
+            spec.commandLine().getErr().println("⛔ Unable to find build with submitted UUID " + uuid + ".");
             return ExitCode.SOFTWARE;
         }
     }

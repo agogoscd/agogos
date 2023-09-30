@@ -67,13 +67,11 @@ public class InMemoryOutputCatcher {
      * 2. Replace any UUID with "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".
      */
     public boolean compareToStdoutSanitized(List<String> data) {
-        List<String> so = stdoutMessages().stream()
-                .map(x -> x.replaceAll(REGEXP_DURATION, "").replaceAll(REGEXP_UUID, SANITIZED_UUID))
-                .collect(Collectors.toList());
-        List<String> d = data.stream()
-                .map(x -> x.replaceAll(REGEXP_DURATION, "").replaceAll(REGEXP_UUID, SANITIZED_UUID))
-                .collect(Collectors.toList());
-        return d.equals(so);
+        return sanitize(data).equals(sanitize(stdoutMessages()));
+    }
+
+    public boolean compareToStderrSanitized(List<String> data) {
+        return sanitize(data).equals(sanitize(stderrMessages()));
     }
 
     public boolean compareToStderr(List<String> data) {
@@ -99,5 +97,11 @@ public class InMemoryOutputCatcher {
 
     private boolean contains(PrintWriter p, StringWriter s, String message) {
         return records(p, s).stream().anyMatch(m -> m.equals(message));
+    }
+
+    private List<String> sanitize(List<String> data) {
+        return data.stream()
+                .map(x -> x.replaceAll(REGEXP_DURATION, "").replaceAll(REGEXP_UUID, SANITIZED_UUID))
+                .collect(Collectors.toList());
     }
 }

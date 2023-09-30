@@ -64,7 +64,7 @@ public class ComponentBuildCommandTest extends ComponentCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.SOFTWARE, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStdoutSanitized(utils.testResourceAsStringList("component/build-build-not-found.txt")));
+                catcher.compareToStderrSanitized(utils.testResourceAsStringList("component/build-build-not-found.txt")));
     }
 
     @Test
@@ -78,6 +78,6 @@ public class ComponentBuildCommandTest extends ComponentCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.USAGE, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStdoutSanitized(utils.testResourceAsStringList("component/build-not-found-component.txt")));
+                catcher.compareToStderrSanitized(utils.testResourceAsStringList("component/build-not-found-component.txt")));
     }
 }
