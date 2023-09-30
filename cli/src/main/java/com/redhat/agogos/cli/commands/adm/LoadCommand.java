@@ -1,4 +1,4 @@
-package com.redhat.agogos.cli.commands.load;
+package com.redhat.agogos.cli.commands.adm;
 
 import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.ResourceLoader;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Command(mixinStandardHelpOptions = true, name = "load", aliases = {
-        "l" }, description = "Load agogos descriptors from files")
+        "l" }, description = "Load Agogos descriptors from files")
 public class LoadCommand extends AbstractCallableSubcommand {
 
     private static final Logger LOG = LoggerFactory.getLogger(LoadCommand.class);

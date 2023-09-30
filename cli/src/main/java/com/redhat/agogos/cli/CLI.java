@@ -7,7 +7,6 @@ import com.redhat.agogos.cli.commands.component.ComponentCommand;
 import com.redhat.agogos.cli.commands.execution.ExecutionCommand;
 import com.redhat.agogos.cli.commands.group.GroupCommand;
 import com.redhat.agogos.cli.commands.info.InfoCommand;
-import com.redhat.agogos.cli.commands.load.LoadCommand;
 import com.redhat.agogos.cli.commands.pipeline.PipelineCommand;
 import com.redhat.agogos.cli.commands.run.RunCommand;
 import com.redhat.agogos.cli.commands.stage.StageCommand;
@@ -111,7 +110,6 @@ public class CLI implements QuarkusApplication {
                 .addSubcommand(ExecutionCommand.class)
                 .addSubcommand(GroupCommand.class)
                 .addSubcommand(InfoCommand.class)
-                .addSubcommand(LoadCommand.class)
                 .addSubcommand(PipelineCommand.class)
                 .addSubcommand(RunCommand.class)
                 .addSubcommand(StageCommand.class)

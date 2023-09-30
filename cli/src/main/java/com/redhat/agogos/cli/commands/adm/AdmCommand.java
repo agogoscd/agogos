@@ -5,7 +5,8 @@ import picocli.CommandLine.Command;
 
 @Command(mixinStandardHelpOptions = true, name = "adm", description = "Agogos administration commands", subcommands = {
         InstallCommand.class,
-        InitNamespaceCommand.class
+        InitNamespaceCommand.class,
+        LoadCommand.class
 })
 public class AdmCommand extends AbstractSubcommand {
 }
