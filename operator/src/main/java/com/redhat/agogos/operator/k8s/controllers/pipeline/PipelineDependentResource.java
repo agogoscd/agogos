@@ -65,16 +65,8 @@ public class PipelineDependentResource
         for (StageEntry stageEntry : agogos.getSpec().getStages()) {
             StageReference stageRef = stageEntry.getStageRef();
             String name = stageRef.getName();
-            String namespace = agogosEnv.getRunningNamespace(stageRef);
 
-            LOG.debug("Processing Stage '{}' from namespace '{}' ", name, namespace);
-
-            Stage stage = kubernetesFacade.get(Stage.class, namespace, name);
-            if (stage == null) {
-                throw new MissingResourceException("Selected Stage '{}' is not available in namespace '{}'",
-                        name, namespace);
-            }
-
+            Stage stage = lookupStage(stageRef, agogos.getMetadata().getNamespace());
             String stageConfig = "{}";
 
             // Convert Component metadata to JSON
@@ -137,5 +129,22 @@ public class PipelineDependentResource
         LOG.debug("New Tekton Pipeline '{}' created for Agogos Pipeline '{}",
                 pipeline.getMetadata().getName(), agogos.getFullName());
         return pipeline;
+    }
+
+    private Stage lookupStage(StageReference stageRef, String pnamespace) {
+        String name = stageRef.getName();
+
+        Stage stage = kubernetesFacade.get(Stage.class, pnamespace, name);
+        if (stage == null) {
+            String namespace = agogosEnv.getRunningNamespace(stageRef);
+            stage = kubernetesFacade.get(Stage.class, namespace, name);
+            if (stage == null) {
+                throw new MissingResourceException("Selected Stage '{}' is not available in namespaces '{}' or '{}'",
+                        name, pnamespace, namespace);
+            }
+        }
+
+        LOG.debug("Stage '{}' found in namespace '{}'", name, stage.getMetadata().getNamespace());
+        return stage;
     }
 }

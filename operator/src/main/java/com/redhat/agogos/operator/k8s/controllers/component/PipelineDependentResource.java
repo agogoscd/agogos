@@ -152,16 +152,7 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
     }
 
     private void prepareBuilderTask(Component component, List<PipelineTask> tasks) {
-        BuilderRef builderRef = component.getSpec().getBuild().getBuilderRef();
-        String name = builderRef.getName();
-        String namespace = agogosEnv.getRunningNamespace(builderRef);
-
-        Builder builder = kubernetesFacade.get(Builder.class, namespace, name);
-        if (builder == null) {
-            throw new MissingResourceException("Selected Builder '{}' is not available in the namespace '{}'",
-                    name, namespace);
-        }
-
+        Builder builder = lookupBuilder(component);
         String jsonParams = objectMapper.asJson(component.getSpec().getBuild().getParams());
         PipelineTask pipelineTask = new PipelineTaskBuilder()
                 .withName(BUILD_PIPELINE_BUILDER_TASK_NAME)
@@ -224,5 +215,24 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         }
 
         return workspaceBindings;
+    }
+
+    private Builder lookupBuilder(Component component) {
+        String cnamespace = component.getMetadata().getNamespace();
+        BuilderRef builderRef = component.getSpec().getBuild().getBuilderRef();
+        String name = builderRef.getName();
+
+        Builder builder = kubernetesFacade.get(Builder.class, cnamespace, name);
+        if (builder == null) {
+            String namespace = agogosEnv.getRunningNamespace(builderRef);
+            builder = kubernetesFacade.get(Builder.class, namespace, name);
+            if (builder == null) {
+                throw new MissingResourceException("Selected Builder '{}' is not available in namespaces '{}' or '{}'",
+                        name, cnamespace, namespace);
+            }
+        }
+
+        LOG.debug("Builder '{}' found in namespace '{}'", name, builder.getMetadata().getNamespace());
+        return builder;
     }
 }
