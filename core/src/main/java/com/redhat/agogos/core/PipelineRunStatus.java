@@ -10,6 +10,7 @@ public enum PipelineRunStatus {
     SUCCEEDED,
     CANCELLING,
     CANCELLED,
+    RESOLVINGTASKREF,
     FAILED,
     TIMEOUT;
 
@@ -50,6 +51,7 @@ public enum PipelineRunStatus {
     public PipelineRunState toEvent() {
         switch (this) {
             case STARTED:
+            case RESOLVINGTASKREF:
             case RUNNING:
                 return PipelineRunState.STARTED;
             case COMPLETED:
@@ -65,6 +67,7 @@ public enum PipelineRunStatus {
     public ResultableResourceStatus toStatus() {
         switch (this) {
             case STARTED:
+            case RESOLVINGTASKREF:
             case RUNNING:
                 return ResultableResourceStatus.RUNNING;
             case COMPLETED:

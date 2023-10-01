@@ -998,6 +998,12 @@ spec:
             status:
               description: PipelineRunStatus defines the observed state of PipelineRun
               properties:
+                startTime:
+                  format: date-time
+                  type: string
+                completionTime:
+                  format: date-time
+                  type: string
                 lastUpdate:
                   format: date-time
                   type: string

@@ -77,6 +77,8 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
 
         Map<String, String> labels = new HashMap<>();
         labels.put(Label.RESOURCE.toString(), parentResource(resource).getKind().toLowerCase());
+        labels.put(Label.NAME.toString(), parentResource(resource).getMetadata().getName());
+        labels.put(Label.INSTANCE.toString(), resource.getMetadata().getLabels().get(Label.INSTANCE.toString()));
 
         PodSecurityContext podSecurityContext = new PodSecurityContextBuilder()
                 .withRunAsNonRoot(runAsNonRoot.orElse(true))

@@ -23,7 +23,6 @@ public class Run extends AgogosResource<RunSpec, ResultableStatus> implements Na
     private static final long serialVersionUID = 6688424087008846788L;
 
     @ToString
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
     public static class RunSpec {

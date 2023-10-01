@@ -2,8 +2,18 @@ package com.redhat.agogos.operator.k8s.controllers;
 
 import com.redhat.agogos.core.KubernetesFacade;
 import com.redhat.agogos.core.errors.ApplicationException;
+import com.redhat.agogos.core.k8s.Label;
+import com.redhat.agogos.core.k8s.Resource;
 import com.redhat.agogos.core.v1alpha1.AgogosResource;
+import com.redhat.agogos.core.v1alpha1.Build;
+import com.redhat.agogos.core.v1alpha1.Execution;
+import com.redhat.agogos.core.v1alpha1.Execution.ExecutionInfo;
+import com.redhat.agogos.core.v1alpha1.Group;
+import com.redhat.agogos.core.v1alpha1.ResultableStatus;
+import com.redhat.agogos.core.v1alpha1.Run;
 import com.redhat.agogos.operator.eventing.CloudEventPublisher;
+import io.fabric8.kubernetes.api.model.ListOptions;
+import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.api.model.Namespaced;
 import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
 import io.javaoperatorsdk.operator.api.reconciler.Cleaner;
@@ -14,6 +24,8 @@ import io.javaoperatorsdk.operator.api.reconciler.UpdateControl;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public abstract class AbstractController<T extends AgogosResource<?, ?>>
         implements Namespaced, Reconciler<T>, Cleaner<T> {
@@ -43,5 +55,57 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
 
     protected AgogosResource<?, ?> parentResource(T resource, Context<T> context) {
         throw new ApplicationException("No implementation of parentResource for '{}'", resource.getKind());
+    }
+
+    protected void updateExecutionInformation(T resource, String name, ResultableStatus resourceStatus) {
+        String group = resource.getMetadata().getLabels().get(Label.create(Resource.GROUP));
+        if (group != null) {
+            String fullName = resource.getFullName();
+
+            // Update the Execution with the new build status.
+            String instance = resource.getMetadata().getLabels().get(Label.INSTANCE.toString());
+            ListOptions options = new ListOptionsBuilder()
+                    .withLabelSelector(Label.RESOURCE + "=" + Resource.GROUP.toString().toLowerCase() + ","
+                            + Label.NAME + "=" + group + "," + Label.INSTANCE + "=" + instance)
+                    .build();
+            List<Execution> executions = kubernetesFacade.list(Execution.class, resource.getMetadata().getNamespace(), options);
+            if (executions.size() > 0) {
+                Execution execution = executions.get(0);
+                ExecutionInfo info = findExecutionInfo(resource, execution, name);
+                if (info != null) {
+                    ResultableStatus s = new ResultableStatus();
+                    s.setCompletionTime(resourceStatus.getCompletionTime());
+                    s.setLastUpdate(resourceStatus.getLastUpdate());
+                    s.setStartTime(resourceStatus.getStartTime());
+                    s.setStatus(resourceStatus.getStatus());
+
+                    info.setStatus(s);
+                    if (kubernetesFacade.update(execution) != null) {
+                        LOG.info("Updated execution info for '{}' to {} in '{}'", fullName,
+                                resourceStatus.getStatus(), execution.getFullName());
+                    } else {
+                        LOG.error("Unable to update execution info for '{}' to {} in '{}'", fullName,
+                                resourceStatus.getStatus(), execution.getFullName());
+                    }
+                } else {
+                    LOG.error("Unable to find ExecutionInfo for build '{}' with group '{}' and instance '{}'",
+                            fullName, group, instance);
+                }
+            } else {
+                LOG.error("Unable to find Execution for build '{}'", fullName);
+            }
+        }
+    }
+
+    private ExecutionInfo findExecutionInfo(T resource, Execution execution, String name) {
+        if (resource instanceof Build) {
+            return execution.getSpec().getComponents().get(name);
+        } else if (resource instanceof Group) {
+            return execution.getSpec().getGroups().get(name);
+        } else if (resource instanceof Run) {
+            return execution.getSpec().getPipelines().get(name);
+        } else {
+            throw new ApplicationException("Unrecognized resource in findExecutionInfo: " + resource.getKind());
+        }
     }
 }

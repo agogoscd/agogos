@@ -95,8 +95,9 @@ public class SubmissionController extends AbstractController<Submission> {
         run.getSpec().setPipeline(submission.getSpec().getName());
         run.getMetadata().setLabels(labels);
         run = kubernetesFacade.create(run);
-        LOG.debug("Trigger '{}' fired and created Run '{}'",
-                submission.getMetadata().getLabels().get(TEKTON_TRIGGER_LABEL_PREFIX + "trigger"),
+
+        String tLabel = submission.getMetadata().getLabels().get(TEKTON_TRIGGER_LABEL_PREFIX + "trigger");
+        LOG.debug((tLabel == null ? "CLI" : "Trigger " + tLabel + " fired and") + " created Run '{}'",
                 run.getMetadata().getName());
     }
 

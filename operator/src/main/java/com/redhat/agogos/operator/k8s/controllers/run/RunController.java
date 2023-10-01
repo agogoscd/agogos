@@ -2,7 +2,6 @@ package com.redhat.agogos.operator.k8s.controllers.run;
 
 import com.redhat.agogos.core.PipelineRunStatus;
 import com.redhat.agogos.core.ResultableResourceStatus;
-import com.redhat.agogos.core.errors.ApplicationException;
 import com.redhat.agogos.core.v1alpha1.Pipeline;
 import com.redhat.agogos.core.v1alpha1.ResultableStatus;
 import com.redhat.agogos.core.v1alpha1.Run;
@@ -43,24 +42,24 @@ public class RunController extends AbstractController<Run> implements EventSourc
 
     @SuppressWarnings("unchecked")
     @Override
-    public UpdateControl<Run> reconcile(Run resource, Context<Run> context) {
+    public UpdateControl<Run> reconcile(Run run, Context<Run> context) {
 
         Optional<PipelineRun> optional = context.getSecondaryResource(PipelineRun.class);
         if (optional.isEmpty()) {
-            LOG.debug("No PipelineRun for '{}' yet, returning noUpdate", resource.getFullName());
+            LOG.debug("No PipelineRun for '{}' yet, returning noUpdate", run.getFullName());
             return UpdateControl.noUpdate();
         } else if (optional.get().getStatus() == null) {
-            LOG.debug("No PipelineRun status for '{}' yet, returning noUpdate", resource.getFullName());
+            LOG.debug("No PipelineRun status for '{}' yet, returning noUpdate", run.getFullName());
             return UpdateControl.noUpdate();
         }
 
-        PipelineRun pipelinerun = optional.get();
-        PipelineRunStatus runStatus = PipelineRunStatus.fromPipelineRun(pipelinerun);
+        PipelineRun pipelineRun = optional.get();
+        PipelineRunStatus runStatus = PipelineRunStatus.fromPipelineRun(pipelineRun);
         ResultableResourceStatus status = runStatus.toStatus();
 
-        LOG.debug("PipelineRun status for '{}' is {}", resource.getFullName(), runStatus);
+        LOG.debug("PipelineRun status for '{}' is {}", run.getFullName(), runStatus);
 
-        ResultableStatus resourceStatus = resource.getStatus();
+        ResultableStatus resourceStatus = run.getStatus();
         final ResultableStatus originalResourceStatus = objectMapper.clone(resourceStatus);
 
         String message = null;
@@ -68,18 +67,21 @@ public class RunController extends AbstractController<Run> implements EventSourc
 
         switch (runStatus) {
             case STARTED:
-                message = String.format("%s started", resource.getKind());
+                message = String.format("%s started", run.getKind());
+                break;
+            case RESOLVINGTASKREF:
+                message = String.format("%s is resolving a task reference", run.getKind());
                 break;
             case RUNNING:
-                message = String.format("%s is running", resource.getKind());
+                message = String.format("%s is running", run.getKind());
                 break;
             case COMPLETED:
-                message = String.format("%s finished but some actions were skipped", resource.getKind());
+                message = String.format("%s finished but some actions were skipped", run.getKind());
                 break;
             case SUCCEEDED:
-                message = String.format("%s finished", resource.getKind());
+                message = String.format("%s finished", run.getKind());
 
-                List<PipelineRunResult> results = pipelinerun.getStatus().getPipelineResults().stream()
+                List<PipelineRunResult> results = pipelineRun.getStatus().getPipelineResults().stream()
                         .filter(r -> r.getName().equals("data")).collect(Collectors.toUnmodifiableList());
 
                 if (!results.isEmpty()) {
@@ -93,60 +95,66 @@ public class RunController extends AbstractController<Run> implements EventSourc
                 }
                 break;
             case FAILED:
-                message = String.format("%s failed", resource.getKind());
+                message = String.format("%s failed", run.getKind());
                 break;
             case TIMEOUT:
-                message = String.format("%s timed out", resource.getKind());
+                message = String.format("%s timed out", run.getKind());
                 break;
             case CANCELLING:
-                message = String.format("%s is being cancelled", resource.getKind());
+                message = String.format("%s is being cancelled", run.getKind());
                 break;
             case CANCELLED:
-                message = String.format("%s cancelled", resource.getKind());
+                message = String.format("%s cancelled", run.getKind());
                 break;
         }
 
+        Pipeline pipeline = parentResource(run, context);
         resourceStatus.setStatus(status);
         resourceStatus.setReason(message);
         resourceStatus.setResult(result);
-        resourceStatus.setStartTime(pipelinerun.getStatus().getStartTime());
-        resourceStatus.setCompletionTime(pipelinerun.getStatus().getCompletionTime());
+        if (resourceStatus.getStartTime() == null) {
+            resourceStatus.setStartTime(ResultableStatus.getFormattedNow());
+        }
+        if (pipelineRun.getStatus().getCompletionTime() != null && resourceStatus.getCompletionTime() == null) {
+            resourceStatus.setCompletionTime(ResultableStatus.getFormattedNow());
+        }
 
         // Check whether the resource status was modified
         // If this is not the case, we are done here
         if (resourceStatus.equals(originalResourceStatus)) {
-            LOG.debug("No change to {} status of '{}', returning noUpdate", resource.getKind(), resource.getFullName());
+            LOG.debug("No change to {} status of '{}', returning noUpdate", run.getKind(), run.getFullName());
             return UpdateControl.noUpdate();
         }
 
         // Update the last update field
         resourceStatus.setLastUpdate(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date()));
 
-        try {
-            cloudEventPublisher.publish(runStatus.toEvent(), resource, parentResource(resource, context));
-        } catch (Exception e) {
-            LOG.warn("Could not publish {} CloudEvent for {} '{}', reason: {}", resource.getKind().toLowerCase(),
-                    resource.getKind(), resource.getFullName(), e.getMessage(), e);
+        // Update now, BEFORE sending the cloud event. Otherwise we are in a race condition for any interceptors.
+        UpdateControl<Run> ctrl = UpdateControl.updateResourceAndStatus(run);
+
+        if (originalResourceStatus.getStatus() != resourceStatus.getStatus()) {
+            try {
+                cloudEventPublisher.publish(runStatus.toEvent(), run, pipeline);
+            } catch (Exception e) {
+                LOG.warn("Could not publish {} CloudEvent for {} '{}', reason: {}", run.getKind().toLowerCase(),
+                        run.getKind(), run.getFullName(), e.getMessage(), e);
+            }
+        } else {
+            LOG.debug("Not sending CloudEvent, original status '{}', new status '{}'", originalResourceStatus.getStatus(),
+                    resourceStatus.getStatus());
         }
 
-        LOG.debug("Updating {} '{}' with status '{}' (PipelineRun state '{}')",
-                resource.getKind(), resource.getFullName(), status, runStatus);
+        updateExecutionInformation(run, pipeline.getMetadata().getName(), resourceStatus);
 
-        return UpdateControl.updateStatus(resource);
+        LOG.debug("Updating {} '{}' with status '{}' (PipelineRun state '{}')",
+                run.getKind(), run.getFullName(), status, runStatus);
+
+        return ctrl;
     }
 
     @Override
     protected Pipeline parentResource(Run run, Context<Run> context) {
-        Pipeline pipeline = kubernetesFacade.get(
-                Pipeline.class,
-                run.getMetadata().getNamespace(),
-                run.getSpec().getPipeline());
-        if (pipeline == null) {
-            throw new ApplicationException("Could not find Pipeline '{}' in namespace '{}'",
-                    run.getSpec().getPipeline(), run.getMetadata().getNamespace());
-        }
-
-        return pipeline;
+        return context.getSecondaryResource(Pipeline.class).orElseThrow();
     }
 
     @Override
