@@ -31,7 +31,7 @@ public class PipelineRunCommand extends AbstractResourceSubcommand<Pipeline> {
     public Integer call() {
         Pipeline pipeline = kubernetesFacade.get(Pipeline.class, kubernetesFacade.getNamespace(), name);
         if (pipeline == null) {
-            spec.commandLine().getOut().println("⛔ Unable to find pipeline '" + name + "'");
+            spec.commandLine().getErr().println("⛔ Unable to find pipeline '" + name + "'");
             return ExitCode.USAGE;
         }
 
@@ -68,9 +68,10 @@ public class PipelineRunCommand extends AbstractResourceSubcommand<Pipeline> {
                 .build();
         List<Run> runs = kubernetesFacade.listNotEmpty(Run.class, kubernetesFacade.getNamespace(), options);
         if (runs.size() > 0) {
-            return cli.run(RunDescribeCommand.class, runs.get(0).getMetadata().getName());
+            return cli.run(spec.commandLine().getOut(), spec.commandLine().getErr(), RunDescribeCommand.class,
+                    runs.get(0).getMetadata().getName());
         } else {
-            spec.commandLine().getOut().println("⛔ Unable to find run with submitted UUID " + uuid + ".");
+            spec.commandLine().getErr().println("⛔ Unable to find run with submitted UUID " + uuid + ".");
             return ExitCode.SOFTWARE;
         }
     }

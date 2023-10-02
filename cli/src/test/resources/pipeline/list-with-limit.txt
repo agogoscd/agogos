@@ -1,0 +1,4 @@
+NAME                                 STATUS    CREATED
+dummy-group-3-pipeline-1             Ready     2023-09-30 18:39:51
+dummy-group-3-pipeline-2             Ready     2023-09-30 18:39:51
+dummy-group-4-group-1-pipeline-1     Ready     2023-10-01 18:53:37

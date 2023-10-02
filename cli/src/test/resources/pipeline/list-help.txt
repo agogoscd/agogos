@@ -1,0 +1,9 @@
+Usage: agogosctl pipelines list [-hvV] [--limit=<limit>] [-o=<output>]
+list pipelines
+  -h, --help              Show this help message and exit.
+      --limit=<limit>     Number of items to display, if not provided all
+                            resources will be returned.
+  -o, --output=<output>   Output format, valid values: plain, yaml, json,
+                            default: plain.
+  -v, --verbose
+  -V, --version           Print version information and exit.

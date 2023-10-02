@@ -1,0 +1,128 @@
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Run
+metadata:
+  creationTimestamp: "2023-10-01T20:01:54Z"
+  finalizers:
+  - runs.agogos.redhat.com/finalizer
+  generateName: dummy-group-3-pipeline-1-
+  generation: 1
+  labels:
+    agogos.redhat.com/group: dummy-group-3
+    agogos.redhat.com/instance: 2c4cf1be-7401-483a-bedb-34a4c6d58bc6
+    agogos.redhat.com/name: dummy-group-3-pipeline-1
+    agogos.redhat.com/resource: pipeline
+  name: dummy-group-3-pipeline-1-fpp9p
+  namespace: gallen
+  resourceVersion: "507354"
+  uid: 4b9bc31d-71eb-4177-8c99-347fdf4be994
+spec:
+  pipeline: dummy-group-3-pipeline-1
+status:
+  completionTime: "2023-10-01T20:02:07.824Z"
+  lastUpdate: "2023-10-01T16:02:07-04:00"
+  reason: Run finished
+  startTime: "2023-10-01T20:01:55.401Z"
+  status: Finished
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Run
+metadata:
+  creationTimestamp: "2023-10-01T20:01:54Z"
+  finalizers:
+  - runs.agogos.redhat.com/finalizer
+  generateName: dummy-group-3-pipeline-2-
+  generation: 1
+  labels:
+    agogos.redhat.com/group: dummy-group-3
+    agogos.redhat.com/instance: 2c4cf1be-7401-483a-bedb-34a4c6d58bc6
+    agogos.redhat.com/name: dummy-group-3-pipeline-2
+    agogos.redhat.com/resource: pipeline
+  name: dummy-group-3-pipeline-2-8swps
+  namespace: gallen
+  resourceVersion: "507400"
+  uid: ea67625f-dbe4-453c-a672-d30e66e4a1ae
+spec:
+  pipeline: dummy-group-3-pipeline-2
+status:
+  completionTime: "2023-10-01T20:02:13.602Z"
+  lastUpdate: "2023-10-01T16:02:13-04:00"
+  reason: Run finished
+  startTime: "2023-10-01T20:02:13.601Z"
+  status: Finished
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Run
+metadata:
+  creationTimestamp: "2023-10-01T20:01:37Z"
+  finalizers:
+  - runs.agogos.redhat.com/finalizer
+  generateName: dummy-group-4-pipeline-1-
+  generation: 1
+  labels:
+    agogos.redhat.com/group: dummy-group-4
+    agogos.redhat.com/instance: 2c4cf1be-7401-483a-bedb-34a4c6d58bc6
+    agogos.redhat.com/name: dummy-group-4-pipeline-1
+    agogos.redhat.com/resource: pipeline
+  name: dummy-group-4-pipeline-1-stz4n
+  namespace: gallen
+  resourceVersion: "507147"
+  uid: 754ecc4c-4a37-48d9-8e57-c6fd8911e985
+spec:
+  pipeline: dummy-group-4-pipeline-1
+status:
+  completionTime: "2023-10-01T20:01:55.437Z"
+  lastUpdate: "2023-10-01T16:01:55-04:00"
+  reason: Run finished
+  startTime: "2023-10-01T20:01:37.752Z"
+  status: Finished
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Run
+metadata:
+  creationTimestamp: "2023-10-01T20:01:25Z"
+  finalizers:
+  - runs.agogos.redhat.com/finalizer
+  generateName: dummy-pipeline-1-
+  generation: 1
+  labels:
+    agogos.redhat.com/instance: 2c4cf1be-7401-483a-bedb-34a4c6d58bc6
+    agogos.redhat.com/name: dummy-pipeline-1
+    agogos.redhat.com/resource: pipeline
+  name: dummy-pipeline-1-vztp7
+  namespace: gallen
+  resourceVersion: "506567"
+  uid: 0492e504-d93d-46fa-8a4f-c994c9bf1b0d
+spec:
+  pipeline: dummy-pipeline-1
+status:
+  completionTime: "2023-10-01T20:01:36.761Z"
+  lastUpdate: "2023-10-01T16:01:36-04:00"
+  reason: Run finished
+  startTime: "2023-10-01T20:01:26.134Z"
+  status: Finished
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Run
+metadata:
+  creationTimestamp: "2023-10-01T20:01:37Z"
+  finalizers:
+  - runs.agogos.redhat.com/finalizer
+  generateName: dummy-pipeline-2-
+  generation: 1
+  labels:
+    agogos.redhat.com/instance: 2c4cf1be-7401-483a-bedb-34a4c6d58bc6
+    agogos.redhat.com/name: dummy-pipeline-2
+    agogos.redhat.com/resource: pipeline
+  name: dummy-pipeline-2-m2x7d
+  namespace: gallen
+  resourceVersion: "507066"
+  uid: 0cc71539-d579-46e7-aedc-afeaa95d93c9
+spec:
+  pipeline: dummy-pipeline-2
+status:
+  completionTime: "2023-10-01T20:01:54.624Z"
+  lastUpdate: "2023-10-01T16:01:54-04:00"
+  reason: Run finished
+  startTime: "2023-10-01T20:01:37.487Z"
+  status: Finished

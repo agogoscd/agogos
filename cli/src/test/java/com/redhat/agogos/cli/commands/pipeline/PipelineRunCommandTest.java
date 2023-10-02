@@ -1,64 +1,83 @@
 package com.redhat.agogos.cli.commands.pipeline;
 
-import static org.mockito.Mockito.times;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 
-import com.redhat.agogos.cli.CLI;
-import com.redhat.agogos.cli.commands.AbstractCommandTest;
-import com.redhat.agogos.core.KubernetesFacade;
 import com.redhat.agogos.core.v1alpha1.Pipeline;
 import com.redhat.agogos.core.v1alpha1.Run;
 import io.fabric8.kubernetes.api.model.ListOptions;
-import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
-import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.mockito.MockitoConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mockito;
-import picocli.CommandLine;
+import picocli.CommandLine.ExitCode;
 
-import java.util.Arrays;
-import java.util.HashMap;
-
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @QuarkusTest
-public class PipelineRunCommandTest extends AbstractCommandTest {
-
-    @InjectMock
-    KubernetesFacade kubernetesFacadeMock;
-
-    @MockitoConfig(convertScopes = true)
-    @InjectMock
-    KubernetesSerialization objectMapperMock;
-
-    @InjectMock
-    CLI cliMock;
-
-    @InjectMocks
-    PipelineRunCommand pipelineRunCommand = new PipelineRunCommand();
+public class PipelineRunCommandTest extends PipelineCommandBaseTest {
 
     @Test
-    public void callsResourceAndAnotherCommand() throws Exception {
-        Mockito.when(kubernetesFacadeMock.get(Mockito.any(), Mockito.any(), Mockito.any()))
-                .thenReturn(new Pipeline());
-        Mockito.when(objectMapperMock.asJson(Mockito.any()))
-                .thenReturn("");
-        Mockito.when(kubernetesFacadeMock.unmarshal(Mockito.any(), Mockito.any()))
-                .thenReturn(new HashMap<String, Object>());
+    public void runHelp() throws Exception {
+        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "pipeline", "run", "--help");
+
+        Assertions.assertEquals(ExitCode.OK, returnCode);
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("pipeline/run-help.txt")));
+    }
+
+    @Test
+    public void runNoPipelineSpecified() throws Exception {
+        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "pipeline", "run");
+
+        Assertions.assertEquals(ExitCode.USAGE, returnCode);
+        Assertions.assertTrue(catcher.compareToStderr(utils.testResourceAsStringList("pipeline/run-no-pipeline.txt")));
+    }
+
+    @Test
+    public void runSpecificPipeline() throws Exception {
         Mockito.when(kubernetesFacadeMock.getNamespace())
                 .thenReturn("namespace");
-        Mockito.when(
-                kubernetesFacadeMock.listNotEmpty(Mockito.any(), Mockito.any(String.class), Mockito.any(ListOptions.class)))
-                .thenReturn(Arrays.asList(new Run()));
-        Mockito.when(cliMock.run(Mockito.any(), Mockito.any())).thenReturn(0);
+        Mockito.when(kubernetesFacadeMock.get(Pipeline.class, "namespace", "dummy-pipeline-1"))
+                .thenReturn(pipelines.get(4));
+        Mockito.when(kubernetesFacadeMock.listNotEmpty(eq(Run.class), eq("namespace"), any(ListOptions.class)))
+                .thenReturn(runs.subList(3, 4));
+        Mockito.when(kubernetesFacadeMock.get(Run.class, "namespace", "dummy-pipeline-1-vztp7"))
+                .thenReturn(runs.get(3));
 
-        CommandLine cmd = new CommandLine(pipelineRunCommand);
+        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "pipeline", "run", "dummy-pipeline-1");
 
-        int returnCode = cmd.execute("pipeline");
+        Assertions.assertEquals(ExitCode.OK, returnCode);
+        Assertions.assertTrue(
+                catcher.compareToStdout(utils.testResourceAsStringList("pipeline/run-specific-pipeline.txt")));
+    }
 
-        Assertions.assertEquals(0, returnCode);
-        Mockito.verify(kubernetesFacadeMock).listNotEmpty(Mockito.any(), Mockito.any(String.class),
-                Mockito.any(ListOptions.class));
-        Mockito.verify(kubernetesFacadeMock, times(2)).getNamespace();
+    @Test
+    public void runSpecificPipelineRunNotFound() throws Exception {
+        Mockito.when(kubernetesFacadeMock.getNamespace())
+                .thenReturn("namespace");
+        Mockito.when(kubernetesFacadeMock.get(Pipeline.class, "namespace", "dummy-pipeline-1"))
+                .thenReturn(pipelines.get(0));
+        Mockito.when(kubernetesFacadeMock.listNotEmpty(eq(Run.class), eq("namespace"), any(ListOptions.class)))
+                .thenReturn(runs.subList(0, 0));
+
+        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "pipeline", "run", "dummy-pipeline-1");
+
+        Assertions.assertEquals(ExitCode.SOFTWARE, returnCode);
+        Assertions.assertTrue(
+                catcher.compareToStderrSanitized(utils.testResourceAsStringList("pipeline/run-run-not-found.txt")));
+    }
+
+    @Test
+    public void runNotFoundPipeline() throws Exception {
+        Mockito.when(kubernetesFacadeMock.getNamespace())
+                .thenReturn("namespace");
+        Mockito.when(kubernetesFacadeMock.get(Pipeline.class, "namespace", "not-found"))
+                .thenReturn(null);
+
+        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "pipeline", "run", "not-found");
+
+        Assertions.assertEquals(ExitCode.USAGE, returnCode);
+        Assertions.assertTrue(
+                catcher.compareToStderrSanitized(utils.testResourceAsStringList("pipeline/run-not-found-pipeline.txt")));
     }
 }

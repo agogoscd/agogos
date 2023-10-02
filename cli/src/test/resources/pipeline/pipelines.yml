@@ -1,0 +1,175 @@
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Pipeline
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Pipeline","metadata":{"annotations":{},"name":"dummy-group-3-pipeline-1","namespace":"gallen"},"spec":{"stages":[{"config":{"int-value":0},"stageRef":{"name":"dummy-stage-1"}}]}}
+  creationTimestamp: "2023-09-30T18:39:51Z"
+  finalizers:
+  - pipelines.agogos.redhat.com/finalizer
+  generation: 2
+  name: dummy-group-3-pipeline-1
+  namespace: gallen
+  resourceVersion: "2438"
+  uid: c069777b-20ea-4d46-a153-dafcc0866dc4
+spec:
+  dependents:
+    components: []
+    groups: []
+    pipelines: []
+  stages:
+  - config:
+      int-value: 0
+    stageRef:
+      name: dummy-stage-1
+status:
+  lastUpdate: "2023-09-30T14:39:51-04:00"
+  reason: Pipeline is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Pipeline
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Pipeline","metadata":{"annotations":{},"name":"dummy-group-3-pipeline-2","namespace":"gallen"},"spec":{"stages":[{"config":{"int-value":10},"stageRef":{"name":"dummy-stage-2"}}]}}
+  creationTimestamp: "2023-09-30T18:39:51Z"
+  finalizers:
+  - pipelines.agogos.redhat.com/finalizer
+  generation: 2
+  name: dummy-group-3-pipeline-2
+  namespace: gallen
+  resourceVersion: "2441"
+  uid: 21883850-f00a-49e1-8544-b2fa4e956430
+spec:
+  dependents:
+    components: []
+    groups: []
+    pipelines: []
+  stages:
+  - config:
+      int-value: 10
+    stageRef:
+      name: dummy-stage-2
+status:
+  lastUpdate: "2023-09-30T14:39:51-04:00"
+  reason: Pipeline is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Pipeline
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Pipeline","metadata":{"annotations":{},"name":"dummy-group-4-group-1-pipeline-1","namespace":"gallen"},"spec":{"stages":[{"config":{"int-value":0},"stageRef":{"name":"dummy-stage-1"}}]}}
+  creationTimestamp: "2023-10-01T18:53:37Z"
+  finalizers:
+  - pipelines.agogos.redhat.com/finalizer
+  generation: 2
+  name: dummy-group-4-group-1-pipeline-1
+  namespace: gallen
+  resourceVersion: "482575"
+  uid: 0f047d40-ad9a-4880-a7b6-fdbc67729ebb
+spec:
+  dependents:
+    components: []
+    groups: []
+    pipelines: []
+  stages:
+  - config:
+      int-value: 0
+    stageRef:
+      name: dummy-stage-1
+status:
+  lastUpdate: "2023-10-01T14:53:37-04:00"
+  reason: Pipeline is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Pipeline
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Pipeline","metadata":{"annotations":{},"name":"dummy-group-4-pipeline-1","namespace":"gallen"},"spec":{"stages":[{"config":{"int-value":0},"stageRef":{"name":"dummy-stage-1"}}]}}
+  creationTimestamp: "2023-10-01T18:53:37Z"
+  finalizers:
+  - pipelines.agogos.redhat.com/finalizer
+  generation: 2
+  name: dummy-group-4-pipeline-1
+  namespace: gallen
+  resourceVersion: "482576"
+  uid: 58ef5c1d-4163-4299-acb5-7dd41094ebcb
+spec:
+  dependents:
+    components: []
+    groups: []
+    pipelines: []
+  stages:
+  - config:
+      int-value: 0
+    stageRef:
+      name: dummy-stage-1
+status:
+  lastUpdate: "2023-10-01T14:53:37-04:00"
+  reason: Pipeline is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Pipeline
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Pipeline","metadata":{"annotations":{},"name":"dummy-pipeline-1","namespace":"gallen"},"spec":{"dependents":{"groups":["dummy-group-4"],"pipelines":["dummy-pipeline-2"]},"stages":[{"config":{"int-value":0},"stageRef":{"name":"dummy-stage-1"}}]}}
+  creationTimestamp: "2023-09-30T18:39:51Z"
+  finalizers:
+  - pipelines.agogos.redhat.com/finalizer
+  generation: 3
+  name: dummy-pipeline-1
+  namespace: gallen
+  resourceVersion: "483935"
+  uid: d1a7add0-87f7-4031-a68b-65e4b8a83e6a
+spec:
+  dependents:
+    components: []
+    groups:
+    - dummy-group-4
+    pipelines:
+    - dummy-pipeline-2
+  stages:
+  - config:
+      int-value: 0
+    stageRef:
+      name: dummy-stage-1
+status:
+  lastUpdate: "2023-09-30T14:39:51-04:00"
+  reason: Pipeline is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Pipeline
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Pipeline","metadata":{"annotations":{},"name":"dummy-pipeline-2","namespace":"gallen"},"spec":{"dependents":{"groups":["dummy-group-3"]},"stages":[{"config":{"int-value":0},"stageRef":{"name":"dummy-stage-2"}}]}}
+  creationTimestamp: "2023-09-30T18:39:51Z"
+  finalizers:
+  - pipelines.agogos.redhat.com/finalizer
+  generation: 4
+  name: dummy-pipeline-2
+  namespace: gallen
+  resourceVersion: "443295"
+  uid: 1f63f420-68fa-4a0c-901e-b856b5a0fe07
+spec:
+  dependents:
+    groups:
+    - dummy-group-3
+  stages:
+  - config:
+      int-value: 0
+    stageRef:
+      name: dummy-stage-2
+status:
+  lastUpdate: "2023-09-30T14:39:51-04:00"
+  reason: Pipeline is ready
+  status: Ready
