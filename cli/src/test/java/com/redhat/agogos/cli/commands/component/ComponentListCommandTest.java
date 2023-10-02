@@ -21,7 +21,7 @@ public class ComponentListCommandTest extends ComponentCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "components", "list", "--help");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("component/list-help.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/component/list-help.txt")));
     }
 
     @Test
@@ -34,7 +34,7 @@ public class ComponentListCommandTest extends ComponentCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "components", "list");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("component/list.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/component/list.txt")));
     }
 
     @Test
@@ -47,6 +47,7 @@ public class ComponentListCommandTest extends ComponentCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "components", "list", "--limit", "1");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("component/list-with-limit.txt")));
+        Assertions
+                .assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/component/list-with-limit.txt")));
     }
 }

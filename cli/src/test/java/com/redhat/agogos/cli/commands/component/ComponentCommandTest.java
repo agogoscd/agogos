@@ -14,6 +14,6 @@ public class ComponentCommandTest extends AbstractCommandTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "component", "--help");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("component/help.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/component/help.txt")));
     }
 }

@@ -22,7 +22,7 @@ public class ComponentBuildCommandTest extends ComponentCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "component", "build", "--help");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("component/build-help.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/component/build-help.txt")));
     }
 
     @Test
@@ -30,7 +30,8 @@ public class ComponentBuildCommandTest extends ComponentCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "component", "build");
 
         Assertions.assertEquals(ExitCode.USAGE, returnCode);
-        Assertions.assertTrue(catcher.compareToStderr(utils.testResourceAsStringList("component/build-no-component.txt")));
+        Assertions.assertTrue(
+                catcher.compareToStderr(utils.testResourceAsStringList("commands/component/build-no-component.txt")));
     }
 
     @Test
@@ -48,7 +49,7 @@ public class ComponentBuildCommandTest extends ComponentCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStdout(utils.testResourceAsStringList("component/build-specific-component.txt")));
+                catcher.compareToStdout(utils.testResourceAsStringList("commands/component/build-specific-component.txt")));
     }
 
     @Test
@@ -64,7 +65,8 @@ public class ComponentBuildCommandTest extends ComponentCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.SOFTWARE, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStderrSanitized(utils.testResourceAsStringList("component/build-build-not-found.txt")));
+                catcher.compareToStderrSanitized(
+                        utils.testResourceAsStringList("commands/component/build-build-not-found.txt")));
     }
 
     @Test
@@ -78,6 +80,7 @@ public class ComponentBuildCommandTest extends ComponentCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.USAGE, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStderrSanitized(utils.testResourceAsStringList("component/build-not-found-component.txt")));
+                catcher.compareToStderrSanitized(
+                        utils.testResourceAsStringList("commands/component/build-not-found-component.txt")));
     }
 }

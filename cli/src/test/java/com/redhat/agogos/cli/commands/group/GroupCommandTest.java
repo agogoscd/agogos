@@ -14,6 +14,6 @@ public class GroupCommandTest extends AbstractCommandTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "group", "--help");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("group/help.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/group/help.txt")));
     }
 }

@@ -17,7 +17,7 @@ public class GroupDescribeCommandTest extends GroupCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "group", "describe", "--help");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("group/describe-help.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/group/describe-help.txt")));
     }
 
     @Test
@@ -25,7 +25,7 @@ public class GroupDescribeCommandTest extends GroupCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "group", "describe");
 
         Assertions.assertEquals(ExitCode.USAGE, returnCode);
-        Assertions.assertTrue(catcher.compareToStderr(utils.testResourceAsStringList("group/describe-no-group.txt")));
+        Assertions.assertTrue(catcher.compareToStderr(utils.testResourceAsStringList("commands/group/describe-no-group.txt")));
     }
 
     @Test
@@ -39,7 +39,7 @@ public class GroupDescribeCommandTest extends GroupCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStdout(utils.testResourceAsStringList("group/describe-specific-group.txt")));
+                catcher.compareToStdout(utils.testResourceAsStringList("commands/group/describe-specific-group.txt")));
     }
 
     @Test
@@ -53,6 +53,6 @@ public class GroupDescribeCommandTest extends GroupCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.USAGE, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStderr(utils.testResourceAsStringList("group/describe-unknown-group.txt")));
+                catcher.compareToStderr(utils.testResourceAsStringList("commands/group/describe-unknown-group.txt")));
     }
 }

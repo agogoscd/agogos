@@ -21,7 +21,7 @@ public class BuildListCommandTest extends BuildCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "build", "list", "--help");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("build/list-help.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/build/list-help.txt")));
     }
 
     @Test
@@ -34,7 +34,7 @@ public class BuildListCommandTest extends BuildCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "build", "list");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("build/list.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/build/list.txt")));
     }
 
     @Test
@@ -47,6 +47,6 @@ public class BuildListCommandTest extends BuildCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "build", "list", "--limit", "3");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("build/list-with-limit.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/build/list-with-limit.txt")));
     }
 }

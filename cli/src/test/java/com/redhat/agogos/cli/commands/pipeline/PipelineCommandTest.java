@@ -14,6 +14,6 @@ public class PipelineCommandTest extends AbstractCommandTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "pipeline", "--help");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("pipeline/help.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/pipeline/help.txt")));
     }
 }

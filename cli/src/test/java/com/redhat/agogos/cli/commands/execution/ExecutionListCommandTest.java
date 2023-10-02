@@ -21,7 +21,7 @@ public class ExecutionListCommandTest extends ExecutionCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "executions", "list", "--help");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("execution/list-help.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/execution/list-help.txt")));
     }
 
     @Test
@@ -34,7 +34,7 @@ public class ExecutionListCommandTest extends ExecutionCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "executions", "list");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("execution/list.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/execution/list.txt")));
     }
 
     @Test
@@ -47,6 +47,7 @@ public class ExecutionListCommandTest extends ExecutionCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "executions", "list", "--limit", "1");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("execution/list-with-limit.txt")));
+        Assertions
+                .assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/execution/list-with-limit.txt")));
     }
 }

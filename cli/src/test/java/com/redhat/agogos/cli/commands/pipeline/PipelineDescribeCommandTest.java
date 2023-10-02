@@ -17,7 +17,7 @@ public class PipelineDescribeCommandTest extends PipelineCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "pipeline", "describe", "--help");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("pipeline/describe-help.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/pipeline/describe-help.txt")));
     }
 
     @Test
@@ -25,7 +25,8 @@ public class PipelineDescribeCommandTest extends PipelineCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "pipeline", "describe");
 
         Assertions.assertEquals(ExitCode.USAGE, returnCode);
-        Assertions.assertTrue(catcher.compareToStderr(utils.testResourceAsStringList("pipeline/describe-no-pipeline.txt")));
+        Assertions.assertTrue(
+                catcher.compareToStderr(utils.testResourceAsStringList("commands/pipeline/describe-no-pipeline.txt")));
     }
 
     @Test
@@ -39,7 +40,7 @@ public class PipelineDescribeCommandTest extends PipelineCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStdout(utils.testResourceAsStringList("pipeline/describe-specific-pipeline.txt")));
+                catcher.compareToStdout(utils.testResourceAsStringList("commands/pipeline/describe-specific-pipeline.txt")));
     }
 
     @Test
@@ -53,6 +54,6 @@ public class PipelineDescribeCommandTest extends PipelineCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.USAGE, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStderr(utils.testResourceAsStringList("pipeline/describe-unknown-pipeline.txt")));
+                catcher.compareToStderr(utils.testResourceAsStringList("commands/pipeline/describe-unknown-pipeline.txt")));
     }
 }

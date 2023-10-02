@@ -18,7 +18,7 @@ public class InfoCommandTest extends AbstractCommandTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "info", "--help");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("info/help.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/info/help.txt")));
     }
 
     @Test
@@ -34,6 +34,6 @@ public class InfoCommandTest extends AbstractCommandTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "info");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("info/info-output.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/info/info-output.txt")));
     }
 }

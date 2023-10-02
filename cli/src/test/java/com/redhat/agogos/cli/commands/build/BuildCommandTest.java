@@ -14,6 +14,6 @@ public class BuildCommandTest extends AbstractCommandTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "build", "--help");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("build/help.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/build/help.txt")));
     }
 }

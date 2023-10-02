@@ -13,7 +13,7 @@ public abstract class ComponentCommandBaseTest extends AbstractCommandTest {
 
     @BeforeAll
     public void beforeAll() {
-        builds = utils.loadTestResources(Build.class, "component/builds.yml");
-        components = utils.loadTestResources(Component.class, "component/components.yml");
+        builds = utils.loadTestResources(Build.class, "commands/component/builds.yml");
+        components = utils.loadTestResources(Component.class, "commands/component/components.yml");
     }
 }

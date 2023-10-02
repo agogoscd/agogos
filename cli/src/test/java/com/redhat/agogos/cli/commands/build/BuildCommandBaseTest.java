@@ -11,6 +11,6 @@ public abstract class BuildCommandBaseTest extends AbstractCommandTest {
 
     @BeforeAll
     public void beforeAll() {
-        builds = utils.loadTestResources(Build.class, "build/builds.yml");
+        builds = utils.loadTestResources(Build.class, "commands/build/builds.yml");
     }
 }

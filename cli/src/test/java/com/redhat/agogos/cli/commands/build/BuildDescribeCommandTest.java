@@ -17,7 +17,7 @@ public class BuildDescribeCommandTest extends BuildCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "build", "describe", "--help");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("build/describe-help.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/build/describe-help.txt")));
     }
 
     @Test
@@ -25,7 +25,7 @@ public class BuildDescribeCommandTest extends BuildCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "build", "describe");
 
         Assertions.assertEquals(ExitCode.USAGE, returnCode);
-        Assertions.assertTrue(catcher.compareToStderr(utils.testResourceAsStringList("build/describe-no-build.txt")));
+        Assertions.assertTrue(catcher.compareToStderr(utils.testResourceAsStringList("commands/build/describe-no-build.txt")));
     }
 
     @Test
@@ -38,7 +38,8 @@ public class BuildDescribeCommandTest extends BuildCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "build", "describe", "dummy-component-dep-1-62k7v");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("build/describe-specific-build.txt")));
+        Assertions.assertTrue(
+                catcher.compareToStdout(utils.testResourceAsStringList("commands/build/describe-specific-build.txt")));
     }
 
     @Test
@@ -51,6 +52,7 @@ public class BuildDescribeCommandTest extends BuildCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "build", "describe", "--last");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("build/describe-last-build.txt")));
+        Assertions
+                .assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/build/describe-last-build.txt")));
     }
 }

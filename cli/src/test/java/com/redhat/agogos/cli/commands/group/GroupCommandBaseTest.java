@@ -13,7 +13,7 @@ public abstract class GroupCommandBaseTest extends AbstractCommandTest {
 
     @BeforeAll
     public void beforeAll() {
-        groups = utils.loadTestResources(Group.class, "group/groups.yml");
-        executions = utils.loadTestResources(Execution.class, "group/executions.yml");
+        groups = utils.loadTestResources(Group.class, "commands/group/groups.yml");
+        executions = utils.loadTestResources(Execution.class, "commands/group/executions.yml");
     }
 }

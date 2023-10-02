@@ -22,7 +22,7 @@ public class GroupExecutionCommandTest extends GroupCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "group", "execute", "--help");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("group/execution-help.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/group/execution-help.txt")));
     }
 
     @Test
@@ -30,7 +30,7 @@ public class GroupExecutionCommandTest extends GroupCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "group", "execute");
 
         Assertions.assertEquals(ExitCode.USAGE, returnCode);
-        Assertions.assertTrue(catcher.compareToStderr(utils.testResourceAsStringList("group/execution-no-group.txt")));
+        Assertions.assertTrue(catcher.compareToStderr(utils.testResourceAsStringList("commands/group/execution-no-group.txt")));
     }
 
     @Test
@@ -47,7 +47,7 @@ public class GroupExecutionCommandTest extends GroupCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "group", "execute", "dummy-component-group-1");
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStdout(utils.testResourceAsStringList("group/execution-specific-group.txt")));
+                catcher.compareToStdout(utils.testResourceAsStringList("commands/group/execution-specific-group.txt")));
     }
 
     @Test
@@ -63,7 +63,8 @@ public class GroupExecutionCommandTest extends GroupCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.SOFTWARE, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStderrSanitized(utils.testResourceAsStringList("group/execution-execution-not-found.txt")));
+                catcher.compareToStderrSanitized(
+                        utils.testResourceAsStringList("commands/group/execution-execution-not-found.txt")));
     }
 
     @Test
@@ -77,6 +78,6 @@ public class GroupExecutionCommandTest extends GroupCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.USAGE, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStderr(utils.testResourceAsStringList("group/execution-not-found-group.txt")));
+                catcher.compareToStderr(utils.testResourceAsStringList("commands/group/execution-not-found-group.txt")));
     }
 }

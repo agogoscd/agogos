@@ -21,7 +21,7 @@ public class GroupListCommandTest extends GroupCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "group", "list", "--help");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("group/list-help.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/group/list-help.txt")));
     }
 
     @Test
@@ -34,7 +34,7 @@ public class GroupListCommandTest extends GroupCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "group", "list");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("group/list.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/group/list.txt")));
     }
 
     @Test
@@ -47,6 +47,6 @@ public class GroupListCommandTest extends GroupCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "group", "list", "--limit", "1");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("group/list-with-limit.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/group/list-with-limit.txt")));
     }
 }

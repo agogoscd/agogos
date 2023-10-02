@@ -22,7 +22,7 @@ public class PipelineRunCommandTest extends PipelineCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "pipeline", "run", "--help");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("pipeline/run-help.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/pipeline/run-help.txt")));
     }
 
     @Test
@@ -30,7 +30,7 @@ public class PipelineRunCommandTest extends PipelineCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "pipeline", "run");
 
         Assertions.assertEquals(ExitCode.USAGE, returnCode);
-        Assertions.assertTrue(catcher.compareToStderr(utils.testResourceAsStringList("pipeline/run-no-pipeline.txt")));
+        Assertions.assertTrue(catcher.compareToStderr(utils.testResourceAsStringList("commands/pipeline/run-no-pipeline.txt")));
     }
 
     @Test
@@ -48,7 +48,7 @@ public class PipelineRunCommandTest extends PipelineCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStdout(utils.testResourceAsStringList("pipeline/run-specific-pipeline.txt")));
+                catcher.compareToStdout(utils.testResourceAsStringList("commands/pipeline/run-specific-pipeline.txt")));
     }
 
     @Test
@@ -64,7 +64,7 @@ public class PipelineRunCommandTest extends PipelineCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.SOFTWARE, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStderrSanitized(utils.testResourceAsStringList("pipeline/run-run-not-found.txt")));
+                catcher.compareToStderrSanitized(utils.testResourceAsStringList("commands/pipeline/run-run-not-found.txt")));
     }
 
     @Test
@@ -78,6 +78,7 @@ public class PipelineRunCommandTest extends PipelineCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.USAGE, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStderrSanitized(utils.testResourceAsStringList("pipeline/run-not-found-pipeline.txt")));
+                catcher.compareToStderrSanitized(
+                        utils.testResourceAsStringList("commands/pipeline/run-not-found-pipeline.txt")));
     }
 }

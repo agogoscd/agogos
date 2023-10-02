@@ -17,7 +17,7 @@ public class ComponentDescribeCommandTest extends ComponentCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "component", "describe", "--help");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
-        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("component/describe-help.txt")));
+        Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/component/describe-help.txt")));
     }
 
     @Test
@@ -25,7 +25,8 @@ public class ComponentDescribeCommandTest extends ComponentCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "component", "describe");
 
         Assertions.assertEquals(ExitCode.USAGE, returnCode);
-        Assertions.assertTrue(catcher.compareToStderr(utils.testResourceAsStringList("component/describe-no-component.txt")));
+        Assertions.assertTrue(
+                catcher.compareToStderr(utils.testResourceAsStringList("commands/component/describe-no-component.txt")));
     }
 
     @Test
@@ -39,7 +40,7 @@ public class ComponentDescribeCommandTest extends ComponentCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStdout(utils.testResourceAsStringList("component/describe-specific-component.txt")));
+                catcher.compareToStdout(utils.testResourceAsStringList("commands/component/describe-specific-component.txt")));
     }
 
     @Test
@@ -53,6 +54,6 @@ public class ComponentDescribeCommandTest extends ComponentCommandBaseTest {
 
         Assertions.assertEquals(ExitCode.USAGE, returnCode);
         Assertions.assertTrue(
-                catcher.compareToStderr(utils.testResourceAsStringList("component/describe-unknown-component.txt")));
+                catcher.compareToStderr(utils.testResourceAsStringList("commands/component/describe-unknown-component.txt")));
     }
 }

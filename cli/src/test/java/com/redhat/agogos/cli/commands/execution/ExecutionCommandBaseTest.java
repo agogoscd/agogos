@@ -11,6 +11,6 @@ public abstract class ExecutionCommandBaseTest extends AbstractCommandTest {
 
     @BeforeAll
     public void beforeAll() {
-        executions = utils.loadTestResources(Execution.class, "execution/executions.yml");
+        executions = utils.loadTestResources(Execution.class, "commands/execution/executions.yml");
     }
 }

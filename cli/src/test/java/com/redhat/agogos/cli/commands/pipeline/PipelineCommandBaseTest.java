@@ -13,7 +13,7 @@ public abstract class PipelineCommandBaseTest extends AbstractCommandTest {
 
     @BeforeAll
     public void beforeAll() {
-        pipelines = utils.loadTestResources(Pipeline.class, "pipeline/pipelines.yml");
-        runs = utils.loadTestResources(Run.class, "pipeline/runs.yml");
+        pipelines = utils.loadTestResources(Pipeline.class, "commands/pipeline/pipelines.yml");
+        runs = utils.loadTestResources(Run.class, "commands/pipeline/runs.yml");
     }
 }
