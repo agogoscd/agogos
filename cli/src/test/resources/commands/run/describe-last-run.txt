@@ -1,0 +1,13 @@
+💖 About
+
+Name:		dummy-group-3-pipeline-1-fpp9p
+
+🎉 Status
+
+Status:		Finished 
+Reason:		Run finished
+Created:	2023-10-01 20:01:54
+Started:	2023-10-01 20:01:55
+Finished:	2023-10-01 20:02:07
+Duration:	0 minute(s)
+

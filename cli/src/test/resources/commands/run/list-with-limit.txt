@@ -1,0 +1,4 @@
+NAME                               STATUS       CREATED
+dummy-group-4-pipeline-1-stz4n     Finished     2023-10-01 20:01:37
+dummy-group-3-pipeline-1-fpp9p     Finished     2023-10-01 20:01:54
+dummy-group-3-pipeline-2-8swps     Finished     2023-10-01 20:01:54

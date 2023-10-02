@@ -1,0 +1,9 @@
+Usage: agogosctl runs describe [-hlvV] [-o=<output>] [<name>]
+describe run
+      [<name>]            Name of the run
+  -h, --help              Show this help message and exit.
+  -l, --last              Show description for last run
+  -o, --output=<output>   Output format, valid values: plain, yaml, json,
+                            default: plain.
+  -v, --verbose
+  -V, --version           Print version information and exit.

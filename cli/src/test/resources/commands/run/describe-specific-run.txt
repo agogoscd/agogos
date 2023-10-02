@@ -1,0 +1,13 @@
+💖 About
+
+Name:		dummy-pipeline-1-vztp7
+
+🎉 Status
+
+Status:		Finished 
+Reason:		Run finished
+Created:	2023-10-01 20:01:25
+Started:	2023-10-01 20:01:26
+Finished:	2023-10-01 20:01:36
+Duration:	0 minute(s)
+
