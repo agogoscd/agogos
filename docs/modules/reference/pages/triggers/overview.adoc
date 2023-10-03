@@ -4,18 +4,9 @@ This guide will help you understand how Triggers work and what are the best
 practices related to Triggers.
 
 == Introduction
-
-Every
-xref:concepts:builds.adoc[Build]
-or
-xref:concepts:pipelines.adoc[Pipeline]
-can be run manually but this is not sufficient for automated systems.
-This is where
-xref:concepts:triggers.adoc[Triggers]
-come into play.
-
-Triggers are a way to define *when* a particular Pipeline (or Build) should
-be run.
+Every Build or Pipeline can be run manually, but this is not sufficient for
+automated systems. This is where Triggers come into play. Triggers are a way
+to define *when* a particular Pipeline (or Build) should be run.
 
 A Trigger is a binding between some event in the system and some action.
 Defined action is performed only when an event meets the required criteria
@@ -61,12 +52,12 @@ trigger2 -> pipeline [color="#a83232",penwidth="2",label="Run"];
 }
 ....
 
-There are multiple event types within the system and there are multiple Trigger types
-as well to cover these cases.
+There are multiple event types within the system and there are multiple Trigger
+types as well to cover these cases.
 
 [TIP]
 ====
-To understand better Triggers you may want to read about
+To understand Triggers better you may want to read about
 xref:events/overview.adoc[Events]
 first.
 ====
@@ -108,21 +99,18 @@ If the triggers are configured incorrectly -- resources can be triggered
 ====
 
 == Supported Target Resources
-
 Resource that can be defined as Trigger targets:
 
-* xref:concepts:components.adoc[Component]
- -- a new build will of specified Component be started
-* xref:concepts:pipelines.adoc[Pipeline]
- -- specified Pipeline will be run
+* Component
+ -- a new build of the specified Component is started
+* Pipeline
+ -- specified Pipeline is run
 
 == Examples
-
 The
-xref:reference:triggers/examples.adoc[examples page]
-contains examples usage of Triggers.
+xref:triggers/examples.adoc[Triggers Examples page]
+contains examples of Triggers.
 
 == More Information
-
-If you want to know more on how Triggers are implemented, we have a
+If you want to know more on how Triggers are implemented in Agogos, we have a
 xref:triggers/internals.adoc[document describing this].

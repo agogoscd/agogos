@@ -1,19 +1,7 @@
 = Component Build Trigger
 
-[TIP]
-====
-Read more about the
-xref:concepts:components.adoc[_Component_ concept].
-====
-
-[NOTE]
-====
-This Trigger is part of
-xref:reference:triggers/build/index.adoc[Build triggers].
-====
-
 A Component build trigger can be used to trigger a resource after a build of a
-specific Component is finished and we know exactly what is the Component name.
+specific Component is finished and we know exactly what the Component name is.
 
 .Example of a Component build trigger
 [source,yaml]
@@ -28,8 +16,8 @@ spec:
         name: "one"
   target:
     kind: Component
-    name: two
+    name: "two"
 ----
 
-In above example the `two` Component build will be started
+In the  example above, the `two` Component build will be started
 when a build of Component `one` is finished.

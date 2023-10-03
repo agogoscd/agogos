@@ -8,11 +8,7 @@ Pod Security Policy settings are covered under the
 `agogos.security.pod-security-policy` hierarchy.
 ====
 
-By default every
-xref:concepts:builds.adoc[Build]
-and
-xref:concepts:runs.adoc[Run]
-is executed with following Pod Security settings:
+By default every Agogos run is executed with following Pod Security settings:
 
 `runAsNonRoot`::
 Default: `true`

@@ -1,37 +1,28 @@
 = Build Artifacts
 
-[TIP]
-====
-Looking for
-xref:builds/results.adoc[Build results]?
-====
+== Overview
+Artifacts are output files of a Build. Every Build can define *zero or more*
+artifacts.
 
-Artifacts are files being the output of a Build. Every
-xref:concepts:builds.adoc[Build]
-can define *zero or more* artifacts.
-
-Artifacts are important for
-xref:concepts:pipelines.adoc[Pipeline]
-and
-xref:concepts:builds.adoc[Build]
-concepts which work on the output of Builds. Artifacts together with
+Artifacts are important for Pipelines that work on the output of Builds.
+Artifacts together with
 xref:builds/results.adoc[Build Results]
-provide required information so that other Builds and Pipelines can utilize
+provide required information so that other Pipelines can utilize
 the output of a previous Build.
 
-We can define two types of artifacts:
+There are two types of artifacts:
 
 . Local artifacts -- produced as part of the Build process in the Builder
   Pod and not uploaded anywhere,
 . External artifacts -- could be either:
 .. produced locally (just like local artifacts), but uploaded to an external
    storage, or
-.. produced by an external system and stored externally (image registry,
-   Maven repository, etc) as well
+.. produced by an external system and stored externally (such as in an image
+   registry or Maven repository).
 
-In case of external artifacts -- we usually do not have the need to store them
-internally to Agogos as well. What we need to do though is to have pointers to
-these files. This can be achieved in two ways:
+In case of external artifacts, Agogos usually does not have to store them
+internally as well. What Agogos needs to do is to have pointers to these files.
+This can be achieved in two ways:
 
 . Using
   xref:builds/results.adoc[Build results]
@@ -50,14 +41,10 @@ Agogos does not define the file type of the artifact, it can be anything:
 a binary or a text file. Agogos does not investigate these files.
 
 == Defining Artifacts
-
-#TODO#
-
-It is the responsibility of the user to define which files from the Build
-output should be.
+It is the responsibility of the developer to define which files from a Build
+are saved.
 
 == Artifact Handlers
-
 Artifact handlers have two responsibilities:
 
 . Storing artifacts in (potentially long-living) storage.
