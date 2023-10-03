@@ -9,7 +9,6 @@ spec:
     - dummy-2
   build:
     builderRef:
-      kind: Builder
       name: dummy-v1
 ---
 apiVersion: agogos.redhat.com/v1alpha1
@@ -22,7 +21,6 @@ spec:
     - dummy-3
   build:
     builderRef:
-      kind: Builder
       name: dummy-v1
 ---
 apiVersion: agogos.redhat.com/v1alpha1
@@ -32,5 +30,4 @@ metadata:
 spec:
   build:
     builderRef:
-      kind: Builder
       name: dummy-v1
