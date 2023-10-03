@@ -1,5 +1,0 @@
-= Pipelines
-
-Pipeline is a collection
-xref:stages.adoc[Stages]
-executed in particular order is called.

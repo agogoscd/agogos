@@ -1,7 +1,0 @@
-= Triggers
-
-Triggers are a way to define *when* should *what* happen in the system.
-It is a construct which makes it possible to define actions being
-a result of some events.
-
-Read xref:reference:triggers/overview.adoc[more about Triggers].

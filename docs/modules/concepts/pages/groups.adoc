@@ -1,5 +1,0 @@
-= Groups
-
-Group is a concept which combines multiple
-xref:components.adoc[Components]
-together.
