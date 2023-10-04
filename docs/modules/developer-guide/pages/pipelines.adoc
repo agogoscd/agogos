@@ -1,0 +1,88 @@
+= Pipelines
+
+This document provides a guide to start coding your own Pipeline for Agogos.
+
+[IMPORTANT]
+====
+When this document mentions Pipeline it refers to the Agogos Custom Resource
+named Pipeline, not the Tekton Custom Resource named Pipeline.
+====
+
+== Stage and Tekton Task
+Pipelines in its minimal expression are built of Agogos Stages and Tekton
+Tasks. The following file contains a simple defintion of a Stage and its
+associated Task. Apply the file to get the Stage and its Task created.
+
+[source,yaml]
+----
+include::example$pipelines/stage.yaml[]
+----
+
+[IMPORTANT]
+====
+You need to create multiple Stages referencing the same Task as Stages are not
+reusable in the same Pipeline. This limitation will be removed, see
+link:https://issues.redhat.com/browse/AGOGOS-343[AGOGOS-343].
+====
+
+There are two workspaces being passed to Stages: "pipeline" and "stage". The
+"pipeline" workspace contains a directoy per stage being used in the pipeline.
+The "stage" workspace is the directory related to the specific stage within the
+"pipeline" workspace. This allows for file sharing between Stages of the same
+Pipeline.
+
+
+== Pipeline
+Pipelines are composed by multiple stages that can be run in parallel or define
+rules to execute them in a particular order. In this Pipeline, Agogos executes
+the `write-1` and `write-2` stages in parallel and the `read` stage after both
+are finished.
+
+[source,yaml]
+----
+include::example$pipelines/pipeline.yaml[]
+----
+
+Execute the Pipeline with the [command]`agogosctl`:
+
+[source,bash]
+----
+agogosctl pipeline run my-pipeline
+----
+
+On execution, the Pipeline should fail on the `read` stage. Take a look at its
+logs:
+
+[source,bash]
+----
+$ kubectl logs -f my-pipeline-<id>-read-pod 
+Defaulted container "step-execute" out of: step-execute, prepare (init), place-scripts (init)
+/workspace/pipeline:
+total 12
+drwxrwxrwx 2 root root 4096 Sep 29 06:25 read
+drwxrwxrwx 2 root root 4096 Sep 29 06:24 write-1
+drwxrwxrwx 2 root root 4096 Sep 29 06:24 write-2
+
+/workspace/pipeline/read:
+total 0
+
+/workspace/pipeline/write-1:
+total 4
+-rw-r--r-- 1 65532 root 23 Sep 29 06:24 a-simple-file
+
+/workspace/pipeline/write-2:
+total 4
+-rw-r--r-- 1 65532 root 23 Sep 29 06:24 a-simple-file
+Exiting with an error for teaching purposes
+----
+
+The `write-1` and `write-2` stages created their own [filename]`a-simple-file`
+in their respective folders, named after the stage's names. From the `read`
+stage we were able to access these files.
+
+== Moving Forward
+The example Pipeline and Stages provided in this document use Bash, but you are
+not limited to it. You are able to change the container you are using, the script
+you are executing, and the steps that the Task is performing. See the
+link:https://gitlab.cee.redhat.com/agogos/extensions-internal[extensions-internal repository]
+for examples of Stages.
