@@ -7,6 +7,8 @@ validate:
   script:
     - mkdir -p ~/.ssh
     - chmod 600 ~/.ssh
+    - ls -lstd ~/.ssh
+    - touch ~/.ssh/known_hosts
     - ssh-keyscan -t rsa gitlab.cee.redhat.com >> ~/.ssh/known_hosts
     - npm install -g pajv
     - cd /tmp
