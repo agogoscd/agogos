@@ -7,7 +7,7 @@ validate:
   script:
     - npm install -g pajv
     - cd /tmp
-    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cee.redhat.com:gallen/extensions-internal.git
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cee.redhat.com/gallen/extensions-internal.git
     - git branch AGOGOS-400
   tags: [docker]
 
