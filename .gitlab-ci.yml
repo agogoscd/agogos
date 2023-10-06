@@ -1,5 +1,5 @@
 validate:
-  image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
+  image: registry.access.redhat.com/ubi9/nodejs-18:latest
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
     MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
