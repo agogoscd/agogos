@@ -5,14 +5,9 @@ validate:
     MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
   stage: test
   script:
-    - mkdir -p ~/.ssh
-    - chmod 666 ~/.ssh
-    - ls -lstd ~/.ssh
-    - sudo touch ~/.ssh/known_hosts
-    - sudo ssh-keyscan -t rsa gitlab.cee.redhat.com >> ~/.ssh/known_hosts
     - npm install -g pajv
     - cd /tmp
-    - git clone git@gitlab.cee.redhat.com:gallen/extensions-internal.git
+    - git clone gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.cee.redhat.com:gallen/extensions-internal.git
     - git branch AGOGOS-400
   tags: [docker]
 
