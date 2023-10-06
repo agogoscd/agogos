@@ -5,6 +5,7 @@ validate:
     MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
   stage: test
   script:
+    - ssh-keyscan -t rsa gitlab.cee.redhat.com >> ~/.ssh/known_hosts
     - npm install -g pajv
     - git clone git@gitlab.cee.redhat.com:gallen/extensions-internal.git
     - git branch AGOGOS-400
