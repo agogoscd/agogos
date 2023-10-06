@@ -6,7 +6,7 @@ validate:
   stage: test
   script:
     - mkdir -p ~/.ssh
-    - chmod 600 ~/.ssh
+    - chmod 666 ~/.ssh
     - ls -lstd ~/.ssh
     - touch ~/.ssh/known_hosts
     - ssh-keyscan -t rsa gitlab.cee.redhat.com >> ~/.ssh/known_hosts
