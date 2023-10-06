@@ -1,0 +1,68 @@
+= Coding Guidelines
+
+This document provides instructions and clarifications for some coding decisions
+made across the entire Agogos project.
+
+== Dependency Injection
+Agogos use
+link:https://en.wikipedia.org/wiki/Dependency_injection[dependency injection]
+in all the codebase. The injection is made using the
+link:https://es.quarkus.io/guides/cdi-reference[Quarkus DI (also called ArC)].
+The library relies on the `jakarta.inject.Inject` and other annotations to work.
+Dependency injection is the process in which an object receives objects it needs
+automatically, without worrying about their instantiation.
+
+.No dependency injection
+[source,java]
+----
+public class MyClass {
+
+    DependencyA dependencyA;
+
+    DependencyB dependencyB;
+
+    public MyClass() {
+        this.dependencyA = new DependencyA();
+        this.dependencyB = new DependencyB();
+    }
+
+}
+----
+
+."Traditional" dependency injection
+[source,java]
+----
+public class MyClass {
+
+    DependencyA dependencyA;
+
+    DependencyB dependencyB;
+
+    public MyClass(DependencyA instanceA, DependencyB instanceB) {
+        this.dependencyA = instanceA;
+        this.dependencyB = instanceB;
+    }
+
+}
+----
+
+."Jakarta" field dependency injection
+[source,java]
+----
+@ApplicationScoped
+public class MyClass {
+
+    @Inject
+    DependencyA dependencyA;
+
+    @Inject
+    DependencyB dependencyB;
+
+}
+----
+
+Agogos uses the "Jakarta" field injection style. Jakarta also supports injection
+on constructors and methods, but we are using the field injection, where fields
+of classes get injected. This injection system is used in testing too. See
+xref:testing.adoc[]
+for more information on testing.

@@ -1,5 +1,7 @@
 = Testing Agogos
 
+This page provides an overview about testing Agogos.
+
 == Basics
 To run the whole test suite execute:
 
@@ -18,7 +20,7 @@ $ ./mvnw --non-recursive verify
 Open the [filename]`target/site/jacoco/index.html` to see the report.
 
 == Single Test or Test Suite
-When you need to run a single test, execute:
+To run a single test, execute:
 
 [source,bash]
 ----
@@ -34,7 +36,203 @@ $ ./mvnw test -D failIfNoTests=false -D "test = ClassUnderTest"
 
 [WARNING]
 ====
-`-D failIfNoTests=false` is required because when you select a single test,
+`-D failIfNoTests=false` is required because when a single test is selected,
 all modules run for tests, but nothing matches. Removing the option makes the
-execution to fail after the first module with no matches executed.
+execution fail after the first module with no matches executed.
+====
+
+== Understanding Injection in Tests
+Agogos uses the "Jakarta" dependency injection specification (see
+xref:coding.adoc[]
+for more information). This means that nearly everything is injected and not
+instantiated directly. Injection is active in tests and it works automatically
+and recursively. Take the following files as an example:
+
+[source,java]
+----
+// Utils.java
+package com.my.test;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class Utils {
+
+    public String doSomething() {
+        return "Hello!";
+    }
+}
+----
+
+[source,java]
+----
+// MyClass.java
+package com.my.test;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped // This is needed so Quarkus is able to Inject it within the Test class
+public class MyClass {
+
+    @Inject
+    Utils utils;
+
+    public String doSomething() {
+        return utils.doSomething();
+    }
+
+}
+
+----
+
+[source,java]
+----
+// MyClassTest.java
+package com.my.test;
+
+import io.quarkus.test.junit.QuarkusTest;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+@QuarkusTest
+public class MyClassTest {
+
+    @Inject
+    MyClass myClass;
+
+    @Test
+    public void assertSomething() {
+        String response = myClass.doSomething();
+        Asertions.assertEqual("Hello!", response);
+    }
+}
+----
+
+In the `MyClassTest`, `MyClass` is injected as a field. Fields from `MyClass` are
+also injected, so they contain a real instance of `Utils` within the `myClass` instance.
+
+[WARNING]
+====
+* Do not try to use `Assertions.assertNotNull(myClass.utils)`,
+the returned value is always `null`.
+* Be careful as real objects are being injected. In Agogos this means the tests
+may be connecting to the current Kubernetes cluster.
+====
+
+== Understanding Mocks in Tests
+When Agogos reaches for external resources, create mocks for the objects
+that interact with external resources. To create the mocks, Quarkus use
+link:https://site.mockito.org/[Mockito].
+Take the following files as an example:
+
+[source,java]
+----
+// Utils.java
+package com.my.test;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped
+public class Utils {
+
+    public String doSomething() {
+        return "Hello!";
+    }
+
+    public String doSomethingComplex(ArrayList<String> words) {
+        return String.join(", ", words);
+    }
+
+}
+----
+
+[source,java]
+----
+// MyClass.java
+package com.my.test;
+
+import jakarta.enterprise.context.ApplicationScoped;
+
+@ApplicationScoped // This is needed so Quarkus is able to Inject it within the Test class
+public class MyClass {
+
+    @Inject
+    Utils utils;
+
+    public String doSomething() {
+        return utils.doSomething();
+    }
+
+    public String sayComplex(ArrayList<String> words) {
+        return utils.doSomethingComplex(words);
+    }
+
+}
+----
+
+[source,java]
+----
+// MyClassTest.java
+package com.my.test;
+
+import io.quarkus.test.InjectMock;
+import io.quarkus.test.junit.QuarkusTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+@QuarkusTest
+public class MyClassTest {
+
+    @InjectMock
+    MyUtils utilsMock;
+
+    @Inject
+    MyClass myClass;
+
+    @Test
+    public void assertSomething() {
+        Mockito
+            .when(utilsMock.doSomething())
+            .thenReturn("ABC");
+        Assertions.assertEquals("ABC", myClass.sayHello());
+    }
+
+    @Test
+    public void assertSomethingComplex() {
+        ArrayList<String> words = new ArrayList<String>();
+        words.add("complex");
+        words.add("words");
+
+        Mockito.when(utilsMock.doSomethingComplex(words)).thenReturn("abc");
+
+        Assertions.assertEquals("abc", myClass.sayComplex(words));
+    }
+
+    @Test
+    public void assertSomethingComplexAny() {
+        Mockito.when(utilsMock.doSomethingComplex(Mockito.any())).thenReturn("abc");
+
+        Assertions.assertEquals("abc", myClass.sayComplex(new ArrayList<String>()));
+    }
+
+}
+----
+
+Provided that `MyUtils` is a class that reached for external resources, the
+annotation `io.quarkus.test.InjectMock` creates a mock for any injection
+happening. Then `Mockito.when(...).thenReturn(...)` is used to control its
+return value.
+
+Mockito has different ways of matching method calls based on their arguments.
+Explictly match them or use `Mockito.any()` to match anything. `Mockito.any()`
+can be used with types too to restrict further the matches. See
+link:https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/ArgumentMatchers.html[ArgumentMatchers documentation]
+for more information about argument matching.
+
+[IMPORTANT]
+====
+Mocks created with `io.quarkus.test.InjectMock` return `null` on all of their
+methods. Use `Mockito.when(...).thenReturn(...)` to control their return values.
 ====
