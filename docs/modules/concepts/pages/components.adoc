@@ -1,0 +1,159 @@
+= Components
+
+Agogos' Components are resources that represent a buildable object. They
+require an Agogos' Builder and can define multiple Agogos' Handlers. Components
+pass parameters and configuration to Builders and Handlers to modify their
+behaviour.
+
+A resource file defining a Component looks like this:
+
+[source,yaml]
+----
+---
+kind: Component
+metadata:
+  name: my-component
+spec:
+  pre:
+  - handlerRef:
+      name: my-pre-handler
+    params:
+      key: value
+  build:
+    builderRef:
+      name: my-builder
+    params:
+      key: value
+  post:
+  - handlerRef:
+      name: my-post-handler
+    params:
+      key: value
+----
+
+When a Component is created, Agogos creates a Tekton Pipeline associated with
+it that contains the proper steps defined by the Handlers and the Builder. Every
+time the Component is changed, its Tekton Pipeline is updated.
+
+== Builders and Handlers
+Agogos' Builders and Handlers are resources that wrap a Tekton Task that provide
+schema validation for Components. When a Component is created its `params` are
+validated against the Builder's or Handler's `spec.schema.openAPIV3Schema` key,
+rejecting their creation if the validation fails. Builders validate Component's
+`spec.build.params` and Handlers validate `spec.pre[?].params` or
+`spec.post[?].params` if they are referenced.
+
+A resource file for a Builder schema looks like this:
+
+[source,yaml]
+----
+---
+kind: Builder
+metadata:
+  name: my-builder
+spec:
+  taskRef:
+    name: my-builder-task # Task in the current namespace
+  schema:
+    openAPIV3Schema:
+      required: [key]
+      properties:
+        key:
+          type: string
+----
+
+A resource file for two Handler schemas looks like this:
+
+[source,yaml]
+----
+---
+kind: Handler
+metadata:
+  name: my-pre-handler
+spec:
+  taskRef:
+    name: my-pre-handler-task # Task in the current namespace
+  schema:
+    openAPIV3Schema:
+      required: [pre]
+      properties:
+        pre:
+          type: boolean
+---
+kind: Handler
+metadata:
+  name: my-post-handler
+spec:
+  taskRef:
+    name: my-post-handler-task # Task in the current namespace
+  schema:
+    openAPIV3Schema:
+      required: [post]
+      properties:
+        post:
+          type: boolean
+----
+
+An example resource file for a Component that matches the above schemas would look like this:
+
+[source,yaml]
+----
+---
+kind: Component
+metadata:
+  name: my-component
+spec:
+  pre:
+  - handlerRef:
+      name: my-pre-handler
+    params:
+      pre: true # or false
+  build:
+    builderRef:
+      name: my-builder
+    params:
+      key: value
+  post:
+  - handlerRef:
+      name: my-post-handler
+    params:
+      post: true # or false
+----
+
+[TIP]
+====
+For more details about creating Builders, see
+xref:developer-guide:builders.adoc[].
+====
+
+== Builds
+Agogos' Builds are resources that represent a single build for a Component. When
+a Build resource is created, a Tekton PipelineRun is created too. The Tekton
+PipelineRun references the Tekton Pipeline associated with the Component of the
+Build.
+
+[WARNING]
+====
+Do not create Builds directly as there are intermediate steps that may need to
+happen. See
+xref:submissions.adoc[].
+====
+
+[source,yaml]
+----
+---
+kind: Build
+metadata:
+  generatename: my-component-
+spec:
+  component: my-component
+----
+
+Builds have in their `status` information about the Component and its 
+associated Tekton PipelineRun.
+
+[IMPORTANT]
+====
+To reduce resource consumption, Agogos removes Tekton PipelineRuns when they
+complete successfully. This removes the Tekton PipelineRun pods from the namespace.
+====

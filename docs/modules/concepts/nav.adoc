@@ -1,2 +1,4 @@
 * Concepts
-** xref:index.adoc[]
+** xref:components.adoc[]
+** xref:pipelines.adoc[]
+** xref:submissions.adoc[]
