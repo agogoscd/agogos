@@ -1,3 +1,15 @@
+validate:
+  image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
+  variables:
+    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+    MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
+  stage: test
+  script:
+    - npm install -g pajv
+    - git clone git@gitlab.cee.redhat.com:gallen/extensions-internal.git
+    - git branch AGOGOS-400
+  tags: [docker]
+
 verify:
   image: registry.access.redhat.com/ubi9/openjdk-17:latest
   variables:
