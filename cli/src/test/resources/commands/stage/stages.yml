@@ -1,0 +1,176 @@
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Stage
+metadata:
+  creationTimestamp: "2023-10-07T16:16:19Z"
+  generation: 1
+  name: dummy-stage-1
+  namespace: gallen
+  resourceVersion: "1336056"
+  uid: 664db787-2a95-4c53-96ac-024d95f44b59
+spec:
+  schema:
+    openAPIV3Schema:
+      description: Schema definition for configuration data passed to the Dummy
+        Stage
+      properties:
+        bool-value:
+          description: A dummy boolean value
+          type: boolean
+        enum-value:
+          description: A dummy enumerated string value
+          enum:
+          - EXAMPLE_A
+          - EXAMPLE_B
+          - EXAMPLE_C
+          type: string
+        int-value:
+          description: The integer that will be increased each time the stage is
+            run in the same pipeline.
+          type: int
+        str-value:
+          description: A dummy string value
+          type: string
+      required:
+      - int-value
+  taskRef:
+    params:
+    - name: namespace
+      value: agogos
+    - name: name
+      value: agogos-stage-dummy-v1
+    - name: kind
+      value: task
+    resolver: cluster
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Stage
+metadata:
+  creationTimestamp: "2023-10-07T16:16:19Z"
+  generation: 1
+  name: dummy-stage-2
+  namespace: gallen
+  resourceVersion: "1336057"
+  uid: 1db71f46-63c1-4444-84e7-caa12f1c2535
+spec:
+  schema:
+    openAPIV3Schema:
+      description: Schema definition for configuration data passed to the Dummy
+        Stage
+      properties:
+        bool-value:
+          description: A dummy boolean value
+          type: boolean
+        enum-value:
+          description: A dummy enumerated string value
+          enum:
+          - EXAMPLE_A
+          - EXAMPLE_B
+          - EXAMPLE_C
+          type: string
+        int-value:
+          description: The integer that will be increased each time the stage is
+            run in the same pipeline.
+          type: int
+        str-value:
+          description: A dummy string value
+          type: string
+      required:
+      - int-value
+  taskRef:
+    params:
+    - name: namespace
+      value: agogos
+    - name: name
+      value: agogos-stage-dummy-v1
+    - name: kind
+      value: task
+    resolver: cluster
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Stage
+metadata:
+  creationTimestamp: "2023-10-07T16:16:19Z"
+  generation: 1
+  name: dummy-stage-3
+  namespace: gallen
+  resourceVersion: "1336058"
+  uid: a878ce4f-e64f-4423-90a7-d6cca8fac266
+spec:
+  schema:
+    openAPIV3Schema:
+      description: Schema definition for configuration data passed to the Dummy
+        Stage
+      properties:
+        bool-value:
+          description: A dummy boolean value
+          type: boolean
+        enum-value:
+          description: A dummy enumerated string value
+          enum:
+          - EXAMPLE_A
+          - EXAMPLE_B
+          - EXAMPLE_C
+          type: string
+        int-value:
+          description: The integer that will be increased each time the stage is
+            run in the same pipeline.
+          type: int
+        str-value:
+          description: A dummy string value
+          type: string
+      required:
+      - int-value
+  taskRef:
+    params:
+    - name: namespace
+      value: agogos
+    - name: name
+      value: agogos-stage-dummy-v1
+    - name: kind
+      value: task
+    resolver: cluster
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Stage
+metadata:
+  creationTimestamp: "2023-10-07T16:20:10Z"
+  generation: 1
+  name: errata-stage-v1
+  namespace: agogos
+  resourceVersion: "1337285"
+  uid: e6e123bd-bd56-469c-a80e-103f3a309a2d
+spec:
+  schema:
+    openAPIV3Schema:
+      description: Schema definition for configuration data passed to the Errata
+        Stage
+      properties:
+        bool-value:
+          description: A errata boolean value
+          type: boolean
+        enum-value:
+          description: A errata enumerated string value
+          enum:
+          - EXAMPLE_A
+          - EXAMPLE_B
+          - EXAMPLE_C
+          type: string
+        int-value:
+          description: The integer that will be increased each time the stage is
+            run in the same pipeline.
+          type: int
+        str-value:
+          description: A errata string value
+          type: string
+      required:
+      - int-value
+  taskRef:
+    params:
+    - name: namespace
+      value: agogos
+    - name: name
+      value: errata-stage-v1
+    - name: kind
+      value: task
+    resolver: cluster

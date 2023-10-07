@@ -5,6 +5,7 @@ import picocli.CommandLine.Command;
 
 @Command(mixinStandardHelpOptions = true, name = "stage", aliases = {
         "stages", "stg" }, description = "Interact with stages", subcommands = { // 
+                StageDescribeCommand.class,
                 StageListCommand.class
         })
 public class StageCommand extends AbstractSubcommand {

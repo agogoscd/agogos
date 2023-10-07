@@ -12,10 +12,22 @@ public class StageListCommand extends AbstractListCommand<Stage> {
 
     @Override
     public List<Stage> getResources() {
-        List<Stage> resources = kubernetesFacade.list(
+        List<Stage> stages = getStages(kubernetesFacade.getNamespace());
+        if (limit == 0 || stages.size() < limit) {
+            stages.addAll(getStages(agogosEnvironment.getRunningNamespace()));
+        }
+        return limit == 0 ? stages : stages.subList(0, Math.toIntExact(limit));
+    }
+
+    @Override
+    protected Integer printList(List<Stage> resources) {
+        return printList(resources, true);
+    }
+
+    private List<Stage> getStages(String namespace) {
+        return kubernetesFacade.list(
                 Stage.class,
-                kubernetesFacade.getNamespace(),
+                namespace,
                 new ListOptionsBuilder().withLimit(limit).build());
-        return resources;
     }
 }

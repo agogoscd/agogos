@@ -33,10 +33,10 @@ public class BuilderDescribeCommandTest extends BuilderCommandBaseTest {
     public void describeSpecificBuilder() throws Exception {
         Mockito.when(kubernetesFacadeMock.getNamespace())
                 .thenReturn("namespace");
-        Mockito.when(kubernetesFacadeMock.get(Builder.class, "namespace", "dummy-component-dep-1-62k7v"))
+        Mockito.when(kubernetesFacadeMock.get(Builder.class, "namespace", "dummy-v1"))
                 .thenReturn(builders.get(0));
 
-        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "builder", "describe", "dummy-component-dep-1-62k7v");
+        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "builder", "describe", "dummy-v1");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(

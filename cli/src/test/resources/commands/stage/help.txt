@@ -1,0 +1,10 @@
+Usage: agogosctl stage [-hvV] [-o=<output>] [COMMAND]
+Interact with stages
+  -h, --help              Show this help message and exit.
+  -o, --output=<output>   Output format, valid values: plain, yaml, json,
+                            default: plain.
+  -v, --verbose
+  -V, --version           Print version information and exit.
+Commands:
+  describe, d, desc  describe stage
+  list, l            list stages
