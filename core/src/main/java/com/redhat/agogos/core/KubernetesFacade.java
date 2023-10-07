@@ -1,6 +1,9 @@
 package com.redhat.agogos.core;
 
 import com.redhat.agogos.core.retries.KubernetesClientRetries;
+import io.fabric8.kubernetes.api.model.APIGroupList;
+import io.fabric8.kubernetes.api.model.APIResourceList;
+import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
@@ -45,6 +48,14 @@ public class KubernetesFacade {
         return kubernetesClient.getKubernetesVersion();
     }
 
+    public APIGroupList getApiGroups() {
+        return kubernetesClient.getApiGroups();
+    }
+
+    public APIResourceList getApiResources(String groupVersion) {
+        return kubernetesClient.getApiResources(groupVersion);
+    }
+
     public <T extends HasMetadata> T create(T resource) {
         return retriesClient.create(resource);
     }
@@ -87,12 +98,11 @@ public class KubernetesFacade {
     }
 
     public <T extends HasMetadata> List<StatusDetails> delete(T resource) {
-        return delete(resource.getClass(), resource.getMetadata().getNamespace(), resource.getMetadata().getName());
+        return retriesClient.delete(resource);
     }
 
     public <T extends HasMetadata> List<StatusDetails> delete(T resource, Integer retries, Integer interval) {
-        return delete(resource.getClass(), resource.getMetadata().getNamespace(), resource.getMetadata().getName(),
-                retries, interval);
+        return retriesClient.delete(resource, retries, interval);
     }
 
     public <T extends HasMetadata> T get(Class<T> clazz, String namespace, String name) {
@@ -220,6 +230,16 @@ public class KubernetesFacade {
     public <T extends HasMetadata> List<T> listNotEmpty(Class<T> clazz, String namespace, ListOptions options, Integer retries,
             Integer interval) {
         return list(clazz, namespace, options, retries, interval, true);
+    }
+
+    public List<GenericKubernetesResource> getKubernetesResources(String namespace,
+            String groupVersion, String kind, ListOptions options) {
+        return retriesClient.getKubernetesResources(namespace, groupVersion, kind, options);
+    }
+
+    public List<GenericKubernetesResource> getKubernetesResources(String namespace,
+            String groupVersion, String kind, ListOptions options, Integer retries, Integer interval) {
+        return retriesClient.getKubernetesResources(namespace, groupVersion, kind, options, retries, interval);
     }
 
     public void waitForAllPodsRunning(String namespace) {

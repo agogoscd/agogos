@@ -9,9 +9,11 @@ import java.util.stream.Collectors;
 
 @JsonSerialize(using = ToStringSerializer.class)
 public enum Label {
+    EXTENSION("extension"),
     INSTANCE("instance"),
     NAME("name"),
-    RESOURCE("resource");
+    RESOURCE("resource"),
+    SYNC("sync-to-namespace");
 
     public static String AGOGOS_LABEL_PREFIX = "agogos.redhat.com/";
 

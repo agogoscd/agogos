@@ -1,6 +1,7 @@
 package com.redhat.agogos.core.retries;
 
 import com.redhat.agogos.core.errors.ApplicationException;
+import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.StatusDetails;
@@ -105,6 +106,30 @@ public class KubernetesClientRetries {
         });
 
         return decorated.apply(resource);
+    }
+
+    public <T extends HasMetadata> List<StatusDetails> delete(T resource) {
+        return delete(resource, DEFAULT_MAX_RETRIES, DEFAULT_MAX_INTERVAL);
+    }
+
+    public <T extends HasMetadata> List<StatusDetails> delete(T resource, Integer retries, Integer interval) {
+        RetryConfig config = RetryConfig.<List<StatusDetails>> custom()
+                .maxAttempts(retries)
+                .waitDuration(Duration.ofSeconds(interval))
+                .retryExceptions(KubernetesClientException.class)
+                .build();
+
+        RetryRegistry registry = RetryRegistry.of(config);
+        Retry retry = registry.retry(getRegistryRetryName("delete-resource", retries, interval));
+        retry.getEventPublisher()
+                .onRetry(e -> LOG.warn("⚠️ WARN: Retrying delete for {}",
+                        resource.getMetadata().getNamespace() + "/" + resource.getMetadata().getName()));
+
+        Supplier<List<StatusDetails>> decorated = Retry.decorateSupplier(retry, () -> {
+            return kubernetesClient.resource(resource).delete();
+        });
+
+        return decorated.get();
     }
 
     public <T extends HasMetadata> List<StatusDetails> delete(Class<T> clazz, String namespace, String name) {
@@ -219,6 +244,35 @@ public class KubernetesClientRetries {
 
         Supplier<List<HasMetadata>> decorated = Retry.decorateSupplier(retry, () -> {
             return kubernetesClient.resources(HasMetadata.class).inNamespace(namespace).list(options).getItems();
+        });
+
+        return decorated.get();
+    }
+
+    public <T extends HasMetadata> List<GenericKubernetesResource> getKubernetesResources(String namespace,
+            String groupVersion, String kind, ListOptions options) {
+        return getKubernetesResources(namespace, groupVersion, kind, options, DEFAULT_MAX_RETRIES, DEFAULT_MAX_INTERVAL);
+    }
+
+    public List<GenericKubernetesResource> getKubernetesResources(String namespace,
+            String groupVersion, String kind, ListOptions options, Integer retries, Integer interval) {
+        Builder<Set<String>> builder = RetryConfig.<Set<String>> custom()
+                .maxAttempts(retries)
+                .waitDuration(Duration.ofSeconds(interval))
+                .retryExceptions(KubernetesClientException.class);
+
+        RetryConfig config = builder.build();
+
+        RetryRegistry registry = RetryRegistry.of(config);
+        Retry retry = registry.retry("get-kubernetes-resources");
+        retry.getEventPublisher()
+                .onRetry(e -> LOG.warn("⚠️ WARN: Retrying getKubernetesResources for {} {}", groupVersion, kind));
+
+        Supplier<List<GenericKubernetesResource>> decorated = Retry.decorateSupplier(retry, () -> {
+            return kubernetesClient.genericKubernetesResources(groupVersion, kind)
+                    .inNamespace(namespace)
+                    .list(options)
+                    .getItems();
         });
 
         return decorated.get();

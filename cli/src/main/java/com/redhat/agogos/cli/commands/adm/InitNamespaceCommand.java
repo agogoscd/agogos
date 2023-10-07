@@ -4,19 +4,28 @@ import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.AbstractCallableSubcommand;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller.AgogosRole;
+import com.redhat.agogos.core.k8s.Label;
 import com.redhat.agogos.core.v1alpha1.Dependency;
 import com.redhat.agogos.core.v1alpha1.Submission;
 import io.fabric8.knative.eventing.v1.Broker;
 import io.fabric8.knative.eventing.v1.BrokerBuilder;
 import io.fabric8.knative.eventing.v1.Trigger;
 import io.fabric8.knative.eventing.v1.TriggerBuilder;
+import io.fabric8.kubernetes.api.model.APIResourceList;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
+import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.ListOptions;
+import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
+import io.fabric8.kubernetes.api.model.LocalObjectReference;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
+import io.fabric8.kubernetes.api.model.ObjectMetaBuilder;
 import io.fabric8.kubernetes.api.model.ResourceQuota;
 import io.fabric8.kubernetes.api.model.ResourceQuotaBuilder;
+import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.api.model.ServiceAccount;
 import io.fabric8.kubernetes.api.model.ServiceAccountBuilder;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRole;
@@ -26,7 +35,7 @@ import io.fabric8.kubernetes.api.model.rbac.RoleBinding;
 import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.Subject;
 import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
-import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
+import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.tekton.pipeline.v1beta1.CustomRun;
 import io.fabric8.tekton.pipeline.v1beta1.CustomRunBuilder;
 import io.fabric8.tekton.triggers.v1alpha1.ClusterInterceptor;
@@ -42,7 +51,6 @@ import io.fabric8.tekton.triggers.v1beta1.TriggerSpecBindingBuilder;
 import io.fabric8.tekton.triggers.v1beta1.TriggerSpecTemplateBuilder;
 import io.fabric8.tekton.triggers.v1beta1.TriggerTemplateSpec;
 import io.fabric8.tekton.triggers.v1beta1.TriggerTemplateSpecBuilder;
-import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +62,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -64,9 +74,6 @@ import java.util.stream.Collectors;
 @Command(mixinStandardHelpOptions = true, name = "init-namespace", aliases = {
         "init" }, description = "Initialize selected namespace to work with Agogos")
 public class InitNamespaceCommand extends AbstractCallableSubcommand {
-
-    @Inject
-    KubernetesSerialization objectMapper;
 
     private static final Logger LOG = LoggerFactory.getLogger(InitNamespaceCommand.class);
 
@@ -96,6 +103,8 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
     private static final String RESOURCE_NAME_CONFIG = "agogos-config";
     private static final String RESOURCE_NAME_EVENTING = "agogos-eventing";
 
+    private static final String SECRET_DOCKER_CONFIG_JSON = "kubernetes.io/dockerconfigjson";
+
     private static final Map<String, String> LABELS = Map.of(
             "app.kubernetes.io/part-of", "agogos",
             "app.kubernetes.io/component", "namespace");
@@ -117,6 +126,9 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
     @Option(names = { "--quota-file" }, description = "Resource quota file to be applied to the namespace")
     File quotaFile;
+
+    @Option(names = { "--extensions" }, description = "Extensions to be added to the namespace")
+    Set<String> extensions = new HashSet<>();
 
     @Override
     public Integer call() {
@@ -149,6 +161,8 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
         installAgogosRoleBindings(bindings);
 
         installAgogosQuota();
+
+        installExtensions();
 
         kubernetesFacade.waitForAllPodsRunning(namespace);
 
@@ -625,5 +639,148 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         io.fabric8.tekton.triggers.v1beta1.Trigger trigger = kubernetesFacade.serverSideApply(builder.build());
         Helper.status(trigger);
+    }
+
+    private void installExtensions() {
+        Map<String, Set<String>> groupVersions = getResourceData();
+        groupVersions.entrySet().stream()
+                .forEach(e -> {
+                    e.getValue().stream()
+                            .forEach(v -> {
+                                LOG.info("MAP => {}: {}", e.getKey(), v);
+                            });
+                });
+
+        // Remove any synced resources for extensions that are no longer on the list to be installed.
+        getSyncedExtensionResources(groupVersions, namespace).stream()
+                .filter(r -> !extensions.contains(r.getMetadata().getLabels().get(Label.EXTENSION.toString())))
+                .forEach(r -> {
+                    LOG.info("INSTANCE OF => " + objectMapper.asYaml(r));
+                    kubernetesFacade.delete(r);
+                    Helper.status("🗑️  OK: ", r);
+
+                    // If it's a pull secret, remove it from the SA in the namespace.
+                    if (isDockerConfigJsonSecret(r)) {
+                        ServiceAccount sa = kubernetesFacade.get(ServiceAccount.class, namespace, RESOURCE_NAME);
+                        if (sa != null) {
+                            LocalObjectReference lor = new LocalObjectReference(namespace);
+                            if (!sa.getImagePullSecrets().contains(lor)) {
+                                sa.getImagePullSecrets().add(lor);
+                                kubernetesFacade.serverSideApply(sa);
+                            }
+                        }
+                    }
+                });
+
+        // Apply all the resources for each extension to the namespace.
+        extensions.stream().forEach(extension -> {
+            getAgogosExtensionResources(groupVersions, extension).stream()
+                    .forEach(r -> {
+                        r = cleanseMetadata(r);
+                        kubernetesFacade.serverSideApply(r);
+                        // If it's a pull secret, add it to the SA in the namespace.
+                        if (isDockerConfigJsonSecret(r)) {
+                            ServiceAccount sa = kubernetesFacade.get(ServiceAccount.class, namespace, RESOURCE_NAME);
+                            if (sa != null) {
+                                LocalObjectReference lor = new LocalObjectReference(namespace);
+                                if (!sa.getImagePullSecrets().contains(lor)) {
+                                    sa.getImagePullSecrets().add(lor);
+                                    kubernetesFacade.serverSideApply(sa);
+                                }
+                            }
+                        }
+                        Helper.status(r);
+                    });
+        });
+    }
+
+    /*
+     * Get the resources for all extensions that have been synced to the given namespace.
+     */
+    private List<GenericKubernetesResource> getSyncedExtensionResources(Map<String, Set<String>> groupVersions,
+            String extension) {
+        String selector = Label.SYNC.toString() + "=true";
+        return getResources(groupVersions, namespace, selector);
+    }
+
+    /*
+     * Get the resources for the extension in the agogos namespace that need to be synced.
+     */
+    private List<GenericKubernetesResource> getAgogosExtensionResources(Map<String, Set<String>> groupVersions,
+            String extension) {
+        String selector = Label.EXTENSION.toString() + "=" + extension + "," + Label.SYNC.toString() + "=true";
+        return getResources(groupVersions, agogosEnvironment.getRunningNamespace(), selector);
+    }
+
+    private List<GenericKubernetesResource> getResources(Map<String, Set<String>> groupVersions, String namespace,
+            String selector) {
+        List<GenericKubernetesResource> resources = new ArrayList<>();
+
+        ListOptions options = new ListOptionsBuilder()
+                .withLabelSelector(selector)
+                .build();
+
+        groupVersions.entrySet().forEach(e -> {
+            e.getValue().forEach(kind -> {
+                try {
+                    // Get the generic resources and add the Kind on each.
+                    List<GenericKubernetesResource> rlist = kubernetesFacade.getKubernetesResources(namespace, e.getKey(), kind,
+                            options);
+                    rlist.stream().forEach(r -> r.setKind(kind));
+                    resources.addAll(rlist);
+                } catch (KubernetesClientException kce) {
+                    LOG.warn(kce.getMessage());
+                }
+            });
+        });
+        return resources;
+    }
+
+    /*
+     * Get a map of all the group/versions to their APIs
+     */
+    private Map<String, Set<String>> getResourceData() {
+        Map<String, Set<String>> groupVersions = new HashMap<>();
+        kubernetesFacade.getApiGroups().getGroups().stream()
+                .filter(g -> !g.getName().equals("authentication.k8s.io") && !g.getName().equals("authorization.k8s.io"))
+                .forEach(group -> {
+                    group.getVersions().stream().forEach(gv -> {
+                        APIResourceList apis = kubernetesFacade.getApiResources(gv.getGroupVersion());
+                        apis.getResources().stream()
+                                .filter(r -> !gv.getGroupVersion().equals("apps/v1") && !r.getKind().equals("Scale"))
+                                .forEach(api -> {
+                                    if (!groupVersions.keySet().contains(gv.getGroupVersion())) {
+                                        groupVersions.put(gv.getGroupVersion(), new HashSet<String>());
+                                    }
+                                    groupVersions.get(gv.getGroupVersion()).add(api.getKind());
+                                });
+                    });
+                });
+
+        Set<String> v1 = new HashSet<>();
+        kubernetesFacade.getApiResources("v1").getResources().stream()
+                .filter(r -> r.getGroup() == null)
+                .filter(r -> !r.getKind().endsWith("Options") && !r.getKind().equals("Binding"))
+                .forEach(r -> {
+                    v1.add(r.getKind());
+                });
+        groupVersions.put("v1", v1);
+
+        return groupVersions;
+    }
+
+    private boolean isDockerConfigJsonSecret(Object o) {
+        return o instanceof Secret && ((Secret) o).getType().equals(SECRET_DOCKER_CONFIG_JSON);
+    }
+
+    // Cleanse the metadata so we can create a new resource.
+    private GenericKubernetesResource cleanseMetadata(GenericKubernetesResource r) {
+        ObjectMeta metadata = new ObjectMetaBuilder()
+                .withName(r.getMetadata().getName())
+                .withNamespace(namespace)
+                .withLabels(r.getMetadata().getLabels())
+                .build();
+        r.setMetadata(metadata);
+        return r;
     }
 }

@@ -152,9 +152,7 @@ public class KubernetesFacadeTest {
         Mockito.verify(
                 kubernetesClientRetries,
                 Mockito.times(1)).delete(
-                        resource.getClass(),
-                        resource.getMetadata().getNamespace(),
-                        resource.getMetadata().getName());
+                        resource);
     }
 
     @Test
@@ -169,9 +167,7 @@ public class KubernetesFacadeTest {
         Mockito.verify(
                 kubernetesClientRetries,
                 Mockito.times(1)).delete(
-                        resource.getClass(),
-                        resource.getMetadata().getNamespace(),
-                        resource.getMetadata().getName(),
+                        resource,
                         3,
                         3);
     }
@@ -558,6 +554,30 @@ public class KubernetesFacadeTest {
                 kubernetesClientRetries,
                 Mockito.times(1)).list(
                         resource.getClass(), "default", options, 33, 33, true);
+    }
+
+    @Test
+    public void kubernetesResourcesNamespaceGroupVersionKindAndOptions() throws Exception {
+        ListOptions options = new ListOptionsBuilder().build();
+
+        kubernetesFacade.getKubernetesResources("default", "groupVersion", "kind", options);
+
+        Mockito.verify(
+                kubernetesClientRetries,
+                Mockito.times(1)).getKubernetesResources("default",
+                        "groupVersion", "kind", options);
+    }
+
+    @Test
+    public void kubernetesResourcesNamespaceGroupVersionKindAndOptionsWithRetries() throws Exception {
+        ListOptions options = new ListOptionsBuilder().build();
+
+        kubernetesFacade.getKubernetesResources("default", "groupVersion", "kind", options, 133, 133);
+
+        Mockito.verify(
+                kubernetesClientRetries,
+                Mockito.times(1)).getKubernetesResources("default",
+                        "groupVersion", "kind", options, 133, 133);
     }
 
     @Test

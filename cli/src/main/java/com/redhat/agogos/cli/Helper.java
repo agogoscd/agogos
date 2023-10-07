@@ -1,5 +1,6 @@
 package com.redhat.agogos.cli;
 
+import com.redhat.agogos.core.k8s.Label;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,17 +15,21 @@ public class Helper {
     }
 
     public static void status(HasMetadata... resources) {
+        status("👉 OK: ", resources);
+    }
+
+    public static void status(String start, HasMetadata... resources) {
         StringBuilder sb = null;
 
         for (HasMetadata resource : resources) {
             sb = new StringBuilder()//
-                    .append("👉 OK: ")
+                    .append(start)
                     .append(getStatusLine(resource));
             LOG.info(sb.toString());
         }
     }
 
-    public static String getStatusLine(HasMetadata resource) {
+    private static String getStatusLine(HasMetadata resource) {
         StringBuilder sb = null;
 
         sb = new StringBuilder()//
@@ -38,6 +43,12 @@ public class Helper {
         if (resource.getMetadata().getNamespace() != null) {
             sb.append(" (ns: ")
                     .append(resource.getMetadata().getNamespace())
+                    .append(")");
+        }
+
+        if (resource.getMetadata().getLabels().containsKey(Label.EXTENSION.toString())) {
+            sb.append(" (extension: ")
+                    .append(resource.getMetadata().getLabels().get(Label.EXTENSION.toString()))
                     .append(")");
         }
 
