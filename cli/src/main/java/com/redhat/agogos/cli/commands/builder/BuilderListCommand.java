@@ -12,10 +12,22 @@ public class BuilderListCommand extends AbstractListCommand<Builder> {
 
     @Override
     public List<Builder> getResources() {
-        List<Builder> resources = kubernetesFacade.list(
+        List<Builder> builders = getBuilders(kubernetesFacade.getNamespace());
+        if (limit == 0 || builders.size() < limit) {
+            builders.addAll(getBuilders(agogosEnvironment.getRunningNamespace()));
+        }
+        return limit == 0 ? builders : builders.subList(0, Math.toIntExact(limit));
+    }
+
+    @Override
+    protected Integer printList(List<Builder> resources) {
+        return printList(resources, true);
+    }
+
+    private List<Builder> getBuilders(String namespace) {
+        return kubernetesFacade.list(
                 Builder.class,
-                kubernetesFacade.getNamespace(),
+                namespace,
                 new ListOptionsBuilder().withLimit(limit).build());
-        return resources;
     }
 }

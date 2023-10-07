@@ -1,0 +1,9 @@
+Missing required parameter: '<name>'
+Usage: agogosctl builder describe [-hvV] [-o=<output>] <name>
+describe builder
+      <name>              Name of the builder
+  -h, --help              Show this help message and exit.
+  -o, --output=<output>   Output format, valid values: plain, yaml, json,
+                            default: plain.
+  -v, --verbose
+  -V, --version           Print version information and exit.

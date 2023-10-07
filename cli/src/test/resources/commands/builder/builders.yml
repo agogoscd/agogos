@@ -1,0 +1,249 @@
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Builder
+metadata:
+  creationTimestamp: "2023-10-07T13:47:43Z"
+  generation: 1
+  name: dummy-v1
+  namespace: gallen
+  resourceVersion: "1288185"
+  uid: b2755a71-d055-4d84-a228-c041543e4e2e
+spec:
+  taskRef:
+    params:
+    - name: name
+      value: agogos-builder-dummy-v1
+    - name: kind
+      value: task
+    - name: namespace
+      value: agogos
+    resolver: cluster
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Builder
+metadata:
+  creationTimestamp: "2023-10-04T18:53:56Z"
+  generation: 1
+  labels:
+    agogos.redhat.com/phase: build
+    app.kubernetes.io/component: builder
+    app.kubernetes.io/instance: brew-v1
+    app.kubernetes.io/part-of: agogos
+  name: brew-v1
+  namespace: agogos
+  resourceVersion: "12765"
+  uid: d3eac3ff-50a7-4641-82e5-1e3a6ef0c2aa
+spec:
+  schema:
+    openAPIV3Schema:
+      components:
+        schemas:
+          Brew:
+            properties:
+              brew:
+                flags:
+                  description: Additional flags to add to the brew build command
+                  items:
+                    type: string
+                  type: array
+              source-ref:
+                description: Git reference (branch) to use when building the component
+                type: string
+              source-repo:
+                description: 'Source repository in following format: [namespace]/[repository-name]'
+                type: string
+              target:
+                description: The Brew target
+                type: string
+              type:
+                description: Build type
+                type: string
+            required:
+            - source-repo
+            - source-ref
+            - type
+            type: object
+          Image:
+            allOf:
+            - $ref: '#/components/schemas/Brew'
+            - properties:
+                arch:
+                  description: The architecture of the image
+                  enum:
+                  - x86_64
+                  - ppc64le
+                  - i386
+                  type: string
+                disk-size:
+                  description: The disk device size in gigabytes
+                  type: integer
+                distro:
+                  description: The RPM based distribution the image will be based
+                    on
+                  type: string
+                factory-parameters:
+                  description: Parameter and value passed to image factory.
+                  example:
+                  - parameter: generate_icicle
+                    value: "False"
+                  - parameter: docker_cmd
+                    value: /bin/echo Hello World
+                  items:
+                    properties:
+                      parameter:
+                        type: string
+                      value:
+                        type: string
+                    type: object
+                  type: array
+                formats:
+                  description: The formats of the result
+                  items:
+                    enum:
+                    - vmdk
+                    - qcow
+                    - qcow2
+                    - vdi
+                    - vpc
+                    - rhevm-ova
+                    - vsphere-ova
+                    - vagrant-virtualbox
+                    - vagrant-libvirt
+                    - vagrant-vmware-fusion
+                    - vagrant-hyperv
+                    - docker
+                    - raw-xz
+                    - liveimg-squashfs
+                    - tar-gz
+                    - raw
+                    type: string
+                  type: array
+                install-tree-url:
+                  description: The URL to a location you can install an operating
+                    system from
+                  type: string
+                kickstart:
+                  description: Path to the kickstart file inside the source repository
+                    and ref
+                  type: string
+                ksversion:
+                  description: The syntax version used in the kickstart file
+                  type: string
+                name:
+                  description: The name of the image without versioning information
+                  type: string
+                release:
+                  description: The release number of the image
+                  type: string
+                repos:
+                  description: The repos used to install RPMs in the image
+                  items:
+                    type: string
+                  type: array
+                version:
+                  description: The version of the image
+                  type: string
+              required:
+              - name
+              - version
+              - arch
+              - install-tree-url
+              - kickstart
+              - distro
+              type: object
+          IndirectionImage:
+            allOf:
+            - $ref: '#/components/schemas/Brew'
+            - properties:
+                arch:
+                  description: Architecture of the output image.
+                  enum:
+                  - x86_64
+                  - ppc64le
+                  - i386
+                  type: string
+                base-image-nvr:
+                  description: Build ID or NVR of the base image.
+                  type: string
+                indirection-template:
+                  description: Path to the indirection template file, within the
+                    source repository.
+                  type: string
+                name:
+                  description: Name of the output image.
+                  type: string
+                release:
+                  description: Release of the output image.
+                  type: string
+                results-loc:
+                  description: Path where the results are saved.
+                  type: string
+                utility-image-nvr:
+                  description: Build ID or NVR of the utility image.
+                  type: string
+                version:
+                  description: Version of the output image.
+                  type: string
+              required:
+              - base-image-nvr
+              - utility-image-nvr
+              - indirection-template
+              - arch
+              - name
+              - version
+              - release
+              - results-loc
+              type: object
+          RPM:
+            allOf:
+            - $ref: '#/components/schemas/Brew'
+            - properties:
+                regen-repos:
+                  description: Brew tags that need to be updated with the new RPM
+                    that was just built
+                  items:
+                    type: string
+                  type: array
+              type: object
+          WrapperRPM:
+            allOf:
+            - $ref: '#/components/schemas/Brew'
+            - properties:
+                image-nvr:
+                  description: Build ID or NVR that gets wrapped into the RPM
+                  type: string
+              required:
+              - image-nvr
+              type: object
+      description: Schema definition for all supported component types within Brew
+        builder
+      discriminator:
+        mapping:
+          image: '#/components/schemas/Image'
+          indirection-image: '#/components/schemas/IndirectionImage'
+          rpm: '#/components/schemas/RPM'
+          wrapper-rpm: '#/components/schemas/WrapperRPM'
+        propertyName: type
+      oneOf:
+      - $ref: '#/components/schemas/RPM'
+      - $ref: '#/components/schemas/Image'
+      - $ref: '#/components/schemas/WrapperRPM'
+      - $ref: '#/components/schemas/IndirectionImage'
+      properties:
+        type:
+          description: The type of the component supported by the builder
+          enum:
+          - rpm
+          - image
+          - indirection-image
+          - wrapper-rpm
+          type: string
+  taskRef:
+    params:
+    - name: kind
+      value: task
+    - name: namespace
+      value: agogos
+    - name: name
+      value: agogos-builder-brew-v1
+    resolver: cluster

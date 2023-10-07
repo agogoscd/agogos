@@ -44,6 +44,10 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
     }
 
     protected Integer printList(List<T> resources) {
+        return printList(resources, false);
+    }
+
+    protected Integer printList(List<T> resources, Boolean includeNamespace) {
         if (resources.isEmpty()) {
             spec.commandLine().getOut().println("No resources found");
             return CommandLine.ExitCode.USAGE;
@@ -52,6 +56,12 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
         // Find max length of the name and add some more spaces for nicer look
         final int nameColumnLength = resources.stream()
                 .mapToInt(res -> res.getMetadata().getName().length())
+                .max()
+                .getAsInt() + 5;
+
+        // Find max length of the namespace and add some more spaces for nicer look
+        final int namespaceColumnLength = resources.stream()
+                .mapToInt(res -> res.getMetadata().getNamespace().length())
                 .max()
                 .getAsInt() + 5;
 
@@ -65,15 +75,22 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
         // Header
         spec.commandLine().getOut().println(Ansi.AUTO.string(
                 String.format(
-                        "@|bold %-" + nameColumnLength + "." + nameColumnLength + "s%-" + statusColumnLength + "."
-                                + statusColumnLength + "s CREATED|@",
-                        "NAME", "STATUS")));
+                        "@|bold %-" + nameColumnLength + "." + nameColumnLength +
+                                (includeNamespace ? "s%-" + namespaceColumnLength + "." + namespaceColumnLength : "s%") +
+                                "s%-" + statusColumnLength + "." + statusColumnLength +
+                                "s CREATED|@",
+                        "NAME", (includeNamespace ? "NAMESPACE" : ""), "STATUS")));
 
         // Main content
         resources.stream().sorted(byCreationTime()).forEach(resource -> {
             StringBuilder sb = new StringBuilder(
                     String.format("%-" + nameColumnLength + "." + nameColumnLength + "s",
                             resource.getMetadata().getName()));
+
+            if (includeNamespace) {
+                sb.append(String.format("%-" + namespaceColumnLength + "." + namespaceColumnLength + "s",
+                        resource.getMetadata().getNamespace()));
+            }
 
             String status = "";
             String color = "white";
