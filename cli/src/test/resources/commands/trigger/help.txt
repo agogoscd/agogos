@@ -1,0 +1,10 @@
+Usage: agogosctl triggers [-hvV] [-o=<output>] [COMMAND]
+Interact with triggers
+  -h, --help              Show this help message and exit.
+  -o, --output=<output>   Output format, valid values: plain, yaml, json,
+                            default: plain.
+  -v, --verbose
+  -V, --version           Print version information and exit.
+Commands:
+  describe, desc, d  describe trigger
+  list, l            list triggers

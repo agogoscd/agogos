@@ -1,0 +1,255 @@
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Trigger
+metadata:
+  creationTimestamp: "2023-10-08T23:49:53Z"
+  finalizers:
+  - triggers.agogos.redhat.com/finalizer
+  generation: 1
+  name: build-to-component
+  namespace: gallen
+  resourceVersion: "1937996"
+  uid: 73aa0343-79c8-4567-a925-7d9c211dd8af
+spec:
+  events:
+  - build:
+      filter: body.component.metadata.name == 'cpaas-test-brew-rpm'
+  target:
+    kind: Pipeline
+    name: pipeline-1
+status:
+  lastUpdate: "2023-10-08T19:49:53-04:00"
+  reason: Agogos Trigger is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Trigger
+metadata:
+  creationTimestamp: "2023-10-08T23:49:53Z"
+  finalizers:
+  - triggers.agogos.redhat.com/finalizer
+  generation: 1
+  name: cel-to-component
+  namespace: gallen
+  resourceVersion: "1938001"
+  uid: f2bc9156-d636-4ea7-9275-af6700c976d2
+spec:
+  events:
+  - cel:
+      filter: header.match('ce-type', 'com.redhat.agogos.event.build.success.v1alpha1')
+  - cel:
+      filter: body.component.spec.builder == 'maven' && body.component.spec.data.source.url.contains('github.com')
+  target:
+    kind: Component
+    name: component-1
+status:
+  lastUpdate: "2023-10-08T19:49:53-04:00"
+  reason: Agogos Trigger is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Trigger
+metadata:
+  creationTimestamp: "2023-10-08T23:49:53Z"
+  finalizers:
+  - triggers.agogos.redhat.com/finalizer
+  generation: 1
+  name: component-to-component
+  namespace: gallen
+  resourceVersion: "1937951"
+  uid: 14812d86-0100-4834-b00f-f52b90750ff8
+spec:
+  events:
+  - component:
+      name: component-1
+  target:
+    kind: Component
+    name: component-2
+status:
+  lastUpdate: "2023-10-08T19:49:53-04:00"
+  reason: Agogos Trigger is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Trigger
+metadata:
+  creationTimestamp: "2023-10-08T23:49:53Z"
+  finalizers:
+  - triggers.agogos.redhat.com/finalizer
+  generation: 1
+  name: component-to-group
+  namespace: gallen
+  resourceVersion: "1937957"
+  uid: a5e71ba7-d870-4060-81d2-1cba1e39912a
+spec:
+  events:
+  - component:
+      name: component-1
+  target:
+    kind: Group
+    name: group-1
+status:
+  lastUpdate: "2023-10-08T19:49:53-04:00"
+  reason: Agogos Trigger is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Trigger
+metadata:
+  creationTimestamp: "2023-10-08T23:49:53Z"
+  finalizers:
+  - triggers.agogos.redhat.com/finalizer
+  generation: 1
+  name: component-to-pipeline
+  namespace: gallen
+  resourceVersion: "1937964"
+  uid: 64825a04-0da3-414d-9a2d-181ba6001ba5
+spec:
+  events:
+  - component:
+      name: component-1
+  target:
+    kind: Pipeline
+    name: pipeline-1
+status:
+  lastUpdate: "2023-10-08T19:49:53-04:00"
+  reason: Agogos Trigger is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Trigger
+metadata:
+  creationTimestamp: "2023-10-08T23:55:39Z"
+  finalizers:
+  - triggers.agogos.redhat.com/finalizer
+  generation: 1
+  name: group-to-component
+  namespace: gallen
+  resourceVersion: "1939844"
+  uid: 04b933a9-a9e8-45b3-b056-fc3e1f180430
+spec:
+  events:
+  - group:
+      name: group-1
+  target:
+    kind: Component
+    name: component-1
+status:
+  lastUpdate: "2023-10-08T19:55:39-04:00"
+  reason: Agogos Trigger is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Trigger
+metadata:
+  creationTimestamp: "2023-10-08T23:55:39Z"
+  finalizers:
+  - triggers.agogos.redhat.com/finalizer
+  generation: 1
+  name: group-to-group
+  namespace: gallen
+  resourceVersion: "1939850"
+  uid: b329614c-3365-4815-8438-c4c15a857ac5
+spec:
+  events:
+  - group:
+      name: group-1
+  target:
+    kind: Group
+    name: group-2
+status:
+  lastUpdate: "2023-10-08T19:55:41-04:00"
+  reason: Agogos Trigger is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Trigger
+metadata:
+  creationTimestamp: "2023-10-08T23:55:39Z"
+  finalizers:
+  - triggers.agogos.redhat.com/finalizer
+  generation: 1
+  name: group-to-pipeline
+  namespace: gallen
+  resourceVersion: "1939846"
+  uid: 07271eec-a8d4-4b58-a7ad-e22cf307860f
+spec:
+  events:
+  - group:
+      name: group-1
+  target:
+    kind: Pipeline
+    name: pipeline-1
+status:
+  lastUpdate: "2023-10-08T19:55:39-04:00"
+  reason: Agogos Trigger is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Trigger
+metadata:
+  creationTimestamp: "2023-10-08T23:49:53Z"
+  finalizers:
+  - triggers.agogos.redhat.com/finalizer
+  generation: 1
+  name: pipeline-to-component
+  namespace: gallen
+  resourceVersion: "1937986"
+  uid: a466e751-06cd-4741-87ad-e3f3f4aca034
+spec:
+  events:
+  - pipeline:
+      name: pipeline-1
+  target:
+    kind: Component
+    name: component-1
+status:
+  lastUpdate: "2023-10-08T19:49:53-04:00"
+  reason: Agogos Trigger is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Trigger
+metadata:
+  creationTimestamp: "2023-10-08T23:49:53Z"
+  finalizers:
+  - triggers.agogos.redhat.com/finalizer
+  generation: 1
+  name: pipeline-to-group
+  namespace: gallen
+  resourceVersion: "1937989"
+  uid: 28618548-a5b8-48fc-9cb4-704a15902373
+spec:
+  events:
+  - pipeline:
+      name: pipeline-1
+  target:
+    kind: Group
+    name: group-1
+status:
+  lastUpdate: "2023-10-08T19:49:53-04:00"
+  reason: Agogos Trigger is ready
+  status: Ready
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Trigger
+metadata:
+  creationTimestamp: "2023-10-08T23:49:53Z"
+  finalizers:
+  - triggers.agogos.redhat.com/finalizer
+  generation: 1
+  name: pipeline-to-pipeline
+  namespace: gallen
+  resourceVersion: "1937993"
+  uid: ce18c3d5-67d2-449a-9676-5c8fc608ec2c
+spec:
+  events:
+  - pipeline:
+      name: pipeline-1
+  target:
+    kind: Pipeline
+    name: pipeline-2
+status:
+  lastUpdate: "2023-10-08T19:49:53-04:00"
+  reason: Agogos Trigger is ready
+  status: Ready
