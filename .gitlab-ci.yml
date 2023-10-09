@@ -8,6 +8,7 @@ validate:
     - npm install -g pajv
     - cd /tmp
     - git clone https://gitlab.cee.redhat.com/gallen/extensions-internal.git
+    - cd extensions-internal
     - git branch AGOGOS-400
   tags: [docker]
 
