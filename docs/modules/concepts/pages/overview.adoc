@@ -1,0 +1,98 @@
+= Overview
+
+This page is an overview of Agogos.
+
+Agogos is a build and delivery orchestrator for Red{nbsp}Hat products. It automates
+tasks for many Red{nbsp}Hat internal services. Some of the systems Agogos uses are:
+Brew (building), Jira (bug tracking), Bugzilla (bug tracking),
+Errata{nbsp}Tool (delivery), Index{nbsp}Image{nbsp}Builder (delivery), and Dist-Git (source code).
+Agogos does not build, test, or release Red{nbsp}Hat products directly, it uses these
+services instead.
+
+Agogos implements the Kubernetes
+link:https://kubernetes.io/docs/concepts/extend-kubernetes/operator/[operator pattern].
+It uses Kubernetes
+link:https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/[custom resources]
+to manage its data and work. Users create some resouces, for example
+xref:components.adoc[]
+and
+xref:pipelines.adoc[],
+and Agogos does operations on the Kubernetes cluster based on the data in the
+resources.
+
+Controllers are the implementation of the operator pattern. They react to changes
+on one or more custom resources in a process named *reconciliation*. The goal
+of this process is to change the cluster state to match the data in the custom
+resource. For example, when you create a Kubernetes `Pod` resource, the Pod
+controller reacts and creates a container (and other accessory things like
+networks) calling the underlying container runtime.
+
+== Technology Stack
+Agogos is a Kubernetes operator, so it runs on top of
+link:https://kubernetes.io/docs/concepts/overview/[Kubernetes].
+Kubernetes is a platform to manage containerized workloads and services.
+
+Agogos is a Java project that uses
+link:https://quarkus.io/[Quarkus].
+Quarkus is a set of different Java libraries and utilities that help with the
+development of applications. It provides custom wrappers around those and other
+useful tools like live reloading and auto-provisioning of services as databases.
+
+Agogos uses the
+link:https://junit.org/junit5/docs/current/user-guide/[Junit 5]
+project in combination with Quarkus and
+link:https://site.mockito.org/[Mockito]
+to test its logic.
+
+Agogos uses the
+link:https://javaoperatorsdk.io/[Java Operator SDK (JOSDK)]
+and the
+link:https://github.com/fabric8io/kubernetes-client[Fabric8io Kubernetes Client]
+to interact with the Kubernetes cluster and register itself as an operator.
+
+Agogos uses different
+link:https://tekton.dev/[Tekton]
+projects. It uses
+link:https://tekton.dev/docs/pipelines/[Tekton Pipelines]
+to run containers that contact the different services it orchestrates,
+link:https://tekton.dev/docs/triggers/[Tekton Triggers]
+to react to internal events sent by the Agogos controllers and
+link:https://tekton.dev/docs/chains/[Tekton Chains]
+to provide proof that certain actions are performed to comply with supply chain
+security.
+
+Agogos uses the
+link:https://knative.dev/docs/eventing/[Knative Eventing]
+project to add a message bus to the installation. Agogos controllers send
+messages that Tekton Triggers receive in order to perform some actions in the
+process.
+
+== Code Organization
+The Agogos code base is located in the Red{nbsp}Hat internal GitLab CEE instance,
+in the
+link:gitlab.cee.redhat.com/agogos/[Agogos group].
+The
+link:gitlab.cee.redhat.com/agogos/agogos/[main Agogos repository],
+contains the code for Agogos. The other repositories contain Red{nbsp}Hat
+internal code.
+
+Agogos is organized into three main Java projects: CLI, Operator and Webhooks.
+The CLI project produces the [command]`agogosctl` binary that is used to
+interact with the Agogos Operator in the cluster where it is installed.
+The Operator project contains all the controllers that react to the custom
+resources. There is a single controller per custom resource, named after it.
+The Webhooks project provides validation for the Agogos custom resources.
+Kubernetes calls the webhooks endpoints when it is needed. See
+link:https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/[Admission Controllers]
+for more information.
+
+There are two supporting projects: Core and Tests.
+The Core project contains all the custom resources in Java code, utilities for
+sending events with Knative and other helper classes.
+The Test project provides utilties used for testing in the other projects.
+
+== External Documents
+Agogos has a
+link:https://drive.google.com/drive/u/0/folders/1IbZorQi9s5DZuCWfzVeUzRYOovtUAyLp[Google Drive folder]
+where various documents are stored. The main folder is "Design Documents" where
+documents detailing the design behind the features of Agogos are stored.
