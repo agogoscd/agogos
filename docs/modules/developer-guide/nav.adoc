@@ -16,4 +16,5 @@
 *** xref:webhooks/ssl_certificates.adoc[]
 ** xref:documentation/index.adoc[Documentation]
 *** xref:documentation/style_guide.adoc[Style Guide]
+*** xref:documentation/search_engine.adoc[Search Engine]
 ** xref:ide.adoc[]

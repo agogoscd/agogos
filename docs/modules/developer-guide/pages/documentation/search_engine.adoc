@@ -1,0 +1,108 @@
+= Agogos Search Engine Overview
+
+== Scope
+This page provides and overview of the full-text search engine used by this
+documentation site.
+
+== Antora and Lunr
+link:https://antora.org/[Antora]
+is the documentation site generator used to publish our AsciiDoc files.
+link:https://lunrjs.com/[Lunr]
+is the javascript library used to create an index from text and execute
+searches from it.
+link:https://gitlab.com/antora/antora-lunr-extension[Antora's Lunr Extension]
+is the integration of the Lunr library into the Antora site generator.
+All of our code for the documentation is located in the
+link:https://gitlab.cee.redhat.com/agogos/agogos/-/tree/main/docs[docs directory of the Agogos source code repository].
+
+== Antora playbook
+Antora is configured in the [filename]`antora-playbook-local.yml` and
+[filename]`antora-playbook.yml` files.
+The [filename]`antora-playbook-local.yml` file is for local deployment and
+continuous integration testing. The [filename]`antora-playbook.yml` file is for production deployment. See
+link:https://docs.antora.org/antora/latest/playbook/set-up-playbook[Antora's Set Up a playbook]
+for more information.
+
+=== Supplemental files
+In the Antora playbook files, the field `ui.supplemental-files`specifies
+the directory where
+link:https://docs.antora.org/antora-ui-default/templates/[Handlebar template partials]
+or static files can be placed to be overwritten. Header and footer contents
+are currently overwritten by  [filename]`header-content.hbs` and
+[filename]`footer-content.hbs` partials. See other built-in partials in
+link:https://gitlab.com/antora/antora-ui-default/-/tree/master/src/partials[Antora's default UI repository].
+
+=== Extensions
+In the Antora playbook files, the field `antora.extensions` specifies the
+enabled extensions.
+
+* `@antora/lunr-extension` is Antora's only built-in extension.
+It creates an index with the site contents. It also adds the search box
+placed in the header which performs searches on the index.
+* `extensions/lunr-patch` is a custom extension to modify the way
+lunr-extension creates the content index.
+
+==== Custom extension: lunr-patch
+To improve the search experience in the Agogos documentation the following
+default lunr behaviors are modified:
+
+* Disable stemmer: does an exact search instead of search based on words stems.
++
+The stemmer is disabled from lunr-extension to address
+link:https://gitlab.com/antora/antora-lunr-extension/-/issues/43[this issue].
+
+* Remove hyphen from separator regex: the amount of schema keys and other
+hyphenated words in the documentation need these words to be considered as a
+whole.
++
+The separator regex is configured from lunr-extension to address
+link:https://gitlab.com/antora/antora-lunr-extension/-/issues/65[this issue].
+
+link:https://gitlab.com/antora/antora-lunr-extension#user-content-configuration[Lunr-extension configuration]
+is limited as the only available versions are `alpha` releases.
+To patch Lunr search behavior the [filename]`vendor/lunr.js` is included as
+a supplemental file.
+
+== Search behavior
+
+. The search term is lowercased and trimmed.
+. If the search term has multiple words:
+.. Prioritize searches where all words are present (they can be out of order).
+.. Include results where part of the words is missing.
+. If the search term has one word:
+.. Prioritize results where the term is present.
+.. If no exact match, include results where the term is contained in a word.
+
+[WARNING]
+====
+Don't use quotation marks to expect exact match. This isn't implemented by Lunr.
+====
+
+== Results
+When displaying search results:
+
+. Each result represents a page, section, or part of the content.
+. All the matches in page titles are shown.
++
+`Blocked` search term retrieves 8 title section results for
+xref:policy-guides/jira.adoc[Jira]
+page.
+. Only the first match per page content is displayed.
++
+`Blocked` search term retrieves only the first match for
+xref:policy-guides/jira.adoc[Jira]
+content.
+. If text matches, surrounding text is shown. If a title matches, the whole
+title is shown.
+. The result entries are pushed to the results box.
+
+
+[IMPORTANT]
+====
+When two words are searched, only the first one is highlighted.
+However, both are being considered during a search.
+The implementation does it this way because it is simpler to build the
+result list with only one match per document.
+====
+
+If the user clicks outside the search the result box is emptied.

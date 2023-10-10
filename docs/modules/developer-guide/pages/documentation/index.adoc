@@ -6,6 +6,7 @@ the Agogos system.
 
 == References
 * xref:documentation/style_guide.adoc[Documentation Style Guide]
+* xref:documentation/search_engine.adoc[Search Engine Overview]
 
 == AsciiDoc
 The Agogos documentation is stored in GitLab as AsciiDoc files.
