@@ -20,3 +20,8 @@ asciidoc:
     kroki-fetch-diagram: true
   extensions:
     - asciidoctor-kroki
+
+antora:
+  extensions:
+  - require: '@antora/lunr-extension'
+  - require: ./docs/custom_extensions/lunr-patch.js
