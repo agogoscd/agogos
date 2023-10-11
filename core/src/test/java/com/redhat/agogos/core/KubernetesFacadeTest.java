@@ -11,7 +11,6 @@ import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.MockitoConfig;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -33,13 +32,6 @@ public class KubernetesFacadeTest {
 
     @Inject
     KubernetesFacade kubernetesFacade;
-
-    @Test
-    public void getKubernetesClient() throws Exception {
-        KubernetesClient kubeClient = kubernetesFacade.getKubernetesClient();
-
-        Assertions.assertNotNull(kubeClient);
-    }
 
     @Test
     public void getMasterUrl() throws Exception {
@@ -608,5 +600,14 @@ public class KubernetesFacadeTest {
                 kubernetesSerializationMock,
                 Mockito.times(1)).unmarshal(
                         stream, resource.getClass());
+    }
+
+    @Test
+    public void kubernetesRestartDeployment() throws Exception {
+        kubernetesFacade.restartDeployment("default", "deployment");
+
+        Mockito.verify(
+                kubernetesClientRetries,
+                Mockito.times(1)).restartDeployment("default", "deployment");
     }
 }

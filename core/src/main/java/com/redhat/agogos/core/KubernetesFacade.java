@@ -8,6 +8,7 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.api.model.StatusDetails;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.VersionInfo;
@@ -27,10 +28,6 @@ public class KubernetesFacade {
 
     @Inject
     KubernetesClientRetries retriesClient;
-
-    public KubernetesClient getKubernetesClient() {
-        return kubernetesClient;
-    }
 
     public URL getMasterUrl() {
         return kubernetesClient.getMasterUrl();
@@ -256,5 +253,9 @@ public class KubernetesFacade {
 
     public <T> T unmarshal(Class<T> clazz, InputStream input) {
         return kubernetesClient.getKubernetesSerialization().unmarshal(input, clazz);
+    }
+
+    public Deployment restartDeployment(String namespace, String name) {
+        return retriesClient.restartDeployment(namespace, name);
     }
 }

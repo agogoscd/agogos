@@ -114,8 +114,7 @@ public class WebhooksInstaller extends Installer {
             if (webhooksService != null) {
                 helper.println(String.format("🕞 Restarting Webhooks service after updating certificates..."));
 
-                kubernetesFacade.getKubernetesClient().apps().deployments().inNamespace(namespace).withName(ServiceAccountName)
-                        .rolling().restart();
+                kubernetesFacade.restartDeployment(namespace, ServiceAccountName);
             }
         }
 

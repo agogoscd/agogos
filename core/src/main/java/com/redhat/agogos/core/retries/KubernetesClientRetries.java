@@ -5,6 +5,7 @@ import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.StatusDetails;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.tekton.triggers.v1beta1.EventListener;
@@ -276,6 +277,25 @@ public class KubernetesClientRetries {
         });
 
         return decorated.get();
+    }
+
+    public Deployment restartDeployment(String namespace, String name) {
+        RetryConfig config = RetryConfig.<EventListener> custom()
+                .maxAttempts(DEFAULT_MAX_RETRIES)
+                .waitDuration(Duration.ofSeconds(DEFAULT_MAX_INTERVAL))
+                .build();
+
+        RetryRegistry registry = RetryRegistry.of(config);
+        Retry retry = registry.retry("restart-deployment");
+        retry.getEventPublisher()
+                .onRetry(e -> LOG.info("⏳ WAIT: Waiting for Deployment '{}' in namespace '{}' to be restarted",
+                        name, namespace));
+        Supplier<Deployment> decorated = Retry.decorateSupplier(retry, () -> {
+            return kubernetesClient.apps().deployments().inNamespace(namespace).withName(name).rolling().restart();
+        });
+
+        LOG.info("👉 OK: Deployment '{}' in namespace '{}' has been restarted", name, namespace);
+        return (Deployment) decorated.get();
     }
 
     public void waitForAllPodsRunning(String namespace) {

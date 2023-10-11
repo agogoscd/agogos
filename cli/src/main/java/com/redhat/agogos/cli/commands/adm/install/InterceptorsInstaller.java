@@ -106,8 +106,7 @@ public class InterceptorsInstaller extends Installer {
             if (interceptorsService != null) {
                 helper.println(String.format("🕞 Restarting Interceptors service after updating certificates..."));
 
-                kubernetesFacade.getKubernetesClient().apps().deployments().inNamespace(namespace).withName(ServiceAccountName)
-                        .rolling().restart();
+                kubernetesFacade.restartDeployment(namespace, ServiceAccountName);
             }
         }
 
