@@ -1,6 +1,5 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
-import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import com.redhat.agogos.cli.config.DependencyConfig;
 import com.redhat.agogos.core.errors.ApplicationException;
@@ -38,6 +37,6 @@ public abstract class DependencyInstaller extends Installer {
         for (HasMetadata r : resources) {
             installed.add(kubernetesFacade.serverSideApply(r));
         }
-        Helper.status(installed);
+        helper.status(installed);
     }
 }

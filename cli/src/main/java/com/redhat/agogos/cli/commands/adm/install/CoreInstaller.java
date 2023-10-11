@@ -1,6 +1,5 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
-import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.HasMetadata;
@@ -28,8 +27,6 @@ import io.fabric8.tekton.triggers.v1beta1.TriggerTemplate;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +42,6 @@ import java.util.stream.Stream;
 @ApplicationScoped
 @RegisterForReflection
 public class CoreInstaller extends Installer {
-    private static final Logger LOG = LoggerFactory.getLogger(CoreInstaller.class);
 
     private static final String RESOURCE_NAME_EVENTING = "agogos-eventing";
 
@@ -79,7 +75,7 @@ public class CoreInstaller extends Installer {
 
     @Override
     public void install(InstallProfile profile, String createNamespace) {
-        LOG.info("🕞 Installing Agogos core resources...");
+        helper.println(String.format("🕞 Installing Agogos core resources..."));
 
         List<HasMetadata> resources = new ArrayList<>();
         resources.add(namespace(createNamespace));
@@ -97,9 +93,9 @@ public class CoreInstaller extends Installer {
             installed.add(kubernetesFacade.serverSideApply(r));
         }
 
-        Helper.status(installed);
+        helper.status(installed);
 
-        LOG.info("✅ Agogos core resources installed");
+        helper.println(String.format("✅ Agogos core resources installed"));
     }
 
     private ServiceAccount createServiceAccount(String namespace) {
@@ -164,7 +160,6 @@ public class CoreInstaller extends Installer {
         return new ClusterRoleBindingBuilder()
                 .withNewMetadata()
                 .withName(binding)
-                .withNamespace(sa.getMetadata().getNamespace())
                 .endMetadata()
                 .addNewSubject()
                 .withApiGroup(HasMetadata.getGroup(sa.getClass()))

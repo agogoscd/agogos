@@ -1,0 +1,24 @@
+Usage: agogosctl adm init-namespace [-hvV] -n=<namespace> [-o=<output>]
+                                    [--quota-file=<quotaFile>] [--admins=<admin>
+                                    [,<admin>...]]... [--editors=<editor>[,
+                                    <editor>...]]...
+                                    [--extensions=<extensions>]...
+                                    [--viewers=<viewer>[,<viewer>...]]...
+Initialize selected namespace to work with Agogos
+      --admins=<admin>[,<admin>...]
+                          List of users given the admin role for the namespace
+      --editors=<editor>[,<editor>...]
+                          List of users given the edit role for the namespace
+      --extensions=<extensions>
+                          Extensions to be added to the namespace
+  -h, --help              Show this help message and exit.
+  -n, --namespace=<namespace>
+                          Name of the namespace to be initialized
+  -o, --output=<output>   Output format, valid values: plain, yaml, json,
+                            default: plain.
+      --quota-file=<quotaFile>
+                          Resource quota file to be applied to the namespace
+  -v, --verbose
+  -V, --version           Print version information and exit.
+      --viewers=<viewer>[,<viewer>...]
+                          List of users given the view role for the namespace

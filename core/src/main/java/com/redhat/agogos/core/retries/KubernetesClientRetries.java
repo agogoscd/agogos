@@ -307,11 +307,14 @@ public class KubernetesClientRetries {
         }
     }
 
-    public EventListener waitForEventListenerRunning(String namespace, String name) {
+    public EventListener waitForEventListenerRunning(EventListener el) {
+        String name = el.getMetadata().getName();
+        String namespace = el.getMetadata().getNamespace();
+
         RetryConfig config = RetryConfig.<EventListener> custom()
                 .maxAttempts(ALL_PODS_RUNNING_MAX_RETRIES)
                 .waitDuration(Duration.ofSeconds(ALL_PODS_RUNNING_MAX_INTERVAL))
-                .retryOnResult(el -> el.getStatus().getAddress().getUrl() == null)
+                .retryOnResult(listener -> listener.getStatus().getAddress().getUrl() == null)
                 .build();
 
         RetryRegistry registry = RetryRegistry.of(config);

@@ -1,0 +1,44 @@
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  creationTimestamp: "2023-10-04T18:19:08Z"
+  generation: 1
+  name: agogos
+  namespace: test-namespace
+  resourceVersion: "1674"
+  uid: 2d23f90c-2e6d-4dd1-827e-9ac979a7d014
+spec:
+  namespaceSelector:
+    matchNames:
+    - test-namespace
+  resources: {}
+  serviceAccountName: agogos-eventing
+status:
+  address:
+    url: http://el-agogos.test-namespace.svc.cluster.local:8080
+  conditions:
+  - lastTransitionTime: "2023-10-04T18:19:15Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2023-10-04T18:19:15Z"
+    message: Deployment exists
+    status: "True"
+    type: Deployment
+  - lastTransitionTime: "2023-10-04T18:19:15Z"
+    message: ReplicaSet "el-agogos-65596c479b" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  - lastTransitionTime: "2023-10-04T18:19:15Z"
+    message: EventListener is ready
+    status: "True"
+    type: Ready
+  - lastTransitionTime: "2023-10-04T18:19:15Z"
+    message: Service exists
+    status: "True"
+    type: Service
+  configuration:
+    generatedName: el-agogos

@@ -7,8 +7,6 @@ import io.fabric8.kubernetes.api.model.rbac.ClusterRole;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -19,14 +17,12 @@ import java.util.List;
 @RegisterForReflection
 public class KnativeEventingInstaller extends DependencyInstaller {
 
-    private static final Logger LOG = LoggerFactory.getLogger(KnativeEventingInstaller.class);
-
     @Inject
     KnativeEventingDependency eventing;
 
     @Override
     public void install(InstallProfile profile, String namespace) {
-        LOG.info("🕞 Installing Knative Eventing {}...", eventing.version());
+        helper.println(String.format("🕞 Installing Knative Eventing %s...", eventing.version()));
 
         cleanup();
         install(eventing, profile, namespace, loaded -> {
@@ -37,7 +33,7 @@ public class KnativeEventingInstaller extends DependencyInstaller {
 
         kubernetesFacade.waitForAllPodsRunning(eventing.namespace());
 
-        LOG.info("✅ Knative Eventing {} installed", eventing.version());
+        helper.println(String.format("✅ Knative Eventing %s installed", eventing.version()));
     }
 
     /**
@@ -55,15 +51,7 @@ public class KnativeEventingInstaller extends DependencyInstaller {
         List<String> rolesToDelete = List.of("addressable-resolver", "channelable-manipulator", "podspecable-binding",
                 "source-observer");
 
-        LOG.info("🕞 Cleaning up Knative Eventing resources...");
-
-        String releaseLabel = "eventing.knative.dev/release";
-
-        kubernetesFacade.getKubernetesClient().admissionRegistration().v1().validatingWebhookConfigurations()
-                .withLabel(releaseLabel).delete();
-        kubernetesFacade.getKubernetesClient().admissionRegistration().v1().mutatingWebhookConfigurations()
-                .withLabel(releaseLabel)
-                .delete();
+        helper.println(String.format("🕞 Cleaning up Knative Eventing resources..."));
 
         kubernetesFacade.delete(Deployment.class, eventing.namespace(), "eventing-webhook");
 

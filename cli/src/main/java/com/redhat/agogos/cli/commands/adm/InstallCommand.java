@@ -11,8 +11,6 @@ import com.redhat.agogos.cli.commands.adm.install.TektonTriggersInstaller;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -21,8 +19,6 @@ import java.util.Comparator;
 
 @Command(mixinStandardHelpOptions = true, name = "install", description = "Install Agogos")
 public class InstallCommand extends AbstractCallableSubcommand {
-
-    private static final Logger LOG = LoggerFactory.getLogger(InstallCommand.class);
 
     public static enum InstallProfile {
         dev,
@@ -64,14 +60,17 @@ public class InstallCommand extends AbstractCallableSubcommand {
      */
     @Override
     public Integer call() {
-        LOG.info("💻 Selected profile: {}", profile);
+        cli.getCommandLine().getOut().println(String.format("💻 Selected profile: %s", profile));
 
+        SortInstallers si = new SortInstallers();
         installers.stream()
                 .filter(i -> inProfile(profile, i))
                 .filter(i -> !(skipTekton && (i instanceof TektonInstaller || i instanceof TektonTriggersInstaller)))
                 .filter(i -> !(skipKnative && i instanceof KnativeEventingInstaller))
-                .sorted(Comparator.comparingInt(i -> getPriority(i)))
-                .forEach(installer -> installer.install(profile, namespace));
+                .sorted((a, b) -> si.compare(a, b))
+                .forEach(installer -> {
+                    installer.install(profile, namespace);
+                });
 
         return CommandLine.ExitCode.OK;
     }
@@ -131,4 +130,13 @@ public class InstallCommand extends AbstractCallableSubcommand {
         return false;
     }
 
+    class SortInstallers implements Comparator<Installer> {
+        public int compare(Installer a, Installer b) {
+            if (getPriority(a) != getPriority(b)) {
+                return Integer.compare(getPriority(a), getPriority(b));
+            } else {
+                return a.getClass().getName().compareTo(b.getClass().getName());
+            }
+        }
+    }
 }

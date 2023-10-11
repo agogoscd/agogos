@@ -1,0 +1,55 @@
+💻 Selected profile: dev
+🕞 Installing Agogos CRDs...
+👉 OK: CustomResourceDefinition: builders.agogos.redhat.com (apiextensions.k8s.io/v1)
+👉 OK: CustomResourceDefinition: builds.agogos.redhat.com (apiextensions.k8s.io/v1)
+👉 OK: CustomResourceDefinition: components.agogos.redhat.com (apiextensions.k8s.io/v1)
+👉 OK: CustomResourceDefinition: dependencies.agogos.redhat.com (apiextensions.k8s.io/v1)
+👉 OK: CustomResourceDefinition: executions.agogos.redhat.com (apiextensions.k8s.io/v1)
+👉 OK: CustomResourceDefinition: groups.agogos.redhat.com (apiextensions.k8s.io/v1)
+👉 OK: CustomResourceDefinition: handlers.agogos.redhat.com (apiextensions.k8s.io/v1)
+👉 OK: CustomResourceDefinition: pipelines.agogos.redhat.com (apiextensions.k8s.io/v1)
+👉 OK: CustomResourceDefinition: runs.agogos.redhat.com (apiextensions.k8s.io/v1)
+👉 OK: CustomResourceDefinition: stages.agogos.redhat.com (apiextensions.k8s.io/v1)
+👉 OK: CustomResourceDefinition: submissions.agogos.redhat.com (apiextensions.k8s.io/v1)
+👉 OK: CustomResourceDefinition: triggers.agogos.redhat.com (apiextensions.k8s.io/v1)
+✅ Agogos CRDs installed
+🕞 Installing Agogos core resources...
+👉 OK: Namespace: agogos (v1)
+👉 OK: ClusterRole: agogos-sa (rbac.authorization.k8s.io/v1)
+👉 OK: ClusterRole: agogos-eventing (rbac.authorization.k8s.io/v1)
+👉 OK: ClusterRole: agogos-admin (rbac.authorization.k8s.io/v1)
+👉 OK: ClusterRole: agogos-edit (rbac.authorization.k8s.io/v1)
+👉 OK: ClusterRole: agogos-view (rbac.authorization.k8s.io/v1)
+👉 OK: ServiceAccount: agogos (v1) (ns: agogos)
+👉 OK: ClusterRoleBinding: agogos-sa (rbac.authorization.k8s.io/v1)
+👉 OK: ClusterRoleBinding: agogos-sa-admin (rbac.authorization.k8s.io/v1)
+👉 OK: Secret: agogos (v1) (ns: agogos)
+✅ Agogos core resources installed
+🕞 Installing Agogos Interceptors component...
+👉 OK: ServiceAccount: agogos-interceptors (v1) (ns: agogos)
+👉 OK: Secret: agogos-interceptors (v1) (ns: agogos)
+👉 OK: ClusterInterceptor: group-execute (triggers.tekton.dev/v1alpha1)
+✅ Agogos Interceptors installed
+
+👋 Interceptor configuration in development mode. You can use following environment variables to point the Interceptor application to generated certificate:
+
+👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES=/home/gallen/work/cpaas/agogos/cli/interceptors.pem
+👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES=/home/gallen/work/cpaas/agogos/cli/interceptors.crt
+🕞 Installing Agogos Webhooks component...
+👉 OK: ValidatingWebhookConfiguration: webhook.agogos.redhat.com (admissionregistration.k8s.io/v1)
+👉 OK: MutatingWebhookConfiguration: webhook.agogos.redhat.com (admissionregistration.k8s.io/v1)
+👉 OK: ServiceAccount: agogos-webhooks (v1) (ns: agogos)
+👉 OK: ClusterRole: agogos-webhooks (rbac.authorization.k8s.io/v1)
+👉 OK: ClusterRoleBinding: agogos-webhooks (rbac.authorization.k8s.io/v1)
+👉 OK: Secret: agogos-webhooks (v1) (ns: agogos)
+✅ Agogos Webhooks installed
+
+👋 Webhook configuration in development mode. You can use following environment variables to point the Webhook application to generated certificate:
+
+👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES=/home/gallen/work/cpaas/agogos/cli/webhooks.pem
+👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES=/home/gallen/work/cpaas/agogos/cli/webhooks.crt
+🕞 Installing Agogos Operator component...
+👉 OK: ServiceAccount: agogos-operator (v1) (ns: agogos)
+👉 OK: ClusterRole: agogos-operator (rbac.authorization.k8s.io/v1)
+👉 OK: ClusterRoleBinding: agogos-operator (rbac.authorization.k8s.io/v1)
+✅ Agogos Operator installed

@@ -1,6 +1,5 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
-import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
@@ -29,13 +28,13 @@ import io.fabric8.kubernetes.api.model.rbac.SubjectBuilder;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Profile(InstallProfile.dev)
 @Profile(InstallProfile.local)
@@ -44,8 +43,6 @@ import java.util.Map;
 @ApplicationScoped
 @RegisterForReflection
 public class OperatorInstaller extends Installer {
-
-    private static final Logger LOG = LoggerFactory.getLogger(OperatorInstaller.class);
 
     @ConfigProperty(name = "agogos.operator.container-image")
     private String ContainerImage;
@@ -59,12 +56,10 @@ public class OperatorInstaller extends Installer {
 
     @Override
     public void install(InstallProfile profile, String namespace) {
-        LOG.info("🕞 Installing Agogos Operator component...");
+        helper.println(String.format("🕞 Installing Agogos Operator component..."));
 
-        List<HasMetadata> resources = List.of(
-                serviceAccount(namespace),
-                clusterRole(),
-                clusterRoleBinding(namespace));
+        List<HasMetadata> resources = Stream.of(serviceAccount(namespace), clusterRole(), clusterRoleBinding(namespace))
+                .collect(Collectors.toList());
 
         // For local and prod profiles we need to add more resources
         if (profile == InstallProfile.local || profile == InstallProfile.prod) {
@@ -78,9 +73,9 @@ public class OperatorInstaller extends Installer {
             installed.add(kubernetesFacade.serverSideApply(r));
         }
 
-        Helper.status(resources);
+        helper.status(installed);
 
-        LOG.info("✅ Agogos Operator installed");
+        helper.println(String.format("✅ Agogos Operator installed"));
     }
 
     private ServiceAccount serviceAccount(String namespace) {

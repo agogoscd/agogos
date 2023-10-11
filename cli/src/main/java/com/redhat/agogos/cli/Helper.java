@@ -2,34 +2,41 @@ package com.redhat.agogos.cli;
 
 import com.redhat.agogos.core.k8s.Label;
 import io.fabric8.kubernetes.api.model.HasMetadata;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import java.util.List;
 
+@ApplicationScoped
 public class Helper {
-    private static final Logger LOG = LoggerFactory.getLogger(Helper.class);
 
-    public static void status(List<HasMetadata> resources) {
+    @Inject
+    CLI cli;
+
+    public void println(String msg) {
+        cli.getCommandLine().getOut().println(msg);
+    }
+
+    public void status(List<HasMetadata> resources) {
         status(resources.toArray(new HasMetadata[resources.size()]));
     }
 
-    public static void status(HasMetadata... resources) {
+    public void status(HasMetadata... resources) {
         status("👉 OK: ", resources);
     }
 
-    public static void status(String start, HasMetadata... resources) {
+    public void status(String start, HasMetadata... resources) {
         StringBuilder sb = null;
 
         for (HasMetadata resource : resources) {
-            sb = new StringBuilder()//
+            sb = new StringBuilder()
                     .append(start)
                     .append(getStatusLine(resource));
-            LOG.info(sb.toString());
+            println(sb.toString());
         }
     }
 
-    private static String getStatusLine(HasMetadata resource) {
+    private String getStatusLine(HasMetadata resource) {
         StringBuilder sb = null;
 
         sb = new StringBuilder()//
@@ -46,7 +53,8 @@ public class Helper {
                     .append(")");
         }
 
-        if (resource.getMetadata().getLabels().containsKey(Label.EXTENSION.toString())) {
+        if (resource.getMetadata().getLabels() != null
+                && resource.getMetadata().getLabels().containsKey(Label.EXTENSION.toString())) {
             sb.append(" (extension: ")
                     .append(resource.getMetadata().getLabels().get(Label.EXTENSION.toString()))
                     .append(")");

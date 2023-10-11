@@ -1,0 +1,31 @@
+Usage: agogosctl adm install [-hvV] [-sk] [-st] [-n=<namespace>] [-o=<output>]
+                             [-p=<profile>]
+Install Agogos
+  -h, --help                Show this help message and exit.
+  -n, --namespace=<namespace>
+                            Namespace where Agogos resources should be
+                              installed, by default: agogos.
+  -o, --output=<output>     Output format, valid values: plain, yaml, json,
+                              default: plain.
+  -p, --profile=<profile>   Selected installation profile, valid values: dev,
+                              local, prod.
+
+                            Available profiles:
+
+                            * dev: everything is installed in the cluster where
+                              you are already logged in, Agogos resources are
+                              meant to be run outside of the cluster in the
+                              development environment, self-signed certificates
+                              are generated and can be used to connect to
+                              cluster
+                            * local: everything is installed in the cluster
+                              where you are already logged in, Agogos is
+                              deployed in the 'agogos' namespace, self-signed
+                              certificates are used
+                            * prod: everything is installed in the cluster
+                              where you are already logged in, Agogos is
+                              deployed in the 'agogos' namespace,
+      -sk, --skip-knative   Skip Knative Eventing installation.
+      -st, --skip-tekton    Skip Tekton installation.
+  -v, --verbose
+  -V, --version             Print version information and exit.

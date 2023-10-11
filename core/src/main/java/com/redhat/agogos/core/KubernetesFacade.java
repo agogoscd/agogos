@@ -250,8 +250,8 @@ public class KubernetesFacade {
         retriesClient.waitForAllPodsRunning(namespace, retries, interval);
     }
 
-    public EventListener waitForEventListenerRunning(String namespace, String name) {
-        return retriesClient.waitForEventListenerRunning(namespace, name);
+    public EventListener waitForEventListenerRunning(EventListener el) {
+        return retriesClient.waitForEventListenerRunning(el);
     }
 
     public <T> T unmarshal(Class<T> clazz, InputStream input) {

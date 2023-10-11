@@ -1,6 +1,5 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
-import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import com.redhat.agogos.cli.commands.adm.certs.CertProvider;
 import com.redhat.agogos.core.errors.ApplicationException;
@@ -35,8 +34,6 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -55,8 +52,6 @@ import java.util.stream.Collectors;
 @ApplicationScoped
 @RegisterForReflection
 public class InterceptorsInstaller extends Installer {
-
-    private static final Logger LOG = LoggerFactory.getLogger(InterceptorsInstaller.class);
 
     @ConfigProperty(name = "agogos.interceptors.container-image")
     private String ContainerImage;
@@ -82,7 +77,7 @@ public class InterceptorsInstaller extends Installer {
 
     @Override
     public void install(InstallProfile profile, String namespace) {
-        LOG.info("🕞 Installing Agogos Interceptors component...");
+        helper.println(String.format("🕞 Installing Agogos Interceptors component..."));
 
         certProvider.init();
 
@@ -109,16 +104,16 @@ public class InterceptorsInstaller extends Installer {
         if (profile == InstallProfile.local || profile == InstallProfile.prod) {
             Service interceptorsService = kubernetesFacade.get(Service.class, namespace, ServiceAccountName);
             if (interceptorsService != null) {
-                LOG.info("🕞 Restarting Interceptors service after updating certificates...");
+                helper.println(String.format("🕞 Restarting Interceptors service after updating certificates..."));
 
                 kubernetesFacade.getKubernetesClient().apps().deployments().inNamespace(namespace).withName(ServiceAccountName)
                         .rolling().restart();
             }
         }
 
-        Helper.status(installed);
+        helper.status(installed);
 
-        LOG.info("✅ Agogos Interceptors installed");
+        helper.println(String.format("✅ Agogos Interceptors installed"));
 
         if (profile == InstallProfile.dev) {
             writeCerts();
@@ -132,19 +127,19 @@ public class InterceptorsInstaller extends Installer {
         try {
             Files.writeString(keyPath, certProvider.privateKey());
         } catch (IOException e) {
-            throw new ApplicationException("Could not write private key to file '{}'", keyPath.toAbsolutePath());
+            throw new ApplicationException("Could not write private key to file '%s'", keyPath.toAbsolutePath());
         }
 
         try {
             Files.writeString(certPath, certProvider.certificate());
         } catch (IOException e) {
-            throw new ApplicationException("Could not write certificate to file '{}'", certPath.toAbsolutePath());
+            throw new ApplicationException("Could not write certificate to file '%s'", certPath.toAbsolutePath());
         }
 
-        LOG.info(
+        helper.println(
                 "\n👋 Interceptor configuration in development mode. You can use following environment variables to point the Interceptor application to generated certificate:\n");
-        LOG.info("👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES={}", keyPath.toAbsolutePath());
-        LOG.info("👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES={}", certPath.toAbsolutePath());
+        helper.println(String.format("👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES=%s", keyPath.toAbsolutePath()));
+        helper.println(String.format("👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES=%s", certPath.toAbsolutePath()));
     }
 
     private Deployment deployment(String namespace) {

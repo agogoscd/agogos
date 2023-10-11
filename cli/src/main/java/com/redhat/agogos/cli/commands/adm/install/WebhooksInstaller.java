@@ -1,6 +1,5 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
-import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import com.redhat.agogos.cli.commands.adm.certs.CertProvider;
 import com.redhat.agogos.core.errors.ApplicationException;
@@ -48,8 +47,6 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -68,8 +65,6 @@ import java.util.Map;
 @RegisterForReflection
 public class WebhooksInstaller extends Installer {
 
-    private static final Logger LOG = LoggerFactory.getLogger(WebhooksInstaller.class);
-
     @ConfigProperty(name = "agogos.webhooks.container-image")
     private String ContainerImage;
 
@@ -85,7 +80,7 @@ public class WebhooksInstaller extends Installer {
 
     @Override
     public void install(InstallProfile profile, String namespace) {
-        LOG.info("🕞 Installing Agogos Webhooks component...");
+        helper.println(String.format("🕞 Installing Agogos Webhooks component..."));
 
         certProvider.init();
 
@@ -117,16 +112,16 @@ public class WebhooksInstaller extends Installer {
         if (profile == InstallProfile.local || profile == InstallProfile.prod) {
             Service webhooksService = kubernetesFacade.get(Service.class, namespace, ServiceAccountName);
             if (webhooksService != null) {
-                LOG.info("🕞 Restarting Webhooks service after updating certificates...");
+                helper.println(String.format("🕞 Restarting Webhooks service after updating certificates..."));
 
                 kubernetesFacade.getKubernetesClient().apps().deployments().inNamespace(namespace).withName(ServiceAccountName)
                         .rolling().restart();
             }
         }
 
-        Helper.status(installed);
+        helper.status(installed);
 
-        LOG.info("✅ Agogos Webhooks installed");
+        helper.println(String.format("✅ Agogos Webhooks installed"));
 
         if (profile == InstallProfile.dev) {
             writeCerts();
@@ -149,10 +144,10 @@ public class WebhooksInstaller extends Installer {
             throw new ApplicationException("Could not write certificate to file '{}'", certPath.toAbsolutePath());
         }
 
-        LOG.info(
+        helper.println(
                 "\n👋 Webhook configuration in development mode. You can use following environment variables to point the Webhook application to generated certificate:\n");
-        LOG.info("👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES={}", keyPath.toAbsolutePath());
-        LOG.info("👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES={}", certPath.toAbsolutePath());
+        helper.println(String.format("👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES=%s", keyPath.toAbsolutePath()));
+        helper.println(String.format("👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES=%s", certPath.toAbsolutePath()));
     }
 
     private Deployment deployment(String namespace) {

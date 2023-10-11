@@ -15,6 +15,7 @@ public class InMemoryOutputCatcher {
 
     private static final Logger LOG = LoggerFactory.getLogger(InMemoryOutputCatcher.class);
 
+    private static String QUARKUS_FILES_ENVVAR = "QUARKUS_HTTP_SSL_CERTIFICATE(_KEY)?_FILES=.*";
     private static String REGEXP_DURATION = "\\d+ \\w+\\(s\\)\\s*";
     private static String REGEXP_UUID = "[\\w\\d]{8}(-[\\w\\d]{4}){3}-[\\w\\d]{12}";
     private static String SANITIZED_UUID = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
@@ -101,7 +102,9 @@ public class InMemoryOutputCatcher {
 
     private List<String> sanitize(List<String> data) {
         return data.stream()
-                .map(x -> x.replaceAll(REGEXP_DURATION, "").replaceAll(REGEXP_UUID, SANITIZED_UUID))
+                .map(x -> x.replaceAll(QUARKUS_FILES_ENVVAR, "")
+                        .replaceAll(REGEXP_DURATION, "")
+                        .replaceAll(REGEXP_UUID, SANITIZED_UUID))
                 .collect(Collectors.toList());
     }
 }

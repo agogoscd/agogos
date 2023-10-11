@@ -1,0 +1,15 @@
+🕞 Initializing 'test-namespace' namespace with Agogos resources...
+👉 OK: Namespace: test-namespace (v1)
+👉 OK: ConfigMap: agogos-config (v1) (ns: test-namespace)
+👉 OK: ServiceAccount: agogos (v1) (ns: test-namespace)
+👉 OK: RoleBinding: agogos (rbac.authorization.k8s.io/v1) (ns: test-namespace)
+👉 OK: ServiceAccount: agogos-eventing (v1) (ns: test-namespace)
+👉 OK: ClusterRoleBinding: agogos-eventing (rbac.authorization.k8s.io/v1)
+👉 OK: ConfigMap: agogos-broker-config (v1) (ns: test-namespace)
+👉 OK: EventListener: agogos (triggers.tekton.dev/v1beta1) (ns: test-namespace)
+👉 OK: Broker: agogos (eventing.knative.dev/v1) (ns: test-namespace)
+👉 OK: Trigger: agogos (eventing.knative.dev/v1) (ns: test-namespace)
+👉 OK: Trigger: agogos-submission (triggers.tekton.dev/v1beta1) (ns: test-namespace)
+👉 OK: Trigger: agogos-dependency (triggers.tekton.dev/v1beta1) (ns: test-namespace)
+👉 OK: ResourceQuota: agogos-quota (v1) (ns: test-namespace)
+✅ Namespace 'test-namespace' initialized and ready to use!

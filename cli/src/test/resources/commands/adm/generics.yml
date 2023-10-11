@@ -1,0 +1,26 @@
+---
+apiVersion: "v1"
+kind: "Secret"
+metadata:
+  labels:
+    agogos.redhat.com/extension: "brew-v1"
+    agogos.redhat.com/sync-to-namespace: "true"
+  name: "brew-v1-keytab"
+  namespace: "agogos"
+data:
+  keytab: "keytab"
+  principal: "principal"
+type: "Opaque"
+---
+apiVersion: "v1"
+kind: "Secret"
+metadata:
+  labels:
+    agogos.redhat.com/extension: "brew-v1"
+    agogos.redhat.com/sync-to-namespace: "true"
+  name: "brew-v1-pull-secret"
+  namespace: "agogos"
+data:
+  .dockerconfigjson: "dockerconfigjson"
+type: "kubernetes.io/dockerconfigjson"
+

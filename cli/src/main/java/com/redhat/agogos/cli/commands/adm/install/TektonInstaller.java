@@ -7,8 +7,6 @@ import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Profile(InstallProfile.dev)
 @Profile(InstallProfile.local)
@@ -17,8 +15,6 @@ import org.slf4j.LoggerFactory;
 @RegisterForReflection
 public class TektonInstaller extends DependencyInstaller {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TektonInstaller.class);
-
     private static final String CONFIGMAP_FEATURE_FLAGS = "feature-flags";
 
     @Inject
@@ -26,7 +22,7 @@ public class TektonInstaller extends DependencyInstaller {
 
     @Override
     public void install(InstallProfile profile, String namespace) {
-        LOG.info("🕞 Installing Tekton {}...", tekton.version());
+        helper.println(String.format("🕞 Installing Tekton %s...", tekton.version()));
 
         install(tekton, profile, namespace);
 
@@ -34,7 +30,7 @@ public class TektonInstaller extends DependencyInstaller {
 
         kubernetesFacade.waitForAllPodsRunning(tekton.namespace());
 
-        LOG.info("✅ Tekton {} installed", tekton.version());
+        helper.println(String.format("✅ Tekton %s installed", tekton.version()));
     }
 
     private void configureFeatureFlags(InstallProfile profile, String namespace) {
@@ -47,7 +43,7 @@ public class TektonInstaller extends DependencyInstaller {
 
             kubernetesFacade.serverSideApply(configMap);
 
-            LOG.info("👉 OK: Configured Tekton ConfigMap '{}'", CONFIGMAP_FEATURE_FLAGS);
+            helper.println(String.format("👉 OK: Configured Tekton ConfigMap '%s'", CONFIGMAP_FEATURE_FLAGS));
         }
     }
 }

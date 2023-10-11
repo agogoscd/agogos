@@ -1,0 +1,10 @@
+Usage: agogosctl adm [-hvV] [-o=<output>] [COMMAND]
+Agogos administration commands
+  -h, --help              Show this help message and exit.
+  -o, --output=<output>   Output format, valid values: plain, yaml, json,
+                            default: plain.
+  -v, --verbose
+  -V, --version           Print version information and exit.
+Commands:
+  install               Install Agogos
+  init-namespace, init  Initialize selected namespace to work with Agogos

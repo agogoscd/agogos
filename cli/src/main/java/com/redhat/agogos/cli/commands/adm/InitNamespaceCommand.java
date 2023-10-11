@@ -1,6 +1,5 @@
 package com.redhat.agogos.cli.commands.adm;
 
-import com.redhat.agogos.cli.Helper;
 import com.redhat.agogos.cli.commands.AbstractCallableSubcommand;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller;
 import com.redhat.agogos.cli.commands.adm.install.CoreInstaller.AgogosRole;
@@ -25,7 +24,6 @@ import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.ObjectMetaBuilder;
 import io.fabric8.kubernetes.api.model.ResourceQuota;
 import io.fabric8.kubernetes.api.model.ResourceQuotaBuilder;
-import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.api.model.ServiceAccount;
 import io.fabric8.kubernetes.api.model.ServiceAccountBuilder;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRole;
@@ -52,8 +50,6 @@ import io.fabric8.tekton.triggers.v1beta1.TriggerSpecTemplateBuilder;
 import io.fabric8.tekton.triggers.v1beta1.TriggerTemplateSpec;
 import io.fabric8.tekton.triggers.v1beta1.TriggerTemplateSpecBuilder;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -74,8 +70,6 @@ import java.util.stream.Collectors;
 @Command(mixinStandardHelpOptions = true, name = "init-namespace", aliases = {
         "init" }, description = "Initialize selected namespace to work with Agogos")
 public class InitNamespaceCommand extends AbstractCallableSubcommand {
-
-    private static final Logger LOG = LoggerFactory.getLogger(InitNamespaceCommand.class);
 
     private static final String AGOGOS_QUOTA_NAME = "agogos-quota";
     private static final String DEPENDENCY_CEL_INTERCEPTOR_FILTER = String.join(" || ", List.of(
@@ -132,10 +126,11 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
     @Override
     public Integer call() {
-        LOG.info("🕞 Initializing '{}' namespace with Agogos resources...", namespace);
+        helper.println(String.format("🕞 Initializing '%s' namespace with Agogos resources...", namespace));
 
         if (isAgogosCoreNamespace()) {
-            LOG.error("⛔ Unable to initialize namespace '{}' as it is an Agogos core namespace.", namespace);
+            helper.println(
+                    String.format("⛔ Unable to initialize namespace '{}' as it is an Agogos core namespace.", namespace));
             return CommandLine.ExitCode.USAGE;
         }
 
@@ -166,7 +161,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         kubernetesFacade.waitForAllPodsRunning(namespace);
 
-        LOG.info("✅ Namespace '{}' initialized and ready to use!", namespace);
+        helper.println(String.format("✅ Namespace '%s' initialized and ready to use!", namespace));
         return CommandLine.ExitCode.OK;
     }
 
@@ -197,7 +192,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         cm = kubernetesFacade.serverSideApply(cm);
 
-        Helper.status(cm);
+        helper.status(cm);
     }
 
     /**
@@ -215,7 +210,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         ns = kubernetesFacade.serverSideApply(ns);
 
-        Helper.status(ns);
+        helper.status(ns);
     }
 
     private void installMainRoleBinding(ServiceAccount sa) {
@@ -238,7 +233,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         roleBinding = kubernetesFacade.serverSideApply(roleBinding);
 
-        Helper.status(roleBinding);
+        helper.status(roleBinding);
     }
 
     /**
@@ -255,7 +250,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         sa = kubernetesFacade.serverSideApply(sa);
 
-        Helper.status(sa);
+        helper.status(sa);
 
         return sa;
     }
@@ -271,7 +266,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         configMap = kubernetesFacade.serverSideApply(configMap);
 
-        Helper.status(configMap);
+        helper.status(configMap);
 
         return configMap;
     }
@@ -296,7 +291,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         broker = kubernetesFacade.serverSideApply(broker);
 
-        Helper.status(broker);
+        helper.status(broker);
 
         return broker;
     }
@@ -321,9 +316,9 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                 .build();
 
         el = kubernetesFacade.serverSideApply(el);
-        el = kubernetesFacade.waitForEventListenerRunning(namespace, el.getMetadata().getName());
+        el = kubernetesFacade.waitForEventListenerRunning(el);
 
-        Helper.status(el);
+        helper.status(el);
 
         return el;
     }
@@ -347,7 +342,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         trigger = kubernetesFacade.serverSideApply(trigger);
 
-        Helper.status(trigger);
+        helper.status(trigger);
 
         return trigger;
     }
@@ -382,7 +377,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
             roleBinding.getSubjects().add(subject);
             roleBinding = kubernetesFacade.serverSideApply(roleBinding);
         }
-        Helper.status(roleBinding);
+        helper.status(roleBinding);
 
         return roleBinding;
     }
@@ -398,7 +393,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         sa = kubernetesFacade.serverSideApply(sa);
 
-        Helper.status(sa);
+        helper.status(sa);
 
         return sa;
     }
@@ -445,7 +440,10 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                     .build();
 
             roleBinding = kubernetesFacade.serverSideApply(roleBinding);
-            Helper.status(roleBinding);
+            helper.status(roleBinding);
+
+            helper.println(String.format("👧 %s: %s", roleBinding.getMetadata().getName(),
+                    String.join(", ", subjects.stream().map(s -> s.getName()).collect(Collectors.toSet()))));
 
             processed.addAll(e.getValue()); // Add all new users as processed.
         }
@@ -470,9 +468,9 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                     .build();
             resourceQuota = kubernetesFacade.serverSideApply(resourceQuota);
 
-            Helper.status(resourceQuota);
+            helper.status(resourceQuota);
         } catch (FileNotFoundException e) {
-            LOG.error("File " + quotaFile.getName() + " not found, no resource quota applied", e);
+            helper.println("⛔ File " + quotaFile.getName() + " not found, no resource quota applied");
         }
     }
 
@@ -562,7 +560,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                 .endSpec();
 
         io.fabric8.tekton.triggers.v1beta1.Trigger trigger = kubernetesFacade.serverSideApply(builder.build());
-        Helper.status(trigger);
+        helper.status(trigger);
     }
 
     private void installDependencyTrigger(String namespace) {
@@ -638,26 +636,22 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                 .endSpec();
 
         io.fabric8.tekton.triggers.v1beta1.Trigger trigger = kubernetesFacade.serverSideApply(builder.build());
-        Helper.status(trigger);
+        helper.status(trigger);
     }
 
     private void installExtensions() {
+        if (extensions.size() == 0) {
+            return;
+        }
+
         Map<String, Set<String>> groupVersions = getResourceData();
-        groupVersions.entrySet().stream()
-                .forEach(e -> {
-                    e.getValue().stream()
-                            .forEach(v -> {
-                                LOG.info("MAP => {}: {}", e.getKey(), v);
-                            });
-                });
 
         // Remove any synced resources for extensions that are no longer on the list to be installed.
         getSyncedExtensionResources(groupVersions, namespace).stream()
                 .filter(r -> !extensions.contains(r.getMetadata().getLabels().get(Label.EXTENSION.toString())))
                 .forEach(r -> {
-                    LOG.info("INSTANCE OF => " + objectMapper.asYaml(r));
                     kubernetesFacade.delete(r);
-                    Helper.status("🗑️  OK: ", r);
+                    helper.status("🗑️  OK: ", r);
 
                     // If it's a pull secret, remove it from the SA in the namespace.
                     if (isDockerConfigJsonSecret(r)) {
@@ -666,7 +660,8 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                             LocalObjectReference lor = new LocalObjectReference(namespace);
                             if (!sa.getImagePullSecrets().contains(lor)) {
                                 sa.getImagePullSecrets().add(lor);
-                                kubernetesFacade.serverSideApply(sa);
+                                sa = kubernetesFacade.serverSideApply(sa);
+                                helper.status("🗑️  OK: ", sa);
                             }
                         }
                     }
@@ -677,19 +672,20 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
             getAgogosExtensionResources(groupVersions, extension).stream()
                     .forEach(r -> {
                         r = cleanseMetadata(r);
-                        kubernetesFacade.serverSideApply(r);
+                        r = kubernetesFacade.serverSideApply(r);
+                        helper.status(r);
                         // If it's a pull secret, add it to the SA in the namespace.
                         if (isDockerConfigJsonSecret(r)) {
                             ServiceAccount sa = kubernetesFacade.get(ServiceAccount.class, namespace, RESOURCE_NAME);
                             if (sa != null) {
-                                LocalObjectReference lor = new LocalObjectReference(namespace);
+                                LocalObjectReference lor = new LocalObjectReference(r.getMetadata().getName());
                                 if (!sa.getImagePullSecrets().contains(lor)) {
                                     sa.getImagePullSecrets().add(lor);
-                                    kubernetesFacade.serverSideApply(sa);
+                                    sa = kubernetesFacade.serverSideApply(sa);
+                                    helper.status(sa);
                                 }
                             }
                         }
-                        Helper.status(r);
                     });
         });
     }
@@ -729,7 +725,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                     rlist.stream().forEach(r -> r.setKind(kind));
                     resources.addAll(rlist);
                 } catch (KubernetesClientException kce) {
-                    LOG.warn(kce.getMessage());
+                    helper.println("⛔ " + kce.getMessage());
                 }
             });
         });
@@ -769,8 +765,8 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
         return groupVersions;
     }
 
-    private boolean isDockerConfigJsonSecret(Object o) {
-        return o instanceof Secret && ((Secret) o).getType().equals(SECRET_DOCKER_CONFIG_JSON);
+    private boolean isDockerConfigJsonSecret(GenericKubernetesResource r) {
+        return "Secret".equals(r.getKind()) && r.get("type").equals(SECRET_DOCKER_CONFIG_JSON);
     }
 
     // Cleanse the metadata so we can create a new resource.

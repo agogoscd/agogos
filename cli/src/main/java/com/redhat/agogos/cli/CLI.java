@@ -15,6 +15,7 @@ import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
 import jakarta.inject.Inject;
 import lombok.Getter;
+import lombok.Setter;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import picocli.CommandLine;
 import picocli.CommandLine.IFactory;
@@ -47,6 +48,7 @@ public class CLI implements QuarkusApplication {
         user
     }
 
+    @Setter
     @ConfigProperty(name = "agogos.cli-profile", defaultValue = "user")
     Profile profile;
 
