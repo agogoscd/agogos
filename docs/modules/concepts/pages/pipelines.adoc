@@ -1,3 +1,95 @@
 = Pipelines
 
-Pending.
+Agogos' Pipelines are resources that define a set of actions to be executed. They
+require one or more Agogos' Stages. Pipelines define parameters, order and
+dependencies between Stages and Stages execute actions based on the parameters
+provided.
+
+A resource defining a Pipeline looks like this:
+
+[source,yaml]
+----
+---
+kind: Pipeline
+metadata:
+  name: my-pipeline
+spec:
+  stages:
+  - stageRef:
+      name: my-stage-1
+    config:
+      key: value
+  - stageRef:
+      name: my-stage-2
+    config:
+      key: value
+    runAfter: [my-stage-1]
+----
+
+When a Pipeline is created, Agogos creates a Tekton Pipeline associated with it
+that contains the proper steps defined by the Stages. Every time the Pipeline
+is changed, its Tekton Pipeline is updated.
+
+== Stages
+Agogos' Stages are resources that wrap a Tekton Task that provides schema
+validation for Pipelines. When a Pipeline is created, each Stage receives
+information in the `config` parameter. The `config` keys and values are validated
+against the Stage `spec.schema.openAPIV3Schema` key; the Pipeline is not created
+if the validation fails.
+
+A resource file for a Stage looks like this:
+
+[source,yaml]
+----
+---
+kind: Stage
+metatada:
+  name: my-stage-1
+spec:
+  taskRef:
+    name: my-stage-task # Task in the current namespace
+  schema:
+    openAPIV3Schema:
+      required: [key]
+      properties:
+        key:
+          type: string
+----
+
+Pipelines referencing this Stage, named `my-stage-1`, need to provide the
+key `key` in the `config` parameter for the Stage, otherwise the Pipeline
+validation fails.
+
+== Runs
+Agogos' Runs are resources that represent the execution of a Pipeline. When
+a Run resource is created, a Tekton PipelineRun is created too. The Tekton
+PipelineRun references the Tekton Pipeline associated with the Pipeline of the Run.
+
+[WARNING]
+====
+Do not create Runs directly as there are steps that need to happen before
+creating Runs. See
+xref:submissions.adoc[].
+====
+
+[source,yaml]
+----
+---
+kind: Run
+metadata:
+  generatename: my-pipeline-
+spec:
+  pipeline: my-pipeline
+----
+
+[IMPORTANT]
+====
+To reduce resource consumption, Agogos removes Tekton PipelineRuns when they
+complete successfully. This removes the Tekton PipelineRun pods from the namespace.
+====
+
+== Additional Resources
+
+* link:https://gitlab.cee.redhat.com/agogos/agogos/-/blob/main/cli/src/main/resources/deployment/crds/[Agogos CustomResourceDefinitions]
+* link:https://gitlab.cee.redhat.com/agogos/agogos/-/tree/main/core/src/main/java/com/redhat/agogos/core/v1alpha1[Agogos custom resources in Java]
+* link:https://gitlab.cee.redhat.com/agogos/agogos/-/tree/main/operator/src/main/java/com/redhat/agogos/operator/k8s/controllers[Agogos controllers in Java]

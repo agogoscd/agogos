@@ -43,7 +43,7 @@ rejecting their creation if the validation fails. Builders validate Component's
 `spec.build.params` and Handlers validate `spec.pre[?].params` or
 `spec.post[?].params` if they are referenced.
 
-A resource file for a Builder schema looks like this:
+A resource file for a Builder looks like this:
 
 [source,yaml]
 ----
@@ -120,12 +120,6 @@ spec:
       post: true # or false
 ----
 
-[TIP]
-====
-For more details about creating Builders, see
-xref:developer-guide:builders.adoc[].
-====
-
 == Builds
 Agogos' Builds are resources that represent a single build for a Component. When
 a Build resource is created, a Tekton PipelineRun is created too. The Tekton
@@ -149,7 +143,7 @@ spec:
   component: my-component
 ----
 
-Builds have in their `status` information about the Component and its 
+Builds have in their `status` information about the Component and its
 associated Tekton PipelineRun.
 
 [IMPORTANT]
@@ -157,3 +151,10 @@ associated Tekton PipelineRun.
 To reduce resource consumption, Agogos removes Tekton PipelineRuns when they
 complete successfully. This removes the Tekton PipelineRun pods from the namespace.
 ====
+
+== Additional Resources
+
+* xref:developer-guide:builders.adoc[]
+* link:https://gitlab.cee.redhat.com/agogos/agogos/-/blob/main/cli/src/main/resources/deployment/crds/[Agogos CustomResourceDefinitions]
+* link:https://gitlab.cee.redhat.com/agogos/agogos/-/tree/main/core/src/main/java/com/redhat/agogos/core/v1alpha1[Agogos custom resources in Java]
+* link:https://gitlab.cee.redhat.com/agogos/agogos/-/tree/main/operator/src/main/java/com/redhat/agogos/operator/k8s/controllers[Agogos controllers in Java]
