@@ -163,8 +163,16 @@ When you have Agogos up and running, run:
 
 [source,bash]
 ----
-kubectl apply -f https://gitlab.cee.redhat.com/agogos/extensions-internal/-/raw/main/builders/dummy/v1/manifests/builder.yaml
-kubectl apply -f https://gitlab.cee.redhat.com/agogos/extensions-internal/-/raw/main/builders/dummy/v1/manifests/clustertask.yaml
+git clone https://gitlab.cee.redhat.com/agogos/extensions-internal.git
+cd extensions-internal
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r install/requirements.txt
+
+export VAULT_ADDR=https://vault.corp.redhat.com:8200
+export VAULT_NAMESPACE=exd
+export HV_TOKEN=$(vault login -method=oidc -field=token 2>/dev/null)
+python install/install.py builders/dummy/v1/ --hv-token=${HV_TOKEN}
 ----
 
 This command registers the Agogos dummy builder and the Tekton dummy
@@ -254,7 +262,7 @@ Finished:   N/A
 Duration:   0 minute(s)
 ----
 
-After a while, the Group Components and their dependants should be finished:
+After a while, the Group Components and their dependents should be finished:
 
 [source,bash]
 ----
