@@ -1,6 +1,8 @@
 package com.redhat.agogos.cli.commands.adm.install;
 
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
+import com.redhat.agogos.core.v1alpha1.Builder;
+import com.redhat.agogos.core.v1alpha1.Stage;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Namespace;
@@ -15,6 +17,10 @@ import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBinding;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBuilder;
 import io.fabric8.kubernetes.api.model.rbac.PolicyRuleBuilder;
+import io.fabric8.kubernetes.api.model.rbac.Role;
+import io.fabric8.kubernetes.api.model.rbac.RoleBinding;
+import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
+import io.fabric8.kubernetes.api.model.rbac.RoleBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.CustomRun;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 import io.fabric8.tekton.triggers.v1alpha1.ClusterInterceptor;
@@ -49,6 +55,7 @@ public class CoreInstaller extends Installer {
     public static final String CLUSTER_ROLE_AGOGOS_SA_ADMIN = "agogos-sa-admin";
     public static final String CLUSTER_ROLE_AGOGOS_SA = "agogos-sa";
     public static final String CLUSTER_ROLE_NAME_EVENTING = "agogos-el";
+    private static final String ROLE_AGOGOS_READER = "agogos-reader";
 
     public static final Map<String, String> LABELS = Map.of(
             "app.kubernetes.io/part-of", "agogos",
@@ -74,19 +81,21 @@ public class CoreInstaller extends Installer {
     }
 
     @Override
-    public void install(InstallProfile profile, String createNamespace) {
+    public void install(InstallProfile profile, String namespace) {
         helper.println(String.format("🕞 Installing Agogos core resources..."));
 
         List<HasMetadata> resources = new ArrayList<>();
-        resources.add(namespace(createNamespace));
+        resources.add(namespace(namespace));
         resources.add(createClusterRoleSaNamespace());
         resources.add(createClusterRoleEventing());
         resources.addAll(Stream.of(AgogosRole.values()).map(r -> createClusterRole(r)).collect(Collectors.toList()));
-        ServiceAccount sa = createServiceAccount(createNamespace);
+        ServiceAccount sa = createServiceAccount(namespace);
         resources.add(sa);
         resources.add(createSaClusterRoleBinding(sa, CLUSTER_ROLE_AGOGOS_SA, CLUSTER_ROLE_AGOGOS_SA));
         resources.add(createSaClusterRoleBinding(sa, CLUSTER_ROLE_AGOGOS_SA_ADMIN, AgogosRole.ADMIN.name));
         resources.add(createSaSecret(sa));
+        resources.add(createAgogosReaderRole(namespace));
+        resources.add(createAgogosReaderRoleBinding(namespace));
 
         List<HasMetadata> installed = new ArrayList<>();
         for (HasMetadata r : resources) {
@@ -203,6 +212,43 @@ public class CoreInstaller extends Installer {
                                         HasMetadata.getPlural(ClusterRole.class),
                                         HasMetadata.getPlural(ClusterRoleBinding.class))
                                 .withVerbs("create", "delete", "get", "list", "patch", "watch").build())
+                .build();
+    }
+
+    private Role createAgogosReaderRole(String namespace) {
+        Role cr = new RoleBuilder()
+                .withNewMetadata()
+                .withName(ROLE_AGOGOS_READER)
+                .withNamespace(namespace)
+                .endMetadata()
+                .withRules(
+                        new PolicyRuleBuilder().withApiGroups("agogos.redhat.com")
+                                .withResources(
+                                        HasMetadata.getPlural(Builder.class),
+                                        HasMetadata.getPlural(Stage.class))
+                                .withVerbs("get", "list")
+                                .build())
+                .build();
+
+        return cr;
+    }
+
+    private RoleBinding createAgogosReaderRoleBinding(String namespace) {
+        return new RoleBindingBuilder()
+                .withNewMetadata()
+                .withName(ROLE_AGOGOS_READER)
+                .withNamespace(namespace)
+                .endMetadata()
+                .addNewSubject()
+                .withApiGroup(HasMetadata.getGroup(Role.class))
+                .withKind("Group")
+                .withName("system:authenticated")
+                .endSubject()
+                .withNewRoleRef()
+                .withApiGroup(HasMetadata.getGroup(Role.class))
+                .withKind(HasMetadata.getKind(Role.class))
+                .withName(ROLE_AGOGOS_READER)
+                .endRoleRef()
                 .build();
     }
 

@@ -24,6 +24,8 @@
 👉 OK: ClusterRoleBinding: agogos-sa (rbac.authorization.k8s.io/v1)
 👉 OK: ClusterRoleBinding: agogos-sa-admin (rbac.authorization.k8s.io/v1)
 👉 OK: Secret: agogos (v1) (ns: agogos)
+👉 OK: Role: agogos-reader (rbac.authorization.k8s.io/v1) (ns: agogos)
+👉 OK: RoleBinding: agogos-reader (rbac.authorization.k8s.io/v1) (ns: agogos)
 ✅ Agogos core resources installed
 🕞 Installing Agogos Interceptors component...
 👉 OK: ServiceAccount: agogos-interceptors (v1) (ns: agogos)
