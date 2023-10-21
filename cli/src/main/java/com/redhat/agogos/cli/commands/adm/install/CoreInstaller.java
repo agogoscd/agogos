@@ -23,6 +23,7 @@ import io.fabric8.kubernetes.api.model.rbac.RoleBindingBuilder;
 import io.fabric8.kubernetes.api.model.rbac.RoleBuilder;
 import io.fabric8.tekton.pipeline.v1beta1.CustomRun;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
+import io.fabric8.tekton.pipeline.v1beta1.TaskRun;
 import io.fabric8.tekton.triggers.v1alpha1.ClusterInterceptor;
 import io.fabric8.tekton.triggers.v1alpha1.Interceptor;
 import io.fabric8.tekton.triggers.v1beta1.ClusterTriggerBinding;
@@ -160,7 +161,8 @@ public class CoreInstaller extends Installer {
                         new PolicyRuleBuilder().withApiGroups(HasMetadata.getGroup(PipelineRun.class))
                                 .withResources(
                                         HasMetadata.getPlural(CustomRun.class),
-                                        HasMetadata.getPlural(PipelineRun.class))
+                                        HasMetadata.getPlural(PipelineRun.class),
+                                        HasMetadata.getPlural(TaskRun.class))
                                 .withVerbs("create").build())
                 .build();
     }
