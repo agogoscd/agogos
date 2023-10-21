@@ -8,6 +8,7 @@ import com.redhat.agogos.core.v1alpha1.Dependency;
 import com.redhat.agogos.core.v1alpha1.Submission;
 import io.fabric8.knative.eventing.v1.Broker;
 import io.fabric8.knative.eventing.v1.BrokerBuilder;
+import io.fabric8.knative.eventing.v1.SubscriptionsAPIFilterBuilder;
 import io.fabric8.knative.eventing.v1.Trigger;
 import io.fabric8.knative.eventing.v1.TriggerBuilder;
 import io.fabric8.kubernetes.api.model.APIResourceList;
@@ -333,6 +334,8 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                 .withNamespace(namespace)
                 .endMetadata()
                 .withNewSpec()
+                .withFilters(new SubscriptionsAPIFilterBuilder().withNewNot()
+                        .addToExact("type", "dev.tekton.event.triggers.accepted.v1").endNot().build())
                 .withBroker(broker.getMetadata().getName())
                 .withNewSubscriber()
                 .withUri(el.getStatus().getAddress().getUrl())
