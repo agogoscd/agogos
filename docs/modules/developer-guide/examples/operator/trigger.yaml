@@ -1,9 +1,0 @@
-apiVersion: eventing.knative.dev/v1
-kind: Trigger
-metadata:
-  name: default
-  namespace: agogos
-spec:
-  broker: default
-  subscriber:
-    uri: http://el-default.default.svc.cluster.local:8080

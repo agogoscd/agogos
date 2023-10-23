@@ -6,7 +6,6 @@ start_page: ROOT:overview.adoc
 
 nav:
   - modules/concepts/nav.adoc
-  - modules/reference/nav.adoc
-  - modules/user-guide/nav.adoc
   - modules/developer-guide/nav.adoc
   - modules/design-decisions/nav.adoc
+  - modules/reference/nav.adoc

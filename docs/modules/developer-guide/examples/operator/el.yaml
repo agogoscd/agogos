@@ -1,9 +1,0 @@
-apiVersion: triggers.tekton.dev/v1alpha1
-kind: EventListener
-metadata:
-  name: default
-spec:
-  serviceAccountName: agogos-el
-  namespaceSelector:
-    matchNames:
-      - default

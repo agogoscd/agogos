@@ -1,0 +1,5 @@
+= Overview
+
+This documentation section provides data that users might want to look up, but
+do not need to remember. For example a list of commands, configuration files or
+defaults.
