@@ -1,0 +1,40 @@
+= Groups
+
+Agogos' Groups are resources that define Agogos' Pipelines, Component and Groups.
+A resource defining a Group looks like this:
+
+[source,yaml]
+----
+---
+kind: Group
+metadata:
+  name: my-group
+spec:
+  components: [component-a, component-b]
+  pipelines: [pipeline-a, pipeline-b]
+  groups: [group-a, group-b]
+----
+
+== Executions
+Agogos' Executions are resources that represent the execution of a Group defined
+resources. When an Execution is processed, Builds are created for Components,
+Runs are created for Pipelines, and Executions are created for Groups.
+
+[WARNING]
+====
+Do not create Executions directly as there are intermediate steps that need to
+happen. See
+xref:submissions.adoc[].
+====
+
+A resource file defining an Execution looks like this:
+
+[source,yaml]
+----
+---
+kind: Execution
+metadata:
+  generateName: my-group-
+spec:
+  group: my-group
+----

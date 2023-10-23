@@ -1,0 +1,25 @@
+= Dependencies
+
+Agogos' Components, Pipelines and Groups can define dependents Components, Pipelines
+and Groups. The key where dependents should be defined is named `dependents` and
+it looks like this:
+
+[source,yaml]
+----
+---
+kind: Component/Pipeline/Group
+metadata:
+  name: my-component/pipeline/group
+spec:
+  ...
+  dependents:
+    components: [component-a]
+    pipeline: [pipeline-a]
+    group: [group-a]
+  ...
+----
+
+When the Build, Run or Execution of the resource completes, a `Dependency`
+object is created. Then the Dependency resource is processed and dependents'
+Builds, Runs or Executions get created. This process is repeated until the last
+resource defines no dependents.

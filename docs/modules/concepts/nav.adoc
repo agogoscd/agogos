@@ -2,4 +2,6 @@
 ** xref:overview.adoc[]
 ** xref:components.adoc[]
 ** xref:pipelines.adoc[]
+** xref:groups.adoc[]
+** xref:dependencies.adoc[]
 ** xref:submissions.adoc[]

@@ -1,3 +1,16 @@
 = Submissions
 
-Pending.
+Agogos' Submissions are resources that reference an Agogos Pipeline, Group or
+Component. When a Submission is created, depending on the Agogos resource
+type they are referencing, it triggers the creation of another Agogos Resources.
+If a Submission references a Component, it triggers the creation of a Build. If
+a Submission references a Pipeline, it triggers the creation of a Run. If a
+Submission references a Group, it triggers the creation of an Execution.
+
+
+== Additional Resources
+
+* xref:developer-guide:builders.adoc[]
+* link:https://gitlab.cee.redhat.com/agogos/agogos/-/blob/main/cli/src/main/resources/deployment/crds/[Agogos CustomResourceDefinitions]
+* link:https://gitlab.cee.redhat.com/agogos/agogos/-/tree/main/core/src/main/java/com/redhat/agogos/core/v1alpha1[Agogos custom resources in Java]
+* link:https://gitlab.cee.redhat.com/agogos/agogos/-/tree/main/operator/src/main/java/com/redhat/agogos/operator/k8s/controllers[Agogos controllers in Java]
