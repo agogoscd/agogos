@@ -47,14 +47,40 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
             LOG.debug("{} '{}', creating new PipelineRun", build.getKind(), build.getFullName());
         }
 
+        Component component = context.getSecondaryResource(Component.class).get();
+
+        return createPipelineRun(build, component, pipelineRun);
+    }
+
+    private String fullPipelineRunName(PipelineRun pipelineRun) {
+        return String.format("%s/%s", pipelineRun.getMetadata().getNamespace(),
+                (pipelineRun.getMetadata().getName() != null ? pipelineRun.getMetadata().getName() : "<no-name-yet>"));
+    }
+
+    protected Component parentResource(Build build) {
+        LOG.debug("Finding parent Component for Build '{}'", build.getFullName());
+
+        Component component = kubernetesFacade.get(Component.class, build.getMetadata().getNamespace(),
+                build.getSpec().getComponent());
+        if (component == null) {
+            throw new ApplicationException("Could not find Component '{}' in namespace '{}'",
+                    build.getSpec().getComponent(), build.getMetadata().getNamespace());
+        }
+
+        return component;
+    }
+
+    public PipelineRun createPipelineRun(Build build, Component component, PipelineRun pipelineRun) {
         WorkspaceBinding workspace = new WorkspaceBindingBuilder()
                 .withName(WorkspaceMapping.MAIN_WORKSPACE_NAME)
                 .withEmptyDir(new EmptyDirVolumeSource())
                 .build();
 
+        // FIXME: is this parentResource the same that is retrieved as secondaryResource?
+        Component buildParent = parentResource(build);
         Map<String, String> labels = new HashMap<>();
-        labels.put(Label.RESOURCE.toString(), parentResource(build).getKind().toLowerCase());
-        labels.put(Label.NAME.toString(), parentResource(build).getMetadata().getName());
+        labels.put(Label.RESOURCE.toString(), buildParent.getKind().toLowerCase());
+        labels.put(Label.NAME.toString(), buildParent.getMetadata().getName());
         labels.put(Label.INSTANCE.toString(), build.getMetadata().getLabels().get(Label.INSTANCE.toString()));
 
         PodSecurityContext podSecurityContext = new PodSecurityContextBuilder()
@@ -62,10 +88,14 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
                 .withRunAsUser(runAsUser.orElse(65532l))
                 .build();
 
-        Component component = context.getSecondaryResource(Component.class).get();
-        Param param = new ParamBuilder()
+        Param componentParam = new ParamBuilder()
                 .withName("component")
                 .withNewValue(objectMapper.asYaml(component))
+                .build();
+
+        Param paramsParam = new ParamBuilder()
+                .withName("params")
+                .withNewValue(objectMapper.asJson(component.getSpec().getBuild().getParams()))
                 .build();
 
         pipelineRun = new PipelineRunBuilder(pipelineRun)
@@ -77,7 +107,7 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
                 .withNewSpec()
                 .withNewPipelineRef().withName(build.getSpec().getComponent()).endPipelineRef()
                 .withWorkspaces(workspace)
-                .withParams(param)
+                .withParams(componentParam, paramsParam)
                 .withNewPodTemplate()
                 .withSecurityContext(podSecurityContext)
                 .endPodTemplate()
@@ -103,23 +133,5 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
 
         LOG.debug("PipelineRun '{}' created for '{}'", fullPipelineRunName(pipelineRun), build.getFullName());
         return pipelineRun;
-    }
-
-    private String fullPipelineRunName(PipelineRun pipelineRun) {
-        return String.format("%s/%s", pipelineRun.getMetadata().getNamespace(),
-                (pipelineRun.getMetadata().getName() != null ? pipelineRun.getMetadata().getName() : "<no-name-yet>"));
-    }
-
-    protected Component parentResource(Build build) {
-        LOG.debug("Finding parent Component for Build '{}'", build.getFullName());
-
-        Component component = kubernetesFacade.get(Component.class, build.getMetadata().getNamespace(),
-                build.getSpec().getComponent());
-        if (component == null) {
-            throw new ApplicationException("Could not find Component '{}' in namespace '{}'",
-                    build.getSpec().getComponent(), build.getMetadata().getNamespace());
-        }
-
-        return component;
     }
 }

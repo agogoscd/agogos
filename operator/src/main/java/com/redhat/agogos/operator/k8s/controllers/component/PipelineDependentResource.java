@@ -95,8 +95,13 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
                 .withController(true)
                 .build();
 
-        ParamSpec param = new ParamSpecBuilder()
+        ParamSpec componentParam = new ParamSpecBuilder()
                 .withName("component")
+                .withType("string")
+                .build();
+
+        ParamSpec paramsParam = new ParamSpecBuilder()
+                .withName("params")
                 .withType("string")
                 .build();
 
@@ -115,7 +120,7 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
                 .withNamespace(component.getMetadata().getNamespace())
                 .endMetadata()
                 .withNewSpec()
-                .withParams(param)
+                .withParams(componentParam, paramsParam)
                 .withWorkspaces(workspaceMain)
                 .addAllToTasks(tasks)
                 .withResults(result)
@@ -151,15 +156,14 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         });
     }
 
-    private void prepareBuilderTask(Component component, List<PipelineTask> tasks) {
+    public void prepareBuilderTask(Component component, List<PipelineTask> tasks) {
         Builder builder = lookupBuilder(component);
-        String jsonParams = objectMapper.asJson(component.getSpec().getBuild().getParams());
         PipelineTask pipelineTask = new PipelineTaskBuilder()
                 .withName(BUILD_PIPELINE_BUILDER_TASK_NAME)
                 .withTaskRef(builder.getSpec().getTaskRef())
                 .addNewParam()
                 .withName("params")
-                .withNewValue(jsonParams)
+                .withNewValue("$(params.params)")
                 .endParam()
                 .addNewParam()
                 .withName("component")
