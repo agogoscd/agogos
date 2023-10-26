@@ -37,14 +37,14 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.min.version>3.8.2</maven.min.version>
-        <version.compiler.plugin>3.8.1</version.compiler.plugin>
+        <version.compiler.plugin>3.11.0</version.compiler.plugin>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
         <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
         <failsafe-plugin.version>3.0.0-M5</failsafe-plugin.version>
         <cloudevents.version>2.5.0</cloudevents.version>
         <openapi-schema-validator.version>1.0.5</openapi-schema-validator.version>
-        <lombok.version>1.18.28</lombok.version>
+        <lombok.version>1.18.30</lombok.version>
         <quarkus-tekton-client.version>1.0.1</quarkus-tekton-client.version>
         <bouncycastle.version>1.73</bouncycastle.version>
         <resilience4j.version>2.0.2</resilience4j.version>
@@ -149,7 +149,7 @@
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-                <version>2.36.0</version>
+                <version>2.40.0</version>
                 <inherited>false</inherited>
                 <configuration>
                     <pom>
