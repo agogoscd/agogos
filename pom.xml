@@ -201,6 +201,40 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--
+              Vulnerable libraries check
+          -->
+            <plugin>
+                <groupId>io.snyk</groupId>
+                <artifactId>snyk-maven-plugin</artifactId>
+                <version>2.0.0</version>
+                <inherited>false</inherited>
+                <configuration>
+                    <apiToken>${env.SNYK_TOKEN}</apiToken>
+                    <failOnIssues>false</failOnIssues>
+                    <skip>true</skip>
+                    <args>
+                        <arg>--all-projects</arg>
+                        <arg>--json</arg>
+                        <arg>--json-file-output=snyk-results.json</arg>
+                    </args>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>snyk-test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>snyk-monitor</id>
+                        <goals>
+                            <goal>monitor</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
