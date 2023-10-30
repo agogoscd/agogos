@@ -9,18 +9,23 @@ This tutorial shows you how to run a simple component build on Agogos using Mini
 * Build the component
 
 == Before you begin
-This tutorial assumes you have already setup `minikube`, `kubectl` and
-OpenJDK 17. See the following for installation instructions:
+This tutorial assumes you have already setup `minikube`, `kubectl`, `OpenJDK 17`
+and `Hashicorp Vault`. See the following for installation instructions:
 
 * link:https://minikube.sigs.k8s.io/docs/start/[minikube start]
-* link:https://minikube.sigs.k8s.io/docs/drivers/kvm2/[kvm2 driver for minikube]
+* link:https://minikube.sigs.k8s.io/docs/drivers/kvm2/[Linux: kvm2 driver for minikube]
+* link:https://minikube.sigs.k8s.io/docs/drivers/hyperkit/[macOS: hyperkit driver for minikube]
 * link:https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/[kubectl]
 * link:https://openjdk.org/[OpenJDK]
+* link:https://developer.hashicorp.com/vault/downloads/[Hashicorp Vault]
 
 [TIP]
 ====
-The `minikube` guide for the kvm2 driver contains a useful
+* The `minikube` guide for the kvm2 driver contains a useful
 link:https://minikube.sigs.k8s.io/docs/drivers/kvm2/#troubleshooting[troubleshooting guide.]
+* `Hashicorp Vault`: Please contact the 
+link:https://mail.google.com/chat/u/0/#chat/space/AAAA2w955F8[Agogos development team]
+to ensure that you have the necessary access to the vault.
 ====
 
 == Untrusted Certificates
@@ -37,12 +42,24 @@ wget -O $HOME/.minikube/certs/RH-IT-Root-CA.crt https://certs.corp.redhat.com/ce
 wget -O $HOME/.minikube/certs/2022-IT-Root-CA.pem https://certs.corp.redhat.com/certs/2022-IT-Root-CA.pem
 ----
 
+[TIP]
+====
+Your system may need to trust the Red{nbsp}Hat self-signed certificates as well. See the
+link:https://source.redhat.com/groups/public/identity-access-management/it_iam_pki_rhcs_and_digicert/faqs_new_corporate_root_certificate_authority[FAQ on internal certificates]
+for installation instructions.
+====
+
 == Create a Minikube Cluster
 
 [source,bash]
 ----
 minikube start --driver=kvm2 --cpus=4 --memory=6g --disk-size=30GB --kubernetes-version=1.26.1 --embed-certs
 ----
+
+[IMPORTANT]
+====
+If your system is macOS, use `--driver=hyperkit`.
+====
 
 Minikube configures your [filename]`$HOME/.kube/config` to use the newly created
 cluster. `kubectl` supports different contexts, see
@@ -120,8 +137,8 @@ This command forwards the HTTP port of the service to the port `8111` on
 localhost. It is a blocking command, so run it in a separate shell.
 
 == Running Agogos
-Agogos has two components: operator and webhooks. You need to run them in
-separate shells:
+Agogos has different components. You need to keep them running in
+separate shells (press 'q' to exit their processes):
 
 [source,bash]
 .Running the Operator
@@ -175,6 +192,15 @@ export HV_TOKEN=$(vault login -method=oidc -field=token 2>/dev/null)
 python install/install.py builders/dummy/v1/ --hv-token=${HV_TOKEN}
 ----
 
+[NOTES]
+====
+* If the process fails trying to create a fork process, set the
+  following variable before running: 
+  [command]`export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`.
+* If you run into permission issues, ask the Agogos team to add you to the proper
+  Rover team and refresh your token by logging into HashiCorp Vault again.
+====
+
 This command registers the Agogos dummy builder and the Tekton dummy
 ClusterTask. Retrieve the builder using:
 
@@ -185,7 +211,8 @@ kubectl get builders
 java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v builders list
 ----
 
-Next, write the following Components to a file and apply them with `kubectl`:
+Next, write the following Components to a YAML file and apply them using 
+[command]`kubectl apply -f your-file.yml`:
 
 [source,yaml]
 ----
@@ -231,8 +258,8 @@ dummy-3-mwv9q       Finished     YYYY-MM-DD HH:MM:SS
 
 == Building Groups
 Agogos supports Groups to build Components and triggers the builds of their
-dependencies. Create a file with the following content and apply it to your
-namespace with `kubectl`:
+dependencies. Create a YAML file with the following content and apply it to your
+namespace using [command]`kubectl apply -f your-group-file.yml`:
 
 [source,yaml]
 ----
