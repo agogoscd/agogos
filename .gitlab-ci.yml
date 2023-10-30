@@ -139,3 +139,19 @@ lint:commit:
   tags: [docker]
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+tag-neal:
+  image: quay.io/fedora/fedora-minimal:39
+  tags: [docker]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - docs/**/*
+
+  script:
+    - curl -L https://gitlab.com/gitlab-org/cli/-/releases/v1.33.0/downloads/glab_1.33.0_Linux_x86_64.rpm --output glab.rpm
+    - microdnf install -y glab.rpm > /dev/null
+    - glab config set skip_tls_verify true --host gitlab.cee.redhat.com
+    - glab auth login --hostname gitlab.cee.redhat.com --token ${GLAB_TOKEN}
+    - glab mr update ${CI_MERGE_REQUEST_IID} --reviewer +nalhadef
