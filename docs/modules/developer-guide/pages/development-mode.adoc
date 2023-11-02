@@ -180,16 +180,18 @@ When you have Agogos up and running, run:
 
 [source,bash]
 ----
-git clone https://gitlab.cee.redhat.com/agogos/extensions-internal.git
-cd extensions-internal
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -r install/requirements.txt
-
+# Setup vault environment variables
 export VAULT_ADDR=https://vault.corp.redhat.com:8200
 export VAULT_NAMESPACE=exd
 export HV_TOKEN=$(vault login -method=oidc -field=token 2>/dev/null)
+
+# Clone and run a python script to install a builder
+git clone https://gitlab.cee.redhat.com/agogos/extensions-internal.git
+cd extensions-internal
+pipenv install
+pipenv shell
 python install/install.py builders/dummy/v1/ --hv-token=${HV_TOKEN}
+
 ----
 
 [NOTES]
