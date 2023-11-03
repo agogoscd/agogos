@@ -38,8 +38,9 @@
         <maven.compiler.target>17</maven.compiler.target>
         <maven.min.version>3.8.2</maven.min.version>
         <version.compiler.plugin>3.11.0</version.compiler.plugin>
-        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
-        <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
+        <quarkus.bom.artifact-id>quarkus-bom</quarkus.bom.artifact-id>
+        <quarkus.operator-sdk-bom.artifact-id>quarkus-operator-sdk-bom</quarkus.operator-sdk-bom.artifact-id>
+        <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
         <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
         <failsafe-plugin.version>3.0.0-M5</failsafe-plugin.version>
         <cloudevents.version>2.5.0</cloudevents.version>
@@ -49,23 +50,22 @@
         <bouncycastle.version>1.73</bouncycastle.version>
         <resilience4j.version>2.0.2</resilience4j.version>
 
-        <quarkus.platform.version>3.2.6.Final</quarkus.platform.version>
-        <quarkus-operatorsdk.version>6.3.2</quarkus-operatorsdk.version>
+        <quarkus.platform.version>3.5.0</quarkus.platform.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>${quarkus.platform.group-id}</groupId>
-                <artifactId>${quarkus.platform.artifact-id}</artifactId>
+                <artifactId>${quarkus.bom.artifact-id}</artifactId>
                 <version>${quarkus.platform.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>io.quarkiverse.operatorsdk</groupId>
-                <artifactId>quarkus-operator-sdk-bom</artifactId>
-                <version>${quarkus-operatorsdk.version}</version>
+                <groupId>${quarkus.platform.group-id}</groupId>
+                <artifactId>${quarkus.operator-sdk-bom.artifact-id}</artifactId>
+                <version>${quarkus.platform.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
