@@ -5,6 +5,7 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import java.io.PrintWriter;
 import java.util.List;
 
 @ApplicationScoped
@@ -13,26 +14,38 @@ public class Helper {
     @Inject
     CLI cli;
 
-    public void println(String msg) {
+    public PrintWriter getStdout() {
+        return cli.getCommandLine().getOut();
+    }
+
+    public PrintWriter getStderr() {
+        return cli.getCommandLine().getErr();
+    }
+
+    public void printStdout(String msg) {
         cli.getCommandLine().getOut().println(msg);
     }
 
-    public void status(List<HasMetadata> resources) {
-        status(resources.toArray(new HasMetadata[resources.size()]));
+    public void printStderr(String msg) {
+        cli.getCommandLine().getErr().println(msg);
     }
 
-    public void status(HasMetadata... resources) {
-        status("👉 OK: ", resources);
+    public void printStatus(List<HasMetadata> resources) {
+        printStatus(resources.toArray(new HasMetadata[resources.size()]));
     }
 
-    public void status(String start, HasMetadata... resources) {
+    public void printStatus(HasMetadata... resources) {
+        printStatus("👉 OK: ", resources);
+    }
+
+    public void printStatus(String start, HasMetadata... resources) {
         StringBuilder sb = null;
 
         for (HasMetadata resource : resources) {
             sb = new StringBuilder()
                     .append(start)
                     .append(getStatusLine(resource));
-            println(sb.toString());
+            printStdout(sb.toString());
         }
     }
 

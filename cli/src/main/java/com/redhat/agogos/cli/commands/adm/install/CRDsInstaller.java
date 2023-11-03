@@ -19,7 +19,7 @@ public class CRDsInstaller extends Installer {
 
     @Override
     public void install(InstallProfile profile, String namespace) {
-        helper.println(String.format("🕞 Installing Agogos CRDs..."));
+        helper.printStdout(String.format("🕞 Installing Agogos CRDs..."));
 
         InputStream stream = Thread.currentThread().getContextClassLoader()
                 .getResourceAsStream("deployment/crds.yaml");
@@ -31,8 +31,8 @@ public class CRDsInstaller extends Installer {
 
             installed.add(kubernetesFacade.serverSideApply(resource));
         }
-        helper.status(installed);
+        helper.printStatus(installed);
 
-        helper.println(String.format("✅ Agogos CRDs installed"));
+        helper.printStdout(String.format("✅ Agogos CRDs installed"));
     }
 }

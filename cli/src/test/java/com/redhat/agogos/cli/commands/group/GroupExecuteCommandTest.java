@@ -15,7 +15,7 @@ import picocli.CommandLine.ExitCode;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @QuarkusTest
-public class GroupExecutionCommandTest extends GroupCommandBaseTest {
+public class GroupExecuteCommandTest extends GroupCommandBaseTest {
 
     @Test
     public void executionHelp() throws Exception {

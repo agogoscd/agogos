@@ -37,6 +37,6 @@ public abstract class DependencyInstaller extends Installer {
         for (HasMetadata r : resources) {
             installed.add(kubernetesFacade.serverSideApply(r));
         }
-        helper.status(installed);
+        helper.printStatus(installed);
     }
 }

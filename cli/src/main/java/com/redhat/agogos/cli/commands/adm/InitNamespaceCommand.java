@@ -127,10 +127,10 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
     @Override
     public Integer call() {
-        helper.println(String.format("🕞 Initializing '%s' namespace with Agogos resources...", namespace));
+        helper.printStdout(String.format("🕞 Initializing '%s' namespace with Agogos resources...", namespace));
 
         if (isAgogosCoreNamespace()) {
-            helper.println(
+            helper.printStdout(
                     String.format("⛔ Unable to initialize namespace '{}' as it is an Agogos core namespace.", namespace));
             return CommandLine.ExitCode.USAGE;
         }
@@ -162,7 +162,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         kubernetesFacade.waitForAllPodsRunning(namespace);
 
-        helper.println(String.format("✅ Namespace '%s' initialized and ready to use!", namespace));
+        helper.printStdout(String.format("✅ Namespace '%s' initialized and ready to use!", namespace));
         return CommandLine.ExitCode.OK;
     }
 
@@ -193,7 +193,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         cm = kubernetesFacade.serverSideApply(cm);
 
-        helper.status(cm);
+        helper.printStatus(cm);
     }
 
     /**
@@ -211,7 +211,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         ns = kubernetesFacade.serverSideApply(ns);
 
-        helper.status(ns);
+        helper.printStatus(ns);
     }
 
     private void installMainRoleBinding(ServiceAccount sa) {
@@ -234,7 +234,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         roleBinding = kubernetesFacade.serverSideApply(roleBinding);
 
-        helper.status(roleBinding);
+        helper.printStatus(roleBinding);
     }
 
     /**
@@ -251,7 +251,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         sa = kubernetesFacade.serverSideApply(sa);
 
-        helper.status(sa);
+        helper.printStatus(sa);
 
         return sa;
     }
@@ -267,7 +267,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         configMap = kubernetesFacade.serverSideApply(configMap);
 
-        helper.status(configMap);
+        helper.printStatus(configMap);
 
         return configMap;
     }
@@ -292,7 +292,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         broker = kubernetesFacade.serverSideApply(broker);
 
-        helper.status(broker);
+        helper.printStatus(broker);
 
         return broker;
     }
@@ -319,7 +319,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
         el = kubernetesFacade.serverSideApply(el);
         el = kubernetesFacade.waitForEventListenerRunning(el);
 
-        helper.status(el);
+        helper.printStatus(el);
 
         return el;
     }
@@ -345,7 +345,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         trigger = kubernetesFacade.serverSideApply(trigger);
 
-        helper.status(trigger);
+        helper.printStatus(trigger);
 
         return trigger;
     }
@@ -380,7 +380,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
             roleBinding.getSubjects().add(subject);
             roleBinding = kubernetesFacade.serverSideApply(roleBinding);
         }
-        helper.status(roleBinding);
+        helper.printStatus(roleBinding);
 
         return roleBinding;
     }
@@ -396,7 +396,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         sa = kubernetesFacade.serverSideApply(sa);
 
-        helper.status(sa);
+        helper.printStatus(sa);
 
         return sa;
     }
@@ -443,9 +443,9 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                     .build();
 
             roleBinding = kubernetesFacade.serverSideApply(roleBinding);
-            helper.status(roleBinding);
+            helper.printStatus(roleBinding);
 
-            helper.println(String.format("👧 %s: %s", roleBinding.getMetadata().getName(),
+            helper.printStdout(String.format("👧 %s: %s", roleBinding.getMetadata().getName(),
                     String.join(", ", subjects.stream().map(s -> s.getName()).collect(Collectors.toSet()))));
 
             processed.addAll(e.getValue()); // Add all new users as processed.
@@ -471,9 +471,9 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                     .build();
             resourceQuota = kubernetesFacade.serverSideApply(resourceQuota);
 
-            helper.status(resourceQuota);
+            helper.printStatus(resourceQuota);
         } catch (FileNotFoundException e) {
-            helper.println("⛔ File " + quotaFile.getName() + " not found, no resource quota applied");
+            helper.printStdout("⛔ File " + quotaFile.getName() + " not found, no resource quota applied");
         }
     }
 
@@ -563,7 +563,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                 .endSpec();
 
         io.fabric8.tekton.triggers.v1beta1.Trigger trigger = kubernetesFacade.serverSideApply(builder.build());
-        helper.status(trigger);
+        helper.printStatus(trigger);
     }
 
     private void installDependencyTrigger(String namespace) {
@@ -639,7 +639,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                 .endSpec();
 
         io.fabric8.tekton.triggers.v1beta1.Trigger trigger = kubernetesFacade.serverSideApply(builder.build());
-        helper.status(trigger);
+        helper.printStatus(trigger);
     }
 
     private void installExtensions() {
@@ -654,7 +654,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                 .filter(r -> !extensions.contains(r.getMetadata().getLabels().get(Label.EXTENSION.toString())))
                 .forEach(r -> {
                     kubernetesFacade.delete(r);
-                    helper.status("🗑️  OK: ", r);
+                    helper.printStatus("🗑️  OK: ", r);
 
                     // If it's a pull secret, remove it from the SA in the namespace.
                     if (isDockerConfigJsonSecret(r)) {
@@ -664,7 +664,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                             if (!sa.getImagePullSecrets().contains(lor)) {
                                 sa.getImagePullSecrets().add(lor);
                                 sa = kubernetesFacade.serverSideApply(sa);
-                                helper.status("🗑️  OK: ", sa);
+                                helper.printStatus("🗑️  OK: ", sa);
                             }
                         }
                     }
@@ -676,7 +676,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                     .forEach(r -> {
                         r = cleanseMetadata(r);
                         r = kubernetesFacade.serverSideApply(r);
-                        helper.status(r);
+                        helper.printStatus(r);
                         // If it's a pull secret, add it to the SA in the namespace.
                         if (isDockerConfigJsonSecret(r)) {
                             ServiceAccount sa = kubernetesFacade.get(ServiceAccount.class, namespace, RESOURCE_NAME);
@@ -685,7 +685,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                                 if (!sa.getImagePullSecrets().contains(lor)) {
                                     sa.getImagePullSecrets().add(lor);
                                     sa = kubernetesFacade.serverSideApply(sa);
-                                    helper.status(sa);
+                                    helper.printStatus(sa);
                                 }
                             }
                         }
@@ -728,7 +728,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                     rlist.stream().forEach(r -> r.setKind(kind));
                     resources.addAll(rlist);
                 } catch (KubernetesClientException kce) {
-                    helper.println("⛔ " + kce.getMessage());
+                    helper.printStdout("⛔ " + kce.getMessage());
                 }
             });
         });

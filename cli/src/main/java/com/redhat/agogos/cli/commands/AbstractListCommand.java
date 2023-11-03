@@ -49,7 +49,7 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
 
     protected Integer printList(List<T> resources, Boolean includeNamespace) {
         if (resources.isEmpty()) {
-            spec.commandLine().getOut().println("No resources found");
+            helper.printStdout("No resources found");
             return CommandLine.ExitCode.USAGE;
         }
 
@@ -73,7 +73,7 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
                 .getAsInt() + 4; // It's 4 instead of 5, because we need to add a space later so that the color formatting can be escaped.
 
         // Header
-        spec.commandLine().getOut().println(Ansi.AUTO.string(
+        helper.printStdout(Ansi.AUTO.string(
                 String.format(
                         "@|bold %-" + nameColumnLength + "." + nameColumnLength +
                                 (includeNamespace ? "s%-" + namespaceColumnLength + "." + namespaceColumnLength : "s%") +
@@ -131,7 +131,7 @@ public abstract class AbstractListCommand<T extends AgogosResource<?, ? extends 
 
             sb.append(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(resource.creationTime()));
 
-            spec.commandLine().getOut().println(Ansi.AUTO.string(sb.toString()));
+            helper.printStdout(Ansi.AUTO.string(sb.toString()));
 
         });
 

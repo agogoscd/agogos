@@ -56,7 +56,7 @@ public class OperatorInstaller extends Installer {
 
     @Override
     public void install(InstallProfile profile, String namespace) {
-        helper.println(String.format("🕞 Installing Agogos Operator component..."));
+        helper.printStdout(String.format("🕞 Installing Agogos Operator component..."));
 
         List<HasMetadata> resources = Stream.of(serviceAccount(namespace), clusterRole(), clusterRoleBinding(namespace))
                 .collect(Collectors.toList());
@@ -73,9 +73,9 @@ public class OperatorInstaller extends Installer {
             installed.add(kubernetesFacade.serverSideApply(r));
         }
 
-        helper.status(installed);
+        helper.printStatus(installed);
 
-        helper.println(String.format("✅ Agogos Operator installed"));
+        helper.printStdout(String.format("✅ Agogos Operator installed"));
     }
 
     private ServiceAccount serviceAccount(String namespace) {

@@ -83,7 +83,7 @@ public class CoreInstaller extends Installer {
 
     @Override
     public void install(InstallProfile profile, String namespace) {
-        helper.println(String.format("🕞 Installing Agogos core resources..."));
+        helper.printStdout(String.format("🕞 Installing Agogos core resources..."));
 
         List<HasMetadata> resources = new ArrayList<>();
         resources.add(namespace(namespace));
@@ -103,9 +103,9 @@ public class CoreInstaller extends Installer {
             installed.add(kubernetesFacade.serverSideApply(r));
         }
 
-        helper.status(installed);
+        helper.printStatus(installed);
 
-        helper.println(String.format("✅ Agogos core resources installed"));
+        helper.printStdout(String.format("✅ Agogos core resources installed"));
     }
 
     private ServiceAccount createServiceAccount(String namespace) {

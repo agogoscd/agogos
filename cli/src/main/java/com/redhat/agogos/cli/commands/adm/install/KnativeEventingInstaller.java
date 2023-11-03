@@ -22,7 +22,7 @@ public class KnativeEventingInstaller extends DependencyInstaller {
 
     @Override
     public void install(InstallProfile profile, String namespace) {
-        helper.println(String.format("🕞 Installing Knative Eventing %s...", eventing.version()));
+        helper.printStdout(String.format("🕞 Installing Knative Eventing %s...", eventing.version()));
 
         cleanup();
         install(eventing, profile, namespace, loaded -> {
@@ -33,7 +33,7 @@ public class KnativeEventingInstaller extends DependencyInstaller {
 
         kubernetesFacade.waitForAllPodsRunning(eventing.namespace());
 
-        helper.println(String.format("✅ Knative Eventing %s installed", eventing.version()));
+        helper.printStdout(String.format("✅ Knative Eventing %s installed", eventing.version()));
     }
 
     /**
@@ -51,7 +51,7 @@ public class KnativeEventingInstaller extends DependencyInstaller {
         List<String> rolesToDelete = List.of("addressable-resolver", "channelable-manipulator", "podspecable-binding",
                 "source-observer");
 
-        helper.println(String.format("🕞 Cleaning up Knative Eventing resources..."));
+        helper.printStdout(String.format("🕞 Cleaning up Knative Eventing resources..."));
 
         kubernetesFacade.delete(Deployment.class, eventing.namespace(), "eventing-webhook");
 

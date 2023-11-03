@@ -60,7 +60,7 @@ public class InstallCommand extends AbstractCallableSubcommand {
      */
     @Override
     public Integer call() {
-        cli.getCommandLine().getOut().println(String.format("💻 Selected profile: %s", profile));
+        helper.printStdout(String.format("💻 Selected profile: %s", profile));
 
         SortInstallers si = new SortInstallers();
         installers.stream()

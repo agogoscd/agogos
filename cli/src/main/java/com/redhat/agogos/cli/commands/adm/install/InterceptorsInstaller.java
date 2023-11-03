@@ -77,7 +77,7 @@ public class InterceptorsInstaller extends Installer {
 
     @Override
     public void install(InstallProfile profile, String namespace) {
-        helper.println(String.format("🕞 Installing Agogos Interceptors component..."));
+        helper.printStdout(String.format("🕞 Installing Agogos Interceptors component..."));
 
         certProvider.init();
 
@@ -104,15 +104,15 @@ public class InterceptorsInstaller extends Installer {
         if (profile == InstallProfile.local || profile == InstallProfile.prod) {
             Service interceptorsService = kubernetesFacade.get(Service.class, namespace, ServiceAccountName);
             if (interceptorsService != null) {
-                helper.println(String.format("🕞 Restarting Interceptors service after updating certificates..."));
+                helper.printStdout(String.format("🕞 Restarting Interceptors service after updating certificates..."));
 
                 kubernetesFacade.restartDeployment(namespace, ServiceAccountName);
             }
         }
 
-        helper.status(installed);
+        helper.printStatus(installed);
 
-        helper.println(String.format("✅ Agogos Interceptors installed"));
+        helper.printStdout(String.format("✅ Agogos Interceptors installed"));
 
         if (profile == InstallProfile.dev) {
             writeCerts();
@@ -135,10 +135,10 @@ public class InterceptorsInstaller extends Installer {
             throw new ApplicationException("Could not write certificate to file '%s'", certPath.toAbsolutePath());
         }
 
-        helper.println(
+        helper.printStdout(
                 "\n👋 Interceptor configuration in development mode. You can use following environment variables to point the Interceptor application to generated certificate:\n");
-        helper.println(String.format("👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES=%s", keyPath.toAbsolutePath()));
-        helper.println(String.format("👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES=%s", certPath.toAbsolutePath()));
+        helper.printStdout(String.format("👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES=%s", keyPath.toAbsolutePath()));
+        helper.printStdout(String.format("👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES=%s", certPath.toAbsolutePath()));
     }
 
     private Deployment deployment(String namespace) {

@@ -38,7 +38,7 @@ public class AdmInitNamespaceCommandTest extends AdmCommandBaseTest {
         Mockito.when(kubernetesFacadeMock.waitForEventListenerRunning(Mockito.any()))
                 .thenReturn(el);
 
-        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "adm", "init", "-n", "test-namespace", "-v");
+        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "adm", "init", "-n", "test-namespace");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/adm/init-namespace-only.txt")));
@@ -108,7 +108,7 @@ public class AdmInitNamespaceCommandTest extends AdmCommandBaseTest {
                 .thenReturn(sa);
 
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "adm", "init", "-n", "test-namespace", "--extensions",
-                "dummy-v1", "-v");
+                "dummy-v1");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/adm/init-with-extensions.txt")));

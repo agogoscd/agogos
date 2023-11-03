@@ -6,13 +6,8 @@ import com.redhat.agogos.core.AgogosEnvironment;
 import com.redhat.agogos.core.KubernetesFacade;
 import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
 import jakarta.inject.Inject;
-import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.Spec;
 
 public abstract class AbstractSubcommand {
-
-    @Spec
-    protected CommandSpec spec;
 
     @Inject
     protected CLI cli;

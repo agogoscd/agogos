@@ -113,7 +113,7 @@ public class ExecutionDescribeCommand extends AbstractResourceSubcommand<Executi
             }
         }
 
-        spec.commandLine().getOut().println(sb.toString());
+        helper.printStdout(sb.toString());
 
         return CommandLine.ExitCode.OK;
     }

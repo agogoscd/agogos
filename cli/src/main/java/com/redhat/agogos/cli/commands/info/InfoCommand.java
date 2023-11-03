@@ -30,7 +30,7 @@ public class InfoCommand extends AbstractCallableSubcommand {
                                 kubernetesFacade.getKubernetesVersion().getMinor()))))
                 .append(nl);
 
-        spec.commandLine().getOut().println(sb.toString());
+        helper.printStdout(sb.toString());
         return CommandLine.ExitCode.OK;
     }
 }

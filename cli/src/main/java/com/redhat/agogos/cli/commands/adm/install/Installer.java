@@ -11,17 +11,18 @@ import jakarta.inject.Inject;
 @ApplicationScoped
 @Priority
 public abstract class Installer {
+
     @Inject
-    Helper helper;
+    protected CLI cli;
+
+    @Inject
+    protected Helper helper;
 
     @Inject
     KubernetesFacade kubernetesFacade;
 
     @Inject
     ResourceLoader resourceLoader;
-
-    @Inject
-    protected CLI cli;
 
     public abstract void install(InstallProfile profile, String namespace);
 }

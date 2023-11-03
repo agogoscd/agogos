@@ -22,7 +22,7 @@ public class TektonInstaller extends DependencyInstaller {
 
     @Override
     public void install(InstallProfile profile, String namespace) {
-        helper.println(String.format("🕞 Installing Tekton %s...", tekton.version()));
+        helper.printStdout(String.format("🕞 Installing Tekton %s...", tekton.version()));
 
         install(tekton, profile, namespace);
 
@@ -30,7 +30,7 @@ public class TektonInstaller extends DependencyInstaller {
 
         kubernetesFacade.waitForAllPodsRunning(tekton.namespace());
 
-        helper.println(String.format("✅ Tekton %s installed", tekton.version()));
+        helper.printStdout(String.format("✅ Tekton %s installed", tekton.version()));
     }
 
     private void configureFeatureFlags(InstallProfile profile, String namespace) {
@@ -43,7 +43,7 @@ public class TektonInstaller extends DependencyInstaller {
 
             kubernetesFacade.serverSideApply(configMap);
 
-            helper.println(String.format("👉 OK: Configured Tekton ConfigMap '%s'", CONFIGMAP_FEATURE_FLAGS));
+            helper.printStdout(String.format("👉 OK: Configured Tekton ConfigMap '%s'", CONFIGMAP_FEATURE_FLAGS));
         }
     }
 }

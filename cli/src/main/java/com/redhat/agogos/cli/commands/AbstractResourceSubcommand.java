@@ -36,7 +36,7 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
 
     protected Integer showResource(T resource) {
         if (resource == null) {
-            spec.commandLine().getErr().println("⛔ No resource found.");
+            helper.printStderr("⛔ No resource found.");
             return CommandLine.ExitCode.USAGE;
         }
 
@@ -134,7 +134,7 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
 
         }
 
-        spec.commandLine().getOut().println(sb.toString());
+        helper.printStdout(sb.toString());
         return CommandLine.ExitCode.OK;
     }
 
@@ -152,10 +152,10 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
 
         switch (output) {
             case json:
-                printJson(resource);
+                helper.printStdout(toJson(resource));
                 break;
             case yaml:
-                printYaml(resource);
+                helper.printStdout(objectMapper.asYaml(resource));
                 break;
             default:
                 break;
@@ -170,13 +170,4 @@ public abstract class AbstractResourceSubcommand<T extends AgogosResource<?, ? e
             throw new ApplicationException("Cannot convert resource to JSON", e);
         }
     }
-
-    private void printJson(Object resource) {
-        spec.commandLine().getOut().println(toJson(resource));
-    }
-
-    private void printYaml(Object resource) {
-        spec.commandLine().getOut().println(objectMapper.asYaml(resource));
-    }
-
 }

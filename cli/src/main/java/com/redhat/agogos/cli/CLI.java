@@ -13,6 +13,7 @@ import com.redhat.agogos.cli.commands.stage.StageCommand;
 import com.redhat.agogos.cli.commands.trigger.TriggerCommand;
 import io.quarkus.runtime.QuarkusApplication;
 import io.quarkus.runtime.annotations.QuarkusMain;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +28,7 @@ import picocli.CommandLine.Spec;
 import java.io.PrintWriter;
 import java.util.concurrent.Callable;
 
+@ApplicationScoped
 @QuarkusMain
 @CommandLine.Command(name = "agogosctl", mixinStandardHelpOptions = true)
 public class CLI implements QuarkusApplication {

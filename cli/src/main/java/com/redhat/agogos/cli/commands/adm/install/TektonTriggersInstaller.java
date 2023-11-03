@@ -18,12 +18,12 @@ public class TektonTriggersInstaller extends DependencyInstaller {
 
     @Override
     public void install(InstallProfile profile, String namespace) {
-        helper.println(String.format("🕞 Installing Tekton Triggers %s...", triggers.version()));
+        helper.printStdout(String.format("🕞 Installing Tekton Triggers %s...", triggers.version()));
 
         install(triggers, profile, namespace);
 
         kubernetesFacade.waitForAllPodsRunning(triggers.namespace());
 
-        helper.println(String.format("✅ Tekton Triggers %s installed", triggers.version()));
+        helper.printStdout(String.format("✅ Tekton Triggers %s installed", triggers.version()));
     }
 }
