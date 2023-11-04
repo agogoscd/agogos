@@ -33,6 +33,10 @@ public class AdmInitNamespaceCommandTest extends AdmCommandBaseTest {
 
     @Test
     public void initNamespaceOnly() throws Exception {
+        Mockito.when(kubernetesFacadeMock.getApiGroups())
+                .thenReturn(new APIGroupList());
+        Mockito.when(kubernetesFacadeMock.getApiResources(Mockito.anyString()))
+                .thenReturn(new APIResourceList());
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
         Mockito.when(kubernetesFacadeMock.waitForEventListenerRunning(Mockito.any()))
@@ -46,6 +50,10 @@ public class AdmInitNamespaceCommandTest extends AdmCommandBaseTest {
 
     @Test
     public void initWithUsers() throws Exception {
+        Mockito.when(kubernetesFacadeMock.getApiGroups())
+                .thenReturn(new APIGroupList());
+        Mockito.when(kubernetesFacadeMock.getApiResources(Mockito.anyString()))
+                .thenReturn(new APIResourceList());
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
         Mockito.when(kubernetesFacadeMock.waitForEventListenerRunning(Mockito.any()))
@@ -60,6 +68,10 @@ public class AdmInitNamespaceCommandTest extends AdmCommandBaseTest {
 
     @Test
     public void initWithQuota() throws Exception {
+        Mockito.when(kubernetesFacadeMock.getApiGroups())
+                .thenReturn(new APIGroupList());
+        Mockito.when(kubernetesFacadeMock.getApiResources(Mockito.anyString()))
+                .thenReturn(new APIResourceList());
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
         Mockito.when(kubernetesFacadeMock.waitForEventListenerRunning(Mockito.any()))

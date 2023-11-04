@@ -1,15 +1,15 @@
 Usage: agogosctl adm init-namespace [-hvV] -n=<namespace> [-o=<output>]
                                     [--quota-file=<quotaFile>] [--admins=<admin>
                                     [,<admin>...]]... [--editors=<editor>[,
-                                    <editor>...]]...
-                                    [--extensions=<extensions>]...
-                                    [--viewers=<viewer>[,<viewer>...]]...
+                                    <editor>...]]... [--extensions=<extensions>
+                                    [,<extensions>...]]... [--viewers=<viewer>[,
+                                    <viewer>...]]...
 Initialize selected namespace to work with Agogos
       --admins=<admin>[,<admin>...]
                           List of users given the admin role for the namespace
       --editors=<editor>[,<editor>...]
                           List of users given the edit role for the namespace
-      --extensions=<extensions>
+      --extensions=<extensions>[,<extensions>...]
                           Extensions to be added to the namespace
   -h, --help              Show this help message and exit.
   -n, --namespace=<namespace>

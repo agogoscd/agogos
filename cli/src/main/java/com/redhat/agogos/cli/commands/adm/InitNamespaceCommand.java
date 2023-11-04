@@ -122,7 +122,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
     @Option(names = { "--quota-file" }, description = "Resource quota file to be applied to the namespace")
     File quotaFile;
 
-    @Option(names = { "--extensions" }, description = "Extensions to be added to the namespace")
+    @Option(names = { "--extensions" }, split = ",", description = "Extensions to be added to the namespace")
     Set<String> extensions = new HashSet<>();
 
     @Override
@@ -643,10 +643,6 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
     }
 
     private void installExtensions() {
-        if (extensions.size() == 0) {
-            return;
-        }
-
         Map<String, Set<String>> groupVersions = getResourceData();
 
         // Remove any synced resources for extensions that are no longer on the list to be installed.
