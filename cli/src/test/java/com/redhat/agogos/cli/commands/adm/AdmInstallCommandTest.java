@@ -1,5 +1,9 @@
 package com.redhat.agogos.cli.commands.adm;
 
+import static org.mockito.ArgumentMatchers.eq;
+
+import io.fabric8.kubernetes.api.model.ConfigMap;
+import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,6 +26,8 @@ public class AdmInstallCommandTest extends AdmCommandBaseTest {
 
     @Test
     public void installDevProfile() throws Exception {
+        Mockito.when(kubernetesFacadeMock.get(eq(ConfigMap.class), Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(new ConfigMapBuilder().withNewMetadata().endMetadata().build());
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
 
@@ -34,6 +40,8 @@ public class AdmInstallCommandTest extends AdmCommandBaseTest {
 
     @Test
     public void installDevProfileWithoutKnative() throws Exception {
+        Mockito.when(kubernetesFacadeMock.get(eq(ConfigMap.class), Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(new ConfigMapBuilder().withNewMetadata().endMetadata().build());
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
 
@@ -74,10 +82,12 @@ public class AdmInstallCommandTest extends AdmCommandBaseTest {
 
     @Test
     public void installLocalProfile() throws Exception {
+        Mockito.when(kubernetesFacadeMock.get(eq(ConfigMap.class), Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(new ConfigMapBuilder().withNewMetadata().endMetadata().build());
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
 
-        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "adm", "install", "--profile", "local", "-v");
+        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "adm", "install", "--profile", "local");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(
@@ -87,6 +97,8 @@ public class AdmInstallCommandTest extends AdmCommandBaseTest {
 
     @Test
     public void installLocalProfileWithoutKnative() throws Exception {
+        Mockito.when(kubernetesFacadeMock.get(eq(ConfigMap.class), Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(new ConfigMapBuilder().withNewMetadata().endMetadata().build());
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
 

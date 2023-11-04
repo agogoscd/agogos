@@ -41,6 +41,7 @@ public class TektonInstaller extends DependencyInstaller {
                     .addToData("send-cloudevents-for-runs", "false")
                     .build();
 
+            configMap.getMetadata().setManagedFields(null);
             kubernetesFacade.serverSideApply(configMap);
 
             helper.printStdout(String.format("👉 OK: Configured Tekton ConfigMap '%s'", CONFIGMAP_FEATURE_FLAGS));
