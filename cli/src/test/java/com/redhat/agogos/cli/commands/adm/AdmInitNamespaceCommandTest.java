@@ -39,6 +39,8 @@ public class AdmInitNamespaceCommandTest extends AdmCommandBaseTest {
                 .thenReturn(new APIResourceList());
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
+        Mockito.when(kubernetesFacadeMock.update(Mockito.any()))
+                .then(AdditionalAnswers.returnsFirstArg());
         Mockito.when(kubernetesFacadeMock.waitForEventListenerRunning(Mockito.any()))
                 .thenReturn(el);
 
@@ -56,10 +58,13 @@ public class AdmInitNamespaceCommandTest extends AdmCommandBaseTest {
                 .thenReturn(new APIResourceList());
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
+        Mockito.when(kubernetesFacadeMock.update(Mockito.any()))
+                .then(AdditionalAnswers.returnsFirstArg());
         Mockito.when(kubernetesFacadeMock.waitForEventListenerRunning(Mockito.any()))
                 .thenReturn(el);
 
-        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "adm", "init", "-n", "test-namespace", "--admins", "user1",
+        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "adm", "init", "-n", "test-namespace", "--admins",
+                "user1",
                 "--editors", "user2", "--viewers", "user3,user4");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
@@ -73,6 +78,8 @@ public class AdmInitNamespaceCommandTest extends AdmCommandBaseTest {
         Mockito.when(kubernetesFacadeMock.getApiResources(Mockito.anyString()))
                 .thenReturn(new APIResourceList());
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
+                .then(AdditionalAnswers.returnsFirstArg());
+        Mockito.when(kubernetesFacadeMock.update(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
         Mockito.when(kubernetesFacadeMock.waitForEventListenerRunning(Mockito.any()))
                 .thenReturn(el);
@@ -112,6 +119,8 @@ public class AdmInitNamespaceCommandTest extends AdmCommandBaseTest {
                 .thenReturn(groups);
         Mockito.when(kubernetesFacadeMock.getApiResources(Mockito.anyString()))
                 .thenReturn(resources);
+        Mockito.when(kubernetesFacadeMock.update(Mockito.any()))
+                .then(AdditionalAnswers.returnsFirstArg());
         Mockito.when(kubernetesFacadeMock.getKubernetesResources(Mockito.anyString(), eq("agogos.redhat.com/v1alpha1"),
                 Mockito.anyString(),
                 any(ListOptions.class)))
@@ -119,8 +128,11 @@ public class AdmInitNamespaceCommandTest extends AdmCommandBaseTest {
         Mockito.when(kubernetesFacadeMock.get(ServiceAccount.class, "test-namespace", "agogos"))
                 .thenReturn(sa);
 
-        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "adm", "init", "-n", "test-namespace", "--extensions",
+        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "adm", "init", "-n", "test-namespace",
+                "--extensions",
                 "dummy-v1");
+        catcher.logStdout();
+        catcher.logStderr();
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/adm/init-with-extensions.txt")));

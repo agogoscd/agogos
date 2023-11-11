@@ -378,7 +378,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         if (!roleBinding.getSubjects().contains(subject)) {
             roleBinding.getSubjects().add(subject);
-            roleBinding = kubernetesFacade.serverSideApply(roleBinding);
+            roleBinding = kubernetesFacade.update(roleBinding);
         }
         helper.printStatus(roleBinding);
 
@@ -643,9 +643,11 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
     }
 
     private void installExtensions() {
+        helper.printStdout("⏳ WAIT: Preparing to install extensions");
         Map<String, Set<String>> groupVersions = getResourceData();
 
         // Remove any synced resources for extensions that are no longer on the list to be installed.
+        helper.printStdout("⏳ WAIT: Removing obsolete extensions");
         getSyncedExtensionResources(groupVersions, namespace).stream()
                 .filter(r -> !extensions.contains(r.getMetadata().getLabels().get(Label.EXTENSION.toString())))
                 .forEach(r -> {
@@ -665,35 +667,39 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                         }
                     }
                 });
+        helper.printStdout("👉 OK: Extension removal complete");
 
+        if (extensions == null || extensions.size() == 0) {
+            return;
+        }
+
+        helper.printStdout("⏳ WAIT: Installing extensions: " + String.join(", ", extensions));
         // Apply all the resources for each extension to the namespace.
-        extensions.stream().forEach(extension -> {
-            getAgogosExtensionResources(groupVersions, extension).stream()
-                    .forEach(r -> {
-                        r = cleanseMetadata(r);
-                        r = kubernetesFacade.serverSideApply(r);
-                        helper.printStatus(r);
-                        // If it's a pull secret, add it to the SA in the namespace.
-                        if (isDockerConfigJsonSecret(r)) {
-                            ServiceAccount sa = kubernetesFacade.get(ServiceAccount.class, namespace, RESOURCE_NAME);
-                            if (sa != null) {
-                                LocalObjectReference lor = new LocalObjectReference(r.getMetadata().getName());
-                                if (!sa.getImagePullSecrets().contains(lor)) {
-                                    sa.getImagePullSecrets().add(lor);
-                                    sa = kubernetesFacade.serverSideApply(sa);
-                                    helper.printStatus(sa);
-                                }
-                            }
-                        }
-                    });
+        getAgogosExtensionResources(groupVersions, extensions).stream().forEach(r -> {
+            r = cleanseMetadata(r);
+            r = kubernetesFacade.serverSideApply(r);
+            helper.printStatus(r);
+            // If it's a pull secret, add it to the SA in the namespace.
+            if (isDockerConfigJsonSecret(r)) {
+                ServiceAccount sa = kubernetesFacade.get(ServiceAccount.class, namespace, RESOURCE_NAME);
+                if (sa != null) {
+                    LocalObjectReference lor = new LocalObjectReference(r.getMetadata().getName());
+                    if (!sa.getImagePullSecrets().contains(lor)) {
+                        sa.getImagePullSecrets().add(lor);
+                        sa = kubernetesFacade.serverSideApply(sa);
+                        helper.printStatus(sa);
+                    }
+                }
+            }
         });
+        helper.printStdout("👉 OK: Extension installation complete");
     }
 
     /*
      * Get the resources for all extensions that have been synced to the given namespace.
      */
     private List<GenericKubernetesResource> getSyncedExtensionResources(Map<String, Set<String>> groupVersions,
-            String extension) {
+            String namespace) {
         String selector = Label.SYNC.toString() + "=true";
         return getResources(groupVersions, namespace, selector);
     }
@@ -702,8 +708,9 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
      * Get the resources for the extension in the agogos namespace that need to be synced.
      */
     private List<GenericKubernetesResource> getAgogosExtensionResources(Map<String, Set<String>> groupVersions,
-            String extension) {
-        String selector = Label.EXTENSION.toString() + "=" + extension + "," + Label.SYNC.toString() + "=true";
+            Set<String> extensions) {
+        String selector = Label.EXTENSION.toString() + " in (" + String.join(",", extensions) + ")," + Label.SYNC.toString()
+                + "=true";
         return getResources(groupVersions, agogosEnvironment.getRunningNamespace(), selector);
     }
 
@@ -720,11 +727,13 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                 try {
                     // Get the generic resources and add the Kind on each.
                     List<GenericKubernetesResource> rlist = kubernetesFacade.getKubernetesResources(namespace, e.getKey(), kind,
-                            options);
+                            options, 1, 0);
                     rlist.stream().forEach(r -> r.setKind(kind));
                     resources.addAll(rlist);
                 } catch (KubernetesClientException kce) {
-                    helper.printStdout("⛔ " + kce.getMessage());
+                    // Swallow this exception.
+                } catch (Exception ex) {
+                    helper.printStdout("⛔ " + ex.getMessage());
                 }
             });
         });
@@ -742,7 +751,6 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                     group.getVersions().stream().forEach(gv -> {
                         APIResourceList apis = kubernetesFacade.getApiResources(gv.getGroupVersion());
                         apis.getResources().stream()
-                                .filter(r -> !gv.getGroupVersion().equals("apps/v1") && !r.getKind().equals("Scale"))
                                 .forEach(api -> {
                                     if (!groupVersions.keySet().contains(gv.getGroupVersion())) {
                                         groupVersions.put(gv.getGroupVersion(), new HashSet<String>());
@@ -755,7 +763,6 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
         Set<String> v1 = new HashSet<>();
         kubernetesFacade.getApiResources("v1").getResources().stream()
                 .filter(r -> r.getGroup() == null)
-                .filter(r -> !r.getKind().endsWith("Options") && !r.getKind().equals("Binding"))
                 .forEach(r -> {
                     v1.add(r.getKind());
                 });

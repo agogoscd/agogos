@@ -52,7 +52,7 @@ public class Helper {
     private String getStatusLine(HasMetadata resource) {
         StringBuilder sb = null;
 
-        sb = new StringBuilder()//
+        sb = new StringBuilder()
                 .append(resource.getKind())
                 .append(": ")
                 .append(resource.getMetadata().getName())
