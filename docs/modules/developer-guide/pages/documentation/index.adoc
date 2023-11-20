@@ -55,7 +55,7 @@ for information on enabling AsciiDoc rendering.
 
 [IMPORTANT]
 ====
-Final rendering of the CPaaS documentation is done with Antora,
+Final rendering of the Agogos documentation is done with Antora,
 which overrides some of the AsciiDoctor formatting. Use the instructions
 below to render the entire site for a final check of any changes to the
 documentation.
