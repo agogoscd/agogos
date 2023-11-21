@@ -1,6 +1,6 @@
 = Development Mode
 
-This tutorial shows you how to run a simple component build on Agogos using Minikube.
+This tutorial shows you how to run and use Agogos using Minikube.
 
 == Objectives
 
@@ -38,8 +38,7 @@ Run:
 [source,bash]
 ----
 mkdir $HOME/.minikube/certs/
-wget -O $HOME/.minikube/certs/RH-IT-Root-CA.crt https://certs.corp.redhat.com/certs/2015-IT-Root-CA.pem
-wget -O $HOME/.minikube/certs/2022-IT-Root-CA.pem https://certs.corp.redhat.com/certs/2022-IT-Root-CA.pem
+wget -O $HOME/.minikube/certs/RH-IT-Root-CA.crt https://certs.corp.redhat.com/certs/Current-IT-Root-CAs.pem
 ----
 
 [TIP]
@@ -53,7 +52,7 @@ for installation instructions.
 
 [source,bash]
 ----
-minikube start --driver=kvm2 --cpus=4 --memory=6g --disk-size=30GB --kubernetes-version=1.26.1 --embed-certs
+minikube start --driver=kvm2 --kubernetes-version=1.26.1 --cpus=4 --memory=6g --disk-size=30GB --embed-certs
 ----
 
 [IMPORTANT]
@@ -72,8 +71,9 @@ should return `minikube`.
 == Open Firewall Ports From Minikube To The Host
 The Kubernetes cluster needs to contact Agogos' Webhooks for resource validation.
 In development mode this means that Minikube needs to access some host ports. Here,
-we provide information about how to achieve when using `firewalld`. Make
-sure `firewalld` is running, then run:
+we provide information about how to achieve when using Firewalld.
+
+Make sure the process `firewalld` is running, then run:
 
 [source,bash]
 ----
@@ -83,45 +83,33 @@ sudo firewall-cmd --zone=libvirt --add-port=8443/tcp  # This opens the port imme
 
 To open the port 8443 from the Minikube Virtual Machine to localhost.
 
+[WARNING]
+====
+Sometimes Firewalld is disabled and is not started automatically. Run
+[command]`sudo systemctl start firewalld` to start it.
+====
+
 == Installing Agogos in Development Mode
-In the root of the repository, run:
+In the root of the
+link:https://gitlab.cee.redhat.com/agogos/agogos[Agogos]
+repository, run:
 
 [source,bash]
 ----
 ./mvnw clean package -D skipTests
 ----
 
-This command compiles all the Agogos packages. To install the Agogos Operator, run:
+This command compiles all the Agogos packages. Then install the Agogos Operator, run:
 
 [source,bash]
 ----
-java -Dquarkus.profile=dev -Dagogos.cli-profile=admin -jar cli/target/quarkus-app/quarkus-run.jar adm install --profile dev
+java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar adm install --profile dev
 ----
 
-This command install Tekton, Knative Eventing and the Agogos CustomResourceDefinitions,
-as well as the Agogos webhooks. It also creates a self-signed certificate
+This command installs Tekton, Knative Eventing and the Agogos CustomResourceDefinitions,
+as well as the Agogos Webhooks. It also creates a self-signed certificate
 ([filename]`webhooks.pem` and [filename]`webhooks.crt`) to encrypt the Agogos
-webhooks endpoint.
-
-Configure the namespace to use Agogos. Execute:
-
-[source,bash]
-----
-java -Dquarkus.profile=dev -Dagogos.cli-profile=admin -jar cli/target/quarkus-app/quarkus-run.jar adm init --namespace tests
-----
-
-This command creates service accounts, rolebindings, configuration maps... Then
-change the namespace the `kubectl` uses by default:
-
-[source,bash]
-----
-kubectl config set-context --current --namespace tests
-----
-
-[WARNING]
-====
-The Agogos CLI uses the namespace configured in your current `kubectl` context.
-====
+webhooks endpoint. These certificates are automatically used by Agogos.
 
 == Forwarding the Knative Eventing Broker Ingress
 Agogos sends events to the Knative Eventing service. In this tutorial, we run
@@ -175,8 +163,11 @@ You can start Agogos directly from Visual Studio Code, see the
 xref:ide.adoc[IDE guide].
 ====
 
-== Building Components
-When you have Agogos up and running, run:
+== Installing a Builder
+After installing Agogos, you need to install a Builder in order to build stuff.
+We keep our Builders and other Extensions in the
+link:https://gitlab.cee.redhat.com/agogos/extensions-internal[Agogos Extensions Internal repository].
+To install the Builder "Dummy v1" run:
 
 [source,bash]
 ----
@@ -188,10 +179,9 @@ export HV_TOKEN=$(vault login -method=oidc -field=token 2>/dev/null)
 # Clone and run a python script to install a builder
 git clone https://gitlab.cee.redhat.com/agogos/extensions-internal.git
 cd extensions-internal
-pipenv install
+pipenv install --dev
 pipenv shell
 python install/install.py builders/dummy/v1/ --hv-token=${HV_TOKEN}
-
 ----
 
 [NOTES]
@@ -201,18 +191,42 @@ python install/install.py builders/dummy/v1/ --hv-token=${HV_TOKEN}
   [command]`export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`.
 * If you run into permission issues, ask the Agogos team to add you to the proper
   Rover team and refresh your token by logging into HashiCorp Vault again.
+* The process is the same for any other Builder or Extensions, change the folder
+  passed to the [command]`install/install.py` script.
 ====
 
-This command registers the Agogos dummy builder and the Tekton dummy
-ClusterTask. Retrieve the builder using:
+This command registers the Agogos Dummy Builder in the cluster. Retrieve the
+builder using:
 
 [source,bash]
 ----
 kubectl get builders
 # or
-java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v builders list
+java -jar cli/target/quarkus-app/quarkus-run.jar -v builders list
 ----
 
+To use the Builder, you need to initialize a namespace and configure it
+to use the `dummy-v1` Builder:
+
+[source,bash]
+----
+java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar adm init --namespace tests --extensions dummy-v1
+----
+
+This command creates service accounts, rolebindings, configuration maps, and copies
+builder resources. Then change the namespace [command]`kubectl` uses by default:
+
+[source,bash]
+----
+kubectl config set-context --current --namespace tests
+----
+
+[WARNING]
+====
+The Agogos CLI uses the namespace configured in your current [command]`kubectl` context.
+====
+
+== Building Components
 Next, write the following Components to a YAML file and apply them using 
 [command]`kubectl apply -f your-file.yml`:
 
@@ -225,13 +239,13 @@ And then run a build using the Agogos CLI:
 
 [source,bash]
 ----
-$ java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v components list
+$ java -jar cli/target/quarkus-app/quarkus-run.jar -v components list
 NAME          STATUS    CREATED
 dummy-1       Ready     YYYY-MM-DD HH:MM:SS
 dummy-2       Ready     YYYY-MM-DD HH:MM:SS
 dummy-3       Ready     YYYY-MM-DD HH:MM:SS
 
-$ java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v components build dummy-1
+$ java -jar cli/target/quarkus-app/quarkus-run.jar -v components build dummy-1
 💖 About
 
 Name:       dummy-1-cn2rj
@@ -250,7 +264,7 @@ After a while, `dummy-1` and its dependents should be finished:
 
 [source,bash]
 ----
-$ java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v builds list
+$ java -jar cli/target/quarkus-app/quarkus-run.jar -v builds list
 NAME                STATUS       CREATED
 dummy-1-cn2rj       Finished     YYYY-MM-DD HH:MM:SS
 dummy-2-z22dj       Finished     YYYY-MM-DD HH:MM:SS
@@ -272,7 +286,7 @@ Then build the Group `group-1` using the Agogos CLI:
 
 [source,bash]
 ----
-$ java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v group execute group-1
+$ java -jar cli/target/quarkus-app/quarkus-run.jar -v group execute group-1
 💖 About
 
 Name:       group-1-s95mg
@@ -295,7 +309,7 @@ After a while, the Group Components and their dependents should be finished:
 
 [source,bash]
 ----
-$ java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar -v builds list
+$ java -jar cli/target/quarkus-app/quarkus-run.jar -v builds list
 NAME                STATUS       CREATED
 dummy-1-a-chb7x     Finished     YYYY-MM-DD HH:MM:SS
 dummy-1-b-lfwvr     Finished     YYYY-MM-DD HH:MM:SS
