@@ -165,6 +165,7 @@ public class WebhooksInstaller extends Installer {
         Container webhookContainer = new ContainerBuilder()
                 .withName("webhooks").withImage(ContainerImage).withImagePullPolicy("Always")
                 .withEnv(
+                        new EnvVarBuilder().withName("NAMESPACE").withValue(namespace).build(),
                         new EnvVarBuilder().withName("QUARKUS_HTTP_SSL_CERTIFICATE_FILES").withValue("/certs/tls.crt").build(),
                         new EnvVarBuilder().withName("QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES").withValue("/certs/tls.key")
                                 .build())
@@ -176,7 +177,6 @@ public class WebhooksInstaller extends Installer {
                 .withNewResources()
                 .withRequests(requests).withLimits(limits)
                 .endResources()
-                .withEnv(new EnvVarBuilder().withName("NAMESPACE").withValue(namespace).build())
                 .build();
 
         Deployment webhookDeployment = new DeploymentBuilder()
