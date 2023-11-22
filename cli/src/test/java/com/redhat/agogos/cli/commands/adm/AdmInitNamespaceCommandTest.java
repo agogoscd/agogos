@@ -131,8 +131,6 @@ public class AdmInitNamespaceCommandTest extends AdmCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "adm", "init", "-n", "test-namespace",
                 "--extensions",
                 "dummy-v1");
-        catcher.logStdout();
-        catcher.logStderr();
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(catcher.compareToStdout(utils.testResourceAsStringList("commands/adm/init-with-extensions.txt")));

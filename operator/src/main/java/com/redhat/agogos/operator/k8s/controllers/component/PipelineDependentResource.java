@@ -7,8 +7,6 @@ import com.redhat.agogos.core.k8s.Resource;
 import com.redhat.agogos.core.v1alpha1.Builder;
 import com.redhat.agogos.core.v1alpha1.Component;
 import com.redhat.agogos.core.v1alpha1.ComponentBuilderSpec.BuilderRef;
-import com.redhat.agogos.core.v1alpha1.ComponentHandlerSpec;
-import com.redhat.agogos.core.v1alpha1.Handler;
 import com.redhat.agogos.core.v1alpha1.WorkspaceMapping;
 import com.redhat.agogos.operator.k8s.controllers.AbstractDependentResource;
 import io.fabric8.kubernetes.api.model.OwnerReference;
@@ -30,19 +28,17 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class PipelineDependentResource extends AbstractDependentResource<Pipeline, Component> {
 
     private static final Logger LOG = LoggerFactory.getLogger(PipelineDependentResource.class);
 
     private static final String BUILD_PIPELINE_BUILDER_TASK_NAME = "build";
-    private static final String BUILD_PIPELINE_DEFAULT_TASK_WORKSPACE_NAME = "output";
-    private static final String BUILD_PIPELINE_SOURCE_TASK_WORKSPACE_NAME = "output";
 
     @Inject
     AgogosEnvironment agogosEnv;
@@ -63,21 +59,30 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
             LOG.debug("Component '{}', creating new Pipeline", component.getFullName());
         }
 
-        List<PipelineTask> tasks = new ArrayList<>();
+        // Prepare workspace for main task to share content between steps
+        WorkspacePipelineTaskBinding pipelineWsBinding = new WorkspacePipelineTaskBindingBuilder()
+                .withName("pipeline")
+                .withWorkspace(WorkspaceMapping.MAIN_WORKSPACE_NAME)
+                .withSubPath("pipeline")
+                .build();
 
-        // Add any pre Handlers
-        prepareHandlerTasks(component, component.getSpec().getPre(), tasks);
+        // Create all the pre, builder, and post tasks.
+        List<PipelineTask> preTasks = createTasks(component.getSpec().getPre(), pipelineWsBinding,
+                component.getMetadata().getNamespace());
+        PipelineTask builderTask = createBuilderTask(component, pipelineWsBinding);
+        List<PipelineTask> postTasks = createTasks(component.getSpec().getPost(), pipelineWsBinding,
+                component.getMetadata().getNamespace());
 
-        // Finally add the Builder task
-        prepareBuilderTask(component, tasks);
-
-        // Add any post Handlers
-        prepareHandlerTasks(component, component.getSpec().getPost(), tasks);
+        // Set runafter values so all pre tasks run before the build, and all post tasks after.
+        builderTask.setRunAfter(preTasks.stream().map(t -> t.getName()).collect(Collectors.toList()));
+        postTasks.stream().forEach(task -> {
+            task.getRunAfter().add(builderTask.getName());
+        });
 
         // Define main workspace
         PipelineWorkspaceDeclaration workspaceMain = new PipelineWorkspaceDeclarationBuilder()
                 .withName(WorkspaceMapping.MAIN_WORKSPACE_NAME)
-                .withDescription("Main workspace used in the the build pipeline")
+                .withDescription("Main workspace")
                 .build();
 
         // Add any useful/required labels
@@ -122,7 +127,9 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
                 .withNewSpec()
                 .withParams(componentParam, paramsParam)
                 .withWorkspaces(workspaceMain)
-                .addAllToTasks(tasks)
+                .addAllToTasks(preTasks)
+                .addToTasks(builderTask)
+                .addAllToTasks(postTasks)
                 .withResults(result)
                 .endSpec()
                 .build();
@@ -131,32 +138,15 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
         return pipeline;
     }
 
-    private void prepareHandlerTasks(Component component, List<ComponentHandlerSpec> handlers, List<PipelineTask> tasks) {
-        handlers.stream().forEach(handlerSpec -> {
-            String handlerName = handlerSpec.getHandlerRef().getName();
+    public PipelineTask createBuilderTask(Component component, WorkspacePipelineTaskBinding pipelineWsBinding) {
 
-            String jsonParams = objectMapper.asJson(handlerSpec.getParams());
-            Handler handler = kubernetesFacade.get(Handler.class, component.getMetadata().getNamespace(), handlerName);
-            PipelineTaskBuilder pipelineTaskBuilder = new PipelineTaskBuilder()
-                    .withName(handlerSpec.getHandlerRef().getName())
-                    .withTaskRef(handler.getSpec().getTaskRef())
-                    .addNewParam()
-                    .withName("params")
-                    .withNewValue(jsonParams)
-                    .endParam()
-                    .withWorkspaces(workspaceBindings(handler.getSpec().getWorkspaces()));
+        // Prepare workspace for builder task to store results
+        WorkspacePipelineTaskBinding stageWsBinding = new WorkspacePipelineTaskBindingBuilder()
+                .withName("stage")
+                .withWorkspace(WorkspaceMapping.MAIN_WORKSPACE_NAME)
+                .withSubPath(String.format("pipeline/%s", BUILD_PIPELINE_BUILDER_TASK_NAME))
+                .build();
 
-            if (tasks.size() > 1) {
-                pipelineTaskBuilder.withRunAfter(tasks.get(tasks.size() - 1).getName());
-            }
-
-            PipelineTask pipelineTask = pipelineTaskBuilder.build();
-
-            tasks.add(pipelineTask);
-        });
-    }
-
-    public void prepareBuilderTask(Component component, List<PipelineTask> tasks) {
         Builder builder = lookupBuilder(component);
         PipelineTask pipelineTask = new PipelineTaskBuilder()
                 .withName(BUILD_PIPELINE_BUILDER_TASK_NAME)
@@ -169,56 +159,10 @@ public class PipelineDependentResource extends AbstractDependentResource<Pipelin
                 .withName("component")
                 .withNewValue("$(params.component)")
                 .endParam()
-                .withWorkspaces(workspaceBindings(builder.getSpec().getWorkspaces()))
+                .withWorkspaces(stageWsBinding, pipelineWsBinding)
                 .build();
 
-        tasks.add(pipelineTask);
-    }
-
-    /**
-     * <p>
-     * Handle declared workspace binding on the resource. If there are any provided - these will be iterated over and required
-     * workspaces will be bound.
-     * </p>
-     * 
-     * <p>
-     * In case no bindings are provided, default binding will be applied.
-     * </p>
-     * 
-     * @param mappings
-     * @param defaultWorkspace
-     * @return
-     */
-    private List<WorkspacePipelineTaskBinding> workspaceBindings(List<WorkspaceMapping> mappings) {
-        List<WorkspacePipelineTaskBinding> workspaceBindings = new ArrayList<>();
-
-        if (mappings == null || mappings.isEmpty()) {
-            WorkspacePipelineTaskBinding defaultTaskBinding = new WorkspacePipelineTaskBindingBuilder()
-                    .withName(BUILD_PIPELINE_DEFAULT_TASK_WORKSPACE_NAME)
-                    .withWorkspace(WorkspaceMapping.MAIN_WORKSPACE_NAME)
-                    .build();
-
-            workspaceBindings.add(defaultTaskBinding);
-        } else {
-            mappings.forEach(workspaceMapping -> {
-                String targetWorkspaceName = BUILD_PIPELINE_SOURCE_TASK_WORKSPACE_NAME;
-
-                // Handle workspace mappings, if provided
-                if (workspaceMapping.getName() != null) {
-                    targetWorkspaceName = workspaceMapping.getName();
-                }
-
-                WorkspacePipelineTaskBinding pipelineTaskBinding = new WorkspacePipelineTaskBindingBuilder()
-                        .withName(targetWorkspaceName)
-                        .withWorkspace(WorkspaceMapping.MAIN_WORKSPACE_NAME)
-                        .withSubPath(workspaceMapping.getSubPath())
-                        .build();
-
-                workspaceBindings.add(pipelineTaskBinding);
-            });
-        }
-
-        return workspaceBindings;
+        return pipelineTask;
     }
 
     private Builder lookupBuilder(Component component) {

@@ -5,15 +5,13 @@ import com.redhat.agogos.core.v1alpha1.Builder;
 import com.redhat.agogos.core.v1alpha1.Component;
 import com.redhat.agogos.core.v1alpha1.ComponentBuilderSpec.BuilderRef;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineTask;
+import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBinding;
 import io.quarkus.test.InjectMock;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @QuarkusTest
 public class PipelineDependentResourceTest {
@@ -35,12 +33,9 @@ public class PipelineDependentResourceTest {
         component.getMetadata().setName("component");
         component.getSpec().getBuild().setBuilderRef(new BuilderRef("builder"));
 
-        List<PipelineTask> tasks = new ArrayList<>();
+        PipelineTask task = pipelineDependentResource.createBuilderTask(component, new WorkspacePipelineTaskBinding());
+        Assertions.assertNotNull(task);
 
-        pipelineDependentResource.prepareBuilderTask(component, tasks);
-        Assertions.assertEquals(1, tasks.size());
-
-        PipelineTask task = tasks.get(0);
         Assertions.assertEquals(2, task.getParams().size());
         Assertions.assertEquals(
                 "$(params.params)",

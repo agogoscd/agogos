@@ -2,14 +2,14 @@ package com.redhat.agogos.webhooks.k8s;
 
 import com.redhat.agogos.core.v1alpha1.Build;
 import com.redhat.agogos.core.v1alpha1.Component;
-import com.redhat.agogos.core.v1alpha1.Handler;
 import com.redhat.agogos.core.v1alpha1.Run;
+import com.redhat.agogos.core.v1alpha1.Stage;
 import com.redhat.agogos.core.v1alpha1.triggers.Trigger;
 import com.redhat.agogos.webhooks.k8s.mutator.BuildMutator;
 import com.redhat.agogos.webhooks.k8s.mutator.RunMutator;
 import com.redhat.agogos.webhooks.k8s.validator.BuildValidator;
 import com.redhat.agogos.webhooks.k8s.validator.ComponentValidator;
-import com.redhat.agogos.webhooks.k8s.validator.HandlerValidator;
+import com.redhat.agogos.webhooks.k8s.validator.StageValidator;
 import com.redhat.agogos.webhooks.k8s.validator.TriggerValidator;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionReview;
@@ -35,7 +35,7 @@ public class WebhookHandler {
     ComponentValidator componentValidator;
 
     @Inject
-    HandlerValidator handlerValidator;
+    StageValidator StageValidator;
 
     @Inject
     TriggerValidator triggerValidator;
@@ -61,8 +61,8 @@ public class WebhookHandler {
             return componentValidator.validate(admissionReview);
         }
 
-        if (resource instanceof Handler) {
-            return handlerValidator.validate(admissionReview);
+        if (resource instanceof Stage) {
+            return StageValidator.validate(admissionReview);
         }
 
         if (resource instanceof Trigger) {

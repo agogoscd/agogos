@@ -35,11 +35,11 @@ public class Component extends AgogosResource<ComponentSpec, Status> implements 
 
         @Getter
         @Setter
-        private List<ComponentHandlerSpec> pre = new ArrayList<>();
+        private List<StageEntry> pre = new ArrayList<>();
 
         @Getter
         @Setter
-        private List<ComponentHandlerSpec> post = new ArrayList<>();
+        private List<StageEntry> post = new ArrayList<>();
 
         @Getter
         @Setter

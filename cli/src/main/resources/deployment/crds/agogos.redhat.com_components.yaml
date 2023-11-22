@@ -39,49 +39,56 @@ spec:
               properties:
                 pre:
                   type: array
-                  description: "List of Handlers that should be executed before the build"
+                  description: "List of Stages that should be executed before the build"
                   items:
                     type: object
                     properties:
-                      handlerRef:
+                      stageRef:
                         type: object
-                        description: Handler reference
-                        properties:
+                        description: Stage reference
+                        properties:                         
                           name:
                             type: string
-                            description: Name of the Handler
-                        required: ["name"]
-                      params:
-                        type: object
-                        x-kubernetes-preserve-unknown-fields: true
+                            description: Name of the stage to run
+                          namespace:
+                            type: string
+                            description: Namespace of where the Agogos stage can be found, defaults to the Agogos operator namespace.
+                        required:
+                          - name
+                      runAfter:
+                        type: array
+                        items:
+                          type: string
+                        description: A list of stages that must finish BEFORE this stage runs
                       config:
                         type: object
+                        description: "Additional configuration properties passed to the stage implementation"
                         x-kubernetes-preserve-unknown-fields: true
-                        description: "Additional configuration that should be passed to the Handler implementation"
-                    required: ["handlerRef"]
+                    required: ["stageRef"]
 
                 post:
                   type: array
-                  description: "List of Handlers that should be executed after the build"
+                  description: "List of Stages that should be executed after the build"
                   items:
                     type: object
                     properties:
-                      handlerRef:
+                      stageRef:
                         type: object
-                        description: Handler reference
-                        properties:
+                        description: Stage reference
+                        properties:                         
                           name:
                             type: string
-                            description: Name of the Handler
-                        required: ["name"]
-                      params:
-                        type: object
-                        x-kubernetes-preserve-unknown-fields: true
+                            description: Name of the stage to run
+                          namespace:
+                            type: string
+                            description: Namespace of where the Agogos stage can be found, defaults to the Agogos operator namespace.
+                        required:
+                          - name
                       config:
                         type: object
+                        description: "Additional configuration properties passed to the stage implementation"
                         x-kubernetes-preserve-unknown-fields: true
-                        description: "Additional configuration that should be passed to the Handler implementation"
-                    required: ["handlerRef"]
+                    required: ["stageRef"]
 
                 build:
                   type: object

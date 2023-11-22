@@ -106,6 +106,9 @@ public class RunController extends AbstractController<Run> implements EventSourc
             case CANCELLED:
                 message = String.format("%s cancelled", run.getKind());
                 break;
+            case UNKNOWN:
+                message = String.format("%s unknown", run.getKind());
+                break;
         }
 
         Pipeline pipeline = parentResource(run, context);

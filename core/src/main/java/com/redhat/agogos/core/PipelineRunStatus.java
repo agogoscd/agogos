@@ -12,7 +12,8 @@ public enum PipelineRunStatus {
     CANCELLED,
     RESOLVINGTASKREF,
     FAILED,
-    TIMEOUT;
+    TIMEOUT,
+    UNKNOWN;
 
     public static PipelineRunStatus fromTekton(String conditionStatus, String conditionReason) {
         try {
@@ -44,6 +45,9 @@ public enum PipelineRunStatus {
     }
 
     public static PipelineRunStatus fromPipelineRun(PipelineRun pipelineRun) {
+        if (pipelineRun.getStatus() == null) {
+            return PipelineRunStatus.UNKNOWN;
+        }
         Condition condition = pipelineRun.getStatus().getConditions().get(0);
         return PipelineRunStatus.fromTekton(condition.getStatus(), condition.getReason());
     }

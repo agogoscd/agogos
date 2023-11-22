@@ -100,6 +100,9 @@ public class BuildController extends AbstractController<Build> implements EventS
             case CANCELLED:
                 message = String.format("%s cancelled", build.getKind());
                 break;
+            case UNKNOWN:
+                message = String.format("Status for %s is unknown", build.getKind());
+                break;
         }
 
         Component component = parentResource(build, context);

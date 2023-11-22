@@ -1,7 +1,7 @@
 package com.redhat.agogos.core;
 
 import com.redhat.agogos.core.v1alpha1.ComponentBuilderSpec.BuilderRef;
-import com.redhat.agogos.core.v1alpha1.Pipeline.PipelineSpec.StageReference;
+import com.redhat.agogos.core.v1alpha1.StageEntry.StageReference;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.eclipse.microprofile.config.ConfigProvider;
 

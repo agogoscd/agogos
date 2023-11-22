@@ -2,8 +2,8 @@ package com.redhat.agogos.webhooks.k8s.validator;
 
 import com.redhat.agogos.core.v1alpha1.Builder;
 import com.redhat.agogos.core.v1alpha1.Component;
-import com.redhat.agogos.core.v1alpha1.ComponentHandlerSpec;
-import com.redhat.agogos.core.v1alpha1.Handler;
+import com.redhat.agogos.core.v1alpha1.Stage;
+import com.redhat.agogos.core.v1alpha1.StageEntry;
 import com.redhat.agogos.test.CRDTestServerSetup;
 import com.redhat.agogos.webhooks.k8s.WebhookHandler;
 import com.redhat.agogos.webhooks.k8s.validator.ComponentValidatorTest.ComponentValidatorTestServerSetup;
@@ -62,12 +62,12 @@ public class ComponentValidatorTest {
                     .endSpec().build();
             server.getClient().resources(Task.class).inNamespace("default").resource(gitTask).create();
 
-            Handler handler = new Handler("git-v1");
-            handler.getSpec().getTaskRef().setName("git-clone");
-            handler.getSpec().getSchema().getOpenAPIV3Schema().put("git-clone-param-optional",
+            Stage stage = new Stage();
+            stage.getSpec().getTaskRef().setName("git-clone");
+            stage.getSpec().getSchema().getOpenAPIV3Schema().put("git-clone-param-optional",
                     Map.of("type", "object", "properties", Map.of("id", Map.of("type", "string"))));
 
-            server.getClient().resources(Handler.class).inNamespace("default").resource(handler).create();
+            server.getClient().resources(Stage.class).inNamespace("default").resource(stage).create();
         }
     }
 
@@ -129,11 +129,11 @@ public class ComponentValidatorTest {
     @Test
     @DisplayName("Validate non-existing handler")
     public void validateNonExistingHandler() throws IOException {
-        ComponentHandlerSpec handlerSpec = new ComponentHandlerSpec();
-        handlerSpec.getHandlerRef().setName("doesnotexist");
+        StageEntry entry = new StageEntry();
+        entry.getStageRef().setName("doesnotexist");
 
         Component component = (Component) admissionReview.getRequest().getObject();
-        component.getSpec().getPre().add(handlerSpec);
+        component.getSpec().getPre().add(entry);
         component.getSpec().getBuild().getParams().put("someKey", "some allowed content");
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
@@ -144,13 +144,13 @@ public class ComponentValidatorTest {
     }
 
     @Test
-    @DisplayName("Validate required handler params")
+    @DisplayName("Validate required stage params")
     public void validateMismatchedHandlerParams() throws IOException {
-        ComponentHandlerSpec handlerSpec = new ComponentHandlerSpec();
-        handlerSpec.getHandlerRef().setName("git-v1");
+        StageEntry entry = new StageEntry();
+        entry.getStageRef().setName("git-v1");
 
         Component component = (Component) admissionReview.getRequest().getObject();
-        component.getSpec().getPre().add(handlerSpec);
+        component.getSpec().getPre().add(entry);
         component.getSpec().getBuild().getParams().put("someKey", "some allowed content");
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
@@ -163,13 +163,13 @@ public class ComponentValidatorTest {
     @Test
     @DisplayName("Validate unknown handler params")
     public void validateUnknownHandlerParams() throws IOException {
-        ComponentHandlerSpec handlerSpec = new ComponentHandlerSpec();
-        handlerSpec.getHandlerRef().setName("git-v1");
-        handlerSpec.getParams().put("git-clone-param", "some content");
-        handlerSpec.getParams().put("doesnotexist", "some content");
+        StageEntry entry = new StageEntry();
+        entry.getStageRef().setName("git-v1");
+        entry.getConfig().put("git-clone-param", "some content");
+        entry.getConfig().put("doesnotexist", "some content");
 
         Component component = (Component) admissionReview.getRequest().getObject();
-        component.getSpec().getPre().add(handlerSpec);
+        component.getSpec().getPre().add(entry);
         component.getSpec().getBuild().getParams().put("someKey", "some content");
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
@@ -180,15 +180,15 @@ public class ComponentValidatorTest {
     }
 
     @Test
-    @DisplayName("Validate handler param with schema")
+    @DisplayName("Validate stage param with schema")
     public void validateHandlerParamWithSchema() throws IOException {
-        ComponentHandlerSpec handlerSpec = new ComponentHandlerSpec();
-        handlerSpec.getHandlerRef().setName("git-v1");
-        handlerSpec.getParams().put("git-clone-param", "some content");
-        handlerSpec.getParams().put("git-clone-param-optional", "some content");
+        StageEntry entry = new StageEntry();
+        entry.getStageRef().setName("git-v1");
+        entry.getConfig().put("git-clone-param", "some content");
+        entry.getConfig().put("git-clone-param-optional", "some content");
 
         Component component = (Component) admissionReview.getRequest().getObject();
-        component.getSpec().getPre().add(handlerSpec);
+        component.getSpec().getPre().add(entry);
         component.getSpec().getBuild().getParams().put("someKey", "some content");
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")
@@ -199,15 +199,15 @@ public class ComponentValidatorTest {
     }
 
     @Test
-    @DisplayName("Validate correct handler")
+    @DisplayName("Validate correct stage")
     public void validateHandler() throws IOException {
-        ComponentHandlerSpec handlerSpec = new ComponentHandlerSpec();
-        handlerSpec.getHandlerRef().setName("git-v1");
-        handlerSpec.getParams().put("git-clone-param", "some content");
-        handlerSpec.getParams().put("git-clone-param-optional", Map.of("id", "asdasd"));
+        StageEntry entry = new StageEntry();
+        entry.getStageRef().setName("git-v1");
+        entry.getConfig().put("git-clone-param", "some content");
+        entry.getConfig().put("git-clone-param-optional", Map.of("id", "asdasd"));
 
         Component component = (Component) admissionReview.getRequest().getObject();
-        component.getSpec().getPre().add(handlerSpec);
+        component.getSpec().getPre().add(entry);
         component.getSpec().getBuild().getParams().put("someKey", "some content");
 
         RestAssured.given().when().request().contentType(ContentType.JSON).body(admissionReview).post("/validate")

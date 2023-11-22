@@ -32,7 +32,6 @@ public class AgogosResource<S, T> extends CustomResource<S, T> {
     }
 
     @JsonIgnore
-    // TODO: add logic based on status
     public boolean isReady() {
         return true;
     }

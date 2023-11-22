@@ -1,8 +1,0 @@
-com.redhat.agogos.core.v1alpha1.Build
-com.redhat.agogos.core.v1alpha1.Builder
-com.redhat.agogos.core.v1alpha1.Component
-com.redhat.agogos.core.v1alpha1.Group
-com.redhat.agogos.core.v1alpha1.Handler
-com.redhat.agogos.core.v1alpha1.Pipeline
-com.redhat.agogos.core.v1alpha1.Run
-com.redhat.agogos.core.v1alpha1.triggers.Trigger

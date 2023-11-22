@@ -35,6 +35,9 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
     @ConfigProperty(name = "agogos.service-account")
     Optional<String> serviceAccount;
 
+    @ConfigProperty(name = "kubernetes.storage-class")
+    Optional<String> storageClass;
+
     @Override
     protected PipelineRun desired(Build build, Context<Build> context) {
         PipelineRun pipelineRun = new PipelineRun();
@@ -71,9 +74,20 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
     }
 
     public PipelineRun createPipelineRun(Build build, Component component, PipelineRun pipelineRun) {
+        Map<String, Quantity> requests = new HashMap<>();
+        requests.put("storage", Quantity.parse("1Gi")); // TODO: This needs to be configurable
+
+        PersistentVolumeClaim pvc = new PersistentVolumeClaimBuilder()
+                .withNewSpec()
+                .withAccessModes("ReadWriteOnce")
+                .withNewResources().withRequests(requests).endResources()
+                .withStorageClassName(storageClass.orElse(""))
+                .endSpec()
+                .build();
+
         WorkspaceBinding workspace = new WorkspaceBindingBuilder()
                 .withName(WorkspaceMapping.MAIN_WORKSPACE_NAME)
-                .withEmptyDir(new EmptyDirVolumeSource())
+                .withVolumeClaimTemplate(pvc)
                 .build();
 
         // FIXME: is this parentResource the same that is retrieved as secondaryResource?

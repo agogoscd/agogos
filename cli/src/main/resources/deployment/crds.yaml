@@ -257,49 +257,56 @@ spec:
               properties:
                 pre:
                   type: array
-                  description: "List of Handlers that should be executed before the build"
+                  description: "List of Stages that should be executed before the build"
                   items:
                     type: object
                     properties:
-                      handlerRef:
+                      stageRef:
                         type: object
-                        description: Handler reference
-                        properties:
+                        description: Stage reference
+                        properties:                         
                           name:
                             type: string
-                            description: Name of the Handler
-                        required: ["name"]
-                      params:
-                        type: object
-                        x-kubernetes-preserve-unknown-fields: true
+                            description: Name of the stage to run
+                          namespace:
+                            type: string
+                            description: Namespace of where the Agogos stage can be found, defaults to the Agogos operator namespace.
+                        required:
+                          - name
+                      runAfter:
+                        type: array
+                        items:
+                          type: string
+                        description: A list of stages that must finish BEFORE this stage runs
                       config:
                         type: object
+                        description: "Additional configuration properties passed to the stage implementation"
                         x-kubernetes-preserve-unknown-fields: true
-                        description: "Additional configuration that should be passed to the Handler implementation"
-                    required: ["handlerRef"]
+                    required: ["stageRef"]
 
                 post:
                   type: array
-                  description: "List of Handlers that should be executed after the build"
+                  description: "List of Stages that should be executed after the build"
                   items:
                     type: object
                     properties:
-                      handlerRef:
+                      stageRef:
                         type: object
-                        description: Handler reference
-                        properties:
+                        description: Stage reference
+                        properties:                         
                           name:
                             type: string
-                            description: Name of the Handler
-                        required: ["name"]
-                      params:
-                        type: object
-                        x-kubernetes-preserve-unknown-fields: true
+                            description: Name of the stage to run
+                          namespace:
+                            type: string
+                            description: Namespace of where the Agogos stage can be found, defaults to the Agogos operator namespace.
+                        required:
+                          - name
                       config:
                         type: object
+                        description: "Additional configuration properties passed to the stage implementation"
                         x-kubernetes-preserve-unknown-fields: true
-                        description: "Additional configuration that should be passed to the Handler implementation"
-                    required: ["handlerRef"]
+                    required: ["stageRef"]
 
                 build:
                   type: object
@@ -700,116 +707,6 @@ spec:
         - name: Status
           jsonPath: .status.status
           type: string
-        - name: Age
-          type: date
-          jsonPath: .metadata.creationTimestamp
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []
----
-apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
-metadata:
-  name: handlers.agogos.redhat.com
-spec:
-  group: agogos.redhat.com
-  names:
-    kind: Handler
-    listKind: HandlerList
-    plural: handlers
-    singular: handler
-  scope: Namespaced
-  versions:
-    - name: v1alpha1
-      schema:
-        openAPIV3Schema:
-          description: Handler is the schema to define a custom handler that can be executed as part of the build process
-          properties:
-            apiVersion:
-              description:
-                "APIVersion defines the versioned schema of this representation
-                of an object. Servers should convert recognized schemas to the latest
-                internal value, and may reject unrecognized values.
-                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources"
-              type: string
-            kind:
-              description:
-                "Kind is a string value representing the REST resource this
-                object represents. Servers may infer this from the endpoint the client
-                submits requests to. Cannot be updated. In CamelCase.
-                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds"
-              type: string
-            metadata:
-              type: object
-            spec:
-              type: object
-              description: Defines the desired state of Handler
-              properties:
-                taskRef:
-                  type: object
-                  description: Defines the task reference
-                  properties:
-                    resolver:
-                      type: string
-                      description: Resolver used for Tekton Task
-                    name:
-                      type: string
-                      description: Name of the Tekton task
-                    params:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                          value:
-                            type: string
-                  oneOf:
-                    - required: ["resolver", "params"]
-                    - required: ["name"]
-                schema:
-                  type: object
-                  description: Validation definition that should be applied on the Handler configuration passed.
-                  properties:
-                    openAPIV3Schema:
-                      x-kubernetes-preserve-unknown-fields: true
-                      type: object
-                      description: "OpenAPI v3 formatted validation.
-                        More info: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md"
-                  required:
-                    - "openAPIV3Schema"
-
-                workspaces:
-                  type: array
-                  description: "List of workspace mappings between Agogos workspace and Task being the implementation of Handler"
-                  items:
-                    type: object
-                    properties:
-                      # source:
-                      #   type: string
-                      #   description: "Name of the Agogos exposed workspace"
-                      name:
-                        type: string
-                        description: "Name of the target pipeline in the Task implementation"
-                      subPath:
-                        type: string
-                        description: "Subpath on the source workspace that should be exposed as the target workspace"
-                    required:
-                      - "name"
-              required:
-                - "taskRef"
-            status:
-              description: HandlerStatus defines the observed state of Handler
-              type: object
-          type: object
-      served: true
-      storage: true
-      subresources:
-        status: {}
-      additionalPrinterColumns:
         - name: Age
           type: date
           jsonPath: .metadata.creationTimestamp

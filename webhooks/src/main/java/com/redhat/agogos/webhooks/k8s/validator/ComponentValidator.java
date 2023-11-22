@@ -8,8 +8,8 @@ import com.redhat.agogos.core.errors.ValidationException;
 import com.redhat.agogos.core.v1alpha1.Builder;
 import com.redhat.agogos.core.v1alpha1.Component;
 import com.redhat.agogos.core.v1alpha1.ComponentBuilderSpec.BuilderRef;
-import com.redhat.agogos.core.v1alpha1.ComponentHandlerSpec;
-import com.redhat.agogos.core.v1alpha1.Handler;
+import com.redhat.agogos.core.v1alpha1.Stage;
+import com.redhat.agogos.core.v1alpha1.StageEntry;
 import io.fabric8.kubernetes.api.model.StatusBuilder;
 import io.fabric8.kubernetes.api.model.admission.v1.AdmissionResponseBuilder;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -40,8 +40,8 @@ public class ComponentValidator extends Validator<Component> {
             validateBuilder(component);
             validateTaskNames(component);
 
-            validateHandlerParameters(component.getSpec().getPre(), component);
-            validateHandlerParameters(component.getSpec().getPost(), component);
+            validateStageParameters(component.getSpec().getPre(), component);
+            validateStageParameters(component.getSpec().getPost(), component);
 
             responseBuilder.withAllowed(true);
         } catch (ApplicationException e) {
@@ -57,44 +57,46 @@ public class ComponentValidator extends Validator<Component> {
 
     /**
      * <p>
-     * Validates correctness of passed parameters to Handlers.
+     * Validates correctness of passed parameters to Stages.
      * </p>
      * 
      * @param component
      * @throws ApplicationException
      */
-    private void validateHandlerParameters(List<ComponentHandlerSpec> handlers, Component component)
+    private void validateStageParameters(List<StageEntry> entries, Component component)
             throws ApplicationException {
 
-        handlers.stream().forEach(handlerSpec -> {
-            LOG.info("Component '{}' validation: validating parameters for Handler '{}'",
-                    component.getFullName(), handlerSpec.getHandlerRef().getName());
+        entries.stream().forEach(entry -> {
+            LOG.info("Component '{}' validation: validating parameters for Stage '{}'",
+                    component.getFullName(), entry.getStageRef().getName());
 
-            Handler handler = kubernetesFacade.get(
-                    Handler.class,
+            Stage stage = kubernetesFacade.get(
+                    Stage.class,
                     component.getMetadata().getNamespace(),
-                    handlerSpec.getHandlerRef().getName());
-            if (handler == null) {
+                    entry.getStageRef().getName());
+            if (stage == null) {
                 throw new ApplicationException(
-                        "Component definition '{}' is not valid: specified Handler '{}' does not exist in the system",
-                        component.getFullName(), handlerSpec.getHandlerRef().getName());
+                        "Component definition '{}' is not valid: specified Stage '{}' does not exist in the system",
+                        component.getFullName(), entry.getStageRef().getName());
             }
 
-            Object schema = handler.getSpec().getSchema().getOpenAPIV3Schema();
+            Object schema = stage.getSpec().getSchema().getOpenAPIV3Schema();
 
             // No schema provided for the parameter
             if (schema == null) {
+                LOG.warn("Component '{}' validation: no schema found for Stage '{}'",
+                        component.getFullName(), stage.getFullName());
                 return;
             }
 
             ValidationData<Void> validation = new ValidationData<>();
 
             JsonNode schemaNode = objectMapper.convertValue(schema, JsonNode.class);
-            JsonNode contentNode = objectMapper.convertValue(handlerSpec.getParams(), JsonNode.class);
+            JsonNode contentNode = objectMapper.convertValue(entry.getConfig(), JsonNode.class);
 
-            LOG.debug("Component '{}', Handler '{}': validating content: '{}' and schema: '{}'",
+            LOG.debug("Component '{}', Stage '{}': validating content: '{}' and schema: '{}'",
                     component.getFullName(),
-                    handler.getFullName(),
+                    stage.getFullName(),
                     contentNode, schemaNode);
 
             SchemaValidator schemaValidator;
@@ -113,16 +115,16 @@ public class ComponentValidator extends Validator<Component> {
                         .map(item -> item.message().replaceAll("\\.+$", "")).collect(Collectors.toList());
 
                 errorMessages.forEach(message -> {
-                    LOG.error("Component '{}', Handler '{}' params validation error: {}", component.getFullName(),
-                            handler.getFullName(), message);
+                    LOG.error("Component '{}', Stage '{}' params validation error: {}", component.getFullName(),
+                            stage.getFullName(), message);
                 });
 
-                throw new ValidationException("Component '{}', Handler '{}' params is not valid: {}",
-                        component.getFullName(), handler.getFullName(), errorMessages);
+                throw new ValidationException("Component '{}', Stage '{}' parameters are not valid: {}",
+                        component.getFullName(), stage.getFullName(), errorMessages);
             }
 
-            LOG.info("Component '{}' validation: parameters for Handler '{}' are valid!",
-                    component.getFullName(), handlerSpec.getHandlerRef().getName());
+            LOG.info("Component '{}' validation: parameters for Stage '{}' are valid!",
+                    component.getFullName(), entry.getStageRef().getName());
         });
     }
 
@@ -177,16 +179,16 @@ public class ComponentValidator extends Validator<Component> {
     }
 
     private void validateTaskNames(Component component) throws ApplicationException {
-        List<String> names = component.getSpec().getPre().stream().map(s -> s.getHandlerRef().getName())
+        List<String> names = component.getSpec().getPre().stream().map(s -> s.getStageRef().getName())
                 .collect(Collectors.toList());
-        names.addAll(component.getSpec().getPost().stream().map(s -> s.getHandlerRef().getName()).collect(Collectors.toList()));
+        names.addAll(component.getSpec().getPost().stream().map(s -> s.getStageRef().getName()).collect(Collectors.toList()));
         names.add(component.getSpec().getBuild().getBuilderRef().getName());
 
         Set<String> duplicates = names.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
                 .entrySet().stream().filter(m -> m.getValue() > 1).map(Map.Entry::getKey).collect(Collectors.toSet());
 
         if (duplicates.size() > 0) {
-            throw new ValidationException("Component definition '{}' contains duplicate handler names: {}",
+            throw new ValidationException("Component definition '{}' contains duplicate Stage names: {}",
                     component.getFullName(),
                     String.join(", ", duplicates));
         }
