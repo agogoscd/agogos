@@ -378,7 +378,8 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
 
         if (!roleBinding.getSubjects().contains(subject)) {
             roleBinding.getSubjects().add(subject);
-            roleBinding = kubernetesFacade.update(roleBinding);
+            roleBinding.getMetadata().setManagedFields(null);
+            roleBinding = kubernetesFacade.serverSideApply(roleBinding);
         }
         helper.printStatus(roleBinding);
 
@@ -643,8 +644,9 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
     }
 
     private void installExtensions() {
-        helper.printStdout("⏳ WAIT: Preparing to install extensions");
+        helper.printStdout("⏳ WAIT: Generating group/version resource data");
         Map<String, Set<String>> groupVersions = getResourceData();
+        helper.printStdout("👉 OK: Generated group/version resource data");
 
         // Remove any synced resources for extensions that are no longer on the list to be installed.
         helper.printStdout("⏳ WAIT: Removing obsolete extensions");

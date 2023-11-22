@@ -17,7 +17,8 @@
 👧 edit: user2
 👉 OK: RoleBinding: view (rbac.authorization.k8s.io/v1) (ns: test-namespace)
 👧 view: user3, user4
-⏳ WAIT: Preparing to install extensions
+⏳ WAIT: Generating group/version resource data
+👉 OK: Generated group/version resource data
 ⏳ WAIT: Removing obsolete extensions
 👉 OK: Extension removal complete
 ✅ Namespace 'test-namespace' initialized and ready to use!

@@ -12,7 +12,8 @@
 👉 OK: Trigger: agogos-submission (triggers.tekton.dev/v1beta1) (ns: test-namespace)
 👉 OK: Trigger: agogos-dependency (triggers.tekton.dev/v1beta1) (ns: test-namespace)
 👉 OK: ResourceQuota: agogos-quota (v1) (ns: test-namespace)
-⏳ WAIT: Preparing to install extensions
+⏳ WAIT: Generating group/version resource data
+👉 OK: Generated group/version resource data
 ⏳ WAIT: Removing obsolete extensions
 👉 OK: Extension removal complete
 ✅ Namespace 'test-namespace' initialized and ready to use!

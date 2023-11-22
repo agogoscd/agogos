@@ -207,13 +207,13 @@ public class CoreInstaller extends Installer {
                                 .withResources(
                                         HasMetadata.getPlural(Namespace.class),
                                         HasMetadata.getPlural(ResourceQuota.class))
-                                .withVerbs("create", "delete", "get", "list", "patch", "watch").build(),
+                                .withVerbs("create", "delete", "get", "list", "patch", "update", "watch").build(),
                         new PolicyRuleBuilder()
                                 .withApiGroups(HasMetadata.getGroup(ClusterRole.class))
                                 .withResources(
                                         HasMetadata.getPlural(ClusterRole.class),
                                         HasMetadata.getPlural(ClusterRoleBinding.class))
-                                .withVerbs("create", "delete", "get", "list", "patch", "watch").build())
+                                .withVerbs("create", "delete", "get", "list", "patch", "update", "watch").build())
                 .build();
     }
 
