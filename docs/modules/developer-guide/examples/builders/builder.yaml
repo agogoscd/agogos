@@ -18,7 +18,8 @@ metadata:
   name: my-builder-task
 spec:
   workspaces:
-  - name: output
+  - name: pipeline
+  - name: stage
   params:
   - name: params
     type: string
@@ -43,7 +44,7 @@ spec:
       echo "Exiting with an error for teaching purposes"
       exit 1
     args:
-    - "$(workspaces.output.path)"
+    - "$(workspaces.pipeline.path)"
     - "$(results.data.path)"
     - "$(params.params)"
     volumeMounts:

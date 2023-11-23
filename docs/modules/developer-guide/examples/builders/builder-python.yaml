@@ -2,11 +2,6 @@ apiVersion: agogos.redhat.com/v1alpha1
 kind: Builder
 metadata:
   name: my-builder
-  labels:
-    agogos.redhat.com/phase: build
-    app.kubernetes.io/part-of: agogos
-    app.kubernetes.io/component: builder
-    app.kubernetes.io/instance: my-builder
 spec:
   taskRef:
     name: my-builder-task
@@ -21,14 +16,10 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: my-builder-task
-  labels:
-    agogos.redhat.com/phase: build
-    app.kubernetes.io/part-of: agogos
-    app.kubernetes.io/component: builder
-    app.kubernetes.io/instance: my-builder
 spec:
   workspaces:
-  - name: output
+  - name: pipeline
+  - name: stage
   params:
   - name: params
     type: string
@@ -67,7 +58,7 @@ spec:
 
       raise Exception("Learning purposes")
     args:
-    - "--output-path=$(workspaces.output.path)"
+    - "--output-path=$(workspaces.pipeline.path)"
     - "--results-path=$(results.data.path)"
     - "--params=$(params.params)"
     volumeMounts:
