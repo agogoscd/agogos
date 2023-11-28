@@ -1,9 +1,30 @@
+stages:
+  - test
+  - build
+  - deploy
+
+# In order to simplify reviews,
+# - Entries should be in stage order
+# - Labels for new entries should be in the following order:
+#   - stage
+#   - extends
+#   - image
+#   - tags
+#   - parallel
+#   - dependencies
+#   - before_script
+#   - script
+#   - after_script
+#   - artifacts
+#   - rules
+
 verify:
+  stage: test
   image: registry.access.redhat.com/ubi9/openjdk-17:latest
+  tags: [docker]
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
     MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
-  stage: test
   script:
     - mvn spotless:check
     - mvn verify -s ci_settings.xml -Dmaven.wagon.http.ssl.insecure=true
@@ -13,7 +34,6 @@ verify:
       junit:
         - ./**/target/surefire-reports/TEST-*.xml
         - ./**/target/failsafe-reports/TEST-*.xml
-  tags: [docker]
   rules:
     # Run on changes to everything except the documentation
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -29,21 +49,70 @@ verify:
           - test/**/*
           - webhooks/**/*
 
-cli:
+lint:commit:
+  stage: test
+  image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
+  tags: [docker]
+  script:
+    - npm i --loglevel silent
+    - echo "${CI_MERGE_REQUEST_TITLE}" | npx commitlint --config ${CI_PROJECT_DIR}/.commitlintrc.js
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+test-docs:
+  stage: test
+  image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
+  tags: [docker]
+  script:
+    - npm i
+    - >
+      GIT_CREDENTIALS=$GIT_CREDENTIALS NODE_TLS_REJECT_UNAUTHORIZED=0
+      npx antora --fetch --to-dir public antora-playbook-local.yml
+  artifacts:
+    paths:
+      - public
+  rules:
+    # Only run on changes to the documentation
+    # and on merge request changes
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - gulpfile.js
+          - antora*.yml
+          - docs/*.yml
+          - docs/**/*
+
+tag-docs:
+  stage: test
+  image: quay.io/fedora/fedora-minimal:39
+  tags: [docker]
+  script:
+    - curl -L https://gitlab.com/gitlab-org/cli/-/releases/v1.33.0/downloads/glab_1.33.0_Linux_x86_64.rpm --output glab.rpm
+    - microdnf install -y glab.rpm > /dev/null
+    - glab config set skip_tls_verify true --host gitlab.cee.redhat.com
+    - glab auth login --hostname gitlab.cee.redhat.com --token ${GLAB_TOKEN}
+    - glab mr update ${CI_MERGE_REQUEST_IID} --reviewer +cbeer
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - docs/**/*
+
+build-cli:
+  stage: build
   image:
     name: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java17
     entrypoint: ["/bin/sh", "-c"]
+  tags: [docker]
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
     MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
-  stage: build
   script:
     - ./mvnw clean package -pl cli -am -Pnative -s ci_settings.xml -Dmaven.wagon.http.ssl.insecure=true -Dnative-image.xmx=4g
     - mv ./cli/target/agogosctl-runner ./cli/target/agogosctl
   artifacts:
     paths:
       - cli/target/agogosctl
-  tags: [docker]
   rules:
     # Run on changes to everything except the documentation
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -60,10 +129,12 @@ cli:
           - test/**/*
           - webhooks/**/*
 
-webhooks:
+build-webhooks:
+  stage: build
   image:
     name: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java17
     entrypoint: ["/bin/sh", "-c"]
+  tags: [native-images]
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
     MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
@@ -71,12 +142,8 @@ webhooks:
     KUBERNETES_CPU_LIMIT: "2"
     KUBERNETES_MEMORY_REQUEST: "3Gi"
     KUBERNETES_MEMORY_LIMIT: "6Gi"
-
-  stage: build
   script:
     - ./mvnw install -pl webhooks -am -Pnative -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true -Dquarkus.native.native-image-xmx=4g
-  tags:
-    - native-images
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       changes:
@@ -84,32 +151,10 @@ webhooks:
           - core/**/*
           - webhooks/**/*
 
-docs:
-  image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
-  stage: test
-  script:
-    - npm i
-    - >
-      GIT_CREDENTIALS=$GIT_CREDENTIALS NODE_TLS_REJECT_UNAUTHORIZED=0
-      npx antora --fetch --to-dir public antora-playbook-local.yml
-  artifacts:
-    paths:
-      - public
-  tags: [docker]
-  rules:
-    # Only run on changes to the documentation
-    # and on merge request changes
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        paths:
-          - gulpfile.js
-          - antora*.yml
-          - docs/*.yml
-          - docs/**/*
-
-pages:
-  image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
+deploy-docs:
   stage: deploy
+  image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
+  tags: [docker]
   script:
     - npm i
     - >
@@ -118,7 +163,6 @@ pages:
   artifacts:
     paths:
       - public
-  tags: [docker]
   rules:
     # Only run on changes to the documentation
     # and when a merge request has been merged
@@ -129,29 +173,3 @@ pages:
           - antora*.yml
           - docs/*.yml
           - docs/**/*
-
-lint:commit:
-  image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
-  stage: test
-  script:
-    - npm i --loglevel silent
-    - echo "${CI_MERGE_REQUEST_TITLE}" | npx commitlint --config ${CI_PROJECT_DIR}/.commitlintrc.js
-  tags: [docker]
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-
-tag-docs:
-  image: quay.io/fedora/fedora-minimal:39
-  tags: [docker]
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        paths:
-          - docs/**/*
-
-  script:
-    - curl -L https://gitlab.com/gitlab-org/cli/-/releases/v1.33.0/downloads/glab_1.33.0_Linux_x86_64.rpm --output glab.rpm
-    - microdnf install -y glab.rpm > /dev/null
-    - glab config set skip_tls_verify true --host gitlab.cee.redhat.com
-    - glab auth login --hostname gitlab.cee.redhat.com --token ${GLAB_TOKEN}
-    - glab mr update ${CI_MERGE_REQUEST_IID} --reviewer +cbeer
