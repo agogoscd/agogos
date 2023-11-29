@@ -1,6 +1,6 @@
 = Development Mode
 
-This tutorial shows you how to run and use Agogos using Minikube.
+This tutorial shows you how to run and use Agogos with Minikube.
 
 == Objectives
 
@@ -71,7 +71,7 @@ should return `minikube`.
 == Open Firewall Ports From Minikube To The Host
 The Kubernetes cluster needs to contact Agogos' Webhooks for resource validation.
 In development mode this means that Minikube needs to access some host ports. Here,
-we provide information about how to achieve when using Firewalld.
+we provide information about how to open the ports when using Firewalld.
 
 Make sure the process `firewalld` is running, then run:
 
@@ -90,39 +90,48 @@ Sometimes Firewalld is disabled and is not started automatically. Run
 ====
 
 == Installing Agogos in Development Mode
-In the root of the
+
+This procedure installs Tekton, Knative Eventing, and the Agogos CustomResourceDefinitions,
+as well as the Agogos Webhooks. It also creates self-signed certificates
+to encrypt the Agogos webhooks endpoint. These certificates are automatically
+used by Agogos.
+
+. Clone the
 link:https://gitlab.cee.redhat.com/agogos/agogos[Agogos]
-repository, run:
-
+repository
+. In the root folder of the cloned repository compile the project using Maven:
++
 [source,bash]
 ----
-./mvnw clean package -D skipTests
+$ ./mvnw clean package -D skipTests
 ----
 
-This command compiles all the Agogos packages. Then install the Agogos Operator, run:
-
+. Create an alias [command]`agogosctl-dev` to execute the development Java jar file:
++
 [source,bash]
 ----
-java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar adm install --profile dev
+alias agogosctl-dev="java -jar ${PWD}/cli/target/quarkus-app/quarkus-run.jar"
+----
++
+Make sure your alias does not contain the `PWD` variable:
++
+[source,bash]
+----
+alias agogosctl-dev
 ----
 
-This command installs Tekton, Knative Eventing and the Agogos CustomResourceDefinitions,
-as well as the Agogos Webhooks. It also creates a self-signed certificate
-([filename]`webhooks.pem` and [filename]`webhooks.crt`) to encrypt the Agogos
-webhooks endpoint. These certificates are automatically used by Agogos.
-
-== Forwarding the Knative Eventing Broker Ingress
-Agogos sends events to the Knative Eventing service. In this tutorial, we run
-Agogos locally, so the Knative Eventing service needs to be available at localhost.
-Run:
-
+. Install Agogos on the Minikube cluster using the `dev` profile:
++
+[source,bash]
+----
+QUARKUS_PROFILE=dev agogosctl-dev adm install --profile dev
+----
+. Forward the Knative Eventing service to the port `8111` in `localhost`:
++
 [source,bash]
 ----
 kubectl -n knative-eventing port-forward service/broker-ingress 8111:http
 ----
-
-This command forwards the HTTP port of the service to the port `8111` on
-localhost. It is a blocking command, so run it in a separate shell.
 
 == Running Agogos
 Agogos has different components. You need to keep them running in
@@ -164,7 +173,7 @@ xref:ide.adoc[IDE guide].
 ====
 
 == Installing a Builder
-After installing Agogos, you need to install a Builder in order to build stuff.
+After installing Agogos, you need to install a Builder in order to build Components.
 We keep our Builders and other Extensions in the
 link:https://gitlab.cee.redhat.com/agogos/extensions-internal[Agogos Extensions Internal repository].
 To install the Builder "Dummy v1" run:
@@ -191,7 +200,7 @@ python install/install.py builders/dummy/v1/ --hv-token=${HV_TOKEN}
   [command]`export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`.
 * If you run into permission issues, ask the Agogos team to add you to the proper
   Rover team and refresh your token by logging into HashiCorp Vault again.
-* The process is the same for any other Builder or Extensions, change the folder
+* The process is the same for any other Builder or Extension: change the folder
   passed to the [command]`install/install.py` script.
 ====
 
@@ -213,8 +222,9 @@ to use the `dummy-v1` Builder:
 java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar adm init --namespace tests --extensions dummy-v1
 ----
 
-This command creates service accounts, rolebindings, configuration maps, and copies
-builder resources. Then change the namespace [command]`kubectl` uses by default:
+This command creates service accounts, rolebindings and configuration maps. The
+command also copies builder resources. Then change the namespace [command]`kubectl`
+uses by default:
 
 [source,bash]
 ----
