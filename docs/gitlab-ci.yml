@@ -1,0 +1,76 @@
+# In order to simplify reviews,
+# - Entries should be in stage order
+# - Labels for new entries should be in the following order:
+#   - stage
+#   - extends
+#   - image
+#   - tags
+#   - parallel
+#   - dependencies
+#   - before_script
+#   - script
+#   - after_script
+#   - artifacts
+#   - rules
+
+tag-docs:
+  stage: test
+  image: quay.io/fedora/fedora-minimal:39
+  tags: [docker]
+  script:
+    - curl -L https://gitlab.com/gitlab-org/cli/-/releases/v1.33.0/downloads/glab_1.33.0_Linux_x86_64.rpm --output glab.rpm
+    - microdnf install -y glab.rpm > /dev/null
+    - glab config set skip_tls_verify true --host gitlab.cee.redhat.com
+    - glab auth login --hostname gitlab.cee.redhat.com --token ${GLAB_TOKEN}
+    - glab mr update ${CI_MERGE_REQUEST_IID} --reviewer +nalhadef
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - docs/**/*
+
+test-docs:
+  stage: test
+  image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
+  tags: [docker]
+  script:
+    - npm i
+    - >
+      GIT_CREDENTIALS=$GIT_CREDENTIALS NODE_TLS_REJECT_UNAUTHORIZED=0
+      npx antora --fetch --to-dir public antora-playbook-local.yml
+  artifacts:
+    paths:
+      - public
+  rules:
+    # Only run on changes to the documentation
+    # and on merge request changes
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        paths:
+          - gulpfile.js
+          - antora*.yml
+          - docs/*.yml
+          - docs/**/*
+
+deploy-docs:
+  stage: deploy
+  image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
+  tags: [docker]
+  script:
+    - npm i
+    - >
+      GIT_CREDENTIALS=$GIT_CREDENTIALS NODE_TLS_REJECT_UNAUTHORIZED=0
+      npx antora --fetch --to-dir public antora-playbook.yml
+  artifacts:
+    paths:
+      - public
+  rules:
+    # Only run on changes to the documentation
+    # and when a merge request has been merged
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        paths:
+          - gulpfile.js
+          - antora*.yml
+          - docs/*.yml
+          - docs/**/*
