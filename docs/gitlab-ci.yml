@@ -27,7 +27,7 @@ tag-docs:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         paths:
-          - docs/**/*
+          - docs/modules/**/*
 
 test-docs:
   stage: test
@@ -49,7 +49,6 @@ test-docs:
         paths:
           - gulpfile.js
           - antora*.yml
-          - docs/*.yml
           - docs/**/*
 
 deploy-docs:
@@ -72,5 +71,4 @@ deploy-docs:
         paths:
           - gulpfile.js
           - antora*.yml
-          - docs/*.yml
           - docs/**/*
