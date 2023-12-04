@@ -4,20 +4,19 @@ This tutorial shows you how to run and use Agogos with Minikube.
 
 == Objectives
 
-* Install Agogos into a Minikube cluster
-* Define a simple component to build
-* Build the component
+* Install Agogos in development mode into a Minikube cluster
+* Define Agogos Components and build them
 
 == Before you begin
 This tutorial assumes you have already setup `minikube`, `kubectl`, `OpenJDK 17`
 and `Hashicorp Vault`. See the following for installation instructions:
 
 * link:https://minikube.sigs.k8s.io/docs/start/[minikube start]
-* link:https://minikube.sigs.k8s.io/docs/drivers/kvm2/[Linux: kvm2 driver for minikube]
-* link:https://minikube.sigs.k8s.io/docs/drivers/hyperkit/[macOS: hyperkit driver for minikube]
+** link:https://minikube.sigs.k8s.io/docs/drivers/kvm2/[Linux: kvm2 driver for minikube]
+** link:https://minikube.sigs.k8s.io/docs/drivers/hyperkit/[macOS: hyperkit driver for minikube]
 * link:https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/[kubectl]
-* link:https://openjdk.org/[OpenJDK]
-* link:https://developer.hashicorp.com/vault/downloads/[Hashicorp Vault]
+* link:https://openjdk.org/projects/jdk/17/[OpenJDK 17]
+* link:https://developer.hashicorp.com/vault/downloads/[Hashicorp Vault CLI]
 
 [TIP]
 ====
@@ -28,19 +27,56 @@ link:https://mail.google.com/chat/u/0/#chat/space/AAAA2w955F8[Agogos development
 to ensure that you have the necessary access to the vault.
 ====
 
-== Untrusted Certificates
-We need Minikube to trust the Red{nbsp}Hat root certificates as Agogos interacts
-with many different internal services. The internal certificates are self-signed,
-so they are considered
-link:https://minikube.sigs.k8s.io/docs/handbook/untrusted_certs/[untrusted certificates].
-Run:
+== Open Firewall Ports from Minikube to the Host
+The Kubernetes cluster needs to contact Agogos' Webhooks to validate resources.
+In development mode, the Minikube cluster needs to access some host ports.
 
+[NOTE]
+====
+If your system does not use `firewalld`, continue with this guide and if you
+encounter any issues contact the Agogos development team.
+====
+
+. Make sure the process `firewalld` is running:
++
 [source,bash]
 ----
-mkdir $HOME/.minikube/certs/
-wget -O $HOME/.minikube/certs/RH-IT-Root-CA.crt https://certs.corp.redhat.com/certs/Current-IT-Root-CAs.pem
+systemctl status firewalld
+----
++
+If it is not running, run the following command:
++
+[source,bash]
+----
+sudo systemctl start firewalld
 ----
 
+. Immediately open port `8443`:
++
+[source,bash]
+----
+sudo firewall-cmd --zone=libvirt --add-port=8443/tcp
+----
+
+. Configure `firewalld` to permanently open port `8443`:
++
+[source,bash]
+----
+sudo firewall-cmd --permanent --zone=libvirt --add-port=8443/tcp
+----
+
+== Starting the Minikube Cluster
+These commands download the Red{nbsp}Hat root certificates and start the Minikube
+cluster.
+
+. Download the Red{nbsp}Hat current root certificates to the proper folder:
++
+[source,bash]
+----
+mkdir -p $HOME/.minikube/certs/
+wget -O $HOME/.minikube/certs/RH-IT-Root-CA.crt https://certs.corp.redhat.com/certs/Current-IT-Root-CAs.pem
+----
++
 [TIP]
 ====
 Your system may need to trust the Red{nbsp}Hat self-signed certificates as well. See the
@@ -48,53 +84,27 @@ link:https://source.redhat.com/groups/public/identity-access-management/it_iam_p
 for installation instructions.
 ====
 
-== Create a Minikube Cluster
-
+. Create the Minikube cluster:
++
 [source,bash]
 ----
-minikube start --driver=kvm2 --kubernetes-version=1.26.1 --cpus=4 --memory=6g --disk-size=30GB --embed-certs
+minikube start \
+  --driver=kvm2 \
+  --kubernetes-version=1.26.1 \
+  --cpus=4 --memory=6g \
+  --disk-size=30GB --embed-certs
 ----
-
++
 [IMPORTANT]
 ====
-If your system is macOS, use `--driver=hyperkit`.
-====
-
-Minikube configures your [filename]`$HOME/.kube/config` to use the newly created
-cluster. `kubectl` supports different contexts, see
-link:https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/[organize cluster access]
-for detailed information.
-
-Use `kubectl config current-context` to see the context you are working in. It
-should return `minikube`.
-
-== Open Firewall Ports From Minikube To The Host
-The Kubernetes cluster needs to contact Agogos' Webhooks for resource validation.
-In development mode this means that Minikube needs to access some host ports. Here,
-we provide information about how to open the ports when using Firewalld.
-
-Make sure the process `firewalld` is running, then run:
-
-[source,bash]
-----
-sudo firewall-cmd --permanent --zone=libvirt --add-port=8443/tcp  # This opens the port after restart
-sudo firewall-cmd --zone=libvirt --add-port=8443/tcp  # This opens the port immediately
-----
-
-To open the port 8443 from the Minikube Virtual Machine to localhost.
-
-[WARNING]
-====
-Sometimes Firewalld is disabled and is not started automatically. Run
-[command]`sudo systemctl start firewalld` to start it.
+MacOS users change the driver to `hyperkit` (`--driver=hyperkit`).
 ====
 
 == Installing Agogos in Development Mode
-
-This procedure installs Tekton, Knative Eventing, and the Agogos CustomResourceDefinitions,
-as well as the Agogos Webhooks. It also creates self-signed certificates
-to encrypt the Agogos webhooks endpoint. These certificates are automatically
-used by Agogos.
+These commands install Tekton, Knative Eventing, and the Agogos
+CustomResourceDefinitions, as well as the Agogos Webhooks. They also create
+self-signed certificates to encrypt the Agogos webhooks endpoint. These
+certificates are automatically used by Agogos.
 
 . Clone the
 link:https://gitlab.cee.redhat.com/agogos/agogos[Agogos]
@@ -103,7 +113,7 @@ repository
 +
 [source,bash]
 ----
-$ ./mvnw clean package -D skipTests
+./mvnw clean package -D skipTests
 ----
 
 . Create an alias [command]`agogosctl-dev` to execute the development Java jar file:
@@ -120,6 +130,13 @@ Make sure your alias does not contain the `PWD` variable:
 alias agogosctl-dev
 ----
 
+. Make sure you are connected to the Minikube cluster updating your context:
++
+[source,bash]
+----
+minikube update-context
+----
+
 . Install Agogos on the Minikube cluster using the `dev` profile:
 +
 [source,bash]
@@ -134,37 +151,44 @@ kubectl -n knative-eventing port-forward service/broker-ingress 8111:http
 ----
 
 == Running Agogos
-Agogos has different components. You need to keep them running in
-separate shells (press 'q' to exit their processes):
+When you install Agogos in development mode you need to run the different
+components locally. This makes development faster, as you don't need to build
+images to test your changes. You need to keep the following commands running in
+separate shells (you can press 'q' to exit their processes):
 
+. Open a new shell and run the operator:
++
 [source,bash]
-.Running the Operator
 ----
 ./mvnw quarkus:dev -pl operator -am
 ----
 
+. Open a new shell and run the webhooks:
++
 [source,bash]
-.Running the Webhooks
 ----
 ./mvnw quarkus:dev -pl webhooks -am
 ----
 
+. Open a new shell and run the interceptors:
++
 [source,bash]
-.Running the Interceptors
 ----
 ./mvnw quarkus:dev -pl interceptors -am
 ----
 
-Quarkus runs a debug port by default. Since we are running three instances of
-Quarkus, an error is printed:
+Quarkus runs the debugger on port `5005` by default. As we are running three
+instances of Quarkus, two of them do not start in debug mode. The following error
+is printed in their logs, but the application continues running correctly:
 
 [source,text]
 ----
 [ERROR] Port 5005 in use, not starting in debug mode
 ----
 
-If you want the Quarkus debugger for both processes, you need to change the debug
-port. See the Quarkus documentation for detailed information.
+To start every instance in debug mode, change the debug port. See 
+link:https://quarkus.io/guides/maven-tooling#debugging[Maven Tooling - Debugging]
+for more information.
 
 [TIP]
 ====
