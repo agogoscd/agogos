@@ -51,7 +51,9 @@ test-docs:
           - antora*.yml
           - docs/**/*
 
-deploy-docs:
+# This job needs to be called 'pages'
+# https://docs.gitlab.com/ee/user/project/pages/#how-it-works
+pages:
   stage: deploy
   image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
   tags: [docker]
