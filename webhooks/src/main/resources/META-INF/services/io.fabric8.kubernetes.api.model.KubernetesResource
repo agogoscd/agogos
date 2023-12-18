@@ -1,0 +1,3 @@
+com.redhat.agogos.core.v1alpha1.Component
+com.redhat.agogos.core.v1alpha1.Stage
+com.redhat.agogos.core.v1alpha1.triggers.Trigger
