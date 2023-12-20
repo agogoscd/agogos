@@ -20,8 +20,20 @@ and `Hashicorp Vault`. See the following for installation instructions:
 
 [TIP]
 ====
+* Recommend to start with link:https://hdn.corp.redhat.com/fedora-csb-isos/[CBS Fedora 39]
 * The `minikube` guide for the kvm2 driver contains a useful
-link:https://minikube.sigs.k8s.io/docs/drivers/kvm2/#troubleshooting[troubleshooting guide.]
+link:https://minikube.sigs.k8s.io/docs/drivers/kvm2/#troubleshooting[troubleshooting guide].
++
+[source,bash]
+----
+sudo dnf install @virtualization docker
+sudo systemctl enable --now libvirtd
+sudo usermod -aG libvirt $USER
+sudo usermod -aG docker $USER
+newgrp libvirt
+newgrp docker
+----
++
 * `Hashicorp Vault`: Please contact the 
 link:https://mail.google.com/chat/u/0/#chat/space/AAAA2w955F8[Agogos development team]
 to ensure that you have the necessary access to the vault.
