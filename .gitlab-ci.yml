@@ -1,9 +1,11 @@
 stages:
+  - static-analysis
   - test
   - build
   - deploy
 
 include:
+  - local: '/.gitlab-ci.static-analysis.yml'
   - local: '/docs/gitlab-ci.yml'
 
 # In order to simplify reviews,
@@ -20,16 +22,6 @@ include:
 #   - after_script
 #   - artifacts
 #   - rules
-
-lint:commit:
-  stage: test
-  image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
-  tags: [docker]
-  script:
-    - npm i --loglevel silent
-    - echo "${CI_MERGE_REQUEST_TITLE}" | npx commitlint --config ${CI_PROJECT_DIR}/.commitlintrc.js
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 verify-code:
   stage: test
