@@ -656,8 +656,8 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                     kubernetesFacade.delete(r);
                     helper.printStatus("🗑️  OK: ", r);
 
-                    // If it's a pull secret, remove it from the SA in the namespace.
                     if (isDockerConfigJsonSecret(r)) {
+                        // If it's a pull secret, remove it from the SA in the namespace.
                         ServiceAccount sa = kubernetesFacade.get(ServiceAccount.class, namespace, RESOURCE_NAME);
                         if (sa != null) {
                             LocalObjectReference lor = new LocalObjectReference(namespace);
@@ -679,6 +679,13 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
         // Apply all the resources for each extension to the namespace.
         getAgogosExtensionResources(groupVersions, extensions).stream().forEach(r -> {
             r = cleanseMetadata(r);
+
+            if ("Deployment".equals(r.getKind()) && ((Integer) r.get("spec", "replicas")) == 0) {
+                // If we have a deployment, set the number of replicas to 1 if the current value is 0.
+                Map<String, Object> spec = r.get("spec");
+                spec.put("replicas", 1);
+            }
+
             r = kubernetesFacade.serverSideApply(r);
             helper.printStatus(r);
             // If it's a pull secret, add it to the SA in the namespace.
