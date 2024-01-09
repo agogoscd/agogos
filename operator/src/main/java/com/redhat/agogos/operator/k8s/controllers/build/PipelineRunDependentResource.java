@@ -32,6 +32,12 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
     @ConfigProperty(name = "agogos.security.pod-security-policy.runAsUser")
     Optional<Long> runAsUser;
 
+    @ConfigProperty(name = "agogos.security.pod-security-policy.runAsGroup")
+    Optional<Long> runAsGroup;
+
+    @ConfigProperty(name = "agogos.security.pod-security-policy.fsGroup")
+    Optional<Long> fsGroup;
+
     @ConfigProperty(name = "agogos.service-account")
     Optional<String> serviceAccount;
 
@@ -100,6 +106,8 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
         PodSecurityContext podSecurityContext = new PodSecurityContextBuilder()
                 .withRunAsNonRoot(runAsNonRoot.orElse(true))
                 .withRunAsUser(runAsUser.orElse(65532l))
+                .withRunAsGroup(runAsGroup.orElse(65532l))
+                .withFsGroup(fsGroup.orElse(65532l))
                 .build();
 
         Param componentParam = new ParamBuilder()

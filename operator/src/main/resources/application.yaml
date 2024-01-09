@@ -43,13 +43,11 @@ agogos:
       # https://kubernetes.io/docs/concepts/policy/pod-security-policy/#users-and-groups
       runAsNonRoot: true
       # To unify permissions of files created as part of Builds and Pipeline execution
-      # we set the used ID.
+      # we set the user and group ID.
       # https://kubernetes.io/docs/concepts/policy/pod-security-policy/#users-and-groups
       runAsUser: 65532
-
-kubernetes:
-  # Default storage class name in minikube
-  storage-class: "standard"
+      runAsGroup: 65532
+      fsGroup: 65532
 
 "%dev":
   broker/mp-rest/url: http://localhost:8111
@@ -61,6 +59,10 @@ kubernetes:
     cloud-events:
       publish: true
       base-url: "http://localhost:8111"
+
+  kubernetes:
+    # Default storage class name in minikube
+    storage-class: "standard"
 
   quarkus:
     log:
@@ -96,5 +98,12 @@ kubernetes:
     kubernetes-client:
       trust-certs: true
 
+  kubernetes:
+    storage-class: "gp2"
+
 "%test":
   broker/mp-rest/url: http://localhost:8111
+
+  kubernetes:
+    # Default storage class name in minikube
+    storage-class: "standard"
