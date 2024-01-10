@@ -8,21 +8,18 @@ This tutorial shows you how to run and use Agogos with Minikube.
 * Define Agogos Components and build them
 
 == Before you begin
-This tutorial assumes you have already setup `minikube`, `kubectl`, `OpenJDK 17`
-and `Hashicorp Vault`. See the following for installation instructions:
+Before beginning this tutorial, ensure `minikube`, `kubectl`, `OpenJDK 17` are set up.
+See the following for installation instructions:
 
 * link:https://minikube.sigs.k8s.io/docs/start/[minikube start]
 ** link:https://minikube.sigs.k8s.io/docs/drivers/kvm2/[Linux: kvm2 driver for minikube]
 ** link:https://minikube.sigs.k8s.io/docs/drivers/hyperkit/[macOS: hyperkit driver for minikube]
 * link:https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/[kubectl]
 * link:https://openjdk.org/projects/jdk/17/[OpenJDK 17]
-* link:https://developer.hashicorp.com/vault/downloads/[Hashicorp Vault CLI]
 
 [TIP]
 ====
 * Recommend to start with link:https://hdn.corp.redhat.com/fedora-csb-isos/[CBS Fedora 39]
-* The `minikube` guide for the kvm2 driver contains a useful
-link:https://minikube.sigs.k8s.io/docs/drivers/kvm2/#troubleshooting[troubleshooting guide].
 +
 [source,bash]
 ----
@@ -33,10 +30,8 @@ sudo usermod -aG docker $USER
 newgrp libvirt
 newgrp docker
 ----
-+
-* `Hashicorp Vault`: Please contact the 
-link:https://mail.google.com/chat/u/0/#chat/space/AAAA2w955F8[Agogos development team]
-to ensure that you have the necessary access to the vault.
+* The `minikube` guide for the kvm2 driver contains a useful
+link:https://minikube.sigs.k8s.io/docs/drivers/kvm2/#troubleshooting[troubleshooting guide].
 ====
 
 == Open Firewall Ports from Minikube to the Host
@@ -208,93 +203,71 @@ You can start Agogos directly from Visual Studio Code, see the
 xref:ide.adoc[IDE guide].
 ====
 
+== Keeping Agogos Updated
+Delete the Minikube cluster and start this guide again to update Agogos.
+
 == Installing a Builder
-After installing Agogos, you need to install a Builder in order to build Components.
-We keep our Builders and other Extensions in the
-link:https://gitlab.cee.redhat.com/agogos/extensions-internal[Agogos Extensions Internal repository].
-To install the Builder "Dummy v1" run:
+After installing Agogos, you need to install a Builder in order to build
+Components.
 
+. Install the Sample Builder in the `agogos` namespace:
++
 [source,bash]
 ----
-# Setup vault environment variables
-export VAULT_ADDR=https://vault.corp.redhat.com:8200
-export VAULT_NAMESPACE=exd
-export HV_TOKEN=$(vault login -method=oidc -field=token 2>/dev/null)
-
-# Clone and run a python script to install a builder
-git clone https://gitlab.cee.redhat.com/agogos/extensions-internal.git
-cd extensions-internal
-pipenv install --dev
-pipenv shell
-python install/install.py builders/dummy/v1/ --hv-token=${HV_TOKEN}
+kubectl -n agogos apply -f docs/modules/developer-guide/examples/development-mode/sample-builder.yaml
 ----
 
-[NOTES]
-====
-* If the process fails trying to create a fork process, set the
-  following variable before running: 
-  [command]`export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`.
-* If you run into permission issues, ask the Agogos team to add you to the proper
-  Rover team and refresh your token by logging into HashiCorp Vault again.
-* The process is the same for any other Builder or Extension: change the folder
-  passed to the [command]`install/install.py` script.
-====
-
-This command registers the Agogos Dummy Builder in the cluster. Retrieve the
-builder using:
-
+. Initialize the work namespace (for example `tests`) passing `sample-builder`
+as an extension to be installed:
++
 [source,bash]
 ----
-kubectl get builders
-# or
-java -jar cli/target/quarkus-app/quarkus-run.jar -v builders list
+QUARKUS_PROFILE=dev agogosctl-dev adm init --namespace tests --extensions sample-builder
 ----
 
-To use the Builder, you need to initialize a namespace and configure it
-to use the `dummy-v1` Builder:
-
-[source,bash]
-----
-java -Dquarkus.profile=dev -jar cli/target/quarkus-app/quarkus-run.jar adm init --namespace tests --extensions dummy-v1
-----
-
-This command creates service accounts, rolebindings and configuration maps. The
-command also copies builder resources. Then change the namespace [command]`kubectl`
-uses by default:
-
+== Building Components
+. Change your current `kubectl` namespace to your work namespace (for example `tests`),
+so the [command]`agogosctl` command works properly:
++
 [source,bash]
 ----
 kubectl config set-context --current --namespace tests
 ----
 
-[WARNING]
-====
-The Agogos CLI uses the namespace configured in your current [command]`kubectl` context.
-====
-
-== Building Components
-Next, write the following Components to a YAML file and apply them using 
-[command]`kubectl apply -f your-file.yml`:
-
-[source,yaml]
-----
-include::example$development-mode/components.yaml[]
-----
-
-And then run a build using the Agogos CLI:
-
+. Create the sample components:
++
 [source,bash]
 ----
-$ java -jar cli/target/quarkus-app/quarkus-run.jar -v components list
-NAME          STATUS    CREATED
-dummy-1       Ready     YYYY-MM-DD HH:MM:SS
-dummy-2       Ready     YYYY-MM-DD HH:MM:SS
-dummy-3       Ready     YYYY-MM-DD HH:MM:SS
+kubectl apply -f docs/modules/developer-guide/examples/development-mode/components.yaml
+----
 
-$ java -jar cli/target/quarkus-app/quarkus-run.jar -v components build dummy-1
+. List them using the `agogosctl`:
++
+[source,bash]
+----
+agogosctl-dev components list
+----
++
+[source,bash]
+----
+NAME          STATUS    CREATED
+sample-1      Ready     YYYY-MM-DD HH:MM:SS
+sample-2      Ready     YYYY-MM-DD HH:MM:SS
+sample-3      Ready     YYYY-MM-DD HH:MM:SS
+----
+
+. Build the `sample-1` component:
++
+[source,bash]
+----
+agogosctl-dev components build sample-1
+----
++
+[source,bash]
+----
 💖 About
 
-Name:       dummy-1-cn2rj
+Name:       sample-1-cn2rj
 
 🎉 Status
 
@@ -306,40 +279,46 @@ Finished:   N/A
 Duration:   0 minute(s)
 ----
 
-After a while, `dummy-1` and its dependents should be finished:
-
+. List the builds. After a while, all three components should have finished building:
++
 [source,bash]
 ----
-$ java -jar cli/target/quarkus-app/quarkus-run.jar -v builds list
+agogosctl-dev builds list
+----
++
+[source,bash]
+----
 NAME                STATUS       CREATED
-dummy-1-cn2rj       Finished     YYYY-MM-DD HH:MM:SS
-dummy-2-z22dj       Finished     YYYY-MM-DD HH:MM:SS
-dummy-3-mwv9q       Finished     YYYY-MM-DD HH:MM:SS
+sample-1-cn2rj      Finished     YYYY-MM-DD HH:MM:SS
+sample-2-z22dj      Finished     YYYY-MM-DD HH:MM:SS
+sample-3-mwv9q      Finished     YYYY-MM-DD HH:MM:SS
 ----
 
+== Executing Groups
 
-== Building Groups
-Agogos supports Groups to build Components and triggers the builds of their
-dependencies. Create a YAML file with the following content and apply it to your
-namespace using [command]`kubectl apply -f your-group-file.yml`:
-
-[source,yaml]
-----
-include::example$development-mode/components-and-group.yaml[]
-----
-
-Then build the Group `group-1` using the Agogos CLI:
-
+. Apply the Components and Group:
++
 [source,bash]
 ----
-$ java -jar cli/target/quarkus-app/quarkus-run.jar -v group execute group-1
+kubectl apply -f docs/modules/developer-guide/examples/development-mode/group.yaml
+----
+
+. Execute the Group:
++
+[source,bash]
+----
+agogosctl-dev group execute group-1
+----
++
+[source,bash]
+----
 💖 About
 
 Name:       group-1-s95mg
 
-Components: Name                            Status    Started              Completed            Duration
-            dummy-1-a                       New       N/A                  N/A
-            dummy-1-b                       New       N/A                  N/A
+Components: Name      Status  Started  Completed  Duration
+            sample-4  New     N/A      N/A
+            sample-5  New     N/A      N/A
 
 🎉 Status
 
@@ -351,14 +330,22 @@ Finished:   N/A
 Duration:   0 minute(s)
 ----
 
-After a while, the Group Components and their dependents should be finished:
-
+. After a while, the Group Components and their dependents should have finished running:
++
 [source,bash]
 ----
-$ java -jar cli/target/quarkus-app/quarkus-run.jar -v builds list
-NAME                STATUS       CREATED
-dummy-1-a-chb7x     Finished     YYYY-MM-DD HH:MM:SS
-dummy-1-b-lfwvr     Finished     YYYY-MM-DD HH:MM:SS
-dummy-2-g7zwz       Finished     YYYY-MM-DD HH:MM:SS
-dummy-3-t89hc       Finished     YYYY-MM-DD HH:MM:SS
+agogosctl-dev builds list
 ----
++
+[source,bash]
+----
+NAME               STATUS       CREATED
+sample-4-wj5zn     Finished     YYYY-MM-DD HH:MM:SS
+sample-5-qfnxt     Finished     YYYY-MM-DD HH:MM:SS
+sample-6-cjn6q     Finished     YYYY-MM-DD HH:MM:SS
+----
+
+== Additional Resources
+
+* xref:builders.adoc[]
+* xref:pipelines.adoc[]

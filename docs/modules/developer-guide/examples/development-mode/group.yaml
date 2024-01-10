@@ -2,11 +2,8 @@
 apiVersion: agogos.redhat.com/v1alpha1
 kind: Component
 metadata:
-  name: sample-1
+  name: sample-4
 spec:
-  dependents:
-    components:
-    - sample-2
   build:
     builderRef:
       name: sample-builder
@@ -14,11 +11,8 @@ spec:
 apiVersion: agogos.redhat.com/v1alpha1
 kind: Component
 metadata:
-  name: sample-2
+  name: sample-5
 spec:
-  dependents:
-    components:
-    - sample-3
   build:
     builderRef:
       name: sample-builder
@@ -26,8 +20,21 @@ spec:
 apiVersion: agogos.redhat.com/v1alpha1
 kind: Component
 metadata:
-  name: sample-3
+  name: sample-6
 spec:
   build:
     builderRef:
       name: sample-builder
+
+---
+apiVersion: agogos.redhat.com/v1alpha1
+kind: Group
+metadata:
+  name: group-1
+spec:
+  components:
+  - sample-4
+  - sample-5
+  dependents:
+    components:
+    - sample-6
