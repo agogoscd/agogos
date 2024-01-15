@@ -1,4 +1,4 @@
-
+# .gitlab-ci.static-analysis.yml
 lint:commit:
   stage: static-analysis
   image: registry.access.redhat.com/ubi9/nodejs-18-minimal:latest
@@ -8,3 +8,21 @@ lint:commit:
     - echo "${CI_MERGE_REQUEST_TITLE}" | npx commitlint --config ${CI_PROJECT_DIR}/.commitlintrc.js
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+variables:
+  PROJECT_NAME: "agogos:${CI_PROJECT_NAME}"
+  COMPLIANCE: "1"
+  CODE_SCANNING_SOURCES: "."
+  CODE_SCANNING_EXCLUSIONS: ""
+  SONARQUBE_DISABLED: "1"               # set to "0" to enable this scanner"
+  OWASP_DEPENDENCY_CHECK_DISABLED: "1"  # set to "0" to enable this scanner"
+  SEMGREP_DISABLED: "1"                 # set to "0" to enable this scanner"
+
+code_scanning:
+  stage: static-analysis
+  tags: [docker]
+
+include:
+  - project: 'security-guild/code-scanning-container'
+    file: code_scanning-gitlab-ci.yml
+    ref: v1.1.0
