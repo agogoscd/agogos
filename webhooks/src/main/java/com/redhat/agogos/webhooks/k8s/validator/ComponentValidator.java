@@ -133,15 +133,42 @@ public class ComponentValidator extends Validator<Component> {
 
         BuilderRef builderRef = component.getSpec().getBuild().getBuilderRef();
         String name = builderRef.getName();
-        String namespace = (builderRef.getNamespace() != null ? builderRef.getNamespace() : agogosEnv.getRunningNamespace());
-        if (!namespace.equals(agogosEnv.getRunningNamespace()) && !namespace.equals(component.getMetadata().getNamespace())) {
-            throw new ApplicationException("Invalid namespace '{}' specified for builder '{}'", namespace, name);
+
+        // We want to search the Component's namespace first, then fallback to where the Agogos operator is installed
+        String componentNamespace = component.getMetadata().getNamespace();
+        String agogosNamespace = agogosEnv.getRunningNamespace();
+        String builderNamespace = builderRef.getNamespace() != null ? builderRef.getNamespace() : "";
+
+        // We want Components relying on their own Builders (same namespace) or Agogos' ('agogos' namespace)
+        if (!builderNamespace.equals("") && !builderNamespace.equals(agogosNamespace)
+                && !builderNamespace.equals(componentNamespace)) {
+            throw new ApplicationException("Invalid namespace '{}' specified for builder '{}'.", builderNamespace, name);
         }
 
-        Builder builder = kubernetesFacade.get(Builder.class, namespace, name);
-        if (builder == null) {
-            throw new MissingResourceException("Selected builder '{}' is not registered in the namespace '{}'",
-                    name, namespace);
+        // If user defines a namespace, we ensure the Builder is there
+        // otherwise we try the Component's namespace and then Agogos' namespace
+        Builder builder;
+        if (builderNamespace != "") {
+            builder = kubernetesFacade.get(Builder.class, builderNamespace, name);
+            if (builder == null) {
+                throw new MissingResourceException(
+                        "Selected builder '{}' is not registered in the selected namespace '{}'",
+                        name,
+                        builderNamespace);
+            }
+        } else {
+            builder = kubernetesFacade.get(Builder.class, componentNamespace, name);
+            if (builder == null) {
+                LOG.debug("Builder '{}' not found in the component's namespace '{}'.", name, componentNamespace);
+                builder = kubernetesFacade.get(Builder.class, agogosNamespace, name);
+                if (builder == null) {
+                    throw new MissingResourceException(
+                            "Selected builder '{}' is not registered in the namespaces '{}' or '{}'",
+                            name,
+                            componentNamespace,
+                            agogosNamespace);
+                }
+            }
         }
 
         ValidationData<Void> validation = new ValidationData<>();
