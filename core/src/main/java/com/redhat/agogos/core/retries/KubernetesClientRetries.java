@@ -32,7 +32,7 @@ public class KubernetesClientRetries {
 
     private enum Command {
         CREATE("create"),
-        REPLACE("replace"),
+        FORCE_SERVER_SIDE_APPLY("forceServerSideApply"),
         SERVER_SIDE_APPLY("serverSideApply"),
         UPDATE("update");
 
@@ -66,11 +66,23 @@ public class KubernetesClientRetries {
     }
 
     public <T extends HasMetadata> T serverSideApply(T resource) {
-        return createOrUpdate(resource, Command.SERVER_SIDE_APPLY, DEFAULT_MAX_RETRIES, DEFAULT_MAX_INTERVAL);
+        return serverSideApply(resource, DEFAULT_MAX_RETRIES, DEFAULT_MAX_INTERVAL);
     }
 
     public <T extends HasMetadata> T serverSideApply(T resource, Integer retries, Integer interval) {
-        return createOrUpdate(resource, Command.SERVER_SIDE_APPLY, retries, interval);
+        return serverSideApply(resource, Command.SERVER_SIDE_APPLY, retries, interval);
+    }
+
+    public <T extends HasMetadata> T forceServerSideApply(T resource) {
+        return forceServerSideApply(resource, DEFAULT_MAX_RETRIES, DEFAULT_MAX_INTERVAL);
+    }
+
+    public <T extends HasMetadata> T forceServerSideApply(T resource, Integer retries, Integer interval) {
+        return serverSideApply(resource, Command.FORCE_SERVER_SIDE_APPLY, retries, interval);
+    }
+
+    private <T extends HasMetadata> T serverSideApply(T resource, Command command, Integer retries, Integer interval) {
+        return createOrUpdate(resource, command, retries, interval);
     }
 
     public <T extends HasMetadata> T update(T resource) {
@@ -97,6 +109,8 @@ public class KubernetesClientRetries {
             switch (command) {
                 case CREATE:
                     return kubernetesClient.resource(r).create();
+                case FORCE_SERVER_SIDE_APPLY:
+                    return kubernetesClient.resource(r).forceConflicts().serverSideApply();
                 case SERVER_SIDE_APPLY:
                     return kubernetesClient.resource(r).serverSideApply();
                 case UPDATE:

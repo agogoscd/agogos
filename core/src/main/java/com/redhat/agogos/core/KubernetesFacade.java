@@ -69,6 +69,14 @@ public class KubernetesFacade {
         return retriesClient.serverSideApply(resource, retries, interval);
     }
 
+    public <T extends HasMetadata> T forceServerSideApply(T resource) {
+        return retriesClient.forceServerSideApply(resource);
+    }
+
+    public <T extends HasMetadata> T forceServerSideApply(T resource, Integer retries, Integer interval) {
+        return retriesClient.forceServerSideApply(resource, retries, interval);
+    }
+
     public <T extends HasMetadata> T update(T resource) {
         return retriesClient.update(resource);
     }

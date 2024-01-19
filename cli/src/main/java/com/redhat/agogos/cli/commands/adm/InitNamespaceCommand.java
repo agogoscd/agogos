@@ -379,7 +379,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
         if (!roleBinding.getSubjects().contains(subject)) {
             roleBinding.getSubjects().add(subject);
             roleBinding.getMetadata().setManagedFields(null);
-            roleBinding = kubernetesFacade.serverSideApply(roleBinding);
+            roleBinding = kubernetesFacade.forceServerSideApply(roleBinding);
         }
         helper.printStatus(roleBinding);
 

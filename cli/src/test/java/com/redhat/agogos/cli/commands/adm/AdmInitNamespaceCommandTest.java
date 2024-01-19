@@ -39,6 +39,8 @@ public class AdmInitNamespaceCommandTest extends AdmCommandBaseTest {
                 .thenReturn(new APIResourceList());
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
+        Mockito.when(kubernetesFacadeMock.forceServerSideApply(Mockito.any()))
+                .then(AdditionalAnswers.returnsFirstArg());
         Mockito.when(kubernetesFacadeMock.update(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
         Mockito.when(kubernetesFacadeMock.waitForEventListenerRunning(Mockito.any()))
@@ -57,6 +59,8 @@ public class AdmInitNamespaceCommandTest extends AdmCommandBaseTest {
         Mockito.when(kubernetesFacadeMock.getApiResources(Mockito.anyString()))
                 .thenReturn(new APIResourceList());
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
+                .then(AdditionalAnswers.returnsFirstArg());
+        Mockito.when(kubernetesFacadeMock.forceServerSideApply(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
         Mockito.when(kubernetesFacadeMock.update(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
@@ -78,6 +82,8 @@ public class AdmInitNamespaceCommandTest extends AdmCommandBaseTest {
         Mockito.when(kubernetesFacadeMock.getApiResources(Mockito.anyString()))
                 .thenReturn(new APIResourceList());
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
+                .then(AdditionalAnswers.returnsFirstArg());
+        Mockito.when(kubernetesFacadeMock.forceServerSideApply(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
         Mockito.when(kubernetesFacadeMock.update(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
@@ -112,6 +118,8 @@ public class AdmInitNamespaceCommandTest extends AdmCommandBaseTest {
                 .build();
 
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
+                .then(AdditionalAnswers.returnsFirstArg());
+        Mockito.when(kubernetesFacadeMock.forceServerSideApply(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
         Mockito.when(kubernetesFacadeMock.waitForEventListenerRunning(Mockito.any()))
                 .thenReturn(el);

@@ -111,6 +111,26 @@ public class KubernetesFacadeTest {
     }
 
     @Test
+    public void forceServerSideApply() throws Exception {
+        GenericKubernetesResource resource = new GenericKubernetesResourceBuilder().build();
+        kubernetesFacade.forceServerSideApply(resource);
+
+        Mockito.verify(
+                kubernetesClientRetries,
+                Mockito.times(1)).forceServerSideApply(resource);
+    }
+
+    @Test
+    public void forceServerSideApplyWithRetries() throws Exception {
+        GenericKubernetesResource resource = new GenericKubernetesResourceBuilder().build();
+        kubernetesFacade.forceServerSideApply(resource, 5, 5);
+
+        Mockito.verify(
+                kubernetesClientRetries,
+                Mockito.times(1)).forceServerSideApply(resource, 5, 5);
+    }
+
+    @Test
     public void update() throws Exception {
         GenericKubernetesResource resource = new GenericKubernetesResourceBuilder().build();
         kubernetesFacade.update(resource);
