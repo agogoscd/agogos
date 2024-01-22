@@ -89,10 +89,10 @@ spec:
                 status:
                   default: New
                   enum:
-                  - New
-                  - Initializing
-                  - Ready
-                  - Failed
+                    - New
+                    - Initializing
+                    - Ready
+                    - Failed
                   type: string
               type: object
           type: object

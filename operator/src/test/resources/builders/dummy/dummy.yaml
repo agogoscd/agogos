@@ -1,3 +1,4 @@
+---
 apiVersion: agogos.redhat.com/v1alpha1
 kind: Builder
 metadata:

@@ -4,7 +4,7 @@ kind: Execution
 metadata:
   creationTimestamp: "2023-09-27T13:26:10Z"
   finalizers:
-  - executions.agogos.redhat.com/finalizer
+    - executions.agogos.redhat.com/finalizer
   generateName: dummy-component-group-1-
   generation: 5
   labels:
@@ -43,7 +43,7 @@ kind: Execution
 metadata:
   creationTimestamp: "2023-09-27T13:26:30Z"
   finalizers:
-  - executions.agogos.redhat.com/finalizer
+    - executions.agogos.redhat.com/finalizer
   generateName: dummy-component-group-2-
   generation: 6
   labels:
@@ -82,7 +82,7 @@ kind: Execution
 metadata:
   creationTimestamp: "2023-09-29T13:04:45Z"
   finalizers:
-  - executions.agogos.redhat.com/finalizer
+    - executions.agogos.redhat.com/finalizer
   generateName: dummy-component-group-1-
   generation: 3
   labels:
@@ -118,7 +118,7 @@ kind: Execution
 metadata:
   creationTimestamp: "2023-09-29T15:45:26Z"
   finalizers:
-  - executions.agogos.redhat.com/finalizer
+    - executions.agogos.redhat.com/finalizer
   generateName: dummy-component-group-1-
   generation: 5
   labels:

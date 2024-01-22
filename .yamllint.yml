@@ -1,0 +1,10 @@
+---
+extends: default
+
+rules:
+  line-length: disable
+
+ignore:
+  - node_modules/
+  - core/src/test/resources/trigger.yml          # expected format for SerializationTest
+  - cli/src/test/resources/loader/invalid.yaml   # used for testing, contains invalid YAML

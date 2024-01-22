@@ -4,7 +4,7 @@ kind: Build
 metadata:
   creationTimestamp: "2023-09-29T17:20:56Z"
   finalizers:
-  - builds.agogos.redhat.com/finalizer
+    - builds.agogos.redhat.com/finalizer
   generateName: dummy-component-dep-1-
   generation: 1
   labels:
@@ -14,12 +14,12 @@ metadata:
   name: dummy-component-dep-1-pt9ss
   namespace: gallen
   ownerReferences:
-  - apiVersion: agogos.redhat.com/v1alpha1
-    blockOwnerDeletion: true
-    controller: true
-    kind: Component
-    name: dummy-component-dep-1
-    uid: ce9bfb6d-af98-4161-87a3-d2a03f9a5869
+    - apiVersion: agogos.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Component
+      name: dummy-component-dep-1
+      uid: ce9bfb6d-af98-4161-87a3-d2a03f9a5869
   resourceVersion: "106378"
   uid: 4e5b59df-f099-4c2f-b3b6-3ff6a517a14a
 spec:
@@ -33,9 +33,9 @@ status:
       params: {}
     dependents:
       components:
-      - dummy-component-dep-2
+        - dummy-component-dep-2
       groups:
-      - dummy-component-group-1
+        - dummy-component-group-1
       pipelines: []
     post: []
     pre: []

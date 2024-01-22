@@ -41,20 +41,20 @@ metadata:
   name: write-task
 spec:
   workspaces:
-  - name: pipeline
-  - name: stage
+    - name: pipeline
+    - name: stage
   params:
-  - name: config
-    type: string
+    - name: config
+      type: string
   steps:
-  - name: execute
-    image: registry.access.redhat.com/ubi9-minimal:9.2
-    imagePullPolicy: Always
-    script: |
-      #!/bin/sh -e
-      echo "$1" >> $(workspaces.stage.path)/a-simple-file
-    args:
-    - "$(params.config)"
+    - name: execute
+      image: registry.access.redhat.com/ubi9-minimal:9.2
+      imagePullPolicy: Always
+      script: |
+        #!/bin/sh -e
+        echo "$1" >> $(workspaces.stage.path)/a-simple-file
+      args:
+        - "$(params.config)"
 ---
 apiVersion: tekton.dev/v1beta1
 kind: Task
@@ -62,17 +62,17 @@ metadata:
   name: read-task
 spec:
   workspaces:
-  - name: pipeline
-  - name: stage
+    - name: pipeline
+    - name: stage
   params:
-  - name: config
-    type: string
+    - name: config
+      type: string
   steps:
-  - name: execute
-    image: registry.access.redhat.com/ubi9-minimal:9.2
-    imagePullPolicy: Always
-    script: |
-      #!/bin/sh -e
-      ls -lR $(workspaces.pipeline.path)
-      echo "Exiting with an error for teaching purposes"
-      exit 1
+    - name: execute
+      image: registry.access.redhat.com/ubi9-minimal:9.2
+      imagePullPolicy: Always
+      script: |
+        #!/bin/sh -e
+        ls -lR $(workspaces.pipeline.path)
+        echo "Exiting with an error for teaching purposes"
+        exit 1

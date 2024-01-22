@@ -20,9 +20,9 @@ spec:
         enum-value:
           description: A dummy enumerated string value
           enum:
-          - EXAMPLE_A
-          - EXAMPLE_B
-          - EXAMPLE_C
+            - EXAMPLE_A
+            - EXAMPLE_B
+            - EXAMPLE_C
           type: string
         int-value:
           description: The integer that will be increased each time the stage is
@@ -32,15 +32,15 @@ spec:
           description: A dummy string value
           type: string
       required:
-      - int-value
+        - int-value
   taskRef:
     params:
-    - name: namespace
-      value: agogos
-    - name: name
-      value: agogos-stage-dummy-v1
-    - name: kind
-      value: task
+      - name: namespace
+        value: agogos
+      - name: name
+        value: agogos-stage-dummy-v1
+      - name: kind
+        value: task
     resolver: cluster
 ---
 apiVersion: agogos.redhat.com/v1alpha1
@@ -64,9 +64,9 @@ spec:
         enum-value:
           description: A dummy enumerated string value
           enum:
-          - EXAMPLE_A
-          - EXAMPLE_B
-          - EXAMPLE_C
+            - EXAMPLE_A
+            - EXAMPLE_B
+            - EXAMPLE_C
           type: string
         int-value:
           description: The integer that will be increased each time the stage is
@@ -76,15 +76,15 @@ spec:
           description: A dummy string value
           type: string
       required:
-      - int-value
+        - int-value
   taskRef:
     params:
-    - name: namespace
-      value: agogos
-    - name: name
-      value: agogos-stage-dummy-v1
-    - name: kind
-      value: task
+      - name: namespace
+        value: agogos
+      - name: name
+        value: agogos-stage-dummy-v1
+      - name: kind
+        value: task
     resolver: cluster
 ---
 apiVersion: agogos.redhat.com/v1alpha1
@@ -108,9 +108,9 @@ spec:
         enum-value:
           description: A dummy enumerated string value
           enum:
-          - EXAMPLE_A
-          - EXAMPLE_B
-          - EXAMPLE_C
+            - EXAMPLE_A
+            - EXAMPLE_B
+            - EXAMPLE_C
           type: string
         int-value:
           description: The integer that will be increased each time the stage is
@@ -120,15 +120,15 @@ spec:
           description: A dummy string value
           type: string
       required:
-      - int-value
+        - int-value
   taskRef:
     params:
-    - name: namespace
-      value: agogos
-    - name: name
-      value: agogos-stage-dummy-v1
-    - name: kind
-      value: task
+      - name: namespace
+        value: agogos
+      - name: name
+        value: agogos-stage-dummy-v1
+      - name: kind
+        value: task
     resolver: cluster
 ---
 apiVersion: agogos.redhat.com/v1alpha1
@@ -152,9 +152,9 @@ spec:
         enum-value:
           description: A errata enumerated string value
           enum:
-          - EXAMPLE_A
-          - EXAMPLE_B
-          - EXAMPLE_C
+            - EXAMPLE_A
+            - EXAMPLE_B
+            - EXAMPLE_C
           type: string
         int-value:
           description: The integer that will be increased each time the stage is
@@ -164,13 +164,13 @@ spec:
           description: A errata string value
           type: string
       required:
-      - int-value
+        - int-value
   taskRef:
     params:
-    - name: namespace
-      value: agogos
-    - name: name
-      value: errata-stage-v1
-    - name: kind
-      value: task
+      - name: namespace
+        value: agogos
+      - name: name
+        value: errata-stage-v1
+      - name: kind
+        value: task
     resolver: cluster

@@ -7,7 +7,7 @@ metadata:
       {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Component","metadata":{"annotations":{},"name":"dummy-component-dep-1","namespace":"gallen"},"spec":{"build":{"builderRef":{"name":"dummy-v1"}},"dependents":{"components":["dummy-component-dep-2"],"groups":["dummy-component-group-1"]}}}
   creationTimestamp: "2023-09-29T12:14:36Z"
   finalizers:
-  - components.agogos.redhat.com/finalizer
+    - components.agogos.redhat.com/finalizer
   generation: 2
   name: dummy-component-dep-1
   namespace: gallen
@@ -20,9 +20,9 @@ spec:
     params: {}
   dependents:
     components:
-    - dummy-component-dep-2
+      - dummy-component-dep-2
     groups:
-    - dummy-component-group-1
+      - dummy-component-group-1
     pipelines: []
   post: []
   pre: []
@@ -39,7 +39,7 @@ metadata:
       {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Component","metadata":{"annotations":{},"name":"dummy-component-dep-2","namespace":"gallen"},"spec":{"build":{"builderRef":{"name":"dummy-v1"}}}}
   creationTimestamp: "2023-09-29T12:14:36Z"
   finalizers:
-  - components.agogos.redhat.com/finalizer
+    - components.agogos.redhat.com/finalizer
   generation: 2
   name: dummy-component-dep-2
   namespace: gallen
@@ -69,7 +69,7 @@ metadata:
       {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Component","metadata":{"annotations":{},"name":"dummy-component-group-dep-1","namespace":"gallen"},"spec":{"build":{"builderRef":{"name":"dummy-v1"}}}}
   creationTimestamp: "2023-09-29T12:14:37Z"
   finalizers:
-  - components.agogos.redhat.com/finalizer
+    - components.agogos.redhat.com/finalizer
   generation: 2
   name: dummy-component-group-dep-1
   namespace: gallen
@@ -99,7 +99,7 @@ metadata:
       {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Component","metadata":{"annotations":{},"name":"dummy-component-group-dep-2","namespace":"gallen"},"spec":{"build":{"builderRef":{"name":"dummy-v1"}}}}
   creationTimestamp: "2023-09-29T12:14:37Z"
   finalizers:
-  - components.agogos.redhat.com/finalizer
+    - components.agogos.redhat.com/finalizer
   generation: 2
   name: dummy-component-group-dep-2
   namespace: gallen
@@ -129,7 +129,7 @@ metadata:
       {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Component","metadata":{"annotations":{},"name":"dummy-component-group-dep-3","namespace":"gallen"},"spec":{"build":{"builderRef":{"name":"dummy-v1"}}}}
   creationTimestamp: "2023-09-29T12:14:37Z"
   finalizers:
-  - components.agogos.redhat.com/finalizer
+    - components.agogos.redhat.com/finalizer
   generation: 2
   name: dummy-component-group-dep-3
   namespace: gallen
@@ -159,7 +159,7 @@ metadata:
       {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Component","metadata":{"annotations":{},"name":"dummy-component-group-dep-4","namespace":"gallen"},"spec":{"build":{"builderRef":{"name":"dummy-v1"}}}}
   creationTimestamp: "2023-09-29T12:14:37Z"
   finalizers:
-  - components.agogos.redhat.com/finalizer
+    - components.agogos.redhat.com/finalizer
   generation: 2
   name: dummy-component-group-dep-4
   namespace: gallen
@@ -189,7 +189,7 @@ metadata:
       {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Component","metadata":{"annotations":{},"name":"dummy-component-main","namespace":"gallen"},"spec":{"build":{"builderRef":{"name":"dummy-v1"}}}}
   creationTimestamp: "2023-09-29T12:14:36Z"
   finalizers:
-  - components.agogos.redhat.com/finalizer
+    - components.agogos.redhat.com/finalizer
   generation: 2
   name: dummy-component-main
   namespace: gallen

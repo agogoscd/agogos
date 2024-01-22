@@ -4,7 +4,7 @@ kind: Build
 metadata:
   creationTimestamp: "2023-09-27T13:25:48Z"
   finalizers:
-  - builds.agogos.redhat.com/finalizer
+    - builds.agogos.redhat.com/finalizer
   generateName: dummy-component-dep-1-
   generation: 1
   labels:
@@ -14,12 +14,12 @@ metadata:
   name: dummy-component-dep-1-62k7v
   namespace: gallen
   ownerReferences:
-  - apiVersion: agogos.redhat.com/v1alpha1
-    blockOwnerDeletion: true
-    controller: true
-    kind: Component
-    name: dummy-component-dep-1
-    uid: 6966b023-faf5-476f-943b-e61f84709b56
+    - apiVersion: agogos.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Component
+      name: dummy-component-dep-1
+      uid: 6966b023-faf5-476f-943b-e61f84709b56
   resourceVersion: "3307"
   uid: d39dea6f-81c7-40f4-a72b-3e811e3643f7
 spec:
@@ -33,9 +33,9 @@ status:
       params: {}
     dependents:
       components:
-      - dummy-component-dep-2
+        - dummy-component-dep-2
       groups:
-      - dummy-component-group-1
+        - dummy-component-group-1
       pipelines: []
     post: []
     pre: []
@@ -51,7 +51,7 @@ kind: Build
 metadata:
   creationTimestamp: "2023-09-27T13:26:10Z"
   finalizers:
-  - builds.agogos.redhat.com/finalizer
+    - builds.agogos.redhat.com/finalizer
   generateName: dummy-component-dep-2-
   generation: 1
   labels:
@@ -61,12 +61,12 @@ metadata:
   name: dummy-component-dep-2-mf82q
   namespace: gallen
   ownerReferences:
-  - apiVersion: agogos.redhat.com/v1alpha1
-    blockOwnerDeletion: true
-    controller: true
-    kind: Component
-    name: dummy-component-dep-2
-    uid: e015e158-001c-4b73-903b-4b093a6b3c2d
+    - apiVersion: agogos.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Component
+      name: dummy-component-dep-2
+      uid: e015e158-001c-4b73-903b-4b093a6b3c2d
   resourceVersion: "3589"
   uid: a79f4e94-a042-49ea-a46d-1aac760cad4d
 spec:
@@ -96,7 +96,7 @@ kind: Build
 metadata:
   creationTimestamp: "2023-09-27T13:26:11Z"
   finalizers:
-  - builds.agogos.redhat.com/finalizer
+    - builds.agogos.redhat.com/finalizer
   generateName: dummy-component-group-dep-1-
   generation: 1
   labels:
@@ -107,12 +107,12 @@ metadata:
   name: dummy-component-group-dep-1-c7j2k
   namespace: gallen
   ownerReferences:
-  - apiVersion: agogos.redhat.com/v1alpha1
-    blockOwnerDeletion: true
-    controller: true
-    kind: Component
-    name: dummy-component-group-dep-1
-    uid: 738807b4-d12b-4317-89f8-7c9c0875a822
+    - apiVersion: agogos.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Component
+      name: dummy-component-group-dep-1
+      uid: 738807b4-d12b-4317-89f8-7c9c0875a822
   resourceVersion: "3552"
   uid: 07d041ab-7a75-44f9-a384-b3118062919f
 spec:
@@ -142,7 +142,7 @@ kind: Build
 metadata:
   creationTimestamp: "2023-09-27T13:26:11Z"
   finalizers:
-  - builds.agogos.redhat.com/finalizer
+    - builds.agogos.redhat.com/finalizer
   generateName: dummy-component-group-dep-2-
   generation: 1
   labels:
@@ -153,12 +153,12 @@ metadata:
   name: dummy-component-group-dep-2-wvbnm
   namespace: gallen
   ownerReferences:
-  - apiVersion: agogos.redhat.com/v1alpha1
-    blockOwnerDeletion: true
-    controller: true
-    kind: Component
-    name: dummy-component-group-dep-2
-    uid: 65292cc3-8c81-460a-ba7c-d3c5b3aa1a8c
+    - apiVersion: agogos.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Component
+      name: dummy-component-group-dep-2
+      uid: 65292cc3-8c81-460a-ba7c-d3c5b3aa1a8c
   resourceVersion: "3633"
   uid: 7c74f9bb-aa8c-4612-bfe3-0d09119cab77
 spec:
@@ -188,7 +188,7 @@ kind: Build
 metadata:
   creationTimestamp: "2023-09-27T13:26:30Z"
   finalizers:
-  - builds.agogos.redhat.com/finalizer
+    - builds.agogos.redhat.com/finalizer
   generateName: dummy-component-group-dep-3-
   generation: 1
   labels:
@@ -199,12 +199,12 @@ metadata:
   name: dummy-component-group-dep-3-h7jmv
   namespace: gallen
   ownerReferences:
-  - apiVersion: agogos.redhat.com/v1alpha1
-    blockOwnerDeletion: true
-    controller: true
-    kind: Component
-    name: dummy-component-group-dep-3
-    uid: 6f9d6c04-ef9e-4735-837c-92b3094e2660
+    - apiVersion: agogos.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Component
+      name: dummy-component-group-dep-3
+      uid: 6f9d6c04-ef9e-4735-837c-92b3094e2660
   resourceVersion: "3829"
   uid: ea5f98be-2a14-4bab-89e2-b40b9f841a00
 spec:
@@ -234,7 +234,7 @@ kind: Build
 metadata:
   creationTimestamp: "2023-09-27T13:26:30Z"
   finalizers:
-  - builds.agogos.redhat.com/finalizer
+    - builds.agogos.redhat.com/finalizer
   generateName: dummy-component-group-dep-4-
   generation: 1
   labels:
@@ -245,12 +245,12 @@ metadata:
   name: dummy-component-group-dep-4-rtdz9
   namespace: gallen
   ownerReferences:
-  - apiVersion: agogos.redhat.com/v1alpha1
-    blockOwnerDeletion: true
-    controller: true
-    kind: Component
-    name: dummy-component-group-dep-4
-    uid: 01b3fdf6-7089-4b7c-af37-7fef30d70ef3
+    - apiVersion: agogos.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Component
+      name: dummy-component-group-dep-4
+      uid: 01b3fdf6-7089-4b7c-af37-7fef30d70ef3
   resourceVersion: "3861"
   uid: 5c1d6659-2055-4324-83aa-be02b9e5d11a
 spec:
@@ -280,7 +280,7 @@ kind: Build
 metadata:
   creationTimestamp: "2023-09-27T13:26:43Z"
   finalizers:
-  - builds.agogos.redhat.com/finalizer
+    - builds.agogos.redhat.com/finalizer
   generateName: dummy-component-main-
   generation: 1
   labels:
@@ -290,12 +290,12 @@ metadata:
   name: dummy-component-main-pt4ps
   namespace: gallen
   ownerReferences:
-  - apiVersion: agogos.redhat.com/v1alpha1
-    blockOwnerDeletion: true
-    controller: true
-    kind: Component
-    name: dummy-component-main
-    uid: 338e325b-a988-49c5-ad67-0b6ce03a1116
+    - apiVersion: agogos.redhat.com/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Component
+      name: dummy-component-main
+      uid: 338e325b-a988-49c5-ad67-0b6ce03a1116
   resourceVersion: "3991"
   uid: 60a1fa41-a249-4b00-b757-52c646815609
 spec:

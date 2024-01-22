@@ -6,7 +6,7 @@ metadata:
 spec:
   dependents:
     components:
-    - sample-2
+      - sample-2
   build:
     builderRef:
       name: sample-builder
@@ -18,7 +18,7 @@ metadata:
 spec:
   dependents:
     components:
-    - sample-3
+      - sample-3
   build:
     builderRef:
       name: sample-builder

@@ -12,7 +12,7 @@
 #   - after_script
 #   - artifacts
 #   - rules
-
+---
 tag-docs:
   stage: test
   image: quay.io/fedora/fedora-minimal:39

@@ -5,14 +5,14 @@ metadata:
   name: my-pipeline
 spec:
   stages:
-  - stageRef:
-      name: write-1
-    config:
-      property: stage-1
-  - stageRef:
-      name: write-2
-    config:
-      property: stage-2
-  - stageRef:
-      name: read
-    runAfter: [write-1, write-2]
+    - stageRef:
+        name: write-1
+      config:
+        property: stage-1
+    - stageRef:
+        name: write-2
+      config:
+        property: stage-2
+    - stageRef:
+        name: read
+      runAfter: [write-1, write-2]

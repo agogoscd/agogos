@@ -1,3 +1,4 @@
+---
 quarkus:
   banner:
     enabled: false
@@ -16,14 +17,14 @@ quarkus:
       console:
         format: "%m%n"
       category:
+        # "io.quarkus":
+        #   level: "OFF"
         "io.quarkus.kubernetes":
           level: DEBUG
         "com.redhat.agogos":
           level: DEBUG
         "io.fabric8.kubernetes.client":
           level: ERROR
-        # "io.quarkus":
-        #   level: "OFF"
   agogos:
     cli-profile: admin
 
@@ -78,7 +79,7 @@ dependencies:
   tekton-pipelines:
     namespace: "tekton-pipelines"
     version: "v0.50.3"
-    urls: 
+    urls:
       - "https://storage.googleapis.com/tekton-releases/pipeline/previous/${dependencies.tekton-pipelines.version}/release.yaml"
   tekton-triggers:
     namespace: "tekton-pipelines"

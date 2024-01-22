@@ -4,7 +4,7 @@ kind: Run
 metadata:
   creationTimestamp: "2023-10-01T20:01:54Z"
   finalizers:
-  - runs.agogos.redhat.com/finalizer
+    - runs.agogos.redhat.com/finalizer
   generateName: dummy-group-3-pipeline-1-
   generation: 1
   labels:
@@ -30,7 +30,7 @@ kind: Run
 metadata:
   creationTimestamp: "2023-10-01T20:01:54Z"
   finalizers:
-  - runs.agogos.redhat.com/finalizer
+    - runs.agogos.redhat.com/finalizer
   generateName: dummy-group-3-pipeline-2-
   generation: 1
   labels:
@@ -56,7 +56,7 @@ kind: Run
 metadata:
   creationTimestamp: "2023-10-01T20:01:37Z"
   finalizers:
-  - runs.agogos.redhat.com/finalizer
+    - runs.agogos.redhat.com/finalizer
   generateName: dummy-group-4-pipeline-1-
   generation: 1
   labels:
@@ -82,7 +82,7 @@ kind: Run
 metadata:
   creationTimestamp: "2023-10-01T20:01:25Z"
   finalizers:
-  - runs.agogos.redhat.com/finalizer
+    - runs.agogos.redhat.com/finalizer
   generateName: dummy-pipeline-1-
   generation: 1
   labels:
@@ -107,7 +107,7 @@ kind: Run
 metadata:
   creationTimestamp: "2023-10-01T20:01:37Z"
   finalizers:
-  - runs.agogos.redhat.com/finalizer
+    - runs.agogos.redhat.com/finalizer
   generateName: dummy-pipeline-2-
   generation: 1
   labels:

@@ -1,3 +1,4 @@
+---
 apiVersion: agogos.redhat.com/v1alpha1
 kind: Builder
 metadata:
@@ -18,35 +19,35 @@ metadata:
   name: my-builder-task
 spec:
   workspaces:
-  - name: pipeline
-  - name: stage
+    - name: pipeline
+    - name: stage
   params:
-  - name: params
-    type: string
+    - name: params
+      type: string
   results:
-  - name: data
-    description: JSON formatted string
+    - name: data
+      description: JSON formatted string
   volumes:
-  - name: config
-    configMap:
-      name: my-builder-config
-      optional: true
-  steps:
-  - name: execute
-    image: registry.access.redhat.com/ubi9-minimal:9.2
-    imagePullPolicy: Always
-    script: |
-      #!/bin/sh -e
-      echo "$1"
-      echo "$2"
-      echo "$3"
-      cat /config/my-builder-config.json
-      echo "Exiting with an error for teaching purposes"
-      exit 1
-    args:
-    - "$(workspaces.pipeline.path)"
-    - "$(results.data.path)"
-    - "$(params.params)"
-    volumeMounts:
     - name: config
-      mountPath: /config
+      configMap:
+        name: my-builder-config
+        optional: true
+  steps:
+    - name: execute
+      image: registry.access.redhat.com/ubi9-minimal:9.2
+      imagePullPolicy: Always
+      script: |
+        #!/bin/sh -e
+        echo "$1"
+        echo "$2"
+        echo "$3"
+        cat /config/my-builder-config.json
+        echo "Exiting with an error for teaching purposes"
+        exit 1
+      args:
+        - "$(workspaces.pipeline.path)"
+        - "$(results.data.path)"
+        - "$(params.params)"
+      volumeMounts:
+        - name: config
+          mountPath: /config

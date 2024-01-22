@@ -1,3 +1,4 @@
+---
 site:
   title: Agogos
   url: https://agogos.pages.redhat.com/agogos/
@@ -20,5 +21,5 @@ asciidoc:
 
 antora:
   extensions:
-  - require: '@antora/lunr-extension'
-  - require: ./docs/custom_extensions/lunr-patch.js
+    - require: '@antora/lunr-extension'
+    - require: ./docs/custom_extensions/lunr-patch.js

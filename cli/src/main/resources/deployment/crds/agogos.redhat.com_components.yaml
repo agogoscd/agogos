@@ -46,7 +46,7 @@ spec:
                       stageRef:
                         type: object
                         description: Stage reference
-                        properties:                         
+                        properties:
                           name:
                             type: string
                             description: Name of the stage to run
@@ -75,7 +75,7 @@ spec:
                       stageRef:
                         type: object
                         description: Stage reference
-                        properties:                         
+                        properties:
                           name:
                             type: string
                             description: Name of the stage to run

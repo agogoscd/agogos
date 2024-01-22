@@ -1,3 +1,4 @@
+---
 quarkus:
   banner:
     enabled: true
@@ -52,7 +53,7 @@ agogos:
 "%dev":
   broker/mp-rest/url: http://localhost:8111
 
-  #hostnameVerifier: io.quarkus.restclient.NoopHostnameVerifier
+  # hostnameVerifier: io.quarkus.restclient.NoopHostnameVerifier
 
   agogos:
     service-account: agogos
@@ -67,12 +68,12 @@ agogos:
   quarkus:
     log:
       category:
+        # "io.javaoperatorsdk":
+        #  use  level: TRACE
         "com.redhat.agogos":
           level: TRACE
         "io.fabric8.kubernetes.client.informers.cache":
           level: WARN
-        # "io.javaoperatorsdk":
-        #  use  level: TRACE
       file:
         enable: true
         path: "${PWD}/logs/operator.log"

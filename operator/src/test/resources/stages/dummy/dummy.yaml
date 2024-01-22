@@ -1,9 +1,10 @@
+---
 apiVersion: agogos.redhat.com/v1alpha1
 kind: ClusterStage
 metadata:
   name: dummy
   labels:
-    "agogos.redhat.com/phase": test # TODO: Move to Builder
+    "agogos.redhat.com/phase": test   # TODO: Move to Builder
 spec:
   task: agogos-stage-dummy
 ---

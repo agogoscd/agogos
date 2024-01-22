@@ -7,7 +7,7 @@ metadata:
       {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Pipeline","metadata":{"annotations":{},"name":"dummy-group-3-pipeline-1","namespace":"gallen"},"spec":{"stages":[{"config":{"int-value":0},"stageRef":{"name":"dummy-stage-1"}}]}}
   creationTimestamp: "2023-09-30T18:39:51Z"
   finalizers:
-  - pipelines.agogos.redhat.com/finalizer
+    - pipelines.agogos.redhat.com/finalizer
   generation: 2
   name: dummy-group-3-pipeline-1
   namespace: gallen
@@ -19,10 +19,10 @@ spec:
     groups: []
     pipelines: []
   stages:
-  - config:
-      int-value: 0
-    stageRef:
-      name: dummy-stage-1
+    - config:
+        int-value: 0
+      stageRef:
+        name: dummy-stage-1
 status:
   lastUpdate: "2023-09-30T14:39:51-04:00"
   reason: Pipeline is ready
@@ -36,7 +36,7 @@ metadata:
       {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Pipeline","metadata":{"annotations":{},"name":"dummy-group-3-pipeline-2","namespace":"gallen"},"spec":{"stages":[{"config":{"int-value":10},"stageRef":{"name":"dummy-stage-2"}}]}}
   creationTimestamp: "2023-09-30T18:39:51Z"
   finalizers:
-  - pipelines.agogos.redhat.com/finalizer
+    - pipelines.agogos.redhat.com/finalizer
   generation: 2
   name: dummy-group-3-pipeline-2
   namespace: gallen
@@ -48,10 +48,10 @@ spec:
     groups: []
     pipelines: []
   stages:
-  - config:
-      int-value: 10
-    stageRef:
-      name: dummy-stage-2
+    - config:
+        int-value: 10
+      stageRef:
+        name: dummy-stage-2
 status:
   lastUpdate: "2023-09-30T14:39:51-04:00"
   reason: Pipeline is ready
@@ -65,7 +65,7 @@ metadata:
       {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Pipeline","metadata":{"annotations":{},"name":"dummy-group-4-group-1-pipeline-1","namespace":"gallen"},"spec":{"stages":[{"config":{"int-value":0},"stageRef":{"name":"dummy-stage-1"}}]}}
   creationTimestamp: "2023-10-01T18:53:37Z"
   finalizers:
-  - pipelines.agogos.redhat.com/finalizer
+    - pipelines.agogos.redhat.com/finalizer
   generation: 2
   name: dummy-group-4-group-1-pipeline-1
   namespace: gallen
@@ -77,10 +77,10 @@ spec:
     groups: []
     pipelines: []
   stages:
-  - config:
-      int-value: 0
-    stageRef:
-      name: dummy-stage-1
+    - config:
+        int-value: 0
+      stageRef:
+        name: dummy-stage-1
 status:
   lastUpdate: "2023-10-01T14:53:37-04:00"
   reason: Pipeline is ready
@@ -94,7 +94,7 @@ metadata:
       {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Pipeline","metadata":{"annotations":{},"name":"dummy-group-4-pipeline-1","namespace":"gallen"},"spec":{"stages":[{"config":{"int-value":0},"stageRef":{"name":"dummy-stage-1"}}]}}
   creationTimestamp: "2023-10-01T18:53:37Z"
   finalizers:
-  - pipelines.agogos.redhat.com/finalizer
+    - pipelines.agogos.redhat.com/finalizer
   generation: 2
   name: dummy-group-4-pipeline-1
   namespace: gallen
@@ -106,10 +106,10 @@ spec:
     groups: []
     pipelines: []
   stages:
-  - config:
-      int-value: 0
-    stageRef:
-      name: dummy-stage-1
+    - config:
+        int-value: 0
+      stageRef:
+        name: dummy-stage-1
 status:
   lastUpdate: "2023-10-01T14:53:37-04:00"
   reason: Pipeline is ready
@@ -123,7 +123,7 @@ metadata:
       {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Pipeline","metadata":{"annotations":{},"name":"dummy-pipeline-1","namespace":"gallen"},"spec":{"dependents":{"groups":["dummy-group-4"],"pipelines":["dummy-pipeline-2"]},"stages":[{"config":{"int-value":0},"stageRef":{"name":"dummy-stage-1"}}]}}
   creationTimestamp: "2023-09-30T18:39:51Z"
   finalizers:
-  - pipelines.agogos.redhat.com/finalizer
+    - pipelines.agogos.redhat.com/finalizer
   generation: 3
   name: dummy-pipeline-1
   namespace: gallen
@@ -133,14 +133,14 @@ spec:
   dependents:
     components: []
     groups:
-    - dummy-group-4
+      - dummy-group-4
     pipelines:
-    - dummy-pipeline-2
+      - dummy-pipeline-2
   stages:
-  - config:
-      int-value: 0
-    stageRef:
-      name: dummy-stage-1
+    - config:
+        int-value: 0
+      stageRef:
+        name: dummy-stage-1
 status:
   lastUpdate: "2023-09-30T14:39:51-04:00"
   reason: Pipeline is ready
@@ -154,7 +154,7 @@ metadata:
       {"apiVersion":"agogos.redhat.com/v1alpha1","kind":"Pipeline","metadata":{"annotations":{},"name":"dummy-pipeline-2","namespace":"gallen"},"spec":{"dependents":{"groups":["dummy-group-3"]},"stages":[{"config":{"int-value":0},"stageRef":{"name":"dummy-stage-2"}}]}}
   creationTimestamp: "2023-09-30T18:39:51Z"
   finalizers:
-  - pipelines.agogos.redhat.com/finalizer
+    - pipelines.agogos.redhat.com/finalizer
   generation: 4
   name: dummy-pipeline-2
   namespace: gallen
@@ -163,12 +163,12 @@ metadata:
 spec:
   dependents:
     groups:
-    - dummy-group-3
+      - dummy-group-3
   stages:
-  - config:
-      int-value: 0
-    stageRef:
-      name: dummy-stage-2
+    - config:
+        int-value: 0
+      stageRef:
+        name: dummy-stage-2
 status:
   lastUpdate: "2023-09-30T14:39:51-04:00"
   reason: Pipeline is ready

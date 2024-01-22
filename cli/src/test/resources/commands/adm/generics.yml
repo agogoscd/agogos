@@ -23,4 +23,3 @@ metadata:
 data:
   .dockerconfigjson: "dockerconfigjson"
 type: "kubernetes.io/dockerconfigjson"
-

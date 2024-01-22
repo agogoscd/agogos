@@ -1,3 +1,4 @@
+---
 apiVersion: agogos.redhat.com/v1alpha1
 kind: Builder
 metadata:
@@ -18,49 +19,49 @@ metadata:
   name: my-builder-task
 spec:
   workspaces:
-  - name: pipeline
-  - name: stage
+    - name: pipeline
+    - name: stage
   params:
-  - name: params
-    type: string
+    - name: params
+      type: string
   results:
-  - name: data
-    description: JSON formatted string
+    - name: data
+      description: JSON formatted string
   volumes:
-  - name: config
-    configMap:
-      name: my-builder-config
-      optional: true
-  steps:
-  - name: execute
-    image: registry.access.redhat.com/ubi9/python-39:1
-    imagePullPolicy: Always
-    script: |
-      #!/bin/python3
-      import argparse
-      import json
-      from pathlib import Path
-
-      parser = argparse.ArgumentParser()
-      parser.add_argument("--params")
-      parser.add_argument("--results-path")
-      parser.add_argument("--output-path")
-      args = parser.parse_args()
-
-      print(args.output_path)
-      print(args.results_path)
-      print(args.params)
-
-      config_path = Path("/config/my-builder-config.json")
-      if config_path.exists():
-          config = json.loads(config_path.read_text())
-          print(config)
-
-      raise Exception("Learning purposes")
-    args:
-    - "--output-path=$(workspaces.pipeline.path)"
-    - "--results-path=$(results.data.path)"
-    - "--params=$(params.params)"
-    volumeMounts:
     - name: config
-      mountPath: /config
+      configMap:
+        name: my-builder-config
+        optional: true
+  steps:
+    - name: execute
+      image: registry.access.redhat.com/ubi9/python-39:1
+      imagePullPolicy: Always
+      script: |
+        #!/bin/python3
+        import argparse
+        import json
+        from pathlib import Path
+
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--params")
+        parser.add_argument("--results-path")
+        parser.add_argument("--output-path")
+        args = parser.parse_args()
+
+        print(args.output_path)
+        print(args.results_path)
+        print(args.params)
+
+        config_path = Path("/config/my-builder-config.json")
+        if config_path.exists():
+            config = json.loads(config_path.read_text())
+            print(config)
+
+        raise Exception("Learning purposes")
+      args:
+        - "--output-path=$(workspaces.pipeline.path)"
+        - "--results-path=$(results.data.path)"
+        - "--params=$(params.params)"
+      volumeMounts:
+        - name: config
+          mountPath: /config
