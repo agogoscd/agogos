@@ -1,0 +1,38 @@
+= Agogos Platform Code Analysis Guide
+This page provides an overview for developers writing Agogos Platform code.
+It covers the code analysis tools that are used to format and check the code
+created for the Agogos Platform.
+
+== References
+
+* link:https://yamllint.readthedocs.io/en/stable/[yamllint]
+
+== Continuous Integration
+[filename]`yamllint` is run against merge requests in the
+link:https://gitlab.cee.redhat.com/agogos/agogos[Agogos Platform repository].
+Any code changes submitted in a merge request must pass all
+code analysis tools or the merge request continuous integration will fail.
+
+== Install the Code Analysis Tools
+To install the code scanners on Fedora or RHEL run the command:
+
+----
+$ sudo dnf install yamllint
+----
+
+== Run the Code Analysis Locally
+=== Run yamllint
+[filename]`yamllint` should be run against any YAML files you are creating
+or changing. The sample below is for checking changes to the
+[filename]`.gitlab-ci.yml` file.
+
+----
+$ yamllint .gitlab-ci.yml
+----
+
+If you want to check multiple YAML files in the current directory and
+subdirectories, run the following command:
+
+----
+$ find . \( -name \*.yml -o -name \*.yaml \) | xargs -d "\n" yamllint
+----

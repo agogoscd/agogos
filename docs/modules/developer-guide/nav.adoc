@@ -1,5 +1,6 @@
 * Developer Guide
 ** xref:contribution_guide.adoc[]
+** xref:code_analysis.adoc[Code Analysis]
 ** xref:development-mode.adoc[]
 ** xref:coding.adoc[]
 ** xref:testing.adoc[]
