@@ -11,9 +11,11 @@ import io.fabric8.knative.eventing.v1.BrokerBuilder;
 import io.fabric8.knative.eventing.v1.SubscriptionsAPIFilterBuilder;
 import io.fabric8.knative.eventing.v1.Trigger;
 import io.fabric8.knative.eventing.v1.TriggerBuilder;
+import io.fabric8.knative.internal.pkg.apis.duck.v1.WithPodSpecBuilder;
 import io.fabric8.kubernetes.api.model.APIResourceList;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
+import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.ListOptions;
@@ -23,6 +25,8 @@ import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.ObjectMetaBuilder;
+import io.fabric8.kubernetes.api.model.PodSpecBuilder;
+import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.ResourceQuota;
 import io.fabric8.kubernetes.api.model.ResourceQuotaBuilder;
 import io.fabric8.kubernetes.api.model.ServiceAccount;
@@ -103,6 +107,15 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
     private static final Map<String, String> LABELS = Map.of(
             "app.kubernetes.io/part-of", "agogos",
             "app.kubernetes.io/component", "namespace");
+
+    @ConfigProperty(name = "agogos.event-listener.requests.cpu")
+    private String eventListenerRequestsCPU;
+
+    @ConfigProperty(name = "agogos.event-listener.requests.memory")
+    private String eventListenerRequestsMemory;
+
+    @ConfigProperty(name = "agogos.event-listener.limits.memory")
+    private String eventListenerLimitsMemory;
 
     @ConfigProperty(name = "agogos.operator.service-account")
     private String ServiceAccountName;
@@ -303,12 +316,27 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
      * </p>
      */
     private EventListener installTektonEl(ServiceAccount sa, String namespace) {
+        Map<String, Quantity> eventListenerRequests = Map.of(
+                "cpu", new Quantity(eventListenerRequestsCPU),
+                "memory", new Quantity(eventListenerRequestsMemory));
+        Map<String, Quantity> eventListenerLimits = Map.of(
+                "memory", new Quantity(eventListenerLimitsMemory));
         EventListener el = new EventListenerBuilder()
                 .withNewMetadata()
                 .withName(RESOURCE_NAME)
                 .withNamespace(namespace)
                 .endMetadata()
                 .withNewSpec()
+                .withNewResources()
+                .withNewKubernetesResource()
+                .withSpec(new WithPodSpecBuilder().withNewTemplate()
+                        .withSpec(new PodSpecBuilder().withContainers(new ContainerBuilder().withNewResources()
+                                .withRequests(eventListenerRequests)
+                                .withLimits(eventListenerLimits)
+                                .endResources().build()).build())
+                        .endTemplate().build())
+                .endKubernetesResource()
+                .endResources()
                 .withServiceAccountName(sa.getMetadata().getName())
                 .withNewNamespaceSelector()
                 .withMatchNames(namespace)

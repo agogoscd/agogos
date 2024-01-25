@@ -67,6 +67,13 @@ agogos:
   webhooks:
     container-image: "quay.io/agogos/agogos-webhooks:latest"
     service-account: "agogos-webhooks"
+  # The EventListener needs 2Gi to handle a group of 50 builds without being OOMKilled
+  event-listener:
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+    limits:
+      memory: 2Gi
 
 dependencies:
   knative-eventing:
