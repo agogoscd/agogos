@@ -1,4 +1,21 @@
 💻 Selected profile: local
+👉 OK: Namespace: tekton-chains (v1)
+👉 OK: Secret: signing-secrets (v1) (ns: tekton-chains)
+👉 OK: ConfigMap: chains-config (v1) (ns: tekton-chains)
+👉 OK: Deployment: tekton-chains-controller (apps/v1) (ns: tekton-chains)
+👉 OK: ClusterRoleBinding: tekton-chains-controller-cluster-access (rbac.authorization.k8s.io/v1)
+👉 OK: ClusterRole: tekton-chains-controller-cluster-access (rbac.authorization.k8s.io/v1)
+👉 OK: ClusterRole: tekton-chains-controller-tenant-access (rbac.authorization.k8s.io/v1)
+👉 OK: ClusterRoleBinding: tekton-chains-controller-tenant-access (rbac.authorization.k8s.io/v1)
+👉 OK: ServiceAccount: tekton-chains-controller (v1) (ns: tekton-chains)
+👉 OK: Role: tekton-chains-leader-election (rbac.authorization.k8s.io/v1) (ns: tekton-chains)
+👉 OK: RoleBinding: tekton-chains-controller-leaderelection (rbac.authorization.k8s.io/v1) (ns: tekton-chains)
+👉 OK: Role: tekton-chains-info (rbac.authorization.k8s.io/v1) (ns: tekton-chains)
+👉 OK: RoleBinding: tekton-chains-info (rbac.authorization.k8s.io/v1) (ns: tekton-chains)
+👉 OK: ConfigMap: chains-info (v1) (ns: tekton-chains)
+👉 OK: ConfigMap: config-logging (v1) (ns: tekton-chains)
+👉 OK: ConfigMap: tekton-chains-config-observability (v1) (ns: tekton-chains)
+👉 OK: Service: tekton-chains-metrics (v1) (ns: tekton-chains)
 🕞 Installing Knative Eventing v1.11.5...
 🕞 Cleaning up Knative Eventing resources...
 👉 OK: Namespace: knative-eventing (v1)

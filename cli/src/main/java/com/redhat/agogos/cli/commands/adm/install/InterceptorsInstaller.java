@@ -122,6 +122,9 @@ public class InterceptorsInstaller extends Installer {
     private void writeCerts() {
         Path keyPath = Paths.get("interceptors.pem");
         Path certPath = Paths.get("interceptors.crt");
+        Path pathBase = Paths.get(".");
+        Path keyPathRelative = pathBase.relativize(keyPath);
+        Path certPathRelative = pathBase.relativize(certPath);
 
         try {
             Files.writeString(keyPath, certProvider.privateKey());
@@ -137,8 +140,8 @@ public class InterceptorsInstaller extends Installer {
 
         helper.printStdout(
                 "\n👋 Interceptor configuration in development mode. You can use following environment variables to point the Interceptor application to generated certificate:\n");
-        helper.printStdout(String.format("👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES=%s", keyPath.toAbsolutePath()));
-        helper.printStdout(String.format("👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES=%s", certPath.toAbsolutePath()));
+        helper.printStdout(String.format("👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES=./%s", keyPathRelative));
+        helper.printStdout(String.format("👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES=./%s", certPathRelative));
     }
 
     private Deployment deployment(String namespace) {

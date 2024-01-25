@@ -1,4 +1,21 @@
 💻 Selected profile: dev
+👉 OK: Namespace: tekton-chains (v1)
+👉 OK: Secret: signing-secrets (v1) (ns: tekton-chains)
+👉 OK: ConfigMap: chains-config (v1) (ns: tekton-chains)
+👉 OK: Deployment: tekton-chains-controller (apps/v1) (ns: tekton-chains)
+👉 OK: ClusterRoleBinding: tekton-chains-controller-cluster-access (rbac.authorization.k8s.io/v1)
+👉 OK: ClusterRole: tekton-chains-controller-cluster-access (rbac.authorization.k8s.io/v1)
+👉 OK: ClusterRole: tekton-chains-controller-tenant-access (rbac.authorization.k8s.io/v1)
+👉 OK: ClusterRoleBinding: tekton-chains-controller-tenant-access (rbac.authorization.k8s.io/v1)
+👉 OK: ServiceAccount: tekton-chains-controller (v1) (ns: tekton-chains)
+👉 OK: Role: tekton-chains-leader-election (rbac.authorization.k8s.io/v1) (ns: tekton-chains)
+👉 OK: RoleBinding: tekton-chains-controller-leaderelection (rbac.authorization.k8s.io/v1) (ns: tekton-chains)
+👉 OK: Role: tekton-chains-info (rbac.authorization.k8s.io/v1) (ns: tekton-chains)
+👉 OK: RoleBinding: tekton-chains-info (rbac.authorization.k8s.io/v1) (ns: tekton-chains)
+👉 OK: ConfigMap: chains-info (v1) (ns: tekton-chains)
+👉 OK: ConfigMap: config-logging (v1) (ns: tekton-chains)
+👉 OK: ConfigMap: tekton-chains-config-observability (v1) (ns: tekton-chains)
+👉 OK: Service: tekton-chains-metrics (v1) (ns: tekton-chains)
 🕞 Installing Tekton v0.50.3...
 👉 OK: Namespace: tekton-pipelines (v1)
 👉 OK: ClusterRole: tekton-pipelines-controller-cluster-access (rbac.authorization.k8s.io/v1)
@@ -277,8 +294,8 @@
 
 👋 Interceptor configuration in development mode. You can use following environment variables to point the Interceptor application to generated certificate:
 
-👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES=/home/gallen/work/cpaas/agogos/interceptors.pem
-👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES=/home/gallen/work/cpaas/agogos/interceptors.crt
+👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES=./interceptors.pem
+👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES=./interceptors.crt
 🕞 Installing Agogos Webhooks component...
 👉 OK: ValidatingWebhookConfiguration: webhook.agogos.redhat.com (admissionregistration.k8s.io/v1)
 👉 OK: MutatingWebhookConfiguration: webhook.agogos.redhat.com (admissionregistration.k8s.io/v1)
@@ -290,8 +307,8 @@
 
 👋 Webhook configuration in development mode. You can use following environment variables to point the Webhook application to generated certificate:
 
-👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES=/home/gallen/work/cpaas/agogos/webhooks.pem
-👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES=/home/gallen/work/cpaas/agogos/webhooks.crt
+👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES=./webhooks.pem
+👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES=./webhooks.crt
 🕞 Installing Agogos Operator component...
 👉 OK: ServiceAccount: agogos-operator (v1) (ns: agogos)
 👉 OK: ClusterRole: agogos-operator (rbac.authorization.k8s.io/v1)

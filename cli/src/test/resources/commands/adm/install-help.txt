@@ -1,5 +1,5 @@
-Usage: agogosctl adm install [-hvV] [-sk] [-st] [-n=<namespace>] [-o=<output>]
-                             [-p=<profile>]
+Usage: agogosctl adm install [-hvV] [-sk] [-st] [-stc] [-n=<namespace>]
+                             [-o=<output>] [-p=<profile>]
 Install Agogos
   -h, --help                Show this help message and exit.
   -n, --namespace=<namespace>
@@ -27,5 +27,7 @@ Install Agogos
                               deployed in the 'agogos' namespace,
       -sk, --skip-knative   Skip Knative Eventing installation.
       -st, --skip-tekton    Skip Tekton installation.
+      -stc, --skip-tekton-chains
+                            Skip Tekton chains installation.
   -v, --verbose
   -V, --version             Print version information and exit.

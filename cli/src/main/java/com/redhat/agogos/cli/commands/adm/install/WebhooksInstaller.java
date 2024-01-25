@@ -130,6 +130,9 @@ public class WebhooksInstaller extends Installer {
     private void writeCerts() {
         Path keyPath = Paths.get("webhooks.pem");
         Path certPath = Paths.get("webhooks.crt");
+        Path pathBase = Paths.get(".");
+        Path keyPathRelative = pathBase.relativize(keyPath);
+        Path certPathRelative = pathBase.relativize(certPath);
 
         try {
             Files.writeString(keyPath, certProvider.privateKey());
@@ -145,8 +148,8 @@ public class WebhooksInstaller extends Installer {
 
         helper.printStdout(
                 "\n👋 Webhook configuration in development mode. You can use following environment variables to point the Webhook application to generated certificate:\n");
-        helper.printStdout(String.format("👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES=%s", keyPath.toAbsolutePath()));
-        helper.printStdout(String.format("👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES=%s", certPath.toAbsolutePath()));
+        helper.printStdout(String.format("👉 QUARKUS_HTTP_SSL_CERTIFICATE_KEY_FILES=./%s", keyPathRelative));
+        helper.printStdout(String.format("👉 QUARKUS_HTTP_SSL_CERTIFICATE_FILES=./%s", certPathRelative));
     }
 
     private Deployment deployment(String namespace) {

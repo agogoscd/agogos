@@ -34,8 +34,10 @@ public class AdmInstallCommandTest extends AdmCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "adm", "install", "--profile", "dev");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
+
         Assertions.assertTrue(
                 catcher.compareToStdoutSanitized(utils.testResourceAsStringList("commands/adm/install-dev-profile.txt")));
+
     }
 
     @Test
@@ -51,6 +53,22 @@ public class AdmInstallCommandTest extends AdmCommandBaseTest {
         Assertions.assertTrue(
                 catcher.compareToStdoutSanitized(
                         utils.testResourceAsStringList("commands/adm/install-dev-profile-without-knative.txt")));
+    }
+
+    @Test
+    public void installDevProfileWithoutTektonChains() throws Exception {
+        Mockito.when(kubernetesFacadeMock.get(eq(ConfigMap.class), Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(new ConfigMapBuilder().withNewMetadata().endMetadata().build());
+        Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
+                .then(AdditionalAnswers.returnsFirstArg());
+
+        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "adm", "install", "--profile", "dev",
+                "--skip-tekton-chains");
+
+        Assertions.assertEquals(ExitCode.OK, returnCode);
+        Assertions.assertTrue(
+                catcher.compareToStdoutSanitized(
+                        utils.testResourceAsStringList("commands/adm/install-dev-profile-without-tekton-chains.txt")));
     }
 
     @Test
@@ -72,7 +90,7 @@ public class AdmInstallCommandTest extends AdmCommandBaseTest {
                 .then(AdditionalAnswers.returnsFirstArg());
 
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "adm", "install", "--profile", "dev", "--skip-knative",
-                "--skip-tekton");
+                "--skip-tekton", "--skip-tekton-chains");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(
@@ -124,12 +142,30 @@ public class AdmInstallCommandTest extends AdmCommandBaseTest {
     }
 
     @Test
+    public void installLocalProfileWithoutTektonChains() throws Exception {
+        Mockito.when(kubernetesFacadeMock.get(eq(ConfigMap.class), Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(new ConfigMapBuilder().withNewMetadata().endMetadata().build());
+        Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
+                .then(AdditionalAnswers.returnsFirstArg());
+
+        int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "adm", "install", "--profile", "local",
+                "--skip-tekton-chains");
+
+        catcher.stdoutMessages().stream().forEach(System.out::println);
+
+        Assertions.assertEquals(ExitCode.OK, returnCode);
+        Assertions.assertTrue(
+                catcher.compareToStdoutSanitized(
+                        utils.testResourceAsStringList("commands/adm/install-local-profile-without-tekton-chains.txt")));
+    }
+
+    @Test
     public void installLocalProfileWithoutEither() throws Exception {
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
 
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "adm", "install", "--profile", "local", "--skip-knative",
-                "--skip-tekton");
+                "--skip-tekton", "--skip-tekton-chains");
 
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(

@@ -87,3 +87,8 @@ dependencies:
     urls:
       - "https://storage.googleapis.com/tekton-releases/triggers/previous/${dependencies.tekton-triggers.version}/release.yaml"
       - "https://storage.googleapis.com/tekton-releases/triggers/previous/${dependencies.tekton-triggers.version}/interceptors.yaml"
+  tekton-chains:
+    namespace: "tekton-chains"
+    version: "v0.18.0"
+    urls:
+      - "https://storage.googleapis.com/tekton-releases/chains/previous/${dependencies.tekton-chains.version}/release.yaml"

@@ -1,13 +1,7 @@
 package com.redhat.agogos.cli.commands.adm;
 
 import com.redhat.agogos.cli.commands.AbstractCallableSubcommand;
-import com.redhat.agogos.cli.commands.adm.install.Installer;
-import com.redhat.agogos.cli.commands.adm.install.KnativeEventingInstaller;
-import com.redhat.agogos.cli.commands.adm.install.Priority;
-import com.redhat.agogos.cli.commands.adm.install.Profile;
-import com.redhat.agogos.cli.commands.adm.install.Profiles;
-import com.redhat.agogos.cli.commands.adm.install.TektonInstaller;
-import com.redhat.agogos.cli.commands.adm.install.TektonTriggersInstaller;
+import com.redhat.agogos.cli.commands.adm.install.*;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
@@ -43,6 +37,10 @@ public class InstallCommand extends AbstractCallableSubcommand {
     @Option(names = { "--skip-knative", "-sk" }, description = "Skip Knative Eventing installation.", defaultValue = "false")
     public static Boolean skipKnative;
 
+    @Option(names = { "--skip-tekton-chains",
+            "-stc" }, description = "Skip Tekton chains installation.", defaultValue = "false")
+    public static Boolean skipTektonChains;
+
     /**
      * This flag is useful for testing, where the statuses of resources are not always in the correct state considering the fact
      * that we are using a mocked Kubernetes server.
@@ -67,6 +65,7 @@ public class InstallCommand extends AbstractCallableSubcommand {
                 .filter(i -> inProfile(profile, i))
                 .filter(i -> !(skipTekton && (i instanceof TektonInstaller || i instanceof TektonTriggersInstaller)))
                 .filter(i -> !(skipKnative && i instanceof KnativeEventingInstaller))
+                .filter(i -> !(skipTektonChains && (i instanceof TektonChainsInstaller)))
                 .sorted((a, b) -> si.compare(a, b))
                 .forEach(installer -> {
                     installer.install(profile, namespace);
