@@ -1,4 +1,5 @@
 💻 Selected profile: dev
+🕞 Installing Tekton Chains v0.18.0...
 👉 OK: Namespace: tekton-chains (v1)
 👉 OK: Secret: signing-secrets (v1) (ns: tekton-chains)
 👉 OK: ConfigMap: chains-config (v1) (ns: tekton-chains)
@@ -16,6 +17,8 @@
 👉 OK: ConfigMap: config-logging (v1) (ns: tekton-chains)
 👉 OK: ConfigMap: tekton-chains-config-observability (v1) (ns: tekton-chains)
 👉 OK: Service: tekton-chains-metrics (v1) (ns: tekton-chains)
+👉 OK: Configured Tekton Chains ConfigMap 'chains-config'
+✅ Tekton Chains v0.18.0 installed
 🕞 Installing Knative Eventing v1.11.5...
 🕞 Cleaning up Knative Eventing resources...
 👉 OK: Namespace: knative-eventing (v1)

@@ -151,8 +151,6 @@ public class AdmInstallCommandTest extends AdmCommandBaseTest {
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "adm", "install", "--profile", "local",
                 "--skip-tekton-chains");
 
-        catcher.stdoutMessages().stream().forEach(System.out::println);
-
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(
                 catcher.compareToStdoutSanitized(

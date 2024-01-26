@@ -33,7 +33,7 @@ public class TektonChainsInstaller extends DependencyInstaller {
 
     @Override
     public void install(InstallCommand.InstallProfile profile, String namespace) {
-        LOG.info("🕞 Installing Tekton Chains {}...", tektonChains.version());
+        helper.printStdout(String.format("🕞 Installing Tekton Chains %s...", tektonChains.version()));
 
         install(tektonChains, profile, namespace);
 
@@ -41,7 +41,7 @@ public class TektonChainsInstaller extends DependencyInstaller {
 
         kubernetesFacade.waitForAllPodsRunning(tektonChains.namespace());
 
-        LOG.info("✅ Tekton Chains {} installed", tektonChains.version());
+        helper.printStdout(String.format("✅ Tekton Chains %s installed", tektonChains.version()));
     }
 
     private void configureFeatureFlags(InstallCommand.InstallProfile profile, String namespace) {
@@ -57,21 +57,21 @@ public class TektonChainsInstaller extends DependencyInstaller {
 
             kubernetesFacade.update(configMap);
 
-            LOG.info("👉 OK: Configured Tekton Chains ConfigMap '{}'", CONFIGMAP_CHAINS_CONFIG);
+            helper.printStdout(String.format("👉 OK: Configured Tekton Chains ConfigMap '%s'", CONFIGMAP_CHAINS_CONFIG));
 
             Secret signingSecret = kubernetesFacade.get(Secret.class, tektonChains.namespace(), SECRET_SIGNING_SECRETS);
 
             if (signingSecret != null) {
-                LOG.info("🕞 Generating signing secret...");
+                helper.printStdout("🕞 Generating signing secret...");
                 Map<String, String> envVars = new HashMap<>();
                 envVars.put("COSIGN_PASSWORD", "not-ready-for-production");
 
                 Integer statusCode = Utils.executeShellCommand("cosign generate-key-pair k8s://tekton-chains/signing-secrets",
                         (HashMap<String, String>) envVars);
                 if (statusCode == 0)
-                    LOG.info("👉 OK: Signing secret generated");
+                    helper.printStdout("👉 OK: Signing secret generated");
                 else
-                    LOG.error("⚠ Cosign error: status code {}", statusCode);
+                    helper.printStderr(String.format("⚠ Cosign error: status code %s", statusCode));
             }
         }
     }
