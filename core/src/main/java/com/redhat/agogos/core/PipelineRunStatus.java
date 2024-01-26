@@ -4,6 +4,7 @@ import io.fabric8.knative.internal.pkg.apis.Condition;
 import io.fabric8.tekton.pipeline.v1beta1.PipelineRun;
 
 public enum PipelineRunStatus {
+    NEW, // Handle case where PipelineRun has status with no conditions.
     STARTED,
     RUNNING,
     COMPLETED,
@@ -47,6 +48,8 @@ public enum PipelineRunStatus {
     public static PipelineRunStatus fromPipelineRun(PipelineRun pipelineRun) {
         if (pipelineRun.getStatus() == null) {
             return PipelineRunStatus.UNKNOWN;
+        } else if (pipelineRun.getStatus().getConditions() == null || pipelineRun.getStatus().getConditions().size() == 0) {
+            return PipelineRunStatus.NEW;
         }
         Condition condition = pipelineRun.getStatus().getConditions().get(0);
         return PipelineRunStatus.fromTekton(condition.getStatus(), condition.getReason());
@@ -70,6 +73,8 @@ public enum PipelineRunStatus {
 
     public ResultableResourceStatus toStatus() {
         switch (this) {
+            case NEW:
+                return ResultableResourceStatus.NEW;
             case STARTED:
             case RESOLVINGTASKREF:
             case RUNNING:
