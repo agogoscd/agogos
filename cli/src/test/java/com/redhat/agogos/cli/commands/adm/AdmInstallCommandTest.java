@@ -73,6 +73,8 @@ public class AdmInstallCommandTest extends AdmCommandBaseTest {
 
     @Test
     public void installDevProfileWithoutTekton() throws Exception {
+        Mockito.when(kubernetesFacadeMock.get(eq(ConfigMap.class), Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(new ConfigMapBuilder().withNewMetadata().endMetadata().build());
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
 
@@ -130,6 +132,8 @@ public class AdmInstallCommandTest extends AdmCommandBaseTest {
 
     @Test
     public void installLocalProfileWithoutTekton() throws Exception {
+        Mockito.when(kubernetesFacadeMock.get(eq(ConfigMap.class), Mockito.anyString(), Mockito.anyString()))
+                .thenReturn(new ConfigMapBuilder().withNewMetadata().endMetadata().build());
         Mockito.when(kubernetesFacadeMock.serverSideApply(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
 

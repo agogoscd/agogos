@@ -138,6 +138,7 @@
 👉 OK: Deployment: mt-broker-controller (apps/v1) (ns: knative-eventing)
 👉 OK: HorizontalPodAutoscaler: broker-ingress-hpa (autoscaling/v2) (ns: knative-eventing)
 👉 OK: HorizontalPodAutoscaler: broker-filter-hpa (autoscaling/v2) (ns: knative-eventing)
+👉 OK: Configured Knative Eventing ConfigMap 'config-features'
 ✅ Knative Eventing v1.11.5 installed
 🕞 Installing Agogos CRDs...
 👉 OK: CustomResourceDefinition: builders.agogos.redhat.com (apiextensions.k8s.io/v1)

@@ -2,6 +2,8 @@ package com.redhat.agogos.cli.commands.adm.install;
 
 import com.redhat.agogos.cli.commands.adm.InstallCommand.InstallProfile;
 import com.redhat.agogos.cli.config.KnativeEventingDependency;
+import io.fabric8.kubernetes.api.model.ConfigMap;
+import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.rbac.ClusterRole;
 import io.quarkus.runtime.annotations.RegisterForReflection;
@@ -17,6 +19,8 @@ import java.util.List;
 @RegisterForReflection
 public class KnativeEventingInstaller extends DependencyInstaller {
 
+    private static final String CONFIGMAP_CONFIG_FEATURES = "config-features";
+
     @Inject
     KnativeEventingDependency eventing;
 
@@ -30,6 +34,8 @@ public class KnativeEventingInstaller extends DependencyInstaller {
                     resource -> resource instanceof Deployment
                             && resource.getMetadata().getName().equals("pingsource-mt-adapter"));
         });
+
+        configureKnativeEventing(profile, namespace);
 
         kubernetesFacade.waitForAllPodsRunning(eventing.namespace());
 
@@ -58,5 +64,19 @@ public class KnativeEventingInstaller extends DependencyInstaller {
         rolesToDelete.stream().forEach(role -> {
             kubernetesFacade.delete(ClusterRole.class, eventing.namespace(), role);
         });
+    }
+
+    private void configureKnativeEventing(InstallProfile profile, String namespace) {
+        if (profile == InstallProfile.dev || profile == InstallProfile.local) {
+            ConfigMap configMap = kubernetesFacade.get(ConfigMap.class, eventing.namespace(), CONFIGMAP_CONFIG_FEATURES);
+            configMap = new ConfigMapBuilder(configMap)
+                    .addToData("new-trigger-filters", "enabled")
+                    .build();
+
+            configMap.getMetadata().setManagedFields(null);
+            kubernetesFacade.serverSideApply(configMap);
+
+            helper.printStdout(String.format("👉 OK: Configured Knative Eventing ConfigMap '%s'", CONFIGMAP_CONFIG_FEATURES));
+        }
     }
 }
