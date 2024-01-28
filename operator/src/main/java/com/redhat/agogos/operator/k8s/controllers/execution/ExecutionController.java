@@ -2,7 +2,9 @@ package com.redhat.agogos.operator.k8s.controllers.execution;
 
 import com.redhat.agogos.core.ResultableResourceStatus;
 import com.redhat.agogos.core.v1alpha1.Execution;
+import com.redhat.agogos.core.v1alpha1.Execution.ExecutionInfoStatus;
 import com.redhat.agogos.core.v1alpha1.Execution.ExecutionSpec;
+import com.redhat.agogos.core.v1alpha1.Execution.ExecutionStatus;
 import com.redhat.agogos.core.v1alpha1.Group;
 import com.redhat.agogos.core.v1alpha1.ResultableStatus;
 import com.redhat.agogos.operator.k8s.controllers.AbstractController;
@@ -35,28 +37,30 @@ public class ExecutionController extends AbstractController<Execution> {
             return UpdateControl.noUpdate();
         }
 
-        if (!Set.copyOf(group.getSpec().getComponents()).equals(spec.getComponents().keySet()) ||
-                !Set.copyOf(group.getSpec().getGroups()).equals(spec.getGroups().keySet()) ||
-                !Set.copyOf(group.getSpec().getPipelines()).equals(spec.getPipelines().keySet())) {
-            LOG.debug("Number of group elements in '{}'' does not match group '{}'", execution.getMetadata().getName(),
+        final ResultableStatus originalStatus = objectMapper.clone(execution.getStatus());
+        ExecutionStatus status = execution.getStatus();
+        if (status.getBuilds().size() == 0 && status.getExecutions().size() == 0 && status.getRuns().size() == 0) {
+            addExecutionInfoStatus(spec.getBuilds().keySet(), status.getBuilds());
+            addExecutionInfoStatus(spec.getExecutions().keySet(), status.getExecutions());
+            addExecutionInfoStatus(spec.getRuns().keySet(), status.getRuns());
+        }
+
+        if (group.getSpec().getComponents().size() != spec.getBuilds().size() ||
+                group.getSpec().getGroups().size() != spec.getExecutions().size() ||
+                group.getSpec().getPipelines().size() != spec.getRuns().size()) {
+            LOG.debug("Number of execution elements in '{}'' does not match group '{}'", execution.getMetadata().getName(),
                     spec.getGroup());
             return UpdateControl.noUpdate();
         }
 
         Map<ResultableResourceStatus, Long> results = Stream
-                .of(spec.getComponents().values(), spec.getGroups().values(), spec.getPipelines().values())
+                .of(status.getBuilds().values(), status.getExecutions().values(), status.getRuns().values())
                 .flatMap(Collection::stream)
                 .collect(Collectors.groupingBy(x -> x.getStatus().getStatus(), Collectors.counting()));
 
         Stream.of(ResultableResourceStatus.values()).forEach(value -> {
             results.putIfAbsent(value, 0L);
         });
-
-        final ResultableStatus originalStatus = objectMapper.clone(execution.getStatus());
-        ResultableStatus status = execution.getStatus();
-        if (status == null) {
-            status = new ResultableStatus();
-        }
 
         if (results.get(ResultableResourceStatus.NEW) == 0 && results.get(ResultableResourceStatus.RUNNING) == 0) {
             if (results.get(ResultableResourceStatus.ABORTED) > 0) {
@@ -86,7 +90,7 @@ public class ExecutionController extends AbstractController<Execution> {
         status.setLastUpdate(ResultableStatus.getFormattedNow());
 
         // Update now, BEFORE sending the cloud event. Otherwise we are in a race condition for any interceptors.
-        UpdateControl<Execution> ctrl = UpdateControl.updateStatus(execution);
+        UpdateControl<Execution> ctrl = UpdateControl.updateResourceAndStatus(execution);
 
         try {
             cloudEventPublisher.publish(execution);
@@ -100,4 +104,11 @@ public class ExecutionController extends AbstractController<Execution> {
         return ctrl;
     }
 
+    private void addExecutionInfoStatus(Set<String> names, Map<String, ExecutionInfoStatus> statuses) {
+        names.forEach(name -> {
+            ExecutionInfoStatus status = new ExecutionInfoStatus();
+            status.getStatus().setStatus(ResultableResourceStatus.NEW);
+            statuses.put(name, status);
+        });
+    }
 }

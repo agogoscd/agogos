@@ -45,6 +45,7 @@ public class GroupExecuteCommandTest extends GroupCommandBaseTest {
                 .thenReturn(executions.get(0));
 
         int returnCode = cli.run(catcher.getOut(), catcher.getErr(), "group", "execute", "dummy-component-group-1");
+        catcher.logStdout();
         Assertions.assertEquals(ExitCode.OK, returnCode);
         Assertions.assertTrue(
                 catcher.compareToStdout(utils.testResourceAsStringList("commands/group/execution-specific-group.txt")));

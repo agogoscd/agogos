@@ -2,9 +2,9 @@
 
 Name:		dummy-component-group-1-4dvh6
 
-Components:	Name                            Status    Started              Completed            Duration       
-		dummy-component-group-dep-1     Finished  2023-09-27 13:26:11  2023-09-27 13:26:22  0 minute(s)    
-		dummy-component-group-dep-2     Finished  2023-09-27 13:26:30  2023-09-27 13:26:30  0 minute(s)    
+Builds:         Name                            Status    Started              Completed            Duration       
+		dummy-component-group-dep-1-ab  Finished  2023-09-27 13:26:11  2023-09-27 13:26:22  0 minute(s)    
+		dummy-component-group-dep-2-ab  Finished  2023-09-27 13:26:30  2023-09-27 13:26:30  0 minute(s)    
 
 🎉 Status
 

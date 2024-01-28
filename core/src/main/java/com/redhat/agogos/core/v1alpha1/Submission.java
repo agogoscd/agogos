@@ -37,6 +37,10 @@ public class Submission extends AgogosResource<SubmissionSpec, Void> implements 
 
         @Getter
         @Setter
+        private String generatedName;
+
+        @Getter
+        @Setter
         private Resource resource;
 
         @Getter
@@ -56,6 +60,7 @@ public class Submission extends AgogosResource<SubmissionSpec, Void> implements 
             SubmissionSpec spec = (SubmissionSpec) obj;
 
             return Objects.equals(spec.getName(), getName())
+                    && Objects.equals(spec.getGeneratedName(), getGeneratedName())
                     && Objects.equals(spec.getResource(), getResource())
                     && Objects.equals(spec.getInstance(), getInstance())
                     && Objects.equals(spec.getGroup(), getGroup());

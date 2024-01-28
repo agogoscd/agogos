@@ -66,6 +66,9 @@ public class RunController extends AbstractController<Run> implements EventSourc
         Map<Object, Object> result = null;
 
         switch (runStatus) {
+            case NEW:
+                message = String.format("%s created", run.getKind());
+                break;
             case STARTED:
                 message = String.format("%s started", run.getKind());
                 break;

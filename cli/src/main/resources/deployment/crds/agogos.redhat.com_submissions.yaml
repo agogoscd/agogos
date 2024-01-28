@@ -28,6 +28,8 @@ spec:
               properties:
                 name:
                   type: string
+                generatedName:
+                  type: string
                 resource:
                   enum:
                     - Component

@@ -9,8 +9,6 @@ import io.fabric8.kubernetes.api.model.Secret;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +19,6 @@ import java.util.Map;
 @ApplicationScoped
 @RegisterForReflection
 public class TektonChainsInstaller extends DependencyInstaller {
-
-    private static final Logger LOG = LoggerFactory.getLogger(TektonInstaller.class);
 
     private static final String CONFIGMAP_CHAINS_CONFIG = "chains-config";
 

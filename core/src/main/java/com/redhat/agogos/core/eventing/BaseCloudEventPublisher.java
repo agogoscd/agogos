@@ -16,6 +16,7 @@ import jakarta.inject.Inject;
 import jakarta.json.Json;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 import org.slf4j.Logger;
@@ -152,6 +153,7 @@ public abstract class BaseCloudEventPublisher {
         LOG.debug("Sending '{}' CloudEvent", type);
         LOG.debug("CloudEvent: '{}'", objectMapper.asJson(cloudEvent));
 
-        broker.sendEvent(cloudEvent);
+        Response response = broker.sendEvent(cloudEvent);
+        LOG.debug("CloudEvent Response: {}", objectMapper.asJson(response.getHeaders()));
     }
 }

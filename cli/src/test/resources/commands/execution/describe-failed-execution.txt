@@ -2,9 +2,9 @@
 
 Name:		dummy-component-group-1-f8n7t
 
-Components:	Name                            Status    Started              Completed            Duration       
-		dummy-component-group-dep-1     Failed    2023-09-29 15:45:45  2023-09-29 15:45:45  0 minute(s)    
-		dummy-component-group-dep-2     Finished  2023-09-29 15:45:27  2023-09-29 15:45:39  0 minute(s)    
+Builds:         Name                            Status    Started              Completed            Duration       
+		dummy-component-group-dep-1-pq  Failed    2023-09-29 15:45:45  2023-09-29 15:45:45  0 minute(s)    
+		dummy-component-group-dep-2-pq  Finished  2023-09-29 15:45:27  2023-09-29 15:45:39  0 minute(s)    
 
 🎉 Status
 

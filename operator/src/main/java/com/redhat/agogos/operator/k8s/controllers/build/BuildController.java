@@ -65,6 +65,9 @@ public class BuildController extends AbstractController<Build> implements EventS
         Map<Object, Object> result = null;
 
         switch (runStatus) {
+            case NEW:
+                message = String.format("%s created", build.getKind());
+                break;
             case STARTED:
                 message = String.format("%s started", build.getKind());
                 break;

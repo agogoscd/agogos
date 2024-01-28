@@ -98,6 +98,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
             "header.match('ce-type', 'com.redhat.agogos.event.group.execution.v1alpha1')",
             "header.match('ce-type', 'com.redhat.agogos.event.pipeline.run.v1alpha1')"));
     private static final String SUBMISSION_CEL_INTERCEPTOR_GROUP_OVERLAY = "has(body.group) ? body.group : ''";
+    private static final String SUBMISSION_CEL_INTERCEPTOR_GENERATED_NAME_OVERLAY = "has(body.generatedName) ? body.generatedName : ''";
     private static final String RESOURCE_NAME = "agogos";
     private static final String RESOURCE_NAME_CONFIG = "agogos-config";
     private static final String RESOURCE_NAME_EVENTING = "agogos-eventing";
@@ -527,7 +528,8 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
         InterceptorParams overlays = new InterceptorParamsBuilder()
                 .withName("overlays")
                 .withValue(List.of(
-                        Map.of("key", "group", "expression", SUBMISSION_CEL_INTERCEPTOR_GROUP_OVERLAY)))
+                        Map.of("key", "group", "expression", SUBMISSION_CEL_INTERCEPTOR_GROUP_OVERLAY),
+                        Map.of("key", "generatedName", "expression", SUBMISSION_CEL_INTERCEPTOR_GENERATED_NAME_OVERLAY)))
                 .build();
 
         TriggerInterceptor interceptor = new TriggerInterceptorBuilder()
@@ -541,6 +543,10 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
         TriggerSpecBinding nameBinding = new TriggerSpecBindingBuilder()
                 .withName("name")
                 .withValue("$(body.name)")
+                .build();
+        TriggerSpecBinding generatedNameBinding = new TriggerSpecBindingBuilder()
+                .withName("generatedName")
+                .withValue("$(extensions.generatedName)")
                 .build();
         TriggerSpecBinding resourceBinding = new TriggerSpecBindingBuilder()
                 .withName("resource")
@@ -564,6 +570,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                 .withApiVersion(HasMetadata.getApiVersion(Submission.class))
                 .withKind(HasMetadata.getKind(Submission.class))
                 .addToSpec("name", "$(tt.params.name)")
+                .addToSpec("generatedName", "$(tt.params.generatedName)")
                 .addToSpec("resource", "$(tt.params.resource)")
                 .addToSpec("instance", "$(tt.params.instance)")
                 .addToSpec("group", "$(tt.params.group)")
@@ -572,6 +579,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                 .build();
         TriggerTemplateSpec template = new TriggerTemplateSpecBuilder()
                 .addToParams(new ParamSpecBuilder().withName("name").withDefault("$(tt.params.name)").build())
+                .addToParams(new ParamSpecBuilder().withName("generatedName").withDefault("$(tt.params.generatedName)").build())
                 .addToParams(new ParamSpecBuilder().withName("resource").withDefault("$(tt.params.resource)").build())
                 .addToParams(new ParamSpecBuilder().withName("instance").withDefault("$(tt.params.instance)").build())
                 .addToParams(new ParamSpecBuilder().withName("group").withDefault("$(tt.params.group)").build())
@@ -583,7 +591,7 @@ public class InitNamespaceCommand extends AbstractCallableSubcommand {
                 .withNamespace(namespace)
                 .endMetadata()
                 .withNewSpec()
-                .withBindings(nameBinding, resourceBinding, instanceBinding, groupBinding)
+                .withBindings(nameBinding, generatedNameBinding, resourceBinding, instanceBinding, groupBinding)
                 .withInterceptors(interceptor)
                 .withTemplate(new TriggerSpecTemplateBuilder().withSpec(template).build())
                 .withNewTemplate()

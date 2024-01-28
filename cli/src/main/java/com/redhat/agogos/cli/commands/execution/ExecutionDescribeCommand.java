@@ -3,7 +3,7 @@ package com.redhat.agogos.cli.commands.execution;
 import com.redhat.agogos.cli.commands.AbstractResourceSubcommand;
 import com.redhat.agogos.core.ResultableResourceStatus;
 import com.redhat.agogos.core.v1alpha1.Execution;
-import com.redhat.agogos.core.v1alpha1.Execution.ExecutionInfo;
+import com.redhat.agogos.core.v1alpha1.Execution.ExecutionInfoStatus;
 import com.redhat.agogos.core.v1alpha1.ResultableStatus;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -59,9 +59,9 @@ public class ExecutionDescribeCommand extends AbstractResourceSubcommand<Executi
                 .append(nl)
                 .append(nl);
 
-        addDependentLines(sb, execution.getSpec().getComponents(), "Components");
-        addDependentLines(sb, execution.getSpec().getGroups(), "Groups");
-        addDependentLines(sb, execution.getSpec().getPipelines(), "Pipelines");
+        addDependentLines(sb, execution.getStatus().getBuilds(), "Builds:");
+        addDependentLines(sb, execution.getStatus().getExecutions(), "Executions:");
+        addDependentLines(sb, execution.getStatus().getRuns(), "Runs:");
 
         if (execution.getStatus() != null) {
             ResultableStatus status = (ResultableStatus) execution.getStatus();
@@ -118,16 +118,15 @@ public class ExecutionDescribeCommand extends AbstractResourceSubcommand<Executi
         return CommandLine.ExitCode.OK;
     }
 
-    private void addDependentLines(StringBuilder sb, Map<String, ExecutionInfo> dependents, String kind) {
+    private <T extends ExecutionInfoStatus> void addDependentLines(StringBuilder sb, Map<String, T> dependents, String kind) {
         if (dependents.size() > 0) {
             String nl = System.getProperty("line.separator");
             sb.append(Ansi.AUTO.string(
-                    String.format("@|bold %s|@:@|bold \t%-30.30s  %-8s  %-19s  %-19s  %-15s|@", kind, "Name", "Status",
-                            "Started",
-                            "Completed", "Duration")))
+                    String.format("@|bold %-15s %-30.30s  %-8s  %-19s  %-19s  %-15s|@",
+                            kind, "Name", "Status", "Started", "Completed", "Duration")))
                     .append(nl);
-            dependents.entrySet().stream().forEach(e -> {
-                ExecutionInfo info = e.getValue();
+            dependents.entrySet().forEach(e -> {
+                ExecutionInfoStatus info = e.getValue();
                 ResultableStatus status = info.getStatus();
                 ZonedDateTime startTime = status.startTime();
                 ZonedDateTime completionTime = status.completionTime();

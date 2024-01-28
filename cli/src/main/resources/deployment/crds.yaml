@@ -468,7 +468,53 @@ spec:
               properties:
                 group:
                   type: string
-                components:
+                builds:
+                  type: object
+                  additionalProperties:
+                    type: object
+                    properties:
+                      component:
+                        type: string
+                executions:
+                  type: object
+                  additionalProperties:
+                    type: object
+                    properties:
+                      group:
+                        type: string
+                runs:
+                  type: object
+                  additionalProperties:
+                    type: object
+                    properties:
+                      pipeline:
+                        type: string
+              anyOf:
+                - required: ["builds"]
+                - required: ["executions"]
+                - required: ["runs"]
+            status:
+              description: Status defines the observed state of Build
+              properties:
+                startTime:
+                  format: date-time
+                  type: string
+                completionTime:
+                  format: date-time
+                  type: string
+                lastUpdate:
+                  format: date-time
+                  type: string
+                status:
+                  default: New
+                  enum:
+                    - New
+                    - Running
+                    - Finished
+                    - Failed
+                    - Aborted
+                  type: string
+                builds:
                   type: object
                   additionalProperties:
                     type: object
@@ -499,7 +545,7 @@ spec:
                               - Aborted
                             type: string
                         type: object
-                groups:
+                executions:
                   type: object
                   additionalProperties:
                     type: object
@@ -528,7 +574,7 @@ spec:
                               - Aborted
                             type: string
                         type: object
-                pipelines:
+                runs:
                   type: object
                   additionalProperties:
                     type: object
@@ -557,31 +603,6 @@ spec:
                               - Aborted
                             type: string
                         type: object
-              anyOf:
-                - required: ["components"]
-                - required: ["groups"]
-                - required: ["pipelines"]
-            status:
-              description: Status defines the observed state of Build
-              properties:
-                startTime:
-                  format: date-time
-                  type: string
-                completionTime:
-                  format: date-time
-                  type: string
-                lastUpdate:
-                  format: date-time
-                  type: string
-                status:
-                  default: New
-                  enum:
-                    - New
-                    - Running
-                    - Finished
-                    - Failed
-                    - Aborted
-                  type: string
               type: object
           type: object
       served: true
@@ -1061,6 +1082,8 @@ spec:
               type: object
               properties:
                 name:
+                  type: string
+                generatedName:
                   type: string
                 resource:
                   enum:

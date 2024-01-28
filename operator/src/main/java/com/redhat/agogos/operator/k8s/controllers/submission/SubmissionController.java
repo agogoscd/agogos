@@ -5,7 +5,10 @@ import com.redhat.agogos.core.k8s.Resource;
 import com.redhat.agogos.core.v1alpha1.Build;
 import com.redhat.agogos.core.v1alpha1.Component;
 import com.redhat.agogos.core.v1alpha1.Execution;
+import com.redhat.agogos.core.v1alpha1.Execution.ExecutionComponentInfo;
+import com.redhat.agogos.core.v1alpha1.Execution.ExecutionGroupInfo;
 import com.redhat.agogos.core.v1alpha1.Execution.ExecutionInfo;
+import com.redhat.agogos.core.v1alpha1.Execution.ExecutionPipelineInfo;
 import com.redhat.agogos.core.v1alpha1.Group;
 import com.redhat.agogos.core.v1alpha1.Pipeline;
 import com.redhat.agogos.core.v1alpha1.Run;
@@ -22,9 +25,8 @@ import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -77,7 +79,12 @@ public class SubmissionController extends AbstractController<Submission> {
 
     private void submitBuild(Submission submission, Map<String, String> labels) {
         Build build = new Build();
-        build.getMetadata().setGenerateName(submission.getSpec().getName() + "-");
+        // If this is part of a group, use the provided name rather than generating one.
+        if (labels.containsKey(Label.create(Resource.GROUP))) {
+            build.getMetadata().setName(submission.getSpec().getGeneratedName());
+        } else {
+            build.getMetadata().setGenerateName(submission.getSpec().getName() + "-");
+        }
         build.getMetadata().setNamespace(submission.getMetadata().getNamespace());
         build.getSpec().setComponent(submission.getSpec().getName());
         build.getMetadata().setLabels(labels);
@@ -90,7 +97,12 @@ public class SubmissionController extends AbstractController<Submission> {
 
     private void submitPipeline(Submission submission, Map<String, String> labels) {
         Run run = new Run();
-        run.getMetadata().setGenerateName(submission.getSpec().getName() + "-");
+        // If this is part of a group, use the provided name rather than generating one.
+        if (labels.containsKey(Label.create(Resource.GROUP))) {
+            run.getMetadata().setName(submission.getSpec().getGeneratedName());
+        } else {
+            run.getMetadata().setGenerateName(submission.getSpec().getName() + "-");
+        }
         run.getMetadata().setNamespace(submission.getMetadata().getNamespace());
         run.getSpec().setPipeline(submission.getSpec().getName());
         run.getMetadata().setLabels(labels);
@@ -120,31 +132,58 @@ public class SubmissionController extends AbstractController<Submission> {
         execution.getMetadata().setGenerateName(submission.getSpec().getName() + "-");
         execution.getMetadata().setNamespace(submission.getMetadata().getNamespace());
         execution.getSpec().setGroup(submission.getSpec().getName());
-        addExecutionInfo(group.getSpec().getComponents(), execution.getSpec().getComponents());
-        addExecutionInfo(group.getSpec().getGroups(), execution.getSpec().getGroups());
-        addExecutionInfo(group.getSpec().getPipelines(), execution.getSpec().getPipelines());
+        group.getSpec().getComponents().forEach(component -> {
+            execution.getSpec().getBuilds().put(generateName(component), new ExecutionComponentInfo(component));
+        });
+        group.getSpec().getGroups().forEach(grp -> {
+            execution.getSpec().getExecutions().put(generateName(grp), new ExecutionGroupInfo(grp));
+        });
+        group.getSpec().getPipelines().forEach(pipeline -> {
+            execution.getSpec().getRuns().put(generateName(pipeline), new ExecutionPipelineInfo(pipeline));
+        });
+
         kubernetesFacade.create(execution);
 
-        group.getSpec().getComponents().stream().forEach(component -> {
-            sendSubmissionCloudEvent(submission, "build", component, Component.class, submission.getSpec().getName());
+        execution.getSpec().getBuilds().entrySet().forEach(build -> {
+            sendSubmissionCloudEvent(submission, "build", build, Component.class, submission.getSpec().getName());
         });
-        group.getSpec().getGroups().stream().forEach(grp -> {
-            sendSubmissionCloudEvent(submission, "execution", grp, Group.class, submission.getSpec().getName());
+        execution.getSpec().getExecutions().entrySet().forEach(exec -> {
+            sendSubmissionCloudEvent(submission, "execution", exec, Group.class, submission.getSpec().getName());
         });
-        group.getSpec().getPipelines().stream().forEach(pipeline -> {
-            sendSubmissionCloudEvent(submission, "run", pipeline, Pipeline.class, submission.getSpec().getName());
+        execution.getSpec().getRuns().entrySet().forEach(run -> {
+            sendSubmissionCloudEvent(submission, "run", run, Pipeline.class, submission.getSpec().getName());
         });
     }
 
-    private void addExecutionInfo(List<String> items, HashMap<String, ExecutionInfo> info) {
-        items.stream().forEach(name -> info.put(name, new ExecutionInfo()));
+    public String generateName(String name) {
+        final Integer ASCII_0 = 48;
+        final Integer ASCII_9 = 57;
+        final Integer ASCII_A = 97; // Lower-case a.
+        final Integer ASCII_Z = 122; // Lower-case z.
+        final Integer LENGTH = 5;
+        Random random = new Random();
+
+        String generatedString = random.ints(ASCII_0, ASCII_Z + 1)
+                .filter(i -> (i >= ASCII_0 && i <= ASCII_9) || (i >= ASCII_A && i <= ASCII_Z))
+                .limit(LENGTH)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+
+        return String.format("%s-%s", name, generatedString);
     }
 
-    private void sendSubmissionCloudEvent(Submission submission, String state, String name, Class<? extends HasMetadata> clazz,
-            String group) {
-
+    private <T extends ExecutionInfo> void sendSubmissionCloudEvent(Submission submission, String state,
+            Map.Entry<String, T> entry,
+            Class<? extends HasMetadata> clazz, String group) {
         SubmissionSpec spec = new SubmissionSpec();
-        spec.setName(name);
+        if (entry.getValue() instanceof ExecutionComponentInfo) {
+            spec.setName(((ExecutionComponentInfo) entry.getValue()).getComponent());
+        } else if (entry.getValue() instanceof ExecutionGroupInfo) {
+            spec.setName(((ExecutionGroupInfo) entry.getValue()).getGroup());
+        } else if (entry.getValue() instanceof ExecutionPipelineInfo) {
+            spec.setName(((ExecutionPipelineInfo) entry.getValue()).getPipeline());
+        }
+        spec.setGeneratedName(entry.getKey());
         spec.setInstance(submission.getSpec().getInstance());
         spec.setResource(Resource.fromType(HasMetadata.getKind(clazz)));
         spec.setGroup(group);

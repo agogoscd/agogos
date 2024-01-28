@@ -33,6 +33,7 @@ public class KubernetesClientRetries {
     private enum Command {
         CREATE("create"),
         FORCE_SERVER_SIDE_APPLY("forceServerSideApply"),
+        PATCH_STATUS("patchStatus"),
         SERVER_SIDE_APPLY("serverSideApply"),
         UPDATE("update");
 
@@ -85,6 +86,14 @@ public class KubernetesClientRetries {
         return createOrUpdate(resource, command, retries, interval);
     }
 
+    public <T extends HasMetadata> T patchStatus(T resource) {
+        return patchStatus(resource, DEFAULT_MAX_RETRIES, DEFAULT_MAX_INTERVAL);
+    }
+
+    public <T extends HasMetadata> T patchStatus(T resource, Integer retries, Integer interval) {
+        return createOrUpdate(resource, Command.PATCH_STATUS, retries, interval);
+    }
+
     public <T extends HasMetadata> T update(T resource) {
         return createOrUpdate(resource, Command.UPDATE, DEFAULT_MAX_RETRIES, DEFAULT_MAX_INTERVAL);
     }
@@ -103,7 +112,8 @@ public class KubernetesClientRetries {
         RetryRegistry registry = RetryRegistry.of(config);
         Retry retry = registry.retry(getRegistryRetryName(command.toString(), retries, interval));
         retry.getEventPublisher()
-                .onRetry(e -> LOG.warn("⚠️ WARN: Retrying {} for {}", command, resource.getMetadata().getName()));
+                .onRetry(e -> LOG.warn("⚠️ WARN: Retrying #{} {} for {}", e.getNumberOfRetryAttempts(), command,
+                        resource.getMetadata().getName()));
 
         Function<T, T> decorated = Retry.decorateFunction(retry, (T r) -> {
             switch (command) {
@@ -111,6 +121,8 @@ public class KubernetesClientRetries {
                     return kubernetesClient.resource(r).create();
                 case FORCE_SERVER_SIDE_APPLY:
                     return kubernetesClient.resource(r).forceConflicts().serverSideApply();
+                case PATCH_STATUS:
+                    return kubernetesClient.resource(r).patchStatus();
                 case SERVER_SIDE_APPLY:
                     return kubernetesClient.resource(r).serverSideApply();
                 case UPDATE:

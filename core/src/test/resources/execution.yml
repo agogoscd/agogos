@@ -1,0 +1,26 @@
+---
+apiVersion: "agogos.redhat.com/v1alpha1"
+kind: "Execution"
+metadata:
+  labels:
+    agogos.redhat.com/instance: "f6162caa-74b9-4365-9446-404bccdb9bf5"
+    agogos.redhat.com/name: "group-2"
+    agogos.redhat.com/resource: "group"
+  name: "group-2-8cpzz"
+  namespace: "gallen"
+spec:
+  group: "group-2"
+  builds:
+    sample-1-7vrcg:
+      component: "sample-1"
+  executions: {}
+  runs: {}
+status:
+  status: "Running"
+  startTime: "2024-01-26T20:44:08.571Z"
+  builds:
+    sample-1-7vrcg:
+      status:
+        status: "New"
+  executions: {}
+  runs: {}

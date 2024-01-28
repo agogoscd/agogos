@@ -2,9 +2,9 @@
 
 Name:		dummy-component-group-1-xwts6
 
-Components:	Name                            Status    Started              Completed            Duration       
-		dummy-component-group-dep-1     Running   2023-09-29 13:04:45  N/A                  0 second(s)   
-		dummy-component-group-dep-2     Running   2023-09-29 13:04:45  N/A                  0 second(s)   
+Builds:         Name                            Status    Started              Completed            Duration       
+		dummy-component-group-dep-1-kl  Running   2023-09-29 13:04:45  N/A                  173491 minute(s)
+		dummy-component-group-dep-2-kl  Running   2023-09-29 13:04:45  N/A                  173491 minute(s)
 
 🎉 Status
 
@@ -13,5 +13,5 @@ Reason:		N/A
 Created:	2023-09-29 13:04:45
 Started:	2023-09-29 13:04:45
 Finished:	N/A
-Duration:	0 second(s)
+Duration:	173491 minute(s)
 

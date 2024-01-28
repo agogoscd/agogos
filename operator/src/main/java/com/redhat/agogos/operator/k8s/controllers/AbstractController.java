@@ -7,7 +7,7 @@ import com.redhat.agogos.core.k8s.Resource;
 import com.redhat.agogos.core.v1alpha1.AgogosResource;
 import com.redhat.agogos.core.v1alpha1.Build;
 import com.redhat.agogos.core.v1alpha1.Execution;
-import com.redhat.agogos.core.v1alpha1.Execution.ExecutionInfo;
+import com.redhat.agogos.core.v1alpha1.Execution.ExecutionInfoStatus;
 import com.redhat.agogos.core.v1alpha1.Group;
 import com.redhat.agogos.core.v1alpha1.ResultableStatus;
 import com.redhat.agogos.core.v1alpha1.Run;
@@ -71,7 +71,7 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
             List<Execution> executions = kubernetesFacade.list(Execution.class, resource.getMetadata().getNamespace(), options);
             if (executions.size() > 0) {
                 Execution execution = executions.get(0);
-                ExecutionInfo info = findExecutionInfo(resource, execution, name);
+                ExecutionInfoStatus info = findExecutionInfoStatus(resource, execution, resource.getMetadata().getName());
                 if (info != null) {
                     ResultableStatus s = new ResultableStatus();
                     s.setCompletionTime(resourceStatus.getCompletionTime());
@@ -80,7 +80,7 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
                     s.setStatus(resourceStatus.getStatus());
 
                     info.setStatus(s);
-                    if (kubernetesFacade.update(execution) != null) {
+                    if (kubernetesFacade.patchStatus(execution) != null) {
                         LOG.info("Updated execution info for '{}' to {} in '{}'", fullName,
                                 resourceStatus.getStatus(), execution.getFullName());
                     } else {
@@ -97,13 +97,13 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
         }
     }
 
-    private ExecutionInfo findExecutionInfo(T resource, Execution execution, String name) {
+    private ExecutionInfoStatus findExecutionInfoStatus(T resource, Execution execution, String name) {
         if (resource instanceof Build) {
-            return execution.getSpec().getComponents().get(name);
+            return execution.getStatus().getBuilds().get(name);
         } else if (resource instanceof Group) {
-            return execution.getSpec().getGroups().get(name);
+            return execution.getStatus().getExecutions().get(name);
         } else if (resource instanceof Run) {
-            return execution.getSpec().getPipelines().get(name);
+            return execution.getStatus().getRuns().get(name);
         } else {
             throw new ApplicationException("Unrecognized resource in findExecutionInfo: " + resource.getKind());
         }

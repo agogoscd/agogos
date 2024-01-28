@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.redhat.agogos.core.test.TestResources;
 import com.redhat.agogos.core.v1alpha1.Component;
+import com.redhat.agogos.core.v1alpha1.Execution;
 import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
@@ -27,5 +28,12 @@ class SerializationTest {
         String resource = TestResources.asString("trigger.yml");
         Trigger t = mapper.unmarshal(resource, Trigger.class);
         assertEquals(resource, mapper.asYaml(t));
+    }
+
+    @Test
+    void serializeExecutionTest() throws java.io.IOException {
+        String resource = TestResources.asString("execution.yml");
+        Execution e = mapper.unmarshal(resource, Execution.class);
+        assertEquals(resource, mapper.asYaml(e));
     }
 }

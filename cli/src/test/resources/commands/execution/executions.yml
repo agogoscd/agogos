@@ -16,27 +16,34 @@ metadata:
   resourceVersion: "3635"
   uid: f0effa3d-54da-497c-9f78-9f85e2d7c977
 spec:
-  components:
-    dummy-component-group-dep-1:
-      status:
-        completionTime: "2023-09-27T13:26:22.402Z"
-        lastUpdate: "2023-09-27T13:26:22.402Z"
-        startTime: "2023-09-27T13:26:11.564Z"
-        status: Finished
-    dummy-component-group-dep-2:
-      status:
-        completionTime: "2023-09-27T13:26:30.340Z"
-        lastUpdate: "2023-09-27T13:26:30.340Z"
-        startTime: "2023-09-27T13:26:30.340Z"
-        status: Finished
+  builds:
+    dummy-component-group-dep-1-abcde:
+      component: dummy-component-group-dep-1
+    dummy-component-group-dep-2-abcde:
+      component: dummy-component-group-dep-2
   group: dummy-component-group-1
-  groups: {}
-  pipelines: {}
+  executions: {}
+  runs: {}
 status:
   completionTime: "2023-09-27T13:26:30.400Z"
   lastUpdate: "2023-09-27T13:26:30.400Z"
   startTime: "2023-09-27T13:26:10.996Z"
   status: Finished
+  builds:
+    dummy-component-group-dep-1-abcde:
+      status:
+        completionTime: "2023-09-27T13:26:22.402Z"
+        lastUpdate: "2023-09-27T13:26:22.402Z"
+        startTime: "2023-09-27T13:26:11.564Z"
+        status: Finished
+    dummy-component-group-dep-2-abcde:
+      status:
+        completionTime: "2023-09-27T13:26:30.340Z"
+        lastUpdate: "2023-09-27T13:26:30.340Z"
+        startTime: "2023-09-27T13:26:30.340Z"
+        status: Finished
+  executions: {}
+  runs: {}
 ---
 apiVersion: agogos.redhat.com/v1alpha1
 kind: Execution
@@ -55,27 +62,34 @@ metadata:
   resourceVersion: "3860"
   uid: d406176f-98ae-463e-a3c1-47deba3b1fca
 spec:
-  components:
-    dummy-component-group-dep-3:
-      status:
-        completionTime: "2023-09-27T13:26:40.540Z"
-        lastUpdate: "2023-09-27T13:26:40.540Z"
-        startTime: "2023-09-27T13:26:31.178Z"
-        status: Finished
-    dummy-component-group-dep-4:
-      status:
-        completionTime: "2023-09-27T13:26:42.673Z"
-        lastUpdate: "2023-09-27T13:26:42.673Z"
-        startTime: "2023-09-27T13:26:31.297Z"
-        status: Finished
+  builds:
+    dummy-component-group-dep-3-fghij:
+      component: dummy-component-group-dep-3
+    dummy-component-group-dep-4-fghij:
+      component: dummy-component-group-dep-4
   group: dummy-component-group-2
-  groups: {}
-  pipelines: {}
+  executions: {}
+  runs: {}
 status:
   completionTime: "2023-09-27T13:26:42.731Z"
   lastUpdate: "2023-09-27T13:26:42.731Z"
   startTime: "2023-09-27T13:26:30.727Z"
   status: Finished
+  builds:
+    dummy-component-group-dep-3-fghij:
+      status:
+        completionTime: "2023-09-27T13:26:40.540Z"
+        lastUpdate: "2023-09-27T13:26:40.540Z"
+        startTime: "2023-09-27T13:26:31.178Z"
+        status: Finished
+    dummy-component-group-dep-4-fghij:
+      status:
+        completionTime: "2023-09-27T13:26:42.673Z"
+        lastUpdate: "2023-09-27T13:26:42.673Z"
+        startTime: "2023-09-27T13:26:31.297Z"
+        status: Finished
+  executions: {}
+  runs: {}
 ---
 apiVersion: agogos.redhat.com/v1alpha1
 kind: Execution
@@ -94,24 +108,31 @@ metadata:
   resourceVersion: "19754"
   uid: 8d7127e3-5c82-4a7c-a2a1-da7af2a75232
 spec:
-  components:
-    dummy-component-group-dep-1:
-      status:
-        lastUpdate: "2023-09-29T13:04:45.871Z"
-        startTime: "2023-09-29T13:04:45.870Z"
-        status: Running
-    dummy-component-group-dep-2:
-      status:
-        lastUpdate: "2023-09-29T13:04:45.832Z"
-        startTime: "2023-09-29T13:04:45.832Z"
-        status: Running
+  builds:
+    dummy-component-group-dep-1-klmno:
+      component: dummy-component-group-dep-1
+    dummy-component-group-dep-2-klmno:
+      component: dummy-component-group-dep-2
   group: dummy-component-group-1
-  groups: {}
-  pipelines: {}
+  executions: {}
+  runs: {}
 status:
   lastUpdate: "2023-09-29T13:04:45.409Z"
   startTime: "2023-09-29T13:04:45.409Z"
   status: Running
+  builds:
+    dummy-component-group-dep-1-klmno:
+      status:
+        lastUpdate: "2023-09-29T13:04:45.871Z"
+        startTime: "2023-09-29T13:04:45.870Z"
+        status: Running
+    dummy-component-group-dep-2-klmno:
+      status:
+        lastUpdate: "2023-09-29T13:04:45.832Z"
+        startTime: "2023-09-29T13:04:45.832Z"
+        status: Running
+  executions: {}
+  runs: {}
 ---
 apiVersion: agogos.redhat.com/v1alpha1
 kind: Execution
@@ -130,24 +151,31 @@ metadata:
   resourceVersion: "75917"
   uid: 8b3f5818-a053-4ed5-8171-82b700547fbc
 spec:
-  components:
-    dummy-component-group-dep-1:
-      status:
-        completionTime: "2023-09-29T15:45:45.615Z"
-        lastUpdate: "2023-09-29T15:45:45.615Z"
-        startTime: "2023-09-29T15:45:45.615Z"
-        status: Failed
-    dummy-component-group-dep-2:
-      status:
-        completionTime: "2023-09-29T15:45:39.327Z"
-        lastUpdate: "2023-09-29T15:45:39.327Z"
-        startTime: "2023-09-29T15:45:27.300Z"
-        status: Finished
+  builds:
+    dummy-component-group-dep-1-pqrst:
+      component: dummy-component-group-dep-1
+    dummy-component-group-dep-2-pqrst:
+      component: dummy-component-group-dep-2
   group: dummy-component-group-1
-  groups: {}
-  pipelines: {}
+  executions: {}
+  runs: {}
 status:
   completionTime: "2023-09-29T15:45:45.691Z"
   lastUpdate: "2023-09-29T15:45:45.691Z"
   startTime: "2023-09-29T15:45:26.791Z"
   status: Failed
+  builds:
+    dummy-component-group-dep-1-pqrst:
+      status:
+        completionTime: "2023-09-29T15:45:45.615Z"
+        lastUpdate: "2023-09-29T15:45:45.615Z"
+        startTime: "2023-09-29T15:45:45.615Z"
+        status: Failed
+    dummy-component-group-dep-2-pqrst:
+      status:
+        completionTime: "2023-09-29T15:45:39.327Z"
+        lastUpdate: "2023-09-29T15:45:39.327Z"
+        startTime: "2023-09-29T15:45:27.300Z"
+        status: Finished
+  executions: {}
+  runs: {}
