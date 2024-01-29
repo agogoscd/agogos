@@ -26,6 +26,7 @@ variables:
   COMPLIANCE: "1"
   CODE_SCANNING_SOURCES: "."
   CODE_SCANNING_EXCLUSIONS: ""
+  GITLEAKS_DISABLED: "1"                # set to "0" to enable this scanner
   SONARQUBE_DISABLED: "1"               # set to "0" to enable this scanner"
   OWASP_DEPENDENCY_CHECK_DISABLED: "1"  # set to "0" to enable this scanner"
   SEMGREP_DISABLED: "1"                 # set to "0" to enable this scanner"
