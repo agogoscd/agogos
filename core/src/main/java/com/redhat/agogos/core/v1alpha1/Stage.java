@@ -50,6 +50,10 @@ public class Stage extends AgogosResource<StageSpec, Status> implements Namespac
 
         @Getter
         @Setter
+        private Integer retries;
+
+        @Getter
+        @Setter
         private StageSchema schema = new StageSchema();
 
     }

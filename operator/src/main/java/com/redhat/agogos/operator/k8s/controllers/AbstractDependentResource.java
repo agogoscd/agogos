@@ -11,11 +11,7 @@ import com.redhat.agogos.core.v1alpha1.StageEntry.StageReference;
 import com.redhat.agogos.core.v1alpha1.WorkspaceMapping;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.utils.KubernetesSerialization;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineTask;
-import io.fabric8.tekton.pipeline.v1beta1.PipelineTaskBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.TaskRefBuilder;
-import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBinding;
-import io.fabric8.tekton.pipeline.v1beta1.WorkspacePipelineTaskBindingBuilder;
+import io.fabric8.tekton.pipeline.v1beta1.*;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.CRUDKubernetesDependentResource;
 import io.javaoperatorsdk.operator.processing.dependent.kubernetes.KubernetesDependent;
 import jakarta.inject.Inject;
@@ -71,6 +67,15 @@ public abstract class AbstractDependentResource<R extends HasMetadata, P extends
                     .withSubPath(String.format("pipeline/%s", name))
                     .build();
 
+            List<Param> taskParams = new ArrayList<>();
+
+            Param configParam = new ParamBuilder()
+                    .withName("config")
+                    .withNewValue(stageConfig)
+                    .build();
+
+            taskParams.add(configParam);
+
             // Prepare task
             PipelineTask task = new PipelineTaskBuilder()
                     .withName(name)
@@ -81,10 +86,6 @@ public abstract class AbstractDependentResource<R extends HasMetadata, P extends
                             .withResolver(stage.getSpec().getTaskRef().getResolver())
                             .withParams(stage.getSpec().getTaskRef().getParams())
                             .build())
-                    .addNewParam()
-                    .withName("config")
-                    .withNewValue(stageConfig)
-                    .endParam()
                     .withWorkspaces(stageWsBinding, pipelineWsBinding)
                     .build();
 
@@ -92,6 +93,19 @@ public abstract class AbstractDependentResource<R extends HasMetadata, P extends
             if (stageEntry.getRunAfter() != null) {
                 task.setRunAfter(stageEntry.getRunAfter());
             }
+
+            // retries defined at component or pipeline level take precedence over the retries at the stage definition
+            Integer retries = stageEntry.getRetries() != null ? stageEntry.getRetries() : stage.getSpec().getRetries();
+            if (retries != null) {
+                task.setRetries(retries);
+                Param pipelineTaskRetriesParam = new ParamBuilder()
+                        .withName("retries")
+                        .withNewValue("$(context.pipelineTask.retries)")
+                        .build();
+                taskParams.add(pipelineTaskRetriesParam);
+            }
+
+            task.setParams(taskParams);
 
             tasks.add(task);
         }

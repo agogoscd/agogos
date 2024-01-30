@@ -282,6 +282,9 @@ spec:
                         type: object
                         description: "Additional configuration properties passed to the stage implementation"
                         x-kubernetes-preserve-unknown-fields: true
+                      retries:
+                        type: integer
+                        description: The number of times the referenced stage should be retried in case of failure. Takes preference over the retries defined at the Stage level.
                     required: ["stageRef"]
 
                 post:
@@ -306,6 +309,9 @@ spec:
                         type: object
                         description: "Additional configuration properties passed to the stage implementation"
                         x-kubernetes-preserve-unknown-fields: true
+                      retries:
+                        type: integer
+                        description: The number of times the referenced stage should be retried in case of failure. Takes preference over the retries defined at the Stage level.
                     required: ["stageRef"]
 
                 build:
@@ -804,6 +810,9 @@ spec:
                         type: object
                         description: "Additional configuration properties passed to the stage implementation"
                         x-kubernetes-preserve-unknown-fields: true
+                      retries:
+                        type: integer
+                        description: The number of times the referenced stage should be retried in case of failure. Takes preference over the retries defined at the Stage level.
                     required:
                       - "stageRef"
                 dependents:
@@ -1030,6 +1039,9 @@ spec:
                         More info: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md"
                   required:
                     - "openAPIV3Schema"
+                retries:
+                  type: integer
+                  description: The number of times the referenced task should be retried in case of failure. No retries are attempted if the value is not defined. Can be overridden by the retries defined at the Pipeline level.
               required:
                 - "taskRef"
             status:

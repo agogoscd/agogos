@@ -38,6 +38,10 @@ public class StageEntry implements KubernetesResource {
     @Setter
     private Map<Object, Object> config = new HashMap<>();
 
+    @Getter
+    @Setter
+    private Integer retries;
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof StageEntry)) {
@@ -48,7 +52,8 @@ public class StageEntry implements KubernetesResource {
 
         return Objects.equals(stageEntry.getStageRef(), getStageRef())
                 && Objects.equals(stageEntry.getRunAfter(), getRunAfter())
-                && Objects.equals(stageEntry.getConfig(), getConfig());
+                && Objects.equals(stageEntry.getConfig(), getConfig())
+                && Objects.equals(stageEntry.getRetries(), getRetries());
     }
 
     @ToString

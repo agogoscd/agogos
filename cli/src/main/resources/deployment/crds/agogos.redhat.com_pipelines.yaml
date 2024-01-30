@@ -65,6 +65,9 @@ spec:
                         type: object
                         description: "Additional configuration properties passed to the stage implementation"
                         x-kubernetes-preserve-unknown-fields: true
+                      retries:
+                        type: integer
+                        description: The number of times the referenced stage should be retried in case of failure. Takes preference over the retries defined at the Stage level.
                     required:
                       - "stageRef"
                 dependents:
