@@ -29,6 +29,9 @@ public class KubernetesFacade {
     @Inject
     KubernetesClientRetries retriesClient;
 
+    public KubernetesFacade() {
+    }
+
     public URL getMasterUrl() {
         return kubernetesClient.getMasterUrl();
     }

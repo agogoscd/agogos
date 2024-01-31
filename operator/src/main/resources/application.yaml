@@ -24,6 +24,7 @@ quarkus:
       generate: false
       apply: false
     fail-on-version-check: false
+    start-operator: false
   scheduler:
     start-mode: forced
 
