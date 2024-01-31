@@ -1,5 +1,5 @@
 💻 Selected profile: local
-🕞 Installing Tekton Chains v0.18.0...
+🕞 Installing Tekton Chains v0.19.0...
 👉 OK: Namespace: tekton-chains (v1)
 👉 OK: Secret: signing-secrets (v1) (ns: tekton-chains)
 👉 OK: ConfigMap: chains-config (v1) (ns: tekton-chains)
@@ -18,8 +18,8 @@
 👉 OK: ConfigMap: tekton-chains-config-observability (v1) (ns: tekton-chains)
 👉 OK: Service: tekton-chains-metrics (v1) (ns: tekton-chains)
 👉 OK: Configured Tekton Chains ConfigMap 'chains-config'
-✅ Tekton Chains v0.18.0 installed
-🕞 Installing Tekton v0.50.3...
+✅ Tekton Chains v0.19.0 installed
+🕞 Installing Tekton v0.53.3...
 👉 OK: Namespace: tekton-pipelines (v1)
 👉 OK: ClusterRole: tekton-pipelines-controller-cluster-access (rbac.authorization.k8s.io/v1)
 👉 OK: ClusterRole: tekton-pipelines-controller-tenant-access (rbac.authorization.k8s.io/v1)
@@ -27,6 +27,7 @@
 👉 OK: ClusterRole: tekton-events-controller-cluster-access (rbac.authorization.k8s.io/v1)
 👉 OK: Role: tekton-pipelines-controller (rbac.authorization.k8s.io/v1) (ns: tekton-pipelines)
 👉 OK: Role: tekton-pipelines-webhook (rbac.authorization.k8s.io/v1) (ns: tekton-pipelines)
+👉 OK: Role: tekton-pipelines-events-controller (rbac.authorization.k8s.io/v1) (ns: tekton-pipelines)
 👉 OK: Role: tekton-pipelines-leader-election (rbac.authorization.k8s.io/v1) (ns: tekton-pipelines)
 👉 OK: Role: tekton-pipelines-info (rbac.authorization.k8s.io/v1) (ns: tekton-pipelines)
 👉 OK: ServiceAccount: tekton-pipelines-controller (v1) (ns: tekton-pipelines)
@@ -41,13 +42,14 @@
 👉 OK: RoleBinding: tekton-pipelines-controller-leaderelection (rbac.authorization.k8s.io/v1) (ns: tekton-pipelines)
 👉 OK: RoleBinding: tekton-pipelines-webhook-leaderelection (rbac.authorization.k8s.io/v1) (ns: tekton-pipelines)
 👉 OK: RoleBinding: tekton-pipelines-info (rbac.authorization.k8s.io/v1) (ns: tekton-pipelines)
-👉 OK: RoleBinding: tekton-events-controller (rbac.authorization.k8s.io/v1) (ns: tekton-pipelines)
+👉 OK: RoleBinding: tekton-pipelines-events-controller (rbac.authorization.k8s.io/v1) (ns: tekton-pipelines)
 👉 OK: RoleBinding: tekton-events-controller-leaderelection (rbac.authorization.k8s.io/v1) (ns: tekton-pipelines)
 👉 OK: CustomResourceDefinition: clustertasks.tekton.dev (apiextensions.k8s.io/v1)
 👉 OK: CustomResourceDefinition: customruns.tekton.dev (apiextensions.k8s.io/v1)
 👉 OK: CustomResourceDefinition: pipelines.tekton.dev (apiextensions.k8s.io/v1)
 👉 OK: CustomResourceDefinition: pipelineruns.tekton.dev (apiextensions.k8s.io/v1)
 👉 OK: CustomResourceDefinition: resolutionrequests.resolution.tekton.dev (apiextensions.k8s.io/v1)
+👉 OK: CustomResourceDefinition: stepactions.tekton.dev (apiextensions.k8s.io/v1)
 👉 OK: CustomResourceDefinition: tasks.tekton.dev (apiextensions.k8s.io/v1)
 👉 OK: CustomResourceDefinition: taskruns.tekton.dev (apiextensions.k8s.io/v1)
 👉 OK: CustomResourceDefinition: verificationpolicies.tekton.dev (apiextensions.k8s.io/v1)
@@ -61,11 +63,14 @@
 👉 OK: ConfigMap: config-events (v1) (ns: tekton-pipelines)
 👉 OK: ConfigMap: feature-flags (v1) (ns: tekton-pipelines)
 👉 OK: ConfigMap: pipelines-info (v1) (ns: tekton-pipelines)
-👉 OK: ConfigMap: config-leader-election (v1) (ns: tekton-pipelines)
+👉 OK: ConfigMap: config-leader-election-controller (v1) (ns: tekton-pipelines)
+👉 OK: ConfigMap: config-leader-election-events (v1) (ns: tekton-pipelines)
+👉 OK: ConfigMap: config-leader-election-webhook (v1) (ns: tekton-pipelines)
 👉 OK: ConfigMap: config-logging (v1) (ns: tekton-pipelines)
 👉 OK: ConfigMap: config-observability (v1) (ns: tekton-pipelines)
 👉 OK: ConfigMap: config-registry-cert (v1) (ns: tekton-pipelines)
 👉 OK: ConfigMap: config-spire (v1) (ns: tekton-pipelines)
+👉 OK: ConfigMap: config-tracing (v1) (ns: tekton-pipelines)
 👉 OK: Deployment: tekton-pipelines-controller (apps/v1) (ns: tekton-pipelines)
 👉 OK: Service: tekton-pipelines-controller (v1) (ns: tekton-pipelines)
 👉 OK: Deployment: tekton-events-controller (apps/v1) (ns: tekton-pipelines)
@@ -79,18 +84,19 @@
 👉 OK: ConfigMap: bundleresolver-config (v1) (ns: tekton-pipelines-resolvers)
 👉 OK: ConfigMap: cluster-resolver-config (v1) (ns: tekton-pipelines-resolvers)
 👉 OK: ConfigMap: resolvers-feature-flags (v1) (ns: tekton-pipelines-resolvers)
-👉 OK: ConfigMap: config-leader-election (v1) (ns: tekton-pipelines-resolvers)
+👉 OK: ConfigMap: config-leader-election-resolvers (v1) (ns: tekton-pipelines-resolvers)
 👉 OK: ConfigMap: config-logging (v1) (ns: tekton-pipelines-resolvers)
 👉 OK: ConfigMap: config-observability (v1) (ns: tekton-pipelines-resolvers)
 👉 OK: ConfigMap: git-resolver-config (v1) (ns: tekton-pipelines-resolvers)
 👉 OK: ConfigMap: hubresolver-config (v1) (ns: tekton-pipelines-resolvers)
 👉 OK: Deployment: tekton-pipelines-remote-resolvers (apps/v1) (ns: tekton-pipelines-resolvers)
+👉 OK: Service: tekton-pipelines-remote-resolvers (v1) (ns: tekton-pipelines-resolvers)
 👉 OK: HorizontalPodAutoscaler: tekton-pipelines-webhook (autoscaling/v2) (ns: tekton-pipelines)
 👉 OK: Deployment: tekton-pipelines-webhook (apps/v1) (ns: tekton-pipelines)
 👉 OK: Service: tekton-pipelines-webhook (v1) (ns: tekton-pipelines)
 👉 OK: Configured Tekton ConfigMap 'feature-flags'
-✅ Tekton v0.50.3 installed
-🕞 Installing Tekton Triggers v0.25.2...
+✅ Tekton v0.53.3 installed
+🕞 Installing Tekton Triggers v0.25.3...
 👉 OK: ClusterRole: tekton-triggers-admin (rbac.authorization.k8s.io/v1)
 👉 OK: ClusterRole: tekton-triggers-core-interceptors (rbac.authorization.k8s.io/v1)
 👉 OK: ClusterRole: tekton-triggers-core-interceptors-secrets (rbac.authorization.k8s.io/v1)
@@ -141,8 +147,8 @@
 👉 OK: ClusterInterceptor: slack (triggers.tekton.dev/v1alpha1)
 👉 OK: ClusterInterceptor: github (triggers.tekton.dev/v1alpha1)
 👉 OK: ClusterInterceptor: gitlab (triggers.tekton.dev/v1alpha1)
-✅ Tekton Triggers v0.25.2 installed
-🕞 Installing Knative Eventing v1.11.5...
+✅ Tekton Triggers v0.25.3 installed
+🕞 Installing Knative Eventing v1.13.1...
 🕞 Cleaning up Knative Eventing resources...
 👉 OK: Namespace: knative-eventing (v1)
 👉 OK: ServiceAccount: eventing-controller (v1) (ns: knative-eventing)
@@ -248,6 +254,7 @@
 👉 OK: ServiceAccount: mt-broker-filter (v1) (ns: knative-eventing)
 👉 OK: ClusterRole: knative-eventing-mt-broker-ingress (rbac.authorization.k8s.io/v1)
 👉 OK: Role: mt-broker-ingress (rbac.authorization.k8s.io/v1) (ns: knative-eventing)
+👉 OK: ServiceAccount: mt-broker-ingress-oidc (v1) (ns: knative-eventing)
 👉 OK: ServiceAccount: mt-broker-ingress (v1) (ns: knative-eventing)
 👉 OK: ClusterRoleBinding: eventing-mt-channel-broker-controller (rbac.authorization.k8s.io/v1)
 👉 OK: ClusterRoleBinding: knative-eventing-mt-broker-filter (rbac.authorization.k8s.io/v1)
@@ -262,7 +269,7 @@
 👉 OK: HorizontalPodAutoscaler: broker-ingress-hpa (autoscaling/v2) (ns: knative-eventing)
 👉 OK: HorizontalPodAutoscaler: broker-filter-hpa (autoscaling/v2) (ns: knative-eventing)
 👉 OK: Configured Knative Eventing ConfigMap 'config-features'
-✅ Knative Eventing v1.11.5 installed
+✅ Knative Eventing v1.13.1 installed
 🕞 Installing Agogos CRDs...
 👉 OK: CustomResourceDefinition: builders.agogos.redhat.com (apiextensions.k8s.io/v1)
 👉 OK: CustomResourceDefinition: builds.agogos.redhat.com (apiextensions.k8s.io/v1)
