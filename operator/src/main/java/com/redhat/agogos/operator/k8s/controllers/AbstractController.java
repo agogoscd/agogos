@@ -8,10 +8,10 @@ import com.redhat.agogos.core.v1alpha1.AgogosResource;
 import com.redhat.agogos.core.v1alpha1.Build;
 import com.redhat.agogos.core.v1alpha1.Execution;
 import com.redhat.agogos.core.v1alpha1.Execution.ExecutionInfoStatus;
-import com.redhat.agogos.core.v1alpha1.Group;
 import com.redhat.agogos.core.v1alpha1.ResultableStatus;
 import com.redhat.agogos.core.v1alpha1.Run;
 import com.redhat.agogos.operator.eventing.CloudEventPublisher;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.ListOptions;
 import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
 import io.fabric8.kubernetes.api.model.Namespaced;
@@ -70,42 +70,39 @@ public abstract class AbstractController<T extends AgogosResource<?, ?>>
                     .build();
             List<Execution> executions = kubernetesFacade.list(Execution.class, resource.getMetadata().getNamespace(), options);
             if (executions.size() > 0) {
-                Execution execution = executions.get(0);
-                ExecutionInfoStatus info = findExecutionInfoStatus(resource, execution, resource.getMetadata().getName());
-                if (info != null) {
-                    ResultableStatus s = new ResultableStatus();
-                    s.setCompletionTime(resourceStatus.getCompletionTime());
-                    s.setLastUpdate(resourceStatus.getLastUpdate());
-                    s.setStartTime(resourceStatus.getStartTime());
-                    s.setStatus(resourceStatus.getStatus());
+                Execution execution = new Execution();
+                execution.getMetadata().setName(executions.get(0).getMetadata().getName());
+                execution.getMetadata().setNamespace(executions.get(0).getMetadata().getNamespace());
 
-                    info.setStatus(s);
-                    if (kubernetesFacade.patchStatus(execution) != null) {
-                        LOG.info("Updated execution info for '{}' to {} in '{}'", fullName,
-                                resourceStatus.getStatus(), execution.getFullName());
-                    } else {
-                        LOG.error("Unable to update execution info for '{}' to {} in '{}'", fullName,
-                                resourceStatus.getStatus(), execution.getFullName());
-                    }
+                ExecutionInfoStatus info = new ExecutionInfoStatus();
+
+                ResultableStatus s = new ResultableStatus();
+                s.setCompletionTime(resourceStatus.getCompletionTime());
+                s.setLastUpdate(resourceStatus.getLastUpdate());
+                s.setStartTime(resourceStatus.getStartTime());
+                s.setStatus(resourceStatus.getStatus());
+                info.setStatus(s);
+
+                if (resource.getKind().equals(HasMetadata.getKind(Build.class))) {
+                    execution.getStatus().getBuilds().put(resource.getMetadata().getName(), info);
+                } else if (resource.getKind().equals(HasMetadata.getKind(Execution.class))) {
+                    execution.getStatus().getExecutions().put(resource.getMetadata().getName(), info);
+                } else if (resource.getKind().equals(HasMetadata.getKind(Run.class))) {
+                    execution.getStatus().getRuns().put(resource.getMetadata().getName(), info);
                 } else {
-                    LOG.error("Unable to find ExecutionInfo for build '{}' with group '{}' and instance '{}'",
-                            fullName, group, instance);
+                    LOG.error("Unrecognized resource kind: {} ", resource.getKind());
+                }
+
+                if (kubernetesFacade.patchStatus(execution) != null) {
+                    LOG.info("Updated execution info for '{}' to {} in '{}'", fullName,
+                            resourceStatus.getStatus(), execution.getFullName());
+                } else {
+                    LOG.error("Unable to update execution info for '{}' to {} in '{}'", fullName,
+                            resourceStatus.getStatus(), execution.getFullName());
                 }
             } else {
                 LOG.error("Unable to find Execution for build '{}'", fullName);
             }
-        }
-    }
-
-    private ExecutionInfoStatus findExecutionInfoStatus(T resource, Execution execution, String name) {
-        if (resource instanceof Build) {
-            return execution.getStatus().getBuilds().get(name);
-        } else if (resource instanceof Group) {
-            return execution.getStatus().getExecutions().get(name);
-        } else if (resource instanceof Run) {
-            return execution.getStatus().getRuns().get(name);
-        } else {
-            throw new ApplicationException("Unrecognized resource in findExecutionInfo: " + resource.getKind());
         }
     }
 }

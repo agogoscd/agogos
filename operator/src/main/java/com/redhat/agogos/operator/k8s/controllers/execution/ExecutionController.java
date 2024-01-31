@@ -37,7 +37,7 @@ public class ExecutionController extends AbstractController<Execution> {
             return UpdateControl.noUpdate();
         }
 
-        final ResultableStatus originalStatus = objectMapper.clone(execution.getStatus());
+        final ExecutionStatus originalStatus = objectMapper.clone(execution.getStatus());
         ExecutionStatus status = execution.getStatus();
         if (status.getBuilds().size() == 0 && status.getExecutions().size() == 0 && status.getRuns().size() == 0) {
             addExecutionInfoStatus(spec.getBuilds().keySet(), status.getBuilds());
@@ -81,7 +81,8 @@ public class ExecutionController extends AbstractController<Execution> {
             status.setStartTime(ResultableStatus.getFormattedNow());
         }
 
-        if (status.equals(originalStatus)) {
+        // Only check the "main" status here, ignoring builds, executions, and runs.
+        if (status.getStatus().equals(originalStatus.getStatus())) {
             LOG.debug("No change to {} status of '{}', returning noUpdate", execution.getKind(), execution.getFullName());
             return UpdateControl.noUpdate();
         }
@@ -90,7 +91,7 @@ public class ExecutionController extends AbstractController<Execution> {
         status.setLastUpdate(ResultableStatus.getFormattedNow());
 
         // Update now, BEFORE sending the cloud event. Otherwise we are in a race condition for any interceptors.
-        UpdateControl<Execution> ctrl = UpdateControl.updateResourceAndStatus(execution);
+        UpdateControl<Execution> ctrl = UpdateControl.updateStatus(execution);
 
         try {
             cloudEventPublisher.publish(execution);
