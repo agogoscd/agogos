@@ -24,7 +24,6 @@ quarkus:
       generate: false
       apply: false
     fail-on-version-check: false
-    start-operator: false
   scheduler:
     start-mode: forced
 
@@ -109,3 +108,6 @@ agogos:
   kubernetes:
     # Default storage class name in minikube
     storage-class: "standard"
+  quarkus:
+    operator-sdk:
+      start-operator: false
