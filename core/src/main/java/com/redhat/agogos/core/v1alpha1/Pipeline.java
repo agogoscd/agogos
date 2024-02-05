@@ -26,6 +26,12 @@ public class Pipeline extends AgogosResource<PipelineSpec, Status> implements Na
 
     private static final long serialVersionUID = 4918853237265675286L;
 
+    public Pipeline() {
+        super();
+
+        this.status = new Status();
+    }
+
     @ToString
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
@@ -44,10 +50,5 @@ public class Pipeline extends AgogosResource<PipelineSpec, Status> implements Na
     @Override
     protected PipelineSpec initSpec() {
         return new PipelineSpec();
-    }
-
-    @Override
-    protected Status initStatus() {
-        return new Status();
     }
 }

@@ -22,6 +22,12 @@ import lombok.ToString;
 public class Run extends AgogosResource<RunSpec, ResultableStatus> implements Namespaced {
     private static final long serialVersionUID = 6688424087008846788L;
 
+    public Run() {
+        super();
+
+        this.status = new ResultableStatus();
+    }
+
     @ToString
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
@@ -35,10 +41,5 @@ public class Run extends AgogosResource<RunSpec, ResultableStatus> implements Na
     @Override
     protected RunSpec initSpec() {
         return new RunSpec();
-    }
-
-    @Override
-    protected ResultableStatus initStatus() {
-        return new ResultableStatus();
     }
 }

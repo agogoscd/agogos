@@ -25,6 +25,12 @@ import java.util.Map;
 public class Execution extends AgogosResource<ExecutionSpec, ExecutionStatus> implements Namespaced {
     private static final long serialVersionUID = -7092342726608099999L;
 
+    public Execution() {
+        super();
+
+        this.status = new ExecutionStatus();
+    }
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
@@ -132,10 +138,5 @@ public class Execution extends AgogosResource<ExecutionSpec, ExecutionStatus> im
     @Override
     protected ExecutionSpec initSpec() {
         return new ExecutionSpec();
-    }
-
-    @Override
-    protected ExecutionStatus initStatus() {
-        return new ExecutionStatus();
     }
 }

@@ -60,16 +60,13 @@ public class Builder extends AgogosResource<BuilderSpec, Status> implements Name
     }
 
     public Builder() {
+        super();
 
+        this.status = new Status();
     }
 
     public Builder(String name) {
         this.getMetadata().setName(name);
-    }
-
-    @Override
-    protected Status initStatus() {
-        return new Status();
     }
 
     @Override

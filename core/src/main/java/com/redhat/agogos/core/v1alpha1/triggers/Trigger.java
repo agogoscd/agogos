@@ -28,6 +28,12 @@ import java.util.List;
 @Version("v1alpha1")
 public class Trigger extends AgogosResource<TriggerSpec, Status> implements Namespaced {
 
+    public Trigger() {
+        super();
+
+        this.status = new Status();
+    }
+
     @Getter
     @Setter
     @ToString
@@ -46,10 +52,5 @@ public class Trigger extends AgogosResource<TriggerSpec, Status> implements Name
     @Override
     protected TriggerSpec initSpec() {
         return new TriggerSpec();
-    }
-
-    @Override
-    protected Status initStatus() {
-        return new Status();
     }
 }

@@ -26,6 +26,12 @@ import java.util.Map;
 public class Stage extends AgogosResource<StageSpec, Status> implements Namespaced {
     private static final long serialVersionUID = 5548842882024636344L;
 
+    public Stage() {
+        super();
+
+        this.status = new Status();
+    }
+
     @ToString
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
@@ -61,10 +67,5 @@ public class Stage extends AgogosResource<StageSpec, Status> implements Namespac
     @Override
     protected StageSpec initSpec() {
         return new StageSpec();
-    }
-
-    @Override
-    protected Status initStatus() {
-        return new Status();
     }
 }

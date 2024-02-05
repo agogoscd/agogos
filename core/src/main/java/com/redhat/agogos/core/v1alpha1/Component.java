@@ -66,10 +66,12 @@ public class Component extends AgogosResource<ComponentSpec, Status> implements 
 
     public Component() {
         super();
+
+        this.status = new Status();
     }
 
     public Component(String name) {
-        super();
+        this();
 
         this.getMetadata().setName(name);
     }
@@ -86,10 +88,5 @@ public class Component extends AgogosResource<ComponentSpec, Status> implements 
     @Override
     protected ComponentSpec initSpec() {
         return new ComponentSpec();
-    }
-
-    @Override
-    protected Status initStatus() {
-        return new Status();
     }
 }

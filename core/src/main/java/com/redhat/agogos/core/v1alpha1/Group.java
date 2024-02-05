@@ -65,10 +65,12 @@ public class Group extends AgogosResource<GroupSpec, Status> implements Namespac
 
     public Group() {
         super();
+
+        this.status = new Status();
     }
 
     public Group(String name) {
-        super();
+        this();
 
         this.getMetadata().setName(name);
     }
@@ -85,10 +87,5 @@ public class Group extends AgogosResource<GroupSpec, Status> implements Namespac
     @Override
     protected GroupSpec initSpec() {
         return new GroupSpec();
-    }
-
-    @Override
-    protected Status initStatus() {
-        return new Status();
     }
 }

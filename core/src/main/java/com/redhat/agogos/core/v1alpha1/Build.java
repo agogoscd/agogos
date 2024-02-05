@@ -25,6 +25,12 @@ import java.util.Map;
 public class Build extends AgogosResource<BuildSpec, ResultableBuildStatus> implements Namespaced {
     private static final long serialVersionUID = 9122121231081986174L;
 
+    public Build() {
+        super();
+
+        this.status = new ResultableBuildStatus();
+    }
+
     @ToString
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
@@ -38,11 +44,6 @@ public class Build extends AgogosResource<BuildSpec, ResultableBuildStatus> impl
     @Override
     protected BuildSpec initSpec() {
         return new BuildSpec();
-    }
-
-    @Override
-    protected ResultableBuildStatus initStatus() {
-        return new ResultableBuildStatus();
     }
 
     /**
