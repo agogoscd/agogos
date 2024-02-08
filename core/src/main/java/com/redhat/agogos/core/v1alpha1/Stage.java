@@ -47,7 +47,6 @@ public class Stage extends AgogosResource<StageSpec, Status> implements Namespac
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonDeserialize(using = JsonDeserializer.None.class)
     @RegisterForReflection
-
     public static class StageSpec {
 
         @Getter

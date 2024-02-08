@@ -118,7 +118,6 @@ public class PipelineRunDependentResource extends AbstractDependentResource<Pipe
         }
 
         LOG.debug("PipelineRun '{}' created for '{}'", fullPipelineRunName(pipelineRun), resource.getFullName());
-        LOG.error(objectMapper.asYaml(pipelineRun));
         return pipelineRun;
     }
 

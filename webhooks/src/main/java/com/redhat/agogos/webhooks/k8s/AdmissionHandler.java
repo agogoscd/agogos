@@ -9,12 +9,12 @@ import java.util.function.Consumer;
 
 public abstract class AdmissionHandler<T extends CustomResource<?, ?>> {
     public static AdmissionReview review(AdmissionReview admissionReview, Consumer<AdmissionResponseBuilder> response) {
-        AdmissionResponseBuilder responseBuilder = new AdmissionResponseBuilder() //
+        AdmissionResponseBuilder responseBuilder = new AdmissionResponseBuilder()
                 .withUid(admissionReview.getRequest().getUid());
 
         response.accept(responseBuilder);
 
-        AdmissionReviewBuilder reviewBuilder = new AdmissionReviewBuilder() //
+        AdmissionReviewBuilder reviewBuilder = new AdmissionReviewBuilder()
                 .withApiVersion(admissionReview.getApiVersion());
 
         return reviewBuilder.withResponse(responseBuilder.build()).build();

@@ -247,7 +247,9 @@ public class WebhooksInstaller extends Installer {
                 .withOperations("CREATE", "UPDATE")
                 .withApiGroups("agogos.redhat.com")
                 .withApiVersions("v1alpha1")
-                .withResources(HasMetadata.getPlural(Build.class), HasMetadata.getPlural(Component.class),
+                .withResources(HasMetadata.getPlural(Build.class),
+                        HasMetadata.getPlural(Component.class),
+                        HasMetadata.getPlural(com.redhat.agogos.core.v1alpha1.Pipeline.class),
                         HasMetadata.getPlural(Stage.class))
                 .withScope("*")
                 .build();

@@ -2,6 +2,7 @@ package com.redhat.agogos.webhooks.k8s;
 
 import com.redhat.agogos.core.v1alpha1.Build;
 import com.redhat.agogos.core.v1alpha1.Component;
+import com.redhat.agogos.core.v1alpha1.Pipeline;
 import com.redhat.agogos.core.v1alpha1.Run;
 import com.redhat.agogos.core.v1alpha1.Stage;
 import com.redhat.agogos.core.v1alpha1.triggers.Trigger;
@@ -9,6 +10,7 @@ import com.redhat.agogos.webhooks.k8s.mutator.BuildMutator;
 import com.redhat.agogos.webhooks.k8s.mutator.RunMutator;
 import com.redhat.agogos.webhooks.k8s.validator.BuildValidator;
 import com.redhat.agogos.webhooks.k8s.validator.ComponentValidator;
+import com.redhat.agogos.webhooks.k8s.validator.PipelineValidator;
 import com.redhat.agogos.webhooks.k8s.validator.StageValidator;
 import com.redhat.agogos.webhooks.k8s.validator.TriggerValidator;
 import io.fabric8.kubernetes.api.model.KubernetesResource;
@@ -30,15 +32,17 @@ import org.slf4j.LoggerFactory;
 public class WebhookHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebhookHandler.class);
-
     @Inject
     ComponentValidator componentValidator;
 
     @Inject
-    StageValidator StageValidator;
+    StageValidator stageValidator;
 
     @Inject
     TriggerValidator triggerValidator;
+
+    @Inject
+    PipelineValidator pipelineValidator;
 
     @Inject
     BuildValidator buildValidator;
@@ -59,14 +63,14 @@ public class WebhookHandler {
 
         if (resource instanceof Component) {
             return componentValidator.validate(admissionReview);
-        }
-
-        if (resource instanceof Stage) {
-            return StageValidator.validate(admissionReview);
-        }
-
-        if (resource instanceof Trigger) {
+        } else if (resource instanceof Pipeline) {
+            return pipelineValidator.validate(admissionReview);
+        } else if (resource instanceof Stage) {
+            return stageValidator.validate(admissionReview);
+        } else if (resource instanceof Trigger) {
             return triggerValidator.validate(admissionReview);
+        } else {
+            LOG.error("Unknown instance kind: " + resource.getClass());
         }
 
         // If there is no specific handling needed, allow the request
