@@ -11,7 +11,7 @@ public class AgogosEnvironment {
     public String getRunningNamespace() {
         String namespace = System.getenv("NAMESPACE");
         if (namespace == null) {
-            namespace = ConfigProvider.getConfig().getValue("quarkus.kubernetes.namespace", String.class);
+            namespace = ConfigProvider.getConfig().getValue("agogos.kubernetes.namespace", String.class);
         }
         return namespace;
     }

@@ -1,6 +1,10 @@
 ---
+agogos:
+  kubernetes:
+    namespace: agogos
+
 quarkus:
   devservices:
     enabled: false
   kubernetes:
-    namespace: agogos
+    namespace: ${agogos.kubernetes.namespace}
