@@ -205,3 +205,129 @@ To be able to launch debug tasks in the IDE you can add following content to the
   ]
 }
 ----
+
+== IntelliJ IDEA
+
+=== Installation
+
+The community edition is available on the
+link:https://www.jetbrains.com/idea/[official page].
+
+=== Plugins Related to Agogos Development
+
+There are several plugins supported by Red{nbsp}Hat that make Agogos development easier.
+
+[TIP]
+====
+Use the kbd:[Ctrl+Alt+S] keyboard shortcut to access the Settings.
+
+The plugins section is available in the left pane.
+====
+
+* link:https://plugins.jetbrains.com/plugin/15921-kubernetes-by-red-hat[Kubernetes by Red{nbsp}Hat]
+* link:https://plugins.jetbrains.com/plugin/13234-quarkus-tools[Quarkus Tools]
+* link:https://plugins.jetbrains.com/plugin/14096-tekton-pipelines-by-red-hat[Tekton Pipelines by Red{nbsp}Hat]
+
+=== Run Configurations
+
+Click the *Edit Configurations...* button from the *Run* section.
+
+These are the commands used in Development mode integrated in IntelliJ IDEA:
+
+[#_maven]
+==== Maven
+
+Add a run configuration for compiling Agogos, the equivalent to:
+
+[source,bash]
+----
+./mvnw clean package -D skipTests
+----
+
+image::intellij-run-maven.png[intellij run maven]
+
+[NOTE]
+====
+IntelliJ IDEA also provides a panel (located on the right by default) to quickly access maven commands.
+====
+
+==== Shell Script
+
+* Run configuration for starting minikube:
+
+image::minikube_start.png[minikube start]
+
+* Run configuration for exposing knative eventing:
+
+image::knative_event.png[knative event expose]
+
+==== JUnit
+
+The IDE provides an integration with JUnit so it's easy to create
+a run configuration from the test itself or the class that wraps a set of tests:
+
+image::test_arrow.png[run tests]
+
+This automatically creates a run like this:
+
+image::run_config_junit.png[run config JUnit]
+
+==== JAR Application
+
+Run the different commands needed from `agogosctl`.
+
+[NOTE]
+====
+These configurations require the code to be compiled. See the
+xref:developer-guide:ide.adoc#_maven[maven]
+section.
+====
+
+* Run configuration that shows a prompt to accept different arguments for the Agogos CLI:
+
+image::agogos_run.png[Agogosctl run configuration]
+
+* Run configuration for installing the development environment:
+
+image::install_dev.png[Install Dev run configuration]
+
+* Run configuration for installing the namespace `tests`:
+
+image::install_ns_dev.png[Install namespace run configuration]
+
+* Run configuration for building a component with a prompt to provide the name
+of the Agogos Component:
+
+image::build_component.png[Build Component run configuration]
+
+* Run configuration for running a pipeline with a prompt to provide the name
+of the Agogos Pipeline:
+
+image::run_pipeline.png[Run Pipeline run configuration]
+
+==== Quarkus Dev Mode
+
+[NOTE]
+====
+This section requires the Quarkus Plugin.
+====
+
+* Run Operator
+
+image::agogos_operator.png[]
+
+* Run Webhooks
+
+image::agogos_webhooks.png[]
+
+* Run Interceptor
+
+image::agogos_interceptors.png[]
+
+==== Compound
+
+Use this feature to run operator, webhook and interceptor at the same time:
+
+image::run_agogos.png[]
+
+
