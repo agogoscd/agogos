@@ -6,6 +6,7 @@
 ** xref:testing.adoc[]
 ** xref:builders.adoc[]
 ** xref:pipelines.adoc[]
+** xref:tekton-chains.adoc[]
 ** Policy Guides
 *** xref:policy-guides/jira.adoc[Jira]
 *** xref:policy-guides/commit_message_format.adoc[Commit Message Format]

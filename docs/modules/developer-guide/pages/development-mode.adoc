@@ -16,6 +16,7 @@ See the following for installation instructions:
 ** link:https://minikube.sigs.k8s.io/docs/drivers/hyperkit/[macOS: hyperkit driver for minikube]
 * link:https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/[kubectl]
 * link:https://openjdk.org/projects/jdk/17/[OpenJDK 17]
+* link:https://github.com/sigstore/cosign[cosign]
 
 [TIP]
 ====
@@ -33,6 +34,19 @@ newgrp docker
 * The `minikube` guide for the kvm2 driver contains a useful
 link:https://minikube.sigs.k8s.io/docs/drivers/kvm2/#troubleshooting[troubleshooting guide].
 ====
+
+Install cosign for Tekton Chains signing:
+
+Download the binary for your platform from the cosign releases page and copy it to 
+preferred path:
+link:https://github.com/sigstore/cosign/releases/tag/v2.2.3[cosign releases page]
+
+[source,bash]
+----
+curl -O -L "https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64"
+sudo mv cosign-linux-amd64 /usr/local/bin/cosign
+sudo chmod +x /usr/local/bin/cosign
+----
 
 == Open Firewall Ports from Minikube to the Host
 The Kubernetes cluster needs to contact Agogos' Webhooks to validate resources.

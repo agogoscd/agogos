@@ -1,0 +1,43 @@
+= Tekton Chains
+
+In order to provide Supply Chain Security Agogos utilizes
+link:https://tekton.dev/docs/concepts/supply-chain-security/[Tekton Chains]
+to create provisioning attestations.
+
+Tekton Chains works by deploying a controller that runs in the background and monitors TaskRuns and PipelineRuns.
+While Agogos executes build pipelines, Tekton Chains watches the PipelineRuns and TaskRuns.
+The Chains controller generates the provenance for the artifacts produced.
+
+The provenance records the inputs of your Tasks and Pipelines: source repositories, branches, other artifacts; 
+and the outputs: container images, packages, etc. 
+This information is recorded as in-toto metadata and signed. 
+
+In order to get properly signed attestation, a secret `signing-secrets` should
+be present in `tekton-chains` namespace.
+
+Install
+link:https://github.com/sigstore/cosign[cosign]
+for Tekton Chains signing:
+
+[source,bash]
+----
+git clone https://github.com/sigstore/cosign
+cd cosign
+go install ./cmd/cosign
+$(go env GOPATH)/bin/cosign
+----
+
+To generate a secret for proper Tekton Chains attestation,
+link:https://github.com/sigstore/cosign[cosign]
+should be used as following:
+
+
+[source,bash]
+----
+cosign generate-key-pair k8s://tekton-chains/signing-secrets
+----
+
+You will be prompted for a password. 
+The file [filename]`cosign.pub` will be generated in your current directory.
+
+
