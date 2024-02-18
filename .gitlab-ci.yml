@@ -7,6 +7,7 @@ stages:
 
 include:
   - local: '/.gitlab-ci.static-analysis.yml'
+  - local: '/.gitlab-ci-images.yml'
   - local: '/docs/gitlab-ci.yml'
 
 # In order to simplify reviews,
@@ -53,57 +54,4 @@ verify-code:
           - operator/**/*
           - relays/**/*
           - test/**/*
-          - webhooks/**/*
-
-build-cli:
-  stage: build
-  image:
-    name: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java17
-    entrypoint: ["/bin/sh", "-c"]
-  tags: [docker]
-  variables:
-    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
-    MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
-  script:
-    - ./mvnw clean package -pl cli -am -Pnative -s ci_settings.xml -Dmaven.wagon.http.ssl.insecure=true -Dnative-image.xmx=4g
-    - mv ./cli/target/agogosctl-runner ./cli/target/agogosctl
-  artifacts:
-    paths:
-      - cli/target/agogosctl
-  rules:
-    # Run on changes to everything except the documentation
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        paths:
-          - .gitlab-ci.yml
-          - ./*.xml
-          - ./*.json
-          - cli/**/*
-          - core/**/*
-          - node_modules/**/*
-          - operator/**/*
-          - relays/**/*
-          - test/**/*
-          - webhooks/**/*
-
-build-webhooks:
-  stage: build
-  image:
-    name: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java17
-    entrypoint: ["/bin/sh", "-c"]
-  tags: [native-images]
-  variables:
-    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
-    MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
-    KUBERNETES_CPU_REQUEST: "1"
-    KUBERNETES_CPU_LIMIT: "2"
-    KUBERNETES_MEMORY_REQUEST: "3Gi"
-    KUBERNETES_MEMORY_LIMIT: "6Gi"
-  script:
-    - ./mvnw install -pl webhooks -am -Pnative -Dquarkus.container-image.build=true -Dquarkus.container-image.push=true -Dquarkus.native.native-image-xmx=4g
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      changes:
-        paths:
-          - core/**/*
           - webhooks/**/*
