@@ -83,7 +83,7 @@ push-native-image:
     - docker
 
 .build-native-executable:
-  extends: common-variables
+  extends: .common-variables
   artifacts:
     paths:
       - $EXECUTABLE/target/*-runner
