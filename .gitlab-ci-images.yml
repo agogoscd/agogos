@@ -1,29 +1,5 @@
 ---
-build native images:
-  artifacts:
-    paths:
-      - $FOLDER/target/*-runner
-  image:
-    name: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java17
-    entrypoint: ["/bin/sh", "-c"]
-  parallel:
-    matrix:
-      - FOLDER:
-          - interceptors
-          - operator
-          - webhooks
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
-        - .gitlab-ci.yml
-        - core/**/*
-        - $FOLDER/**/*
-  script:
-    - |-
-            ./mvnw package -pl $FOLDER -am -Pnative -Dquarkus.container-image.build=false -Dquarkus.native.native-image-xmx=9g -s settings.xml
-  stage: build
-  tags:
-    - native-images
+.common-variables:
   variables:
     MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
     MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
@@ -32,7 +8,56 @@ build native images:
     KUBERNETES_MEMORY_REQUEST: "2Gi"
     KUBERNETES_MEMORY_LIMIT: "8Gi"
 
-push native images:
+.build-native-image:
+  extends: .common-variables
+  artifacts:
+    paths:
+      - $IMAGE/target/*-runner
+  image:
+    name: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java17
+    entrypoint: ["/bin/sh", "-c"]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - .gitlab-ci.yml
+        - core/**/*
+        - $IMAGE/**/*
+  script:
+    - |-
+            ./mvnw package -pl $IMAGE -am -Pnative -Dquarkus.container-image.build=false -Dquarkus.native.native-image-xmx=9g -s settings.xml
+  stage: build
+  tags:
+    - native-images
+
+build-interceptors:
+  extends: build-native-image
+  variables:
+    IMAGE: interceptors
+
+build-operator:
+  extends: build-native-image
+  needs:
+    job: build-interceptors
+    optional: true
+  variables:
+    IMAGE: operator
+
+build-webhooks:
+  extends: build-native-image
+  needs:
+    job: build-operator
+    optional: true
+  variables:
+    IMAGE: webhooks
+
+push-native-image:
+  needs:
+    - job: build-interceptors
+      optional: true
+    - job: build-operator
+      optional: true
+    - job: build-webhooks
+      optional: true
   image:
     name: gcr.io/kaniko-project/executor:v1.12.1-debug
     entrypoint: [""]
@@ -57,12 +82,13 @@ push native images:
   tags:
     - docker
 
-build native executables:
+.build-native-executable:
+  extends: common-variables
   needs:
     - build native images
   artifacts:
     paths:
-      - $FOLDER/target/*-runner
+      - $EXECUTABLE/target/*-runner
   image:
     name: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java17
     entrypoint: ["/bin/sh", "-c"]
@@ -75,17 +101,15 @@ build native executables:
       changes:
         - .gitlab-ci.yml
         - core/**/*
-        - $FOLDER/**/*
+        - $EXECUTABLE/**/*
   script:
     - |-
-            ./mvnw deploy -pl $FOLDER -am -Pnative -Dquarkus.native.native-image-xmx=9g -Dnexus.username=$NEXUS_USER -Dnexus.password=$NEXUS_PASSWORD -s settings.xml
+            ./mvnw deploy -pl $EXECUTABLE -am -Pnative -Dquarkus.native.native-image-xmx=9g -Dnexus.username=$NEXUS_USER -Dnexus.password=$NEXUS_PASSWORD -s settings.xml
   stage: build
   tags:
     - native-images
+
+build-cli:
+  extends: build-native-executable
   variables:
-    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
-    MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
-    KUBERNETES_CPU_REQUEST: "2"
-    KUBERNETES_CPU_LIMIT: "2"
-    KUBERNETES_MEMORY_REQUEST: "2Gi"
-    KUBERNETES_MEMORY_LIMIT: "8Gi"
+    IMAGE: cli
