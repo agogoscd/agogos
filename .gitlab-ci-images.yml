@@ -1,5 +1,5 @@
 ---
-build native executable:
+build native images:
   artifacts:
     paths:
       - $FOLDER/target/*-runner
@@ -9,7 +9,6 @@ build native executable:
   parallel:
     matrix:
       - FOLDER:
-          - cli
           - interceptors
           - operator
           - webhooks
@@ -21,11 +20,7 @@ build native executable:
         - $FOLDER/**/*
   script:
     - |-
-            if [[ $FOLDER == "cli" ]]; then
-                ./mvnw deploy -pl $FOLDER -am -Pnative -Dquarkus.native.native-image-xmx=9g -Dnexus.username=$NEXUS_USER -Dnexus.password=$NEXUS_PASSWORD -s settings.xml
-            else
-                ./mvnw package -pl $FOLDER -am -Pnative -Dquarkus.container-image.build=false -Dquarkus.native.native-image-xmx=9g -s settings.xml
-            fi
+            ./mvnw package -pl $FOLDER -am -Pnative -Dquarkus.container-image.build=false -Dquarkus.native.native-image-xmx=9g -s settings.xml
   stage: build
   tags:
     - native-images
@@ -37,7 +32,7 @@ build native executable:
     KUBERNETES_MEMORY_REQUEST: "2Gi"
     KUBERNETES_MEMORY_LIMIT: "8Gi"
 
-build and push image:
+push native images:
   image:
     name: gcr.io/kaniko-project/executor:v1.12.1-debug
     entrypoint: [""]
@@ -61,3 +56,36 @@ build and push image:
   stage: deploy
   tags:
     - docker
+
+build native executables:
+  needs:
+    - build native images
+  artifacts:
+    paths:
+      - $FOLDER/target/*-runner
+  image:
+    name: quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java17
+    entrypoint: ["/bin/sh", "-c"]
+  parallel:
+    matrix:
+      - FOLDER:
+          - cli
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - .gitlab-ci.yml
+        - core/**/*
+        - $FOLDER/**/*
+  script:
+    - |-
+            ./mvnw deploy -pl $FOLDER -am -Pnative -Dquarkus.native.native-image-xmx=9g -Dnexus.username=$NEXUS_USER -Dnexus.password=$NEXUS_PASSWORD -s settings.xml
+  stage: build
+  tags:
+    - native-images
+  variables:
+    MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+    MAVEN_MIRROR_URL: "https://agogos-nexus.apps.ocp4.prod.psi.redhat.com/repository/maven-public"
+    KUBERNETES_CPU_REQUEST: "2"
+    KUBERNETES_CPU_LIMIT: "2"
+    KUBERNETES_MEMORY_REQUEST: "2Gi"
+    KUBERNETES_MEMORY_LIMIT: "8Gi"
