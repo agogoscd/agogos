@@ -109,5 +109,12 @@ push-native-image:
 
 build-cli:
   extends: .build-native-executable
+  needs:
+    - job: build-interceptors
+      optional: true
+    - job: build-operator
+      optional: true
+    - job: build-webhooks
+      optional: true
   variables:
     IMAGE: cli
