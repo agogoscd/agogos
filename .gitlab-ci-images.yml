@@ -30,12 +30,12 @@
     - native-images
 
 build-interceptors:
-  extends: build-native-image
+  extends: .build-native-image
   variables:
     IMAGE: interceptors
 
 build-operator:
-  extends: build-native-image
+  extends: .build-native-image
   needs:
     job: build-interceptors
     optional: true
@@ -43,7 +43,7 @@ build-operator:
     IMAGE: operator
 
 build-webhooks:
-  extends: build-native-image
+  extends: .build-native-image
   needs:
     job: build-operator
     optional: true
@@ -84,8 +84,6 @@ push-native-image:
 
 .build-native-executable:
   extends: common-variables
-  needs:
-    - build native images
   artifacts:
     paths:
       - $EXECUTABLE/target/*-runner
@@ -110,6 +108,6 @@ push-native-image:
     - native-images
 
 build-cli:
-  extends: build-native-executable
+  extends: .build-native-executable
   variables:
     IMAGE: cli
