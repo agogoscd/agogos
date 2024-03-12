@@ -24,7 +24,7 @@
         - $IMAGE/**/*
   script:
     - |-
-            ./mvnw package -pl $IMAGE -am -Pnative -Dquarkus.container-image.build=false -Dquarkus.native.native-image-xmx=9g -s settings.xml
+            ./mvnw package -pl $IMAGE -am -Pnative -Dquarkus.container-image.build=false -Dquarkus.native.native-image-xmx=11g -s settings.xml
   stage: build
   tags:
     - native-images
